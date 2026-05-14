@@ -1,0 +1,23 @@
+{
+  "messages": {
+    "required": "Field required.",
+    "min_length": "Must be at least {{minLength}} characters long.",
+    "max_length": "Cannot be longer than {{maxLength}} characters.",
+    "min": "Must be at least {{min}}.",
+    "max": "Cannot exceed {{max}}.",
+    "email": "Must be a valid email address.",
+    "telephone": "Must be a valid telephone number.",
+    "invalid_url": "Must be a valid URL.",
+    "least_password": "Password must be at least 6 characters long.",
+    "required_password": "Please confirm your new password.",
+    "password_not_match": "Passwords do not match.",
+    "invalid_domain": "Please enter a valid domain format.",
+    "invalid_end_at": "The end date must be after the start date.",
+    "invalid_quantity": "Quantity must be between 1 and 10,000",
+    "invalid_code_size": "Code size must be between 12 and 20 characters",
+    "invalid_expiration_date": "Expiration date must be after today",
+    "invalid_assignee": "The assignee is invalid",
+    "min_items": "Must have at least {{min}} item.",
+    "numeric_only": "Only numbers are allowed."
+  }
+}

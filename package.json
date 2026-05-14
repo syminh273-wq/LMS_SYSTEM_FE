@@ -1,0 +1,17 @@
+{
+  "name": "lms-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:consumer": "npm run dev --workspace=apps/consumer-web",
+    "dev:space": "npm run dev --workspace=apps/space-web",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0"
+  }
+}

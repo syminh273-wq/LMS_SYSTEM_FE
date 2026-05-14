@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.venv/
+bin/
+lib/
+include/
+share/
+pyvenv.cfg
+
+# Next.js
+.next/
+out/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs and databases
+*.log
+*.sqlite
+db.sqlite3
+
+# Zencoder
+.zencoder/
+.idea/zencoder
+.idea/zencoder-chat-index.xml
+.idea/zencoder-chats-dedicated.xml
+
+# Project specific
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
