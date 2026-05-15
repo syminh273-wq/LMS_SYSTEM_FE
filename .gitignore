@@ -3,6 +3,7 @@ node_modules/
 .venv/
 bin/
 lib/
+!apps/space-web/src/lib/
 include/
 share/
 pyvenv.cfg
