@@ -19,7 +19,10 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Settings2,
-  QrCode
+  QrCode,
+  Pencil,
+  Trash2,
+  Download
 } from 'lucide-react';
 import { 
   Card, 
@@ -31,7 +34,16 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@shared/components/ui/pagination";
-import { SharingModal } from '@/components/resource/SharingModal';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@shared/components/ui/dropdown-menu";
+import { toast } from 'sonner';
+import { QRCodeSVG } from 'qrcode.react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 export default function ClassroomsPage() {
   const router = useRouter();
@@ -40,7 +52,6 @@ export default function ClassroomsPage() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState('');
-  const [sharingClassroom, setSharingClassroom] = useState<Classroom | null>(null);
 
   const fetchClassrooms = async (page: number) => {
     try {
@@ -55,6 +66,78 @@ export default function ClassroomsPage() {
     }
   };
 
+  const handleDownloadQr = async (classroom: Classroom) => {
+    try {
+      let linkData = classroom.resolve_link;
+      
+      if (!linkData) {
+        toast.info('Đang khởi tạo mã QR...');
+        linkData = await spaceApi.classrooms.getSharingLink(classroom.uid);
+      }
+      
+      if (linkData) {
+        toast.info('Đang tạo ảnh QR...');
+        
+        // 1. Tạo joining URL
+        const joinUrl = `${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`;
+        
+        // 2. Tạo chuỗi SVG từ QRCodeSVG component
+        let svgString = renderToStaticMarkup(
+          <QRCodeSVG 
+            value={joinUrl}
+            size={400}
+            level="H"
+            includeMargin={true}
+          />
+        );
+        
+        // Ensure SVG namespace is present for Blob rendering
+        if (!svgString.includes('xmlns=')) {
+          svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        
+        // 3. Chuyển SVG sang Canvas để tải về dạng PNG
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(svgBlob);
+
+        img.onload = () => {
+          canvas.width = 500;
+          canvas.height = 500;
+          if (ctx) {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 50, 50, 400, 400); 
+            
+            const pngUrl = canvas.toDataURL("image/png");
+            const downloadLink = document.createElement("a");
+            downloadLink.href = pngUrl;
+            downloadLink.download = `QR_Lop_${classroom.name}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            
+            toast.success('Đã tải mã QR xuống');
+          }
+          URL.revokeObjectURL(url);
+        };
+        
+        img.onerror = () => {
+          console.error('Failed to load SVG into Image');
+          toast.error('Có lỗi xảy ra khi tạo ảnh QR');
+          URL.revokeObjectURL(url);
+        };
+
+        img.src = url;
+      }
+    } catch (err) {
+      console.error('Failed to download QR:', err);
+      toast.error('Không thể tải mã QR');
+    }
+  };
+
   useEffect(() => {
     fetchClassrooms(currentPage);
   }, [currentPage]);
@@ -66,6 +149,18 @@ export default function ClassroomsPage() {
   };
 
   const classrooms = data?.results || [];
+
+  const handleDelete = async (uid: string) => {
+    if (confirm('Bạn có chắc chắn muốn xóa phòng học này?')) {
+      try {
+        await spaceApi.classrooms.delete(uid);
+        toast.success('Đã xóa phòng học');
+        fetchClassrooms(currentPage);
+      } catch (err: any) {
+        toast.error(err.message || 'Không thể xóa phòng học');
+      }
+    }
+  };
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
@@ -175,7 +270,7 @@ export default function ClassroomsPage() {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {classrooms.map((classroom) => (
-                  <tr key={classroom.uid} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => setSharingClassroom(classroom)}>
+                  <tr key={classroom.uid} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase">
@@ -206,15 +301,37 @@ export default function ClassroomsPage() {
                     <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
                         <button 
-                          onClick={() => setSharingClassroom(classroom)}
+                          onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
                           className="text-slate-400 hover:text-indigo-600 p-1.5 transition-colors rounded-md hover:bg-indigo-50"
                           title="Xem chi tiết"
                         >
                           <ChevronRight size={18} />
                         </button>
-                        <button className="text-slate-300 hover:text-slate-900 p-1.5 transition-colors">
-                          <MoreVertical size={18} />
-                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="text-slate-300 hover:text-slate-900 p-1.5 transition-colors focus:outline-none">
+                              <MoreVertical size={18} />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
+                              <Pencil size={14} className="mr-2" />
+                              <span>Chỉnh sửa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDownloadQr(classroom)}>
+                              <Download size={14} className="mr-2" />
+                              <span>Tải mã QR</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              variant="destructive"
+                              onClick={() => handleDelete(classroom.uid)}
+                            >
+                              <Trash2 size={14} className="mr-2" />
+                              <span>Xóa phòng</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </td>
                   </tr>
@@ -275,9 +392,31 @@ export default function ClassroomsPage() {
                     {classroom.pid}
                   </div>
                   <div className="flex items-center gap-1">
-                    <button className="text-slate-300 hover:text-slate-900 transition-colors">
-                      <MoreVertical size={18} />
-                    </button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-slate-300 hover:text-slate-900 transition-colors focus:outline-none">
+                          <MoreVertical size={18} />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
+                          <Pencil size={14} className="mr-2" />
+                          <span>Chỉnh sửa</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadQr(classroom)}>
+                          <Download size={14} className="mr-2" />
+                          <span>Tải mã QR</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          variant="destructive"
+                          onClick={() => handleDelete(classroom.uid)}
+                        >
+                          <Trash2 size={14} className="mr-2" />
+                          <span>Xóa phòng</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
                 
@@ -302,7 +441,7 @@ export default function ClassroomsPage() {
               </div>
               <div className="p-4 bg-slate-50 border-t border-slate-100">
                 <Button 
-                  onClick={() => setSharingClassroom(classroom)}
+                  onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
                   variant="ghost" 
                   className="w-full text-[11px] font-bold tracking-widest text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all h-9 rounded-lg"
                 >
@@ -313,12 +452,6 @@ export default function ClassroomsPage() {
           ))}
         </div>
       )}
-
-      <SharingModal 
-        isOpen={!!sharingClassroom}
-        onClose={() => setSharingClassroom(null)}
-        classroom={sharingClassroom}
-      />
     </div>
   );
 }
