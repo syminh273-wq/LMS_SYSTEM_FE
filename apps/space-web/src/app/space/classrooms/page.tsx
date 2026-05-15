@@ -18,7 +18,8 @@ import {
   RotateCcw,
   ChevronsLeft,
   ChevronsRight,
-  Settings2
+  Settings2,
+  QrCode
 } from 'lucide-react';
 import { 
   Card, 
@@ -30,6 +31,7 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@shared/components/ui/pagination";
+import { SharingModal } from '@/components/resource/SharingModal';
 
 export default function ClassroomsPage() {
   const router = useRouter();
@@ -38,6 +40,7 @@ export default function ClassroomsPage() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState('');
+  const [sharingClassroom, setSharingClassroom] = useState<Classroom | null>(null);
 
   const fetchClassrooms = async (page: number) => {
     try {
@@ -130,6 +133,12 @@ export default function ClassroomsPage() {
       </div>
 
       {/* Main Content Area */}
+      {error && (
+        <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 text-slate-400">
           <Loader2 size={40} className="animate-spin mb-4" />
@@ -166,7 +175,7 @@ export default function ClassroomsPage() {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {classrooms.map((classroom) => (
-                  <tr key={classroom.uid} className="hover:bg-slate-50/50 transition-colors group">
+                  <tr key={classroom.uid} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => setSharingClassroom(classroom)}>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase">
@@ -194,10 +203,19 @@ export default function ClassroomsPage() {
                         Hoạt động
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-slate-300 hover:text-slate-900 p-1.5 transition-colors">
-                        <MoreVertical size={18} />
-                      </button>
+                    <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1">
+                        <button 
+                          onClick={() => setSharingClassroom(classroom)}
+                          className="text-slate-400 hover:text-indigo-600 p-1.5 transition-colors rounded-md hover:bg-indigo-50"
+                          title="Xem chi tiết"
+                        >
+                          <ChevronRight size={18} />
+                        </button>
+                        <button className="text-slate-300 hover:text-slate-900 p-1.5 transition-colors">
+                          <MoreVertical size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -256,9 +274,11 @@ export default function ClassroomsPage() {
                   <div className="text-[10px] font-black text-white bg-slate-900 px-2 py-0.5 rounded shadow-sm">
                     {classroom.pid}
                   </div>
-                  <button className="text-slate-300 hover:text-slate-900 transition-colors">
-                    <MoreVertical size={18} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button className="text-slate-300 hover:text-slate-900 transition-colors">
+                      <MoreVertical size={18} />
+                    </button>
+                  </div>
                 </div>
                 
                 <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors text-lg mb-2 line-clamp-1">
@@ -281,7 +301,11 @@ export default function ClassroomsPage() {
                 </div>
               </div>
               <div className="p-4 bg-slate-50 border-t border-slate-100">
-                <Button variant="ghost" className="w-full text-[11px] font-bold tracking-widest text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all h-9 rounded-lg">
+                <Button 
+                  onClick={() => setSharingClassroom(classroom)}
+                  variant="ghost" 
+                  className="w-full text-[11px] font-bold tracking-widest text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all h-9 rounded-lg"
+                >
                   CHI TIẾT PHÒNG HỌC
                 </Button>
               </div>
@@ -289,6 +313,12 @@ export default function ClassroomsPage() {
           ))}
         </div>
       )}
+
+      <SharingModal 
+        isOpen={!!sharingClassroom}
+        onClose={() => setSharingClassroom(null)}
+        classroom={sharingClassroom}
+      />
     </div>
   );
 }

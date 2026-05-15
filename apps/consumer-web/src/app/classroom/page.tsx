@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@shared/components/ui/dropdown-menu";
-import { consumerApi, type Space } from '@/lib/api';
+import { consumerApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 
@@ -25,14 +25,14 @@ export default function ClassroomPage() {
   const router = useRouter();
   const { isAuthenticated, logout } = useRequireAuth();
   const [userName] = useState("Student");
-  const [spaces, setSpaces] = useState<Space[]>([]);
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const fetchSpaces = useCallback(async () => {
+  const fetchClassrooms = useCallback(async () => {
     try {
-      const data = await consumerApi.spaces.mine();
-      setSpaces(data);
+      const data = await consumerApi.classrooms.mine();
+      setClassrooms(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không thể tải danh sách classroom.');
     } finally {
@@ -43,10 +43,10 @@ export default function ClassroomPage() {
   useEffect(() => {
     if (isAuthenticated) {
       queueMicrotask(() => {
-        void fetchSpaces();
+        void fetchClassrooms();
       });
     }
-  }, [fetchSpaces, isAuthenticated]);
+  }, [fetchClassrooms, isAuthenticated]);
 
   if (!isAuthenticated) return null;
 
@@ -112,7 +112,7 @@ export default function ClassroomPage() {
 
         {loading ? (
           <p className="text-sm text-gray-500">Đang tải classroom...</p>
-        ) : spaces.length === 0 ? (
+        ) : classrooms.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
             <p className="font-medium text-gray-900">Bạn chưa có classroom nào.</p>
             <p className="mt-1 text-sm text-gray-500">Tạo space trong trang quản trị để bắt đầu.</p>
@@ -122,11 +122,11 @@ export default function ClassroomPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {spaces.map((space, index) => (
-              <div key={space.uid} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
+            {classrooms.map((classroom, index) => (
+              <div key={classroom.uid} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
                 <div className={`${getSpaceColor(index)} relative h-24 p-4`}>
-                  <h3 className="truncate pr-8 text-xl font-bold text-white">{space.name}</h3>
-                  <p className="text-sm text-white opacity-90">/{space.slug}</p>
+                  <h3 className="truncate pr-8 text-xl font-bold text-white">{classroom.name}</h3>
+                  <p className="text-sm text-white opacity-90">ID: {classroom.pid}</p>
                   <button className="absolute right-4 top-4 rounded-full p-1 text-white hover:bg-white/20">
                     <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
@@ -136,17 +136,17 @@ export default function ClassroomPage() {
                 <div className="min-h-[100px] flex-1 bg-white p-4">
                   <div className="relative -top-10 flex justify-end pr-2">
                     <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gray-300 text-2xl font-bold uppercase text-gray-600">
-                      {space.name[0]}
+                      {classroom.name[0]}
                     </div>
                   </div>
-                  <p className="-mt-8 line-clamp-2 text-sm text-gray-600">{space.description || 'Không có mô tả.'}</p>
+                  <p className="-mt-8 line-clamp-2 text-sm text-gray-600">{classroom.description || 'Không có mô tả.'}</p>
                 </div>
                 <div className="flex justify-between gap-2 border-t border-gray-200 p-3">
-                  <span className={`rounded-full px-2 py-1 text-xs ${space.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {space.is_active ? 'active' : 'inactive'}
+                  <span className={`rounded-full px-2 py-1 text-xs ${classroom.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                    {classroom.status}
                   </span>
-                  <Button size="sm" variant="outline" onClick={() => router.push('/admin')}>
-                    Quản lý
+                  <Button size="sm" variant="outline" onClick={() => router.push(`/classroom/${classroom.uid}`)}>
+                    Vào lớp
                   </Button>
                 </div>
               </div>

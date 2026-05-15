@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "LMS System",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Providers>
+          <Toaster position="top-right" richColors />
           {children}
         </Providers>
       </body>

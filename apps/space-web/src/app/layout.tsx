@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@shared/components/ui/button';
 import { Providers } from "@/components/Providers";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { 
   LayoutDashboard, 
@@ -34,6 +35,7 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <Providers>
+          <Toaster position="top-right" richColors />
           {isAuthPage ? (
             <div className="min-h-screen bg-slate-50">{children}</div>
           ) : (
