@@ -242,6 +242,7 @@ export default function ClassroomChatPanel({
   const [uploading, setUploading] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSendingRef = useRef(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -406,11 +407,13 @@ export default function ClassroomChatPanel({
 
   // ── Send ──────────────────────────────────
   const handleSend = async () => {
+    if (isSendingRef.current) return;
     if (!newMessage.trim() && !pendingFile) return;
     if (status !== 'connected') {
       toast.error('Chưa kết nối. Vui lòng thử lại.');
       return;
     }
+    isSendingRef.current = true;
     setUploading(true);
     try {
       let attachment: ChatAttachment | undefined;
@@ -449,11 +452,12 @@ export default function ClassroomChatPanel({
       setNewMessage('');
     } finally {
       setUploading(false);
+      isSendingRef.current = false;
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !uploading) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSend();
     }

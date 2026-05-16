@@ -1,30 +1,101 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { classroomApi, Classroom } from '@/lib/api';
-import { 
-  Loader2, 
-  ArrowLeft, 
-  Users, 
-  Info, 
+import type { Message } from '@/lib/api/types';
+import {
+  Loader2,
+  ArrowLeft,
+  Users,
+  Info,
   Calendar,
   BookOpen,
   MessageSquare,
   FileText,
-  Video
+  Video,
+  ShieldCheck,
+  Send,
+  Wifi,
+  WifiOff,
+  FileDown,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
+
+function MessageBubble({ msg }: { msg: Message }) {
+  const time = new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+  const renderAttachment = () => {
+    if (!msg.attachment) return null;
+    const { url, name, type } = msg.attachment;
+
+    if (type === 'image') {
+      return (
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={url} alt={name} className="max-w-[240px] rounded-xl mt-1 border border-slate-200 object-cover" />
+        </a>
+      );
+    }
+    if (type === 'video') {
+      return (
+        <video controls src={url} className="max-w-[280px] rounded-xl mt-1 border border-slate-200">
+          <track kind="captions" />
+        </video>
+      );
+    }
+    if (type === 'audio') {
+      return <audio controls src={url} className="mt-1 w-full max-w-[280px]" />;
+    }
+    // pdf / file
+    const Icon = type === 'pdf' ? FileDown : FileText;
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 mt-1 bg-white border border-slate-200 rounded-xl px-3 py-2 hover:bg-slate-50 transition max-w-[280px]"
+      >
+        <Icon size={18} className="text-indigo-500 shrink-0" />
+        <span className="text-xs font-medium text-slate-700 truncate">{name}</span>
+      </a>
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <div className="flex items-baseline gap-2">
+        <span className="text-xs font-bold text-indigo-600">{msg.sender_name || 'Ẩn danh'}</span>
+        <span className="text-[10px] text-slate-400">{time}</span>
+      </div>
+      <div className="max-w-[85%]">
+        {msg.content && (
+          <div className="bg-slate-50 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-700 font-medium">
+            {msg.content}
+          </div>
+        )}
+        {renderAttachment()}
+      </div>
+    </div>
+  );
+}
 
 export default function ClassroomDetailPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = use(params);
   const router = useRouter();
-  const { isAuthenticated } = useRequireAuth();
+  const { isAuthenticated, mounted } = useRequireAuth();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [draft, setDraft] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const {
+    messages, hasMore, loadingMore, connected, loading: chatLoading,
+    sendMessage, scrollContainerRef, topSentinelRef,
+  } = useClassroomChat(isAuthenticated ? uid : null);
 
   useEffect(() => {
     if (isAuthenticated && uid) {
@@ -44,7 +115,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     }
   }, [isAuthenticated, uid]);
 
-  if (!isAuthenticated) return null;
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  if (!mounted) return null;
 
   if (loading) {
     return (
@@ -152,16 +227,76 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               ))}
             </div>
 
-            {/* Empty State / Feed Placeholder */}
-            <div className="bg-white rounded-3xl border border-slate-200 border-dashed p-20 flex flex-col items-center text-center space-y-4">
-              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
-                <MessageSquare size={40} />
+            {/* Chat Feed */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col overflow-hidden" style={{ height: '520px' }}>
+              {/* Chat header */}
+              <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MessageSquare size={16} className="text-indigo-600" />
+                  <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Thảo luận chung</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-bold">
+                  {connected ? (
+                    <><Wifi size={13} className="text-emerald-500" /><span className="text-emerald-500">Trực tuyến</span></>
+                  ) : (
+                    <><WifiOff size={13} className="text-slate-400" /><span className="text-slate-400">Đang kết nối...</span></>
+                  )}
+                </div>
               </div>
-              <div className="max-w-xs">
-                <h3 className="text-slate-900 font-bold text-lg">Chưa có thông báo nào</h3>
-                <p className="text-slate-400 text-sm font-medium">Bắt đầu thảo luận với giáo viên và các học sinh khác trong lớp của bạn.</p>
+
+              {/* Messages */}
+              <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+                {/* Top sentinel — IntersectionObserver triggers loadMore when scrolled here */}
+                <div ref={topSentinelRef} className="h-1" />
+
+                {loadingMore && (
+                  <div className="flex justify-center py-1">
+                    <Loader2 size={14} className="text-indigo-400 animate-spin" />
+                  </div>
+                )}
+
+                {chatLoading && (
+                  <div className="flex justify-center pt-8">
+                    <Loader2 size={24} className="text-indigo-400 animate-spin" />
+                  </div>
+                )}
+
+                {!chatLoading && messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-12">
+                    <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                      <MessageSquare size={28} />
+                    </div>
+                    <p className="text-slate-400 text-sm font-medium">Chưa có tin nhắn nào. Hãy bắt đầu thảo luận!</p>
+                  </div>
+                )}
+
+                {messages.map((msg) => <MessageBubble key={msg.uid} msg={msg} />)}
+                <div ref={messagesEndRef} />
               </div>
-              <Button variant="outline" className="rounded-xl font-bold text-xs tracking-widest px-8">TẠO THẢO LUẬN</Button>
+
+              {/* Input */}
+              <div className="px-4 py-3 border-t border-slate-100 flex gap-2">
+                <input
+                  className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-800 placeholder:text-slate-400 border border-slate-200 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
+                  placeholder="Nhập tin nhắn..."
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey && draft.trim()) {
+                      sendMessage(draft.trim());
+                      setDraft('');
+                    }
+                  }}
+                />
+                <Button
+                  size="icon"
+                  className="rounded-xl bg-indigo-600 hover:bg-indigo-700 shrink-0"
+                  disabled={!draft.trim() || !connected}
+                  onClick={() => { sendMessage(draft.trim()); setDraft(''); }}
+                >
+                  <Send size={16} />
+                </Button>
+              </div>
             </div>
           </div>
 

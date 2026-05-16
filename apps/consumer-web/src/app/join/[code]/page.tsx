@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { consumerApi, SharingLink } from '@/lib/api';
+import { consumerApi, classroomApi, SharingLink } from '@/lib/api';
 import { Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
@@ -25,18 +25,21 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
       setStatus('loading');
       const res = await consumerApi.sharing.resolve(code);
       setLinkData(res);
-      setStatus('success');
-      
-      // If it's a classroom join, we might want to automatically redirect after a delay
+
       if (res.resource_type === 'classroom' && res.action === 'join') {
+        // Join the classroom using the pid code
+        await classroomApi.joinByCode(code);
         toast.success(`Bạn đã tham gia lớp học: ${res.metadata.name || 'Thành công'}`);
+        setStatus('success');
         setTimeout(() => {
           router.push(`/classroom/${res.resource_id}`);
         }, 2000);
+      } else {
+        setStatus('success');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus('error');
-      setErrorMsg(err.message || 'Mã tham gia không hợp lệ hoặc đã hết hạn');
+      setErrorMsg(err instanceof Error ? err.message : 'Mã tham gia không hợp lệ hoặc đã hết hạn');
       toast.error('Tham gia thất bại');
     }
   };
