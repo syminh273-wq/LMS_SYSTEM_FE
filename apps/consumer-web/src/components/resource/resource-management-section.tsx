@@ -11,7 +11,7 @@ type ResourceManagementSectionProps<TItem> = {
   emptyText: string
   loadingText: string
   form: ReactNode
-  renderItem: (item: TItem) => ReactNode
+  renderItemAction: (item: TItem) => ReactNode
 }
 
 export function ResourceManagementSection<TItem>({
@@ -22,7 +22,7 @@ export function ResourceManagementSection<TItem>({
   emptyText,
   loadingText,
   form,
-  renderItem,
+  renderItemAction,
 }: ResourceManagementSectionProps<TItem>) {
   return (
     <Card className="h-full">
@@ -49,7 +49,7 @@ export function ResourceManagementSection<TItem>({
             </p>
           ) : (
             <div className="grid gap-3">
-              {items.map(renderItem)}
+              {items.map(renderItemAction)}
             </div>
           )}
         </div>

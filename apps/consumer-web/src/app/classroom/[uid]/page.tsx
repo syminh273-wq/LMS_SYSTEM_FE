@@ -1,9 +1,10 @@
 'use client';
 
+import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, Classroom } from '@/lib/api';
-import type { Message } from '@/lib/api/types';
+import type { ChatMessage } from '@/lib/api/types';
 import {
   Loader2,
   ArrowLeft,
@@ -24,7 +25,7 @@ import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 
-function MessageBubble({ msg }: { msg: Message }) {
+function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
   const renderAttachment = () => {
@@ -270,7 +271,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   </div>
                 )}
 
-                {messages.map((msg) => <MessageBubble key={msg.uid} msg={msg} />)}
+                {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} />)}
                 <div ref={messagesEndRef} />
               </div>
 

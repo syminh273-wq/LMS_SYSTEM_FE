@@ -149,7 +149,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
       svgData = svgData.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
     }
     
-    const img = new Image();
+    const img = document.createElement("img");
     const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
     const url = URL.createObjectURL(svgBlob);
 
