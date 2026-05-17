@@ -16,9 +16,27 @@ function DropdownMenuPortal({ ...props }: MenuPrimitive.Portal.Props) {
 
 const DropdownMenuTrigger = React.forwardRef<
   HTMLButtonElement,
-  MenuPrimitive.Trigger.Props
->(({ ...props }, ref) => {
-  return <MenuPrimitive.Trigger ref={ref} data-slot="dropdown-menu-trigger" {...props} />
+  MenuPrimitive.Trigger.Props & { asChild?: boolean }
+>(({ asChild, children, ...props }, ref) => {
+  if (asChild && React.isValidElement(children)) {
+    return (
+      <MenuPrimitive.Trigger
+        ref={ref}
+        data-slot="dropdown-menu-trigger"
+        render={children}
+        {...props}
+      />
+    )
+  }
+  return (
+    <MenuPrimitive.Trigger
+      ref={ref}
+      data-slot="dropdown-menu-trigger"
+      {...props}
+    >
+      {children}
+    </MenuPrimitive.Trigger>
+  )
 })
 DropdownMenuTrigger.displayName = "DropdownMenuTrigger"
 

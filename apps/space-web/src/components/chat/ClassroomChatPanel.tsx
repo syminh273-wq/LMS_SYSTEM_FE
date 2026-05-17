@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import {
   useState,
   useEffect,
@@ -510,7 +511,7 @@ export default function ClassroomChatPanel({
           </div>
         )}
 
-        {messages.map((msg) => (
+        {messages.map((msg: ChatMessage) => (
           <MessageBubble
             key={msg.uid}
             msg={msg}

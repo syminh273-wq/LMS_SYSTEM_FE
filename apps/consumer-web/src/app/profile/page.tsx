@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from "react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -81,8 +82,8 @@ export default function ProfilePage() {
         formData.append('avatar', newAvatar);
       }
       
-      const response = await accountService.updateProfile(formData);
-      dispatch(setProfile(response.data));
+      const response = await accountService.updateProfile(formData) as any;
+      dispatch(setProfile(response.data as any));
       setSuccess("Cập nhật hồ sơ thành công!");
       setNewAvatar(null);
       setAvatarPreview(null);

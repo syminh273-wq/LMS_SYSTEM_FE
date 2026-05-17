@@ -28,8 +28,8 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.patch<Classroom>(`/api/v1/space/course/classrooms/${uid}/`, data);
   }
 
-  public async delete(uid: string): Promise<void> {
-    return this.delete<void>(`/api/v1/space/course/classrooms/${uid}/`);
+  public async delete<TResponse = any>(uid: string, options?: RequestInit): Promise<TResponse> {
+    return super.delete<TResponse>(`/api/v1/space/course/classrooms/${uid}/`, options);
   }
 
   public async getSharingLink(uid: string): Promise<SharingLink> {

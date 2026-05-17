@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { spaceApi, PaginatedResponse, Classroom } from '@/lib/api';
@@ -99,7 +100,7 @@ export default function ClassroomsPage() {
         // 3. Chuyển SVG sang Canvas để tải về dạng PNG
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        const img = new Image();
+        const img = document.createElement("img");
         const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
         const url = URL.createObjectURL(svgBlob);
 

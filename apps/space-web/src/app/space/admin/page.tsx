@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -94,7 +95,7 @@ export default function AdminPage() {
   const handleCreateConsumer = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await runAction('Đã tạo consumer.', async () => {
-      await consumerApi.consumers.create(cleanPayload(consumerForm));
+      await consumerApi.consumers.create(cleanPayload(consumerForm) as any);
       setConsumerForm(emptyConsumerForm);
       await loadData();
     });
@@ -149,7 +150,7 @@ export default function AdminPage() {
   const handleCreateSpace = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await runAction('Đã tạo space.', async () => {
-      await consumerApi.spaces.create(cleanPayload(spaceForm));
+      await consumerApi.spaces.create(cleanPayload(spaceForm) as any);
       setSpaceForm(emptySpaceForm);
       await loadData();
     });
@@ -288,7 +289,7 @@ export default function AdminPage() {
               </div>
             </form>
             }
-            renderItem={(consumer) => (
+            renderItemAction={(consumer) => (
               <Card key={consumer.uid} className="relative overflow-hidden transition-all hover:shadow-md border-border/60">
                 <CardHeader className="p-4 flex-row items-start gap-4 space-y-0">
                   <Avatar size="lg" className="border">
@@ -388,7 +389,7 @@ export default function AdminPage() {
               </div>
             </form>
             }
-            renderItem={(space) => (
+            renderItemAction={(space) => (
               <Card key={space.uid} className="relative overflow-hidden transition-all hover:shadow-md border-border/60">
                 <CardHeader className="p-4 flex-row items-start gap-4 space-y-0">
                   <div className="h-12 w-12 rounded-lg border bg-muted flex items-center justify-center shrink-0 overflow-hidden">
@@ -439,9 +440,9 @@ export default function AdminPage() {
   );
 }
 
-function cleanPayload<T extends Record<string, unknown>>(payload: T) {
+function cleanPayload<T>(payload: T): T {
   return Object.fromEntries(
-    Object.entries(payload).filter(([, value]) => value !== '')
+    Object.entries(payload as Record<string, any>).filter(([, value]) => value !== '')
   ) as T;
 }
 
