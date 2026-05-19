@@ -24,7 +24,6 @@ import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { toast } from 'sonner';
 import { Loader2, QrCode, KeyRound, X, Camera } from 'lucide-react';
 
-// ── Join Dialog ───────────────────────────────────────────────────────────────
 
 type JoinTab = 'code' | 'qr';
 

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, Classroom } from '@/lib/api';
+import { classroomApi, Classroom, Exam } from '@/lib/api';
 import type { ChatMessage } from '@/lib/api/types';
 import {
   Loader2,
@@ -20,10 +20,16 @@ import {
   Wifi,
   WifiOff,
   FileDown,
+  ClipboardList,
+  Clock,
+  File,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
+
+type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'meeting';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
@@ -91,6 +97,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [draft, setDraft] = useState('');
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [loadingExams, setLoadingExams] = useState(false);
+  const [examError, setExamError] = useState('');
+  const [selectedExamGroup, setSelectedExamGroup] = useState<ExamGroupKey | null>(null);
+  const [activeTab, setActiveTab] = useState<ClassroomTab>('discussion');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -114,6 +125,25 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       
       void fetchClassroom();
     }
+  }, [isAuthenticated, uid]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !uid) return;
+
+    const fetchExams = async () => {
+      try {
+        setLoadingExams(true);
+        setExamError('');
+        const data = await classroomApi.exams(uid);
+        setExams(data.filter(exam => exam.status === 'published'));
+      } catch (err: unknown) {
+        setExamError(err instanceof Error ? err.message : 'Không thể tải danh sách bài kiểm tra');
+      } finally {
+        setLoadingExams(false);
+      }
+    };
+
+    void fetchExams();
   }, [isAuthenticated, uid]);
 
   useEffect(() => {
@@ -147,6 +177,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       </div>
     );
   }
+
+  const groupedExams = getGroupedPublishedExams(exams);
+  const selectedGroup = selectedExamGroup
+    ? groupedExams.find(group => group.key === selectedExamGroup)
+    : null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
@@ -213,14 +248,17 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             {/* Quick Actions/Nav */}
             <div className="bg-white rounded-2xl border border-slate-200 p-2 flex overflow-x-auto gap-1 shadow-sm no-scrollbar">
               {[
-                { icon: MessageSquare, label: 'Thảo luận', active: true },
-                { icon: BookOpen, label: 'Bài học' },
-                { icon: FileText, label: 'Bài tập' },
-                { icon: Video, label: 'Phòng họp' }
-              ].map((item, idx) => (
+                { key: 'discussion' as const, icon: MessageSquare, label: 'Thảo luận' },
+                { key: 'lessons' as const, icon: BookOpen, label: 'Bài học' },
+                { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
+                { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
+                { key: 'meeting' as const, icon: Video, label: 'Phòng họp' }
+              ].map((item) => (
                 <button 
-                  key={idx}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${item.active ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100' : 'text-slate-500 hover:bg-slate-50'}`}
+                  key={item.key}
+                  type="button"
+                  onClick={() => setActiveTab(item.key)}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === item.key ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100' : 'text-slate-500 hover:bg-slate-50'}`}
                 >
                   <item.icon size={18} />
                   {item.label}
@@ -229,76 +267,211 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             </div>
 
             {/* Chat Feed */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col overflow-hidden" style={{ height: '520px' }}>
-              {/* Chat header */}
-              <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <MessageSquare size={16} className="text-indigo-600" />
-                  <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Thảo luận chung</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-xs font-bold">
-                  {connected ? (
-                    <><Wifi size={13} className="text-emerald-500" /><span className="text-emerald-500">Trực tuyến</span></>
-                  ) : (
-                    <><WifiOff size={13} className="text-slate-400" /><span className="text-slate-400">Đang kết nối...</span></>
-                  )}
-                </div>
-              </div>
-
-              {/* Messages */}
-              <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
-                {/* Top sentinel — IntersectionObserver triggers loadMore when scrolled here */}
-                <div ref={topSentinelRef} className="h-1" />
-
-                {loadingMore && (
-                  <div className="flex justify-center py-1">
-                    <Loader2 size={14} className="text-indigo-400 animate-spin" />
+            {activeTab === 'discussion' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col overflow-hidden" style={{ height: '520px' }}>
+                {/* Chat header */}
+                <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare size={16} className="text-indigo-600" />
+                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Thảo luận chung</span>
                   </div>
-                )}
-
-                {chatLoading && (
-                  <div className="flex justify-center pt-8">
-                    <Loader2 size={24} className="text-indigo-400 animate-spin" />
+                  <div className="flex items-center gap-1.5 text-xs font-bold">
+                    {connected ? (
+                      <><Wifi size={13} className="text-emerald-500" /><span className="text-emerald-500">Trực tuyến</span></>
+                    ) : (
+                      <><WifiOff size={13} className="text-slate-400" /><span className="text-slate-400">Đang kết nối...</span></>
+                    )}
                   </div>
-                )}
+                </div>
 
-                {!chatLoading && messages.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-12">
-                    <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
-                      <MessageSquare size={28} />
+                {/* Messages */}
+                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+                  {/* Top sentinel — IntersectionObserver triggers loadMore when scrolled here */}
+                  <div ref={topSentinelRef} className="h-1" />
+
+                  {loadingMore && (
+                    <div className="flex justify-center py-1">
+                      <Loader2 size={14} className="text-indigo-400 animate-spin" />
                     </div>
-                    <p className="text-slate-400 text-sm font-medium">Chưa có tin nhắn nào. Hãy bắt đầu thảo luận!</p>
+                  )}
+
+                  {chatLoading && (
+                    <div className="flex justify-center pt-8">
+                      <Loader2 size={24} className="text-indigo-400 animate-spin" />
+                    </div>
+                  )}
+
+                  {!chatLoading && messages.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-12">
+                      <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                        <MessageSquare size={28} />
+                      </div>
+                      <p className="text-slate-400 text-sm font-medium">Chưa có tin nhắn nào. Hãy bắt đầu thảo luận!</p>
+                    </div>
+                  )}
+
+                  {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} />)}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input */}
+                <div className="px-4 py-3 border-t border-slate-100 flex gap-2">
+                  <input
+                    className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-800 placeholder:text-slate-400 border border-slate-200 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
+                    placeholder="Nhập tin nhắn..."
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey && draft.trim()) {
+                        sendMessage(draft.trim());
+                        setDraft('');
+                      }
+                    }}
+                  />
+                  <Button
+                    size="icon"
+                    className="rounded-xl bg-indigo-600 hover:bg-indigo-700 shrink-0"
+                    disabled={!draft.trim() || !connected}
+                    onClick={() => { sendMessage(draft.trim()); setDraft(''); }}
+                  >
+                    <Send size={16} />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 'discussion' && activeTab !== 'exams' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="flex h-64 flex-col items-center justify-center text-center text-slate-400">
+                  <FileText size={38} className="mb-3 opacity-30" />
+                  <p className="text-sm font-medium">Nội dung đang được cập nhật.</p>
+                </div>
+              </div>
+            )}
+
+            {/* Exams */}
+            {activeTab === 'exams' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ClipboardList size={17} className="text-indigo-600" />
+                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Bài kiểm tra</span>
+                  </div>
+                  <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black uppercase text-indigo-600">
+                    {exams.length} bài
+                  </span>
+                </div>
+
+                <div className="p-5">
+                  {loadingExams ? (
+                    <div className="flex items-center justify-center h-32 text-slate-400">
+                      <Loader2 size={26} className="animate-spin" />
+                    </div>
+                  ) : examError ? (
+                    <div className="rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-medium text-rose-600">
+                      {examError}
+                    </div>
+                  ) : exams.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-40 text-center text-slate-400">
+                      <ClipboardList size={38} className="mb-3 opacity-30" />
+                      <p className="text-sm font-medium">Chưa có bài kiểm tra nào</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                      {groupedExams.map(group => (
+                        <button
+                          key={group.key}
+                          type="button"
+                          onClick={() => setSelectedExamGroup(group.key)}
+                          className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-100 ${
+                            selectedExamGroup === group.key
+                              ? 'border-indigo-200 bg-indigo-50 shadow-sm'
+                              : 'border-slate-100 bg-slate-50/60'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-black text-slate-900">{group.label}</div>
+                              <div className="text-[10px] font-black uppercase text-slate-400">{group.items.length} bài</div>
+                            </div>
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm ring-1 ring-slate-100">
+                              <ClipboardList size={17} />
+                            </div>
+                          </div>
+                        </button>
+                    ))}
                   </div>
                 )}
 
-                {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} />)}
-                <div ref={messagesEndRef} />
-              </div>
+                {selectedGroup && (
+                  <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <div className="text-[10px] font-black uppercase tracking-wider text-indigo-500">Danh sách bài kiểm tra</div>
+                        <h4 className="mt-1 text-lg font-black text-slate-900">{selectedGroup.label}</h4>
+                      </div>
+                      <Button variant="ghost" size="sm" onClick={() => setSelectedExamGroup(null)} className="rounded-lg text-xs font-bold">
+                        Đóng
+                      </Button>
+                    </div>
 
-              {/* Input */}
-              <div className="px-4 py-3 border-t border-slate-100 flex gap-2">
-                <input
-                  className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-800 placeholder:text-slate-400 border border-slate-200 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
-                  placeholder="Nhập tin nhắn..."
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey && draft.trim()) {
-                      sendMessage(draft.trim());
-                      setDraft('');
-                    }
-                  }}
-                />
-                <Button
-                  size="icon"
-                  className="rounded-xl bg-indigo-600 hover:bg-indigo-700 shrink-0"
-                  disabled={!draft.trim() || !connected}
-                  onClick={() => { sendMessage(draft.trim()); setDraft(''); }}
-                >
-                  <Send size={16} />
-                </Button>
+                    {selectedGroup.items.length === 0 ? (
+                      <div className="mt-4 flex h-28 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-center text-slate-400">
+                        <ClipboardList size={24} className="mb-2 opacity-30" />
+                        <p className="text-xs font-bold">Chưa có bài kiểm tra nào</p>
+                      </div>
+                    ) : (
+                      <div className="mt-4 space-y-3">
+                        {selectedGroup.items.map(exam => {
+                          const deadline = getDeadlineMeta(exam.due_date);
+                          const ContentIcon = getContentTypeIcon(exam.content_type);
+
+                          return (
+                            <button
+                              key={exam.uid}
+                              type="button"
+                              onClick={() => router.push(`/classroom/${uid}/exams/${exam.uid}`)}
+                              className={`w-full rounded-2xl border bg-white p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 ${deadline.cardClassName}`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <h4 className="line-clamp-2 text-sm font-black leading-snug text-slate-900">{exam.title}</h4>
+                                  <p className="mt-1 line-clamp-2 text-xs font-medium leading-relaxed text-slate-500">
+                                    {exam.description || 'Không có mô tả'}
+                                  </p>
+                                </div>
+                                <span className={`shrink-0 rounded-full px-2 py-1 text-[9px] font-black uppercase ${getExamStatusClass(exam.status)}`}>
+                                  {exam.status}
+                                </span>
+                              </div>
+
+                              <div className={`mt-4 rounded-xl border px-3 py-2 ${deadline.badgeClassName}`}>
+                                <div className="flex items-center gap-2">
+                                  <Clock size={14} className="shrink-0" />
+                                  <div className="min-w-0">
+                                    <div className="truncate text-xs font-black">{deadline.label}</div>
+                                    <div className="truncate text-[10px] font-bold opacity-80">{formatDateTime(exam.due_date)}</div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="mt-3 flex items-center justify-between gap-2">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-black uppercase text-slate-500 ring-1 ring-slate-100">
+                                  <ContentIcon size={12} />
+                                  {getContentTypeLabel(exam.content_type)}
+                                </span>
+                                <span className="text-[10px] font-black uppercase text-indigo-500">Xem chi tiết</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
+            )}
           </div>
 
           {/* Right Column - Stats & Info */}
@@ -370,4 +543,148 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       </main>
     </div>
   );
+}
+
+function getExamStatusClass(status: string) {
+  const normalized = status.toLowerCase();
+  if (normalized === 'published' || normalized === 'active' || normalized === 'open') {
+    return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+  }
+  if (normalized === 'draft') {
+    return 'bg-amber-50 text-amber-600 border border-amber-100';
+  }
+  if (normalized === 'closed' || normalized === 'expired') {
+    return 'bg-rose-50 text-rose-600 border border-rose-100';
+  }
+  return 'bg-slate-100 text-slate-600 border border-slate-200';
+}
+
+const EXAM_GROUPS = [
+  {
+    key: 'regular',
+    label: 'Bài kiểm tra thường xuyên',
+    keywords: ['kiem tra thuong xuyen', 'kiểm tra thường xuyên', 'thuong xuyen', 'thường xuyên'],
+  },
+  {
+    key: 'midterm',
+    label: 'Kiểm tra giữa kì',
+    keywords: ['kiem tra giua ki', 'kiểm tra giữa kì', 'kiểm tra giữa kỳ', 'giua ki', 'giữa kì', 'giữa kỳ'],
+  },
+  {
+    key: 'final',
+    label: 'Kiểm tra cuối kì',
+    keywords: ['kiem tra cuoi ki', 'kiểm tra cuối kì', 'kiểm tra cuối kỳ', 'cuoi ki', 'cuối kì', 'cuối kỳ'],
+  },
+] as const;
+
+type ExamGroupKey = typeof EXAM_GROUPS[number]['key'];
+
+function getGroupedPublishedExams(exams: Exam[]) {
+  const publishedExams = exams
+    .filter(exam => exam.status === 'published')
+    .sort((left, right) => getDueTimestamp(left.due_date) - getDueTimestamp(right.due_date));
+
+  return EXAM_GROUPS.map(group => ({
+    ...group,
+    items: publishedExams.filter(exam => isExamInGroup(exam, group.key)),
+  }));
+}
+
+function isExamInGroup(exam: Exam, groupKey: typeof EXAM_GROUPS[number]['key']) {
+  const title = normalizeText(exam.title);
+  const group = EXAM_GROUPS.find(item => item.key === groupKey);
+  if (!group) return false;
+
+  if (group.key === 'regular') {
+    return group.keywords.some(keyword => title.includes(normalizeText(keyword)))
+      || !EXAM_GROUPS.some(item => item.key !== 'regular' && item.keywords.some(keyword => title.includes(normalizeText(keyword))));
+  }
+
+  return group.keywords.some(keyword => title.includes(normalizeText(keyword)));
+}
+
+function getDueTimestamp(value: string | null) {
+  if (!value) return Number.MAX_SAFE_INTEGER;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? Number.MAX_SAFE_INTEGER : timestamp;
+}
+
+function getDeadlineMeta(value: string | null) {
+  if (!value) {
+    return {
+      label: 'Chưa có hạn nộp',
+      cardClassName: 'border-slate-100 hover:border-indigo-200 focus:ring-indigo-100',
+      badgeClassName: 'border-slate-100 bg-slate-50 text-slate-500',
+    };
+  }
+
+  const due = new Date(value).getTime();
+  const hoursLeft = (due - Date.now()) / (1000 * 60 * 60);
+
+  if (Number.isNaN(due)) {
+    return {
+      label: 'Hạn nộp không hợp lệ',
+      cardClassName: 'border-slate-100 hover:border-indigo-200 focus:ring-indigo-100',
+      badgeClassName: 'border-slate-100 bg-slate-50 text-slate-500',
+    };
+  }
+
+  if (hoursLeft <= 0) {
+    return {
+      label: 'Đã hết hạn',
+      cardClassName: 'border-rose-100 hover:border-rose-200 focus:ring-rose-100',
+      badgeClassName: 'border-rose-100 bg-rose-50 text-rose-600',
+    };
+  }
+
+  if (hoursLeft < 24) {
+    return {
+      label: `Còn ${Math.ceil(hoursLeft)} giờ`,
+      cardClassName: 'border-rose-100 hover:border-rose-200 focus:ring-rose-100',
+      badgeClassName: 'border-rose-100 bg-rose-50 text-rose-600',
+    };
+  }
+
+  if (hoursLeft <= 72) {
+    return {
+      label: `Còn ${Math.ceil(hoursLeft / 24)} ngày`,
+      cardClassName: 'border-amber-100 hover:border-amber-200 focus:ring-amber-100',
+      badgeClassName: 'border-amber-100 bg-amber-50 text-amber-600',
+    };
+  }
+
+  return {
+    label: `Còn ${Math.ceil(hoursLeft / 24)} ngày`,
+    cardClassName: 'border-emerald-100 hover:border-emerald-200 focus:ring-emerald-100',
+    badgeClassName: 'border-emerald-100 bg-emerald-50 text-emerald-600',
+  };
+}
+
+function getContentTypeIcon(contentType: string) {
+  if (contentType === 'image') return ImageIcon;
+  if (contentType === 'pdf') return FileDown;
+  if (contentType === 'file') return File;
+  return FileText;
+}
+
+function getContentTypeLabel(contentType: string) {
+  if (contentType === 'image') return 'image';
+  if (contentType === 'pdf') return 'pdf';
+  if (contentType === 'file') return 'file';
+  return 'markdown';
+}
+
+function normalizeText(value: string) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function formatDateTime(value: string | null) {
+  if (!value) return '--';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString('vi-VN');
 }
