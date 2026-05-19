@@ -1,6 +1,7 @@
 import BaseRestApiClient from './client';
 import type { 
   Classroom, 
+  ClassroomMember,
   PaginatedResponse, 
   CreateClassroomRequest, 
   UpdateClassroomRequest,
@@ -34,6 +35,10 @@ export class ClassroomApiClient extends BaseRestApiClient {
 
   public async getSharingLink(uid: string): Promise<SharingLink> {
     return this.get<SharingLink>(`/api/v1/space/course/classrooms/${uid}/sharing_link/`);
+  }
+
+  public async members(uid: string): Promise<ClassroomMember[]> {
+    return this.get<ClassroomMember[]>(`/api/v1/space/course/classrooms/${uid}/members/`);
   }
 
   // Consumer side

@@ -1,5 +1,6 @@
 import { authApi } from './auth';
 import { classroomApi } from './classroom';
+import { examApi } from './exam';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
@@ -11,13 +12,14 @@ export * from './exceptions';
 export const api = {
   auth: authApi,
   classrooms: classroomApi,
+  exams: examApi,
   spaces: spaceApiInstance,
   consumers: consumerApiInstance,
   account: accountService,
 };
 
 // Re-export specific instances
-export { authApi, classroomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService };
+export { authApi, classroomApi, examApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService };
 
 // Backward compatibility exports for the previous structure
 export const consumerApi = {
@@ -38,6 +40,7 @@ export const spaceApi = {
     register: authApi.spaceRegister.bind(authApi),
   },
   classrooms: classroomApi,
+  exams: examApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,
   }
