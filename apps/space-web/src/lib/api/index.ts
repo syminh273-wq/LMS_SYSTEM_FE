@@ -1,18 +1,21 @@
 import { authApi } from './auth';
 import { classroomApi } from './classroom';
 import { examApi } from './exam';
+import { quizApi } from './quiz';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
 
 export * from './types';
 export * from './exceptions';
+export { quizApi };
 
 // For backward compatibility and centralized access
 export const api = {
   auth: authApi,
   classrooms: classroomApi,
   exams: examApi,
+  quizzes: quizApi,
   spaces: spaceApiInstance,
   consumers: consumerApiInstance,
   account: accountService,
@@ -41,6 +44,7 @@ export const spaceApi = {
   },
   classrooms: classroomApi,
   exams: examApi,
+  quizzes: quizApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,
   }

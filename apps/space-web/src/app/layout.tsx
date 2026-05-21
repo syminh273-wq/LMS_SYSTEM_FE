@@ -7,13 +7,14 @@ import { Button } from '@shared/components/ui/button';
 import { Providers } from "@/components/Providers";
 import { Toaster } from "sonner";
 import "./globals.css";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  LogOut,
   BookOpen,
-  UserCircle
+  UserCircle,
+  Trophy,
 } from 'lucide-react';
 
 export default function RootLayout({
@@ -26,8 +27,8 @@ export default function RootLayout({
 
   const navItems = [
     { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
-    { name: 'Classrooms', href: '/space/classrooms', icon: BookOpen },
-    { name: 'Staff Management', href: '/space/staff', icon: Users },
+    { name: 'Lớp học', href: '/space/classrooms', icon: BookOpen },
+    { name: 'Quiz Library', href: '/space/quizzes', icon: Trophy },
     { name: 'Settings', href: '/space/settings', icon: Settings },
   ];
 
@@ -49,7 +50,9 @@ export default function RootLayout({
                 
                 <nav className="flex-1 px-4 space-y-1 mt-4">
                   {navItems.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive = item.href === '/space'
+                      ? pathname === '/space'
+                      : pathname.startsWith(item.href);
                     return (
                       <Link
                         key={item.name}

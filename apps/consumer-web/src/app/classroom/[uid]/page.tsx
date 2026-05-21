@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, Classroom, Exam } from '@/lib/api';
-import type { ChatMessage } from '@/lib/api/types';
+import { classroomApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
+import type { ChatMessage, QuizSummary } from '@/lib/api/types';
 import {
   Loader2,
   ArrowLeft,
@@ -24,12 +24,14 @@ import {
   Clock,
   File,
   Image as ImageIcon,
+  Trophy,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'meeting';
+type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
@@ -101,6 +103,8 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [loadingExams, setLoadingExams] = useState(false);
   const [examError, setExamError] = useState('');
   const [selectedExamGroup, setSelectedExamGroup] = useState<ExamGroupKey | null>(null);
+  const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
   const [activeTab, setActiveTab] = useState<ClassroomTab>('discussion');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -134,8 +138,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoadingExams(true);
         setExamError('');
+        // @ts-expect-error exams method may not exist yet
         const data = await classroomApi.exams(uid);
-        setExams(data.filter(exam => exam.status === 'published'));
+        setExams((data as Exam[]).filter(exam => exam.status === 'published'));
       } catch (err: unknown) {
         setExamError(err instanceof Error ? err.message : 'Không thể tải danh sách bài kiểm tra');
       } finally {
@@ -145,6 +150,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
     void fetchExams();
   }, [isAuthenticated, uid]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !uid || activeTab !== 'quiz') return;
+    const fetchQuizzes = async () => {
+      setLoadingQuizzes(true);
+      try {
+        const data = await consumerQuizApi.listByClassroom(uid);
+        setQuizzes(data.filter(q => q.status === 'published'));
+      } catch {
+        // silently fail — quiz tab shows empty state
+      } finally {
+        setLoadingQuizzes(false);
+      }
+    };
+    void fetchQuizzes();
+  }, [isAuthenticated, uid, activeTab]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -252,6 +273,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'lessons' as const, icon: BookOpen, label: 'Bài học' },
                 { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
+                { key: 'quiz' as const, icon: Trophy, label: 'Quiz Game' },
                 { key: 'meeting' as const, icon: Video, label: 'Phòng họp' }
               ].map((item) => (
                 <button 
@@ -340,7 +362,60 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
-            {activeTab !== 'discussion' && activeTab !== 'exams' && (
+            {/* Quiz Game Tab */}
+            {activeTab === 'quiz' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Trophy size={17} className="text-indigo-600" />
+                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Quiz Game</span>
+                  </div>
+                  <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black uppercase text-indigo-600">
+                    {quizzes.length} quiz
+                  </span>
+                </div>
+                <div className="p-5">
+                  {loadingQuizzes ? (
+                    <div className="flex items-center justify-center h-32 text-slate-400">
+                      <Loader2 size={26} className="animate-spin" />
+                    </div>
+                  ) : quizzes.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-40 text-center text-slate-400">
+                      <Trophy size={38} className="mb-3 opacity-30" />
+                      <p className="text-sm font-medium">Chưa có quiz nào</p>
+                      <p className="text-xs mt-1">Giáo viên chưa phân công quiz cho lớp học này</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4">
+                      {quizzes.map(quiz => (
+                        <button
+                          key={quiz.uid}
+                          type="button"
+                          onClick={() => router.push(`/classroom/${uid}/quiz/${quiz.uid}`)}
+                          className="w-full flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                        >
+                          <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-200">
+                            <Trophy size={22} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-black text-slate-900 text-sm truncate">{quiz.title}</h4>
+                            {quiz.description && (
+                              <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{quiz.description}</p>
+                            )}
+                            <div className="mt-1 text-[10px] font-black uppercase text-indigo-500">
+                              {quiz.questions_count} câu hỏi trắc nghiệm
+                            </div>
+                          </div>
+                          <ChevronRight size={18} className="text-slate-400 shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && (
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="flex h-64 flex-col items-center justify-center text-center text-slate-400">
                   <FileText size={38} className="mb-3 opacity-30" />
@@ -348,6 +423,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 </div>
               </div>
             )}
+
 
             {/* Exams */}
             {activeTab === 'exams' && (

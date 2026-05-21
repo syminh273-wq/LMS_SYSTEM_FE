@@ -1,5 +1,6 @@
 import { authApi } from './auth';
 import { classroomApi } from './classroom';
+import { consumerQuizApi } from './quiz';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
@@ -7,6 +8,7 @@ import { SharingLink } from './types';
 
 export * from './types';
 export * from './exceptions';
+export { consumerQuizApi };
 
 // For backward compatibility and centralized access
 export const api = {

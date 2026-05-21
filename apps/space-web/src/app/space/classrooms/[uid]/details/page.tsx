@@ -23,8 +23,18 @@ import {
   Eye,
   MoreVertical,
   Pencil,
-  Trash2
+  Trash2,
+  Gamepad2,
+  Check,
+  BookOpen,
+  Clock,
+  RotateCcw,
+  RefreshCw,
+  Shuffle,
+  HelpCircle,
 } from 'lucide-react';
+import { quizApi } from '@/lib/api/quiz';
+import type { Quiz } from '@/lib/api/types';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
 import {
@@ -74,7 +84,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'exams'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'exams' | 'quiz'>('info');
   const [conversationUid, setConversationUid] = useState<string | null>(null);
 
   type DocItem = { uid: string; name: string; size: string; date: string; url: string; file_type: string };
@@ -87,6 +97,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [loadingExams, setLoadingExams] = useState(false);
   const [deletingExamUid, setDeletingExamUid] = useState<string | null>(null);
   const [canManageExams, setCanManageExams] = useState(true);
+
+  // Quiz tab state
+  const [assignedQuizzes, setAssignedQuizzes] = useState<Quiz[]>([]);
+  const [loadingQuizzes, setLoadingQuizzes] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [unassigningUid, setUnassigningUid] = useState<string | null>(null);
+  const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -120,7 +137,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'exams') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'exams' || tab === 'quiz') {
       setActiveTab(tab);
     }
     if (isExamKind(kind)) {
@@ -149,6 +166,38 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         toast.error('Không thể tải kênh thảo luận');
       });
   }, [activeTab, uid, conversationUid]);
+
+  const fetchAssignedQuizzes = React.useCallback(async () => {
+    setLoadingQuizzes(true);
+    try {
+      const data = await quizApi.list(uid);
+      setAssignedQuizzes(data);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách quiz');
+    } finally {
+      setLoadingQuizzes(false);
+    }
+  }, [uid]);
+
+  useEffect(() => {
+    if (activeTab === 'quiz') {
+      void fetchAssignedQuizzes();
+    }
+  }, [activeTab, fetchAssignedQuizzes]);
+
+  const handleUnassignQuiz = async (quiz: Quiz) => {
+    if (!window.confirm(`Bỏ giao quiz "${quiz.title}" khỏi lớp này?`)) return;
+    setUnassigningUid(quiz.uid);
+    try {
+      await quizApi.unassignFromClassroom(quiz.uid, uid);
+      setAssignedQuizzes(prev => prev.filter(q => q.uid !== quiz.uid));
+      toast.success('Đã bỏ giao quiz');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể bỏ giao quiz');
+    } finally {
+      setUnassigningUid(null);
+    }
+  };
 
   const fetchExams = React.useCallback(async () => {
     setLoadingExams(true);
@@ -405,6 +454,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <ClipboardList size={18} />
               Bài kiểm tra
             </button>
+            <button
+              onClick={() => setActiveTab('quiz')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'quiz' ? 'bg-violet-50 text-violet-600' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              <Gamepad2 size={18} />
+              Quiz Game
+            </button>
           </div>
 
           <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden">
@@ -577,6 +633,90 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {activeTab === 'chat' && !conversationUid && (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="animate-spin text-slate-400" size={32} />
+            </div>
+          )}
+
+
+          {activeTab === 'quiz' && (
+            <div className="flex flex-col h-full animate-in fade-in duration-300">
+              <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-slate-900">Quiz Game</h3>
+                  <p className="text-xs text-slate-500 font-medium">Giao quiz cho sinh viên trong lớp chơi</p>
+                </div>
+                <Button
+                  onClick={() => setShowAssignModal(true)}
+                  className="bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs rounded-xl h-10 px-5 gap-2 shadow-lg shadow-violet-100"
+                >
+                  <Plus size={16} />
+                  Chọn Quiz để giao
+                </Button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-3">
+                {loadingQuizzes ? (
+                  <div className="flex items-center justify-center h-40 text-slate-400">
+                    <Loader2 size={32} className="animate-spin" />
+                  </div>
+                ) : assignedQuizzes.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-52 text-slate-400">
+                    <Gamepad2 size={42} className="mb-3 opacity-30" />
+                    <p className="text-sm font-medium">Chưa có quiz nào được giao</p>
+                    <p className="text-xs mt-1 mb-5">Nhấn "Chọn Quiz để giao" để thêm quiz cho lớp</p>
+                    <Button onClick={() => setShowAssignModal(true)} variant="outline" className="rounded-xl gap-2 font-bold text-xs">
+                      <Plus size={15} /> Chọn Quiz
+                    </Button>
+                  </div>
+                ) : (
+                  assignedQuizzes.map(quiz => {
+                    const assignment = quiz.assigned_classrooms?.[0];
+                    const timeLimitMin = assignment?.time_limit_seconds ? Math.round(assignment.time_limit_seconds / 60) : 0;
+                    const maxAttempts = assignment?.max_attempts ?? 0;
+                    return (
+                      <div key={quiz.uid} className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-violet-200 hover:shadow-md transition-all p-5 flex items-center gap-4">
+                        <div className="w-11 h-11 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 shrink-0">
+                          <BookOpen size={20} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-black text-slate-900 text-sm truncate">{quiz.title}</div>
+                          <div className="flex items-center gap-3 mt-1.5 text-[11px] font-bold text-slate-400 uppercase flex-wrap">
+                            <span>{quiz.questions_count} câu hỏi</span>
+                            <span className="flex items-center gap-1">
+                              <Clock size={10} />
+                              {timeLimitMin > 0 ? `${timeLimitMin} phút` : 'Không giới hạn TG'}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <RefreshCw size={10} />
+                              {maxAttempts > 0 ? `${maxAttempts} lần` : 'Không giới hạn lần'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingQuiz(quiz)}
+                            className="h-9 w-9 rounded-lg text-slate-400 hover:text-violet-600"
+                            title="Cài đặt"
+                          >
+                            <Settings size={15} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            disabled={unassigningUid === quiz.uid}
+                            onClick={() => void handleUnassignQuiz(quiz)}
+                            className="h-9 w-9 rounded-lg text-slate-400 hover:text-rose-500"
+                            title="Bỏ giao"
+                          >
+                            {unassigningUid === quiz.uid ? <Loader2 size={16} className="animate-spin" /> : <X size={16} />}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
           )}
 
@@ -765,6 +905,342 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
             </div>
           )}
+        </div>
+      </div>
+      {showAssignModal && (
+        <AssignQuizModal
+          classroomId={uid}
+          assignedIds={assignedQuizzes.map(q => q.uid)}
+          onClose={() => setShowAssignModal(false)}
+          onAssigned={(quiz) => {
+            setAssignedQuizzes(prev => [quiz, ...prev]);
+            toast.success(`Đã giao quiz "${quiz.title}" cho lớp`);
+          }}
+        />
+      )}
+      {editingQuiz && (
+        <EditSettingsModal
+          quiz={editingQuiz}
+          classroomId={uid}
+          onClose={() => setEditingQuiz(null)}
+          onSaved={(updated) => {
+            setAssignedQuizzes(prev => prev.map(q => q.uid === updated.uid ? updated : q));
+            setEditingQuiz(null);
+            toast.success('Đã cập nhật cài đặt quiz');
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+function AssignQuizModal({
+  classroomId,
+  assignedIds,
+  onClose,
+  onAssigned,
+}: {
+  classroomId: string;
+  assignedIds: string[];
+  onClose: () => void;
+  onAssigned: (quiz: Quiz) => void;
+}) {
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pendingQuiz, setPendingQuiz] = useState<Quiz | null>(null);
+
+  // Settings
+  const [timeLimitMin, setTimeLimitMin] = useState(0);
+  const [maxAttempts, setMaxAttempts] = useState(0);
+  const [shuffleQuestions, setShuffleQuestions] = useState(false);
+  const [shuffleOptions, setShuffleOptions] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(true);
+  const [passingScore, setPassingScore] = useState(50);
+
+  const [assigning, setAssigning] = useState(false);
+  const [localAssigned, setLocalAssigned] = useState<Set<string>>(new Set(assignedIds));
+
+  useEffect(() => {
+    quizApi.list().then(data => {
+      setQuizzes(data);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const handleConfirmAssign = async () => {
+    if (!pendingQuiz || assigning) return;
+    setAssigning(true);
+    try {
+      const assignment = await quizApi.assignToClassroom(pendingQuiz.uid, classroomId, {
+        time_limit_seconds: timeLimitMin > 0 ? timeLimitMin * 60 : 0,
+        max_attempts: maxAttempts,
+        shuffle_questions: shuffleQuestions,
+        shuffle_options: shuffleOptions,
+        show_explanation: showExplanation,
+        passing_score_pct: passingScore,
+      });
+
+      // Update the quiz object with assignment info to reflect in UI
+      const updatedQuiz = { ...pendingQuiz, assigned_classrooms: [assignment] };
+
+      setLocalAssigned(prev => new Set([...prev, pendingQuiz.uid]));
+      onAssigned(updatedQuiz);
+      setPendingQuiz(null);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể giao quiz');
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  // ── Settings step ──────────────────────────────────────────────────────────
+  if (pendingQuiz) {
+    return (
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-200">
+          <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+            <button type="button" onClick={() => setPendingQuiz(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h2 className="font-black text-slate-900">Cài đặt trước khi giao</h2>
+              <p className="text-xs text-slate-500 font-medium mt-0.5 truncate max-w-xs">{pendingQuiz.title}</p>
+            </div>
+          </div>
+
+          <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh]">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</label>
+                <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</label>
+                <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5">Điểm đạt: {passingScore}%</label>
+              <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
+                className="w-full accent-violet-600" />
+            </div>
+
+            <div className="space-y-3">
+              {[
+                { label: 'Trộn câu hỏi', icon: Shuffle, val: shuffleQuestions, set: setShuffleQuestions },
+                { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
+                { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
+              ].map(item => (
+                <label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 cursor-pointer">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                    <item.icon size={14} className="text-slate-400" /> {item.label}
+                  </div>
+                  <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
+                    className="w-4 h-4 rounded text-violet-600 focus:ring-violet-500" />
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="p-6 pt-0 flex gap-3">
+            <Button variant="outline" onClick={() => setPendingQuiz(null)} className="flex-1 rounded-xl font-bold text-xs h-11">
+              Quay lại
+            </Button>
+            <Button
+              onClick={() => void handleConfirmAssign()}
+              disabled={assigning}
+              className="flex-1 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs h-11 gap-2 shadow-lg shadow-violet-100"
+            >
+              {assigning ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              Giao cho lớp
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Quiz list step ─────────────────────────────────────────────────────────
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[80vh] flex flex-col">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="font-black text-slate-900">Chọn Quiz để giao</h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">Nhấn vào quiz để cài đặt và giao cho lớp</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400">
+            <X size={20} />
+          </Button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          {loading ? (
+            <div className="flex items-center justify-center h-40 text-slate-400">
+              <Loader2 size={28} className="animate-spin" />
+            </div>
+          ) : quizzes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-40 text-slate-400">
+              <BookOpen size={36} className="mb-3 opacity-30" />
+              <p className="text-sm font-medium">Thư viện quiz trống</p>
+              <p className="text-xs mt-1">Tạo quiz mới tại trang Thư viện Quiz</p>
+            </div>
+          ) : (
+            quizzes.map(quiz => {
+              const assigned = localAssigned.has(quiz.uid);
+              return (
+                <button
+                  key={quiz.uid}
+                  type="button"
+                  disabled={assigned}
+                  onClick={() => { setPendingQuiz(quiz); setTimeLimitMin(0); setMaxAttempts(0); }}
+                  className={`w-full text-left rounded-2xl border-2 p-4 transition-all flex items-center gap-4 ${
+                    assigned
+                      ? 'border-emerald-200 bg-emerald-50 cursor-default'
+                      : 'border-slate-100 bg-white hover:border-violet-300 hover:bg-violet-50 cursor-pointer'
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
+                    {assigned ? <Check size={18} /> : <BookOpen size={18} />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-black text-sm text-slate-900 truncate">{quiz.title}</div>
+                    <div className="flex items-center gap-3 mt-0.5 text-[10px] font-bold text-slate-400 uppercase">
+                      <span>{quiz.questions_count} câu hỏi</span>
+                    </div>
+                  </div>
+                  {assigned ? (
+                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-emerald-100 px-2 py-1 rounded-full shrink-0">Đã giao</span>
+                  ) : (
+                    <span className="text-[10px] font-black text-violet-500 uppercase bg-violet-50 px-2 py-1 rounded-full shrink-0">Chọn</span>
+                  )}
+                </button>
+              );
+            })
+          )}
+        </div>
+
+        <div className="p-4 border-t border-slate-100">
+          <Button onClick={onClose} variant="outline" className="w-full rounded-xl font-bold text-xs h-10">
+            Đóng
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditSettingsModal({
+  quiz,
+  classroomId,
+  onClose,
+  onSaved,
+}: {
+  quiz: Quiz;
+  classroomId: string;
+  onClose: () => void;
+  onSaved: (updated: Quiz) => void;
+}) {
+  const existing = quiz.assigned_classrooms?.[0];
+  const [timeLimitMin, setTimeLimitMin] = useState(
+    existing?.time_limit_seconds ? Math.round(existing.time_limit_seconds / 60) : 0
+  );
+  const [maxAttempts, setMaxAttempts] = useState(existing?.max_attempts ?? 0);
+  const [shuffleQuestions, setShuffleQuestions] = useState(existing?.shuffle_questions ?? false);
+  const [shuffleOptions, setShuffleOptions] = useState(existing?.shuffle_options ?? false);
+  const [showExplanation, setShowExplanation] = useState(existing?.show_explanation ?? true);
+  const [passingScore, setPassingScore] = useState(existing?.passing_score_pct ?? 50);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const assignment = await quizApi.updateAssignment(quiz.uid, classroomId, {
+        time_limit_seconds: timeLimitMin > 0 ? timeLimitMin * 60 : 0,
+        max_attempts: maxAttempts,
+        shuffle_questions: shuffleQuestions,
+        shuffle_options: shuffleOptions,
+        show_explanation: showExplanation,
+        passing_score_pct: passingScore,
+      });
+      // reflect updated settings on the quiz object
+      const updated: Quiz = {
+        ...quiz,
+        assigned_classrooms: [assignment],
+      };
+      onSaved(updated);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể cập nhật cài đặt');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="font-black text-slate-900">Cài đặt Quiz</h2>
+            <p className="text-xs text-slate-500 font-medium mt-0.5 truncate max-w-xs">{quiz.title}</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400">
+            <X size={20} />
+          </Button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</label>
+              <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</label>
+              <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5">Điểm đạt: {passingScore}%</label>
+            <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
+              className="w-full accent-violet-600" />
+          </div>
+
+          <div className="space-y-3">
+            {[
+              { label: 'Trộn câu hỏi', icon: Shuffle, val: shuffleQuestions, set: setShuffleQuestions },
+              { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
+              { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
+            ].map(item => (
+              <label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 cursor-pointer">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                  <item.icon size={14} className="text-slate-400" /> {item.label}
+                </div>
+                <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
+                  className="w-4 h-4 rounded text-violet-600 focus:ring-violet-500" />
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-6 pt-0 flex gap-3">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl font-bold text-xs h-11">
+            Hủy
+          </Button>
+          <Button
+            onClick={() => void handleSave()}
+            disabled={saving}
+            className="flex-1 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold text-xs h-11 gap-2 shadow-lg shadow-violet-100"
+          >
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+            Lưu cài đặt
+          </Button>
         </div>
       </div>
     </div>

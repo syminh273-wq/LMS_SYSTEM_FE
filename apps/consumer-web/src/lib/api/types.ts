@@ -134,6 +134,87 @@ export type Message = {
   created_at: string;
 };
 
+export type Exam = {
+  uid: string;
+  classroom_id: string;
+  title: string;
+  description: string;
+  content_type: 'markdown' | 'file' | 'pdf' | 'image';
+  content: string;
+  status: 'draft' | 'published' | 'closed';
+  due_date: string;
+  resource_uid?: string | null;
+  resource_url?: string | null;
+  resource_name?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type QuizQuestionPublic = {
+  uid: string;
+  quiz_id: string;
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  order: number;
+};
+
+export type QuizSummary = {
+  uid: string;
+  created_by: string;
+  resource_id?: string | null;
+  title: string;
+  description: string;
+  questions_count: number;
+  status: string;
+  time_limit_seconds: number;
+  max_attempts: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type QuizAttemptRecord = {
+  uid: string;
+  quiz_id: string;
+  student_id: string;
+  classroom_id: string;
+  attempt_number: number;
+  score: number;
+  total_questions: number;
+  score_pct: number;
+  time_taken_seconds: number;
+  submitted_at: string;
+};
+
+export type QuizPublicDetail = QuizSummary & {
+  questions: QuizQuestionPublic[];
+};
+
+export type QuizSubmitRequest = {
+  answers: Record<string, 'a' | 'b' | 'c' | 'd'>;
+  classroom_id: string;
+  time_taken_seconds?: number;
+};
+
+export type QuizResult = {
+  total: number;
+  correct: number;
+  score: number;
+  attempt_number: number;
+  attempts_used: number;
+  attempts_remaining: number | null;
+  results: Array<{
+    question_uid: string;
+    question_text: string;
+    chosen: string | null;
+    correct_answer: string;
+    is_correct: boolean;
+    explanation: string;
+  }>;
+};
+
 export type SharingLink = {
   uid: string;
   code: string;
