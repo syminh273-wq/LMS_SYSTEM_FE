@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, Classroom, Exam } from '@/lib/api';
-import type { ChatMessage } from '@/lib/api/types';
+import { classroomApi } from '@/lib/api';
+import type { Classroom, Exam, Message } from '@/lib/api/types';
 import {
   Loader2,
   ArrowLeft,
@@ -31,7 +31,7 @@ import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 
 type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'meeting';
 
-function MessageBubble({ msg }: { msg: ChatMessage }) {
+function MessageBubble({ msg }: { msg: Message }) {
   const time = new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
   const renderAttachment = () => {
@@ -310,7 +310,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     </div>
                   )}
 
-                  {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} />)}
+                  {messages.map((msg: Message) => <MessageBubble key={msg.uid} msg={msg} />)}
                   <div ref={messagesEndRef} />
                 </div>
 

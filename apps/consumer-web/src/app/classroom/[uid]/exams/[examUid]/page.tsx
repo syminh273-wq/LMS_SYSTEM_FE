@@ -17,7 +17,8 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { classroomApi, Classroom, Exam, ExamContentType, ExamSubmission } from '@/lib/api';
+import { classroomApi } from '@/lib/api';
+import type { Classroom, Exam, ExamContentType, ExamSubmission } from '@/lib/api/types';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 
 export default function ConsumerExamDetailPage({ params }: { params: Promise<{ uid: string; examUid: string }> }) {
@@ -59,7 +60,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
         setExam(publishedExam);
 
         try {
-          const currentSubmission = await classroomApi.examSubmission(examUid);
+          const currentSubmission = await classroomApi.examSubmission(uid, examUid);
           setSubmission(currentSubmission);
         } catch {
           setSubmission(null);
@@ -152,15 +153,14 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
       setSubmitError('');
       setSubmitMessage('');
       const selectedFile = answerFile;
-      const uploadedResource = selectedFile
-        ? await saveSubmissionResource(selectedFile, examUid, submission?.resource_uid || null)
-        : null;
       const contentType = selectedFile ? getSubmissionContentType(selectedFile) : submission?.content_type || 'file';
-      const savedSubmission = await classroomApi.submitExam(examUid, {
-        content_type: contentType,
-        content: '',
-        resource_uid: uploadedResource?.uid || submission?.resource_uid || null,
-      });
+      const savedSubmission = selectedFile
+        ? await submitExamFile(uid, examUid, selectedFile, contentType)
+        : await classroomApi.submitExam(uid, examUid, {
+            content_type: contentType,
+            content: '',
+            resource_uid: submission?.resource_uid || null,
+          });
       setSubmission(savedSubmission);
       setAnswerFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -185,7 +185,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
       setSubmitting(true);
       setSubmitError('');
       setSubmitMessage('');
-      const savedSubmission = await classroomApi.submitExam(examUid, {
+      const savedSubmission = await classroomApi.submitExam(uid, examUid, {
         content_type: 'markdown',
         content: '',
         resource_uid: null,
@@ -468,28 +468,14 @@ function DownloadButton({ url, label }: { url: string; label: string }) {
   );
 }
 
-async function uploadSubmissionResource(file: File, examUid: string) {
+async function submitExamFile(classroomUid: string, examUid: string, file: File, contentType: ExamContentType) {
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('content_type', contentType);
+  formData.append('content', '');
   formData.append('metadata', JSON.stringify({ context: 'exam_submission', exam_uid: examUid }));
 
-  return classroomApi.uploadSubmissionResource(formData);
-}
-
-async function reuploadSubmissionResource(file: File, examUid: string, resourceUid: string) {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('metadata', JSON.stringify({ context: 'exam_submission', exam_uid: examUid }));
-
-  return classroomApi.reuploadSubmissionResource(resourceUid, formData);
-}
-
-async function saveSubmissionResource(file: File, examUid: string, resourceUid: string | null) {
-  if (resourceUid) {
-    return reuploadSubmissionResource(file, examUid, resourceUid);
-  }
-
-  return uploadSubmissionResource(file, examUid);
+  return classroomApi.submitExam(classroomUid, examUid, formData);
 }
 
 function getSubmissionContentType(file: File): ExamContentType {
