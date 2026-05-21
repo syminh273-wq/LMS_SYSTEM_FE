@@ -32,9 +32,15 @@ import {
   RefreshCw,
   Shuffle,
   HelpCircle,
+  Video,
+  MonitorUp,
+  Camera,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
+import type { MeetingRoom } from '@/lib/api/meeting-room';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
 import {
@@ -49,6 +55,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { toast } from 'sonner';
 import { chatApi } from '@/lib/api/chat';
 import ClassroomChatPanel from '@/components/chat/ClassroomChatPanel';
+import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
+import { useRTC } from '@/lib/hooks/use-rtc';
 
 interface ClassroomDetailsPageProps {
   params: Promise<{ uid: string }>;
@@ -84,8 +92,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'exams' | 'quiz'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'quiz'>('info');
   const [conversationUid, setConversationUid] = useState<string | null>(null);
+  const [meetingRooms, setMeetingRooms] = useState<MeetingRoom[]>([]);
+  const [loadingMeetings, setLoadingMeetings] = useState(false);
+  const [meetingAction, setMeetingAction] = useState<'start' | 'end' | null>(null);
 
   type DocItem = { uid: string; name: string; size: string; date: string; url: string; file_type: string };
   const [documents, setDocuments] = useState<DocItem[]>([]);
@@ -104,6 +115,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [unassigningUid, setUnassigningUid] = useState<string | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+  const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare, stopScreenShare } = useRTC(uid);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -137,7 +149,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'exams' || tab === 'quiz') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'quiz') {
       setActiveTab(tab);
     }
     if (isExamKind(kind)) {
@@ -166,6 +178,24 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         toast.error('Không thể tải kênh thảo luận');
       });
   }, [activeTab, uid, conversationUid]);
+
+  const fetchMeetingRooms = React.useCallback(async () => {
+    setLoadingMeetings(true);
+    try {
+      const rooms = await spaceApi.meetingRooms.getByClassroom(uid);
+      setMeetingRooms(rooms);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể tải phòng họp');
+    } finally {
+      setLoadingMeetings(false);
+    }
+  }, [uid]);
+
+  useEffect(() => {
+    if (activeTab === 'meeting') {
+      void fetchMeetingRooms();
+    }
+  }, [activeTab, fetchMeetingRooms]);
 
   const fetchAssignedQuizzes = React.useCallback(async () => {
     setLoadingQuizzes(true);
@@ -291,6 +321,46 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       toast.error(err instanceof Error ? err.message : 'Không thể xóa bài kiểm tra');
     } finally {
       setDeletingExamUid(null);
+    }
+  };
+
+  const activeMeeting = meetingRooms.find(room => room.status === 'active') || null;
+  const latestMeeting = meetingRooms[0] || null;
+
+  const handleStartMeeting = async (source: 'screen' | 'camera') => {
+    if (!classroom || meetingAction) return;
+
+    setMeetingAction('start');
+    try {
+      const room = activeMeeting || await spaceApi.meetingRooms.quickStart({
+        classroom_uid: uid,
+        title: `Buổi học trực tuyến - ${classroom.name}`,
+        description: `Phòng học trực tuyến cho lớp ${classroom.name}`,
+        max_participants: classroom.max_students,
+      });
+      setMeetingRooms(prev => [room, ...prev.filter(item => item.uid !== room.uid)]);
+      await startMediaShare(source);
+      toast.success(source === 'screen' ? 'Đã mở phòng họp và chia sẻ màn hình' : 'Đã mở phòng họp và bật camera');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể mở phòng họp');
+    } finally {
+      setMeetingAction(null);
+    }
+  };
+
+  const handleEndMeeting = async () => {
+    if (!activeMeeting || meetingAction) return;
+
+    setMeetingAction('end');
+    try {
+      stopScreenShare();
+      const ended = await spaceApi.meetingRooms.end(activeMeeting.uid);
+      setMeetingRooms(prev => prev.map(room => room.uid === ended.uid ? ended : room));
+      toast.success('Đã kết thúc phòng họp');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể kết thúc phòng họp');
+    } finally {
+      setMeetingAction(null);
     }
   };
 
@@ -446,6 +516,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             >
               <MessageSquare size={18} />
               Thảo luận lớp học
+            </button>
+            <button
+              onClick={() => setActiveTab('meeting')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === 'meeting' ? 'bg-emerald-50 text-emerald-600' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              <Video size={18} />
+              Phòng họp
+              {activeMeeting && (
+                <span className="ml-auto h-2 w-2 rounded-full bg-emerald-500" />
+              )}
             </button>
             <button
               onClick={() => setActiveTab('exams')}
@@ -633,6 +713,144 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {activeTab === 'chat' && !conversationUid && (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="animate-spin text-slate-400" size={32} />
+            </div>
+          )}
+
+          {activeTab === 'meeting' && (
+            <div className="flex h-full flex-col animate-in fade-in duration-300">
+              <div className="border-b border-slate-100 bg-slate-50/50 p-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                  <h3 className="font-bold text-slate-900">Phòng họp trực tuyến</h3>
+                  <p className="text-xs text-slate-500 font-medium">Mở buổi học trực tuyến và chia sẻ màn hình cho sinh viên</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-black uppercase ${
+                    activeMeeting
+                      ? 'border-emerald-100 bg-emerald-50 text-emerald-600'
+                      : 'border-slate-200 bg-white text-slate-400'
+                  }`}>
+                    {activeMeeting ? <Wifi size={13} /> : <WifiOff size={13} />}
+                    {activeMeeting ? 'Đang mở' : 'Chưa mở'}
+                  </span>
+                  {activeMeeting ? (
+                    <>
+                      {!localStream ? (
+                        <>
+                          <Button
+                            onClick={() => void handleStartMeeting('screen')}
+                            disabled={meetingAction !== null}
+                            className="h-10 rounded-xl bg-emerald-600 px-5 gap-2 text-xs font-bold text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700"
+                          >
+                            {meetingAction === 'start' ? <Loader2 size={16} className="animate-spin" /> : <MonitorUp size={16} />}
+                            Chia sẻ màn hình
+                          </Button>
+                          <Button
+                            onClick={() => void handleStartMeeting('camera')}
+                            disabled={meetingAction !== null}
+                            variant="outline"
+                            className="h-10 rounded-xl px-5 gap-2 text-xs font-bold"
+                          >
+                            {meetingAction === 'start' ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                            Bật camera
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          onClick={stopMediaShare}
+                          disabled={meetingAction !== null}
+                          variant="outline"
+                          className="h-10 rounded-xl px-5 gap-2 text-xs font-bold"
+                        >
+                          <WifiOff size={16} />
+                          Dừng phát
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => void handleEndMeeting()}
+                        disabled={meetingAction !== null}
+                        variant="destructive"
+                        className="h-10 rounded-xl px-5 gap-2 text-xs font-bold"
+                      >
+                        {meetingAction === 'end' ? <Loader2 size={16} className="animate-spin" /> : <WifiOff size={16} />}
+                        Kết thúc phòng họp
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => void handleStartMeeting('screen')}
+                        disabled={meetingAction !== null}
+                        className="h-10 rounded-xl bg-emerald-600 px-5 gap-2 text-xs font-bold text-white shadow-lg shadow-emerald-100 hover:bg-emerald-700"
+                      >
+                        {meetingAction === 'start' ? <Loader2 size={16} className="animate-spin" /> : <MonitorUp size={16} />}
+                        Chia sẻ màn hình
+                      </Button>
+                      <Button
+                        onClick={() => void handleStartMeeting('camera')}
+                        disabled={meetingAction !== null}
+                        variant="outline"
+                        className="h-10 rounded-xl px-5 gap-2 text-xs font-bold"
+                      >
+                        {meetingAction === 'start' ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                        Bật camera
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                {loadingMeetings ? (
+                  <div className="flex h-40 items-center justify-center text-slate-400">
+                    <Loader2 size={32} className="animate-spin" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                      <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Trạng thái</div>
+                        <div className="mt-2 text-lg font-black text-slate-900">
+                          {activeMeeting ? 'Đang dạy trực tuyến' : 'Sẵn sàng mở lớp'}
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-slate-500">
+                          {activeMeeting ? `Bắt đầu ${formatDateTime(activeMeeting.started_at || activeMeeting.created_at)}` : 'Sinh viên sẽ thấy thông báo khi bạn mở phòng.'}
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Kết nối RTC</div>
+                        <div className="mt-2 flex items-center gap-2 text-lg font-black text-slate-900">
+                          {rtcConnected ? <Wifi size={18} className="text-emerald-500" /> : <WifiOff size={18} className="text-slate-400" />}
+                          {rtcConnected ? 'Đã kết nối' : 'Đang chờ'}
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-slate-500">Kênh tín hiệu dùng mã lớp hiện tại.</div>
+                      </div>
+                      <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Phòng gần nhất</div>
+                        <div className="mt-2 text-sm font-black text-slate-900 line-clamp-1">
+                          {latestMeeting?.title || 'Chưa có phòng họp'}
+                        </div>
+                        <div className="mt-1 text-xs font-medium text-slate-500">
+                          {latestMeeting ? formatDateTime(latestMeeting.created_at) : 'Mở phòng để tạo lịch sử.'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-slate-100 bg-slate-950 p-4 shadow-sm">
+                      {localStream ? (
+                        <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Camera đang phát' : 'Màn hình đang chia sẻ'} />
+                      ) : remoteStream ? (
+                        <ScreenShareViewer stream={remoteStream} label="Nguồn phát từ người tham gia" />
+                      ) : (
+                        <div className="flex aspect-video flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700 text-center text-slate-500">
+                          <Video size={48} className="mb-3 opacity-40" />
+                          <p className="text-sm font-black uppercase tracking-widest">Chưa chia sẻ màn hình</p>
+                          <p className="mt-1 text-xs font-medium">Nhấn "Mở phòng họp" để tạo phòng và bắt đầu chia sẻ.</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
 

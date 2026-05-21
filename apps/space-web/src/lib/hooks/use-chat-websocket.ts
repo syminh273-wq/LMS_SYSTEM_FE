@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useRef, useCallback, useState } from 'react';
+import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 import type { ChatMessage } from '@/lib/api/types';
-
-const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
 
 export type WsStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -41,8 +40,9 @@ export function useChatWebSocket({
     if (!token || !conversationUid) return;
 
     setStatus('connecting');
+    const wsBase = getWebSocketBaseUrl();
     const ws = new WebSocket(
-      `${WS_BASE}/ws/chat/${conversationUid}/?token=${token}`
+      `${wsBase}/ws/chat/${conversationUid}/?token=${token}`
     );
     wsRef.current = ws;
 

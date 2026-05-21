@@ -58,7 +58,7 @@ export default function DashboardPage() {
       <div className="max-w-6xl mx-auto space-y-8">
         <header className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <div className="cursor-pointer" onClick={() => router.push('/')}>
+            <div className="cursor-pointer" onClick={() => router.push('/dashboard')}>
               <Image src="/logo.jpg" alt="LMS LOGO" width={120} height={40} className="h-12 w-auto object-contain" />
             </div>
             <div>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
                   <DropdownMenuItem onClick={() => router.push('/admin')}>
                     Quản trị
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/')}>
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')}>
                     Trang chủ
                   </DropdownMenuItem>
                 </DropdownMenuGroup>

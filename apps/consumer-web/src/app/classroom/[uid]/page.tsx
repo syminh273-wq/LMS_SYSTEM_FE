@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
-import type { ChatMessage, QuizSummary } from '@/lib/api/types';
+import { classroomApi, meetingRoomApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
+import type { Message as ChatMessage, QuizSummary } from '@/lib/api/types';
 import {
   Loader2,
   ArrowLeft,
@@ -15,6 +15,8 @@ import {
   MessageSquare,
   FileText,
   Video,
+  MonitorUp,
+  Camera,
   ShieldCheck,
   Send,
   Wifi,
@@ -30,17 +32,19 @@ import {
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
+import { useRTC } from '@/lib/hooks/use-rtc';
+import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 
 type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
-  const time = new Date(msg.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
 
   const renderAttachment = () => {
     if (!msg.attachment) return null;
     const { url, name, type } = msg.attachment;
 
-    if (type === 'image') {
+    if (type === "image") {
       return (
         <a href={url} target="_blank" rel="noopener noreferrer">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -48,18 +52,17 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         </a>
       );
     }
-    if (type === 'video') {
+    if (type === "video") {
       return (
         <video controls src={url} className="max-w-[280px] rounded-xl mt-1 border border-slate-200">
           <track kind="captions" />
         </video>
       );
     }
-    if (type === 'audio') {
+    if (type === "audio") {
       return <audio controls src={url} className="mt-1 w-full max-w-[280px]" />;
     }
-    // pdf / file
-    const Icon = type === 'pdf' ? FileDown : FileText;
+    const Icon = type === "pdf" ? FileDown : FileText;
     return (
       <a
         href={url}
@@ -76,7 +79,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
   return (
     <div className="flex flex-col gap-0.5">
       <div className="flex items-baseline gap-2">
-        <span className="text-xs font-bold text-indigo-600">{msg.sender_name || 'Ẩn danh'}</span>
+        <span className="text-xs font-bold text-indigo-600">{msg.sender_name || "Ẩn danh"}</span>
         <span className="text-[10px] text-slate-400">{time}</span>
       </div>
       <div className="max-w-[85%]">
@@ -97,38 +100,44 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const { isAuthenticated, mounted } = useRequireAuth();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [draft, setDraft] = useState('');
+  const [error, setError] = useState("");
+  const [draft, setDraft] = useState("");
   const [exams, setExams] = useState<Exam[]>([]);
   const [loadingExams, setLoadingExams] = useState(false);
-  const [examError, setExamError] = useState('');
+  const [examError, setExamError] = useState("");
   const [selectedExamGroup, setSelectedExamGroup] = useState<ExamGroupKey | null>(null);
   const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
-  const [activeTab, setActiveTab] = useState<ClassroomTab>('discussion');
+  const [activeTab, setActiveTab] = useState<ClassroomTab>("discussion");
+  const [activeRoom, setActiveRoom] = useState<any>(null);
+  const [loadingRoom, setLoadingRoom] = useState(false);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
     messages, hasMore, loadingMore, connected, loading: chatLoading,
     sendMessage, scrollContainerRef, topSentinelRef,
   } = useClassroomChat(isAuthenticated ? uid : null);
+  const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare } = useRTC(uid);
+
 
   useEffect(() => {
-    if (isAuthenticated && uid) {
-      const fetchClassroom = async () => {
-        try {
-          setLoading(true);
-          const data = await classroomApi.retrieve(uid);
-          setClassroom(data);
-        } catch (err: any) {
-          setError(err.message || 'Không thể tải thông tin phòng học');
-        } finally {
-          setLoading(false);
-        }
-      };
-      
-      void fetchClassroom();
-    }
+    if (!isAuthenticated || !uid) return;
+
+    const fetchClassroom = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await classroomApi.retrieve(uid);
+        setClassroom(data);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Không thể tải thông tin phòng học');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchClassroom();
   }, [isAuthenticated, uid]);
 
   useEffect(() => {
@@ -137,7 +146,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     const fetchExams = async () => {
       try {
         setLoadingExams(true);
-        setExamError('');
+        setExamError("");
         // @ts-expect-error exams method may not exist yet
         const data = await classroomApi.exams(uid);
         setExams((data as Exam[]).filter(exam => exam.status === 'published'));
@@ -153,23 +162,44 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
   useEffect(() => {
     if (!isAuthenticated || !uid || activeTab !== 'quiz') return;
+
     const fetchQuizzes = async () => {
       setLoadingQuizzes(true);
       try {
         const data = await consumerQuizApi.listByClassroom(uid);
         setQuizzes(data.filter(q => q.status === 'published'));
       } catch {
-        // silently fail — quiz tab shows empty state
+        setQuizzes([]);
       } finally {
         setLoadingQuizzes(false);
       }
     };
+
     void fetchQuizzes();
-  }, [isAuthenticated, uid, activeTab]);
+  }, [activeTab, isAuthenticated, uid]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+
+  useEffect(() => {
+    if (isAuthenticated && uid && activeTab === 'meeting') {
+      const fetchRoom = async () => {
+        try {
+          setLoadingRoom(true);
+          const rooms = await meetingRoomApi.getByClassroom(uid);
+          const active = rooms.find(r => r.status === 'active');
+          setActiveRoom(active || null);
+        } catch (err) {
+          console.error('Failed to fetch meeting room:', err);
+        } finally {
+          setLoadingRoom(false);
+        }
+      };
+      void fetchRoom();
+    }
+  }, [isAuthenticated, uid, activeTab]);
 
   if (!mounted) return null;
 
@@ -415,7 +445,90 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
-            {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && (
+            {/* Meeting Tab */}
+            {activeTab === 'meeting' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col" style={{ height: '520px' }}>
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Video size={17} className="text-indigo-600" />
+                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Phòng họp trực tuyến</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold">
+                    {rtcConnected ? (
+                      <><Wifi size={13} className="text-emerald-500" /><span className="text-emerald-500">Đã kết nối tín hiệu</span></>
+                    ) : (
+                      <><WifiOff size={13} className="text-slate-400" /><span className="text-slate-400">Đang chờ tín hiệu...</span></>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {remoteStream ? (
+                      <ScreenShareViewer stream={remoteStream} label="Giảng viên" />
+                    ) : activeRoom ? (
+                      <div className="aspect-video bg-indigo-900/20 rounded-2xl flex flex-col items-center justify-center text-indigo-600 gap-4 border-2 border-indigo-200 border-dashed animate-pulse">
+                        <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+                          <Video size={32} />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm font-black uppercase tracking-widest">Lớp học đang diễn ra!</p>
+                          <p className="text-xs font-medium opacity-80 mt-1">Bấm nút bên dưới để tham gia</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center text-slate-500 gap-3 border-2 border-dashed border-slate-800">
+                        <Video size={48} className="opacity-20" />
+                        <p className="text-sm font-bold uppercase tracking-widest">Chưa có buổi học nào...</p>
+                      </div>
+                    )}
+                    
+                    {localStream && (
+                      <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Camera của bạn' : 'Màn hình của bạn'} />
+                    )}
+                  </div>
+
+                  <div className="mt-auto flex justify-center gap-4">
+                    {!localStream ? (
+                      <>
+                        <Button 
+                          onClick={() => void startMediaShare('screen')}
+                          className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 h-12 rounded-xl gap-2 shadow-lg shadow-indigo-100"
+                        >
+                          <MonitorUp size={18} />
+                          CHIA SẺ MÀN HÌNH
+                        </Button>
+                        <Button 
+                          onClick={() => void startMediaShare('camera')}
+                          variant="outline"
+                          className="font-bold px-8 h-12 rounded-xl gap-2"
+                        >
+                          <Camera size={18} />
+                          BẬT CAMERA
+                        </Button>
+                      </>
+                    ) : (
+                      <Button 
+                        onClick={stopMediaShare}
+                        variant="destructive"
+                        className="font-bold px-8 h-12 rounded-xl gap-2 shadow-lg shadow-rose-100"
+                      >
+                        <WifiOff size={18} />
+                        DỪNG CHIA SẺ
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    WebRTC Peer-to-Peer Connection • Bảo mật đầu cuối
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && activeTab !== 'meeting' && (
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="flex h-64 flex-col items-center justify-center text-center text-slate-400">
                   <FileText size={38} className="mb-3 opacity-30" />
@@ -502,7 +615,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           const deadline = getDeadlineMeta(exam.due_date);
                           const ContentIcon = getContentTypeIcon(exam.content_type);
 
-                          return (
+                            return (
                             <button
                               key={exam.uid}
                               type="button"

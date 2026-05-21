@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { classroomApi } from '@/lib/api';
+import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 import type { Conversation, Message } from '@/lib/api/types';
 
 const PAGE_SIZE = 10;
@@ -98,7 +99,7 @@ export function useClassroomChat(classroomUid: string | null) {
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (!token) return;
 
-    const wsBase = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+    const wsBase = getWebSocketBaseUrl();
     const ws = new WebSocket(`${wsBase}/ws/chat/${conversation.uid}/?token=${token}`);
     wsRef.current = ws;
 

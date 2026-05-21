@@ -1,6 +1,7 @@
 import { authApi } from './auth';
 import { classroomApi } from './classroom';
 import { examApi } from './exam';
+import { meetingRoomApi } from './meeting-room';
 import { quizApi } from './quiz';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
@@ -15,6 +16,7 @@ export const api = {
   auth: authApi,
   classrooms: classroomApi,
   exams: examApi,
+  meetingRooms: meetingRoomApi,
   quizzes: quizApi,
   spaces: spaceApiInstance,
   consumers: consumerApiInstance,
@@ -22,7 +24,7 @@ export const api = {
 };
 
 // Re-export specific instances
-export { authApi, classroomApi, examApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService };
+export { authApi, classroomApi, examApi, meetingRoomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService };
 
 // Backward compatibility exports for the previous structure
 export const consumerApi = {
@@ -44,6 +46,7 @@ export const spaceApi = {
   },
   classrooms: classroomApi,
   exams: examApi,
+  meetingRooms: meetingRoomApi,
   quizzes: quizApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,

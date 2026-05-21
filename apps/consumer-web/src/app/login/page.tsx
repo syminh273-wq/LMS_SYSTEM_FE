@@ -70,7 +70,7 @@ export default function LoginPage() {
         console.error("Failed to fetch profile after login:", profileErr);
       }
       
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       handleApiError(err, 'Đăng nhập');
     } finally { setLoading(false); }

@@ -20,10 +20,12 @@ npm install
 
 ### 2. Environment Variables
 
-Create a `.env.local` file in the `lms-system-fe` directory and add the backend API URL:
+Create a `.env.local` file in this app directory if you need to override the backend URL:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8000
+# Optional for chat/RTC WebSocket features through ngrok.
+# NEXT_PUBLIC_WS_URL=ws://localhost:8000
 ```
 
 ### 3. Run Development Server
