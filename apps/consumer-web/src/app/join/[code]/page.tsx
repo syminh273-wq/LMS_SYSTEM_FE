@@ -6,6 +6,7 @@ import { consumerApi, classroomApi, SharingLink } from '@/lib/api';
 import { Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
+import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
 
 export default function JoinPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
@@ -29,6 +30,7 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
       if (res.resource_type === 'classroom' && res.action === 'join') {
         // Join the classroom using the pid code
         await classroomApi.joinByCode(code);
+        void sendJoinClassroomNotification({ classroomId: res.resource_id, classroomName: res.metadata.name || '', code });
         toast.success(`Bạn đã tham gia lớp học: ${res.metadata.name || 'Thành công'}`);
         setStatus('success');
         setTimeout(() => {

@@ -22,6 +22,7 @@ import { classroomApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { toast } from 'sonner';
+import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
 import { Loader2, QrCode, KeyRound, X, Camera } from 'lucide-react';
 
 
@@ -102,6 +103,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
     setLoading(true);
     try {
       const classroom = await classroomApi.joinByCode(trimmed);
+      void sendJoinClassroomNotification({ classroomId: classroom.uid, classroomName: classroom.name, code: trimmed });
       toast.success(`Đã tham gia lớp "${classroom.name}" thành công!`);
       onJoined(classroom);
       onClose();

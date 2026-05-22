@@ -13,9 +13,9 @@ import {
   Settings,
   LogOut,
   BookOpen,
-  UserCircle,
-  Trophy,
+  UserCircle
 } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function RootLayout({
   children,
@@ -27,8 +27,8 @@ export default function RootLayout({
 
   const navItems = [
     { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
-    { name: 'Lớp học', href: '/space/classrooms', icon: BookOpen },
-    { name: 'Quiz Library', href: '/space/quizzes', icon: Trophy },
+    { name: 'Classrooms', href: '/space/classrooms', icon: BookOpen },
+    { name: 'Staff Management', href: '/space/staff', icon: Users },
     { name: 'Settings', href: '/space/settings', icon: Settings },
   ];
 
@@ -50,9 +50,7 @@ export default function RootLayout({
                 
                 <nav className="flex-1 px-4 space-y-1 mt-4">
                   {navItems.map((item) => {
-                    const isActive = item.href === '/space'
-                      ? pathname === '/space'
-                      : pathname.startsWith(item.href);
+                    const isActive = pathname === item.href;
                     return (
                       <Link
                         key={item.name}
@@ -89,6 +87,7 @@ export default function RootLayout({
                   </div>
                   
                   <div className="flex items-center gap-4">
+                    <NotificationBell />
                     <div className="flex items-center gap-2 text-sm text-slate-600">
                       <UserCircle size={20} />
                       <span className="font-medium">Admin User</span>
