@@ -134,20 +134,55 @@ export type Message = {
   created_at: string;
 };
 
+export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image';
+export type ExamStatus = 'draft' | 'published' | 'closed';
+
 export type Exam = {
   uid: string;
   classroom_id: string;
   title: string;
   description: string;
-  content_type: 'markdown' | 'file' | 'pdf' | 'image';
+  content_type: ExamContentType;
   content: string;
-  status: 'draft' | 'published' | 'closed';
+  status: ExamStatus;
   due_date: string;
   resource_uid?: string | null;
   resource_url?: string | null;
   resource_name?: string;
   created_at?: string;
   updated_at?: string;
+};
+
+export type ExamSubmission = {
+  uid: string;
+  exam_id: string;
+  classroom_id: string;
+  student_id: string;
+  content_type: ExamContentType;
+  content: string;
+  resource_uid?: string | null;
+  resource_url?: string | null;
+  resource_name?: string;
+  status: string;
+  submitted_at: string | null;
+  grade?: number | null;
+  feedback?: string;
+  graded_by?: string | null;
+  graded_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type SubmitExamRequest = {
+  content_type: ExamContentType;
+  content?: string;
+  resource_uid?: string | null;
+};
+
+export type UploadedResource = {
+  uid: string;
+  url: string;
+  name: string;
 };
 
 export type QuizQuestionPublic = {

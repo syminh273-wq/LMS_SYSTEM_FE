@@ -147,7 +147,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoadingExams(true);
         setExamError("");
-        // @ts-expect-error exams method may not exist yet
         const data = await classroomApi.exams(uid);
         setExams((data as Exam[]).filter(exam => exam.status === 'published'));
       } catch (err: unknown) {

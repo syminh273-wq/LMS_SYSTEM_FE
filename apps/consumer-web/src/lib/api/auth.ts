@@ -16,7 +16,7 @@ export class AuthApiClient extends BaseRestApiClient {
     return this.post<AuthTokenResponse>('/api/v1/consumer/account/login/', data);
   }
 
-  public async consumerRegister(data: RegisterRequest): Promise<ApiMessageResponse> {
+  public async consumerRegister(data: RegisterRequest | FormData): Promise<ApiMessageResponse> {
     return this.post<ApiMessageResponse>('/api/v1/consumer/account/register/', data);
   }
 

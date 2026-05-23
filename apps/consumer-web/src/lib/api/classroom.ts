@@ -2,10 +2,14 @@ import BaseRestApiClient from './client';
 import type {
   Classroom,
   Conversation,
+  Exam,
+  ExamSubmission,
   Message,
   PaginatedResponse,
   CreateClassroomRequest,
   SharingLink,
+  SubmitExamRequest,
+  UploadedResource,
 } from './types';
 
 export class ClassroomApiClient extends BaseRestApiClient {
@@ -41,6 +45,29 @@ export class ClassroomApiClient extends BaseRestApiClient {
 
   public async getConversation(uid: string): Promise<Conversation> {
     return this.get<Conversation>(`/api/v1/consumer/course/classrooms/${uid}/conversation/`);
+  }
+
+  public async exams(uid: string): Promise<Exam[]> {
+    const response = await this.get<Exam[] | { results: Exam[] }>(
+      `/api/v1/consumer/course/classrooms/${uid}/exams/`
+    );
+    return Array.isArray(response) ? response : response.results;
+  }
+
+  public async examSubmission(examUid: string): Promise<ExamSubmission> {
+    return this.get<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/me/`);
+  }
+
+  public async submitExam(examUid: string, data: SubmitExamRequest): Promise<ExamSubmission> {
+    return this.post<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/`, data);
+  }
+
+  public async uploadSubmissionResource(data: FormData): Promise<UploadedResource> {
+    return this.post<UploadedResource>('/api/v1/resource/upload/', data);
+  }
+
+  public async reuploadSubmissionResource(resourceUid: string, data: FormData): Promise<UploadedResource> {
+    return this.patch<UploadedResource>(`/api/v1/resource/${resourceUid}/reupload/`, data);
   }
 
   // ── Chat ───────────────────────────────────────────────────────────────────
