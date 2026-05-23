@@ -5,9 +5,9 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
-    "react": "^19.0.0",
-    "lucide-react": "^0.475.0",
     "@reduxjs/toolkit": "^2.5.1",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
     "react-redux": "^9.2.0"
   }
 }

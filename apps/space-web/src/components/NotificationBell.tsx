@@ -31,6 +31,7 @@ export default function NotificationBell() {
 
   // Lắng nghe Firebase signal — fetch ngay khi consumer join lớp
   useEffect(() => {
+    if (!firebaseApp) return;
     const db = getDatabase(firebaseApp);
     const signalRef = ref(db, 'signals/new_notification');
     onValue(signalRef, () => { void fetchNotifications(); });

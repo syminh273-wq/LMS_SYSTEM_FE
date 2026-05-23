@@ -1,5 +1,9 @@
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
+
+const firebaseConfigured =
+  !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+  !!process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +16,15 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const app: FirebaseApp | null = firebaseConfigured
+  ? getApps().length === 0
+    ? initializeApp(firebaseConfig)
+    : getApps()[0]
+  : null;
 
-export const analytics = async () =>
-  (await isSupported()) ? getAnalytics(app) : null;
+export const analytics = async () => {
+  if (!app) return null;
+  return (await isSupported()) ? getAnalytics(app) : null;
+};
 
 export default app;

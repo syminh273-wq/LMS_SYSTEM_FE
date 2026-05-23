@@ -6,8 +6,8 @@ export async function sendJoinClassroomNotification(params: {
   classroomName: string;
   code: string;
 }) {
+  if (!firebaseApp) return;
   const db = getDatabase(firebaseApp);
-  // Ghi signal real-time để space-web biết có thông báo mới ngay lập tức
   await set(ref(db, "signals/new_notification"), {
     classroom_id: params.classroomId,
     classroom_name: params.classroomName,
