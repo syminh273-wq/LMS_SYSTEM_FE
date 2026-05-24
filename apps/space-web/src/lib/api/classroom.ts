@@ -1,11 +1,12 @@
 import BaseRestApiClient from './client';
-import type { 
-  Classroom, 
+import type {
+  Classroom,
   ClassroomMember,
-  PaginatedResponse, 
-  CreateClassroomRequest, 
+  StudentExamRecord,
+  PaginatedResponse,
+  CreateClassroomRequest,
   UpdateClassroomRequest,
-  SharingLink 
+  SharingLink
 } from './types';
 
 export class ClassroomApiClient extends BaseRestApiClient {
@@ -39,6 +40,26 @@ export class ClassroomApiClient extends BaseRestApiClient {
 
   public async members(uid: string): Promise<ClassroomMember[]> {
     return this.get<ClassroomMember[]>(`/api/v1/space/course/classrooms/${uid}/members/`);
+  }
+
+  public async pendingMembers(uid: string): Promise<ClassroomMember[]> {
+    return this.get<ClassroomMember[]>(`/api/v1/space/course/classrooms/${uid}/members/?status=pending`);
+  }
+
+  public async approveMember(classroomUid: string, memberId: string): Promise<ClassroomMember> {
+    return this.post<ClassroomMember>(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/approve/`);
+  }
+
+  public async rejectMember(classroomUid: string, memberId: string): Promise<void> {
+    return super.delete(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/reject/`);
+  }
+
+  public async kickMember(classroomUid: string, memberId: string): Promise<void> {
+    return super.delete(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/kick/`);
+  }
+
+  public async studentSubmissions(classroomUid: string, memberId: string): Promise<StudentExamRecord[]> {
+    return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/submissions/`);
   }
 
   // Consumer side

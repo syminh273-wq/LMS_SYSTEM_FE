@@ -101,6 +101,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [membershipStatus, setMembershipStatus] = useState<'approved' | 'pending' | null>(null);
   const [draft, setDraft] = useState("");
   const [exams, setExams] = useState<Exam[]>([]);
   const [loadingExams, setLoadingExams] = useState(false);
@@ -130,8 +131,14 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
         setError("");
         const data = await classroomApi.retrieve(uid);
         setClassroom(data);
+        setMembershipStatus('approved');
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Không thể tải thông tin phòng học');
+        const apiData = (err as any)?.data;
+        if ((err as any)?.status === 403 && (apiData as any)?.membership_status === 'pending') {
+          setMembershipStatus('pending');
+        } else {
+          setError(err instanceof Error ? err.message : 'Không thể tải thông tin phòng học');
+        }
       } finally {
         setLoading(false);
       }
@@ -211,6 +218,25 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     );
   }
 
+  if (membershipStatus === 'pending') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+          <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto">
+            <Clock size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Đang chờ phê duyệt</h2>
+          <p className="text-slate-500 text-sm">
+            Yêu cầu tham gia lớp học của bạn đang chờ giáo viên xem xét. Bạn sẽ có thể vào lớp sau khi được chấp thuận.
+          </p>
+          <Button onClick={() => router.push('/classroom')} className="w-full bg-indigo-600">
+            Quay lại danh sách
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (error || !classroom) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -249,10 +275,10 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
           <div className="h-8 w-[1px] bg-slate-200 mx-1" />
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-bold uppercase">
-              {classroom.name.substring(0, 2)}
+              {classroom.name ? classroom.name.substring(0, 2) : '??'}
             </div>
             <h1 className="text-lg font-bold text-slate-900 truncate max-w-[200px] md:max-w-md">
-              {classroom.name}
+              {classroom.name || 'Phòng học'}
             </h1>
           </div>
         </div>

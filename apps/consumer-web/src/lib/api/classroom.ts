@@ -39,8 +39,8 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
   }
 
-  public async joinByCode(code: string): Promise<Classroom> {
-    return this.post<Classroom>('/api/v1/consumer/course/classrooms/join/', { code });
+  public async joinByCode(code: string): Promise<{ membership_status: string }> {
+    return this.post<{ membership_status: string }>('/api/v1/consumer/course/classrooms/join/', { code });
   }
 
   public async getConversation(uid: string): Promise<Conversation> {

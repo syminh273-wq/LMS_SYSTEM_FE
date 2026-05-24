@@ -341,5 +341,16 @@ export type ClassroomMember = {
   member_name: string;
   member_avatar: string;
   role: 'teacher' | 'student';
+  status: 'pending' | 'approved';
   joined_at: string;
+};
+
+export type StudentExamRecord = {
+  exam: {
+    uid: string;
+    title: string;
+    status: string;
+    due_date: string | null;
+  };
+  submission: ExamSubmission | null;
 };

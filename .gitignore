@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 .venv/
+.pnp.*
+.yarn/*
 bin/
 include/
 share/
@@ -65,3 +67,4 @@ db.sqlite3
 .env.development.local
 .env.test.local
 .env.production.local
+*.tsbuildinfo

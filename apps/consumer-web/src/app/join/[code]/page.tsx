@@ -28,14 +28,10 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
       setLinkData(res);
 
       if (res.resource_type === 'classroom' && res.action === 'join') {
-        // Join the classroom using the pid code
         await classroomApi.joinByCode(code);
         void sendJoinClassroomNotification({ classroomId: res.resource_id, classroomName: res.metadata.name || '', code });
-        toast.success(`Bạn đã tham gia lớp học: ${res.metadata.name || 'Thành công'}`);
+        toast.success('Yêu cầu tham gia đã được gửi, chờ giáo viên phê duyệt!');
         setStatus('success');
-        setTimeout(() => {
-          router.push(`/classroom/${res.resource_id}`);
-        }, 2000);
       } else {
         setStatus('success');
       }
@@ -65,23 +61,26 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
         {status === 'success' && linkData && (
           <div className="space-y-4 animate-in zoom-in duration-300">
             <div className="flex justify-center">
-              <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+              <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
                 <CheckCircle2 size={48} />
               </div>
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-slate-900">Tham gia thành công!</h2>
+              <h2 className="text-xl font-bold text-slate-900">Yêu cầu đã được gửi!</h2>
               <p className="text-slate-500 text-sm">
-                Bạn đã được chấp nhận vào {linkData.resource_type === 'classroom' ? 'lớp học' : 'tài nguyên'}:
+                Yêu cầu tham gia {linkData.resource_type === 'classroom' ? 'lớp học' : 'tài nguyên'} đang chờ giáo viên phê duyệt:
               </p>
               <p className="font-bold text-indigo-600 text-lg">{linkData.metadata.name || 'Phòng học mới'}</p>
             </div>
-            <div className="pt-4">
-              <Button 
-                onClick={() => router.push(`/classroom/${linkData.resource_id}`)}
+            <div className="pt-4 space-y-3">
+              <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700 font-medium text-center">
+                Bạn sẽ có thể vào lớp sau khi giáo viên chấp thuận yêu cầu.
+              </div>
+              <Button
+                onClick={() => router.push('/classroom')}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 rounded-xl gap-2 font-bold"
               >
-                Vào lớp ngay
+                Về danh sách lớp học
                 <ArrowRight size={18} />
               </Button>
             </div>

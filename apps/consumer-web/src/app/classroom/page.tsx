@@ -328,7 +328,7 @@ export default function ClassroomPage() {
                 <div className="min-h-[100px] flex-1 bg-white p-4">
                   <div className="relative -top-10 flex justify-end pr-2">
                     <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gray-300 text-2xl font-bold uppercase text-gray-600">
-                      {classroom.name[0]}
+                      {classroom.name ? classroom.name[0] : '?'}
                     </div>
                   </div>
                   <p className="-mt-8 line-clamp-2 text-sm text-gray-600">{classroom.description || 'Không có mô tả.'}</p>
