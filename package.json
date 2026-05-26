@@ -15,6 +15,7 @@
     "turbo": "^2.4.0"
   },
   "dependencies": {
-    "firebase": "^12.13.0"
+    "firebase": "^12.13.0",
+    "react-theme-switch-animation": "^1.0.0"
   }
 }

@@ -18,6 +18,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react';
+import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 
 const navItems = [
@@ -41,11 +42,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   if (isAuthPage) {
-    return <div className="min-h-screen bg-slate-50">{children}</div>;
+    return <div className="min-h-screen bg-slate-50 dark:bg-background">{children}</div>;
   }
 
   return (
-    <div className="flex h-screen bg-[#f8faff]">
+    <div className="flex h-screen bg-[#f8faff] dark:bg-background">
       {/* Sidebar */}
       <aside className={`bg-[#2D283E] text-white flex flex-col shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-72'}`}>
         {sidebarCollapsed ? (
@@ -123,36 +124,38 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-10">
+        <header className="h-20 bg-white dark:bg-card border-b border-slate-100 dark:border-border flex items-center justify-between px-10">
           <div className="flex items-center gap-6 flex-1">
             {pathname.includes('/classrooms/') ? (
               <div className="relative w-96 max-w-full">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   type="text"
-                  className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all"
+                  className="w-full pl-12 pr-4 py-2.5 bg-slate-50 dark:bg-muted border border-slate-100 dark:border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white dark:focus:bg-muted/80 dark:text-foreground dark:placeholder:text-muted-foreground transition-all"
                   placeholder="Tìm kiếm tài liệu, lớp học..."
                 />
               </div>
             ) : (
-              <h2 className="text-lg font-bold text-slate-900 uppercase tracking-widest">
+              <h2 className="text-lg font-bold text-foreground uppercase tracking-widest">
                 {navItems.find(i => pathname.startsWith(i.href))?.name || 'Space Admin'}
               </h2>
             )}
           </div>
 
           <div className="flex items-center gap-8">
-            <button className="relative p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <ThemeToggle />
+
+            <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
               <Bell size={22} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-card"></span>
             </button>
 
-            <div className="flex items-center gap-3 pl-6 border-l border-slate-100">
+            <div className="flex items-center gap-3 pl-6 border-l border-border">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-900 leading-none">Admin User</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase mt-1 tracking-wider">System Admin</p>
+                <p className="text-sm font-bold text-foreground leading-none">Admin User</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1 tracking-wider">System Admin</p>
               </div>
-              <Avatar className="h-10 w-10 border-2 border-slate-50 shadow-sm">
+              <Avatar className="h-10 w-10 border-2 border-muted shadow-sm">
                 <AvatarImage src="https://github.com/shadcn.png" alt="Admin" />
                 <AvatarFallback>AD</AvatarFallback>
               </Avatar>
@@ -160,7 +163,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-[#f8faff] p-10">
+        <main className="flex-1 overflow-y-auto bg-[#f8faff] dark:bg-background p-10">
           {children}
         </main>
       </div>
