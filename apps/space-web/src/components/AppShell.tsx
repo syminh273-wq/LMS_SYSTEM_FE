@@ -14,12 +14,12 @@ import {
   BookOpen,
   Sparkles,
   Search,
-  Bell,
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import NotificationBell from '@/components/NotificationBell';
 
 const navItems = [
   { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
@@ -145,10 +145,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-8">
             <ThemeToggle />
 
-            <button className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
-              <Bell size={22} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-card"></span>
-            </button>
+            <NotificationBell />
 
             <div className="flex items-center gap-3 pl-6 border-l border-border">
               <div className="text-right hidden sm:block">

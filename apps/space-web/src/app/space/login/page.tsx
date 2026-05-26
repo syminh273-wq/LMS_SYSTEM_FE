@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
+import { accountService } from '@/lib/api/account';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setProfile } from '@/lib/redux/userSlice';
 import Image from 'next/image';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
@@ -18,6 +21,7 @@ export default function SpaceLoginPage() {
   const [globalError, setGlobalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<LoginFormValues>({
     defaultValues: { email: '', password: '' }
@@ -47,7 +51,10 @@ export default function SpaceLoginPage() {
       localStorage.setItem('accessToken', response.access);
       localStorage.setItem('refreshToken', response.refresh);
       localStorage.setItem('userType', 'space');
-      
+
+      const profile = await accountService.getProfile();
+      dispatch(setProfile(profile));
+
       router.push('/space');
     } catch (err: any) {
       handleApiError(err);
