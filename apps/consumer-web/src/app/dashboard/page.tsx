@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { clearProfile } from '@/lib/redux/userSlice';
 import Image from 'next/image';
 import {
   Avatar,
@@ -34,6 +36,7 @@ const MOCK_STATS = [
 
 export default function DashboardPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [isAuthenticated] = useState(
     () => typeof window !== 'undefined' && Boolean(localStorage.getItem('accessToken'))
   );
@@ -46,8 +49,7 @@ export default function DashboardPage() {
   }, [isAuthenticated, router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    dispatch(clearProfile());
     router.push('/login');
   };
 

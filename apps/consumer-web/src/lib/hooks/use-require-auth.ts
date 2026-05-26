@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
+import { clearProfile } from "@/lib/redux/userSlice"
 
 export function useRequireAuth() {
   const router = useRouter()
+  const dispatch = useDispatch()
   // Start false on both server and client to avoid hydration mismatch.
   // Set to real value after mount (client-only).
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -20,8 +23,7 @@ export function useRequireAuth() {
   }, [router])
 
   const logout = () => {
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("refreshToken")
+    dispatch(clearProfile())
     router.push("/login")
   }
 
