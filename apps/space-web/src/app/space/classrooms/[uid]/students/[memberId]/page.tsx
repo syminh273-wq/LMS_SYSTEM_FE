@@ -220,16 +220,12 @@ export default function StudentDetailsPage({
 
 function statusClass(status: string) {
   if (status === 'graded') return 'bg-emerald-50 text-emerald-600';
-  if (status === 'submitted') return 'bg-indigo-50 text-indigo-600';
-  if (status === 'late') return 'bg-amber-50 text-amber-600';
-  return 'bg-slate-100 text-slate-500';
+  return 'bg-indigo-50 text-indigo-600';
 }
 
 function statusLabel(status: string) {
   if (status === 'graded') return 'Đã chấm';
-  if (status === 'submitted') return 'Đã nộp';
-  if (status === 'late') return 'Nộp trễ';
-  return status;
+  return 'Đã nộp';
 }
 
 function formatDate(value: string) {

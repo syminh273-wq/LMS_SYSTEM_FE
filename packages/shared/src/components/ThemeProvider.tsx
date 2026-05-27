@@ -3,18 +3,6 @@
 import { flushSync } from 'react-dom';
 import * as React from 'react';
 
-declare global {
-  interface Document {
-    startViewTransition(callback: () => void): ViewTransition;
-  }
-}
-
-interface ViewTransition {
-  ready: Promise<void>;
-  finished: Promise<void>;
-  updateCallbackDone: Promise<void>;
-}
-
 type Theme = 'light' | 'dark';
 
 interface ThemeContextValue {
@@ -43,11 +31,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTheme = React.useCallback((event?: React.MouseEvent) => {
+    const startViewTransition = (
+      document as { startViewTransition?: Document['startViewTransition'] }
+    ).startViewTransition?.bind(document);
     const isAppearanceTransition =
-      document.startViewTransition &&
+      startViewTransition &&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (!isAppearanceTransition || !event) {
+    if (!startViewTransition || !isAppearanceTransition || !event) {
       setTheme(theme === 'dark' ? 'light' : 'dark');
       return;
     }
@@ -59,7 +50,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       Math.max(y, window.innerHeight - y)
     );
 
-    const transition = document.startViewTransition(() => {
+    const transition = startViewTransition(() => {
       flushSync(() => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
       });
