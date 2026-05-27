@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
 import firebaseApp from '@/lib/firebase';
+import { notificationApi } from '@/lib/api/notification';
 
 type FbNotification = {
   uid: string;
@@ -11,6 +12,7 @@ type FbNotification = {
   content: string;
   type: string;
   created_at: string;
+  is_read?: string;
   metadata: Record<string, string>;
 };
 
@@ -43,12 +45,25 @@ export default function NotificationBell() {
       signalRef,
       (snapshot) => {
         const raw = snapshot.val() as Record<string, FbNotification> | null;
-        if (!raw) { setNotifications([]); return; }
+        if (!raw) { 
+          setNotifications([]); 
+          setReadUids(new Set());
+          return; 
+        }
 
         const list = Object.values(raw).sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         setNotifications(list);
+        
+        // Clear readUids that are now confirmed as read in Firebase to keep state lean
+        setReadUids(prev => {
+          const next = new Set(prev);
+          list.forEach(n => {
+            if (n.is_read === 'true') next.delete(n.uid);
+          });
+          return next;
+        });
       },
       (error) => {
         console.error('[NotificationBell] Firebase error:', error);
@@ -69,14 +84,24 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const unreadCount = notifications.filter(n => !readUids.has(n.uid)).length;
+  const unreadCount = notifications.filter(n => n.is_read !== 'true' && !readUids.has(n.uid)).length;
 
-  const handleMarkRead = (uid: string) => {
+  const handleMarkRead = async (uid: string) => {
     setReadUids(prev => new Set(prev).add(uid));
+    try {
+      await notificationApi.markRead(uid);
+    } catch (error) {
+      console.error('[NotificationBell] Failed to mark as read:', error);
+    }
   };
 
-  const handleMarkAllRead = () => {
-    setReadUids(new Set(notifications.map(n => n.uid)));
+  const handleMarkAllRead = async () => {
+    setReadUids(new Set(notifications.filter(n => n.is_read !== 'true').map(n => n.uid)));
+    try {
+      await notificationApi.markAllRead();
+    } catch (error) {
+      console.error('[NotificationBell] Failed to mark all as read:', error);
+    }
   };
 
   return (
@@ -116,7 +141,7 @@ export default function NotificationBell() {
               </li>
             ) : (
               notifications.map((n) => {
-                const isRead = readUids.has(n.uid);
+                const isRead = n.is_read === 'true' || readUids.has(n.uid);
                 return (
                   <li
                     key={n.uid}
