@@ -20,12 +20,12 @@ class NotificationApiClient extends BaseRestApiClient {
     return Array.isArray(res) ? res : res.results;
   }
 
-  async markRead(uid: string, targetUid: string): Promise<void> {
-    await this.post(`/api/v1/notification/notifications/${uid}/read/`, { target_uid: targetUid });
+  async markRead(uid: string): Promise<void> {
+    await this.post(`/api/v1/notification/notifications/${uid}/read/`);
   }
 
-  async markAllRead(targetUid: string): Promise<void> {
-    await this.post('/api/v1/notification/notifications/read-all/', { target_uid: targetUid });
+  async markAllRead(): Promise<void> {
+    await this.post('/api/v1/notification/notifications/read-all/');
   }
 }
 

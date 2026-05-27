@@ -1,42 +1,77 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Bell, CheckCheck } from 'lucide-react';
-import { notificationApi, type Notification } from '@/lib/api/notification';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
 import firebaseApp from '@/lib/firebase';
+import { notificationApi } from '@/lib/api/notification';
 
-const POLL_INTERVAL = 30_000;
+type FbNotification = {
+  uid: string;
+  title: string;
+  content: string;
+  type: string;
+  created_at: string;
+  is_read?: string;
+  metadata: Record<string, string>;
+};
 
 export default function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<FbNotification[]>([]);
+  const [readUids, setReadUids] = useState<Set<string>>(new Set());
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const fetchNotifications = useCallback(async () => {
-    try {
-      const data = await notificationApi.list();
-      setNotifications(data);
-    } catch (err) {
-      console.error('[NotificationBell] fetch failed:', err);
+  useEffect(() => {
+    let uid = null;
+    if (typeof window !== 'undefined') {
+      const profileStr = localStorage.getItem('userProfile');
+      if (profileStr) {
+        try {
+          const profile = JSON.parse(profileStr);
+          uid = profile.uid;
+        } catch (e) {
+          console.error('[NotificationBell] Failed to parse userProfile', e);
+        }
+      }
     }
-  }, []);
+    
+    if (!firebaseApp || !uid) return;
 
-  // Poll định kỳ làm fallback
-  useEffect(() => {
-    fetchNotifications();
-    const timer = setInterval(fetchNotifications, POLL_INTERVAL);
-    return () => clearInterval(timer);
-  }, [fetchNotifications]);
-
-  // Lắng nghe Firebase signal — fetch ngay khi consumer join lớp
-  useEffect(() => {
-    if (!firebaseApp) return;
     const db = getDatabase(firebaseApp);
-    const signalRef = ref(db, 'signals/new_notification');
-    onValue(signalRef, () => { void fetchNotifications(); });
+    const signalRef = ref(db, `notifications/${uid}`);
+
+    onValue(
+      signalRef,
+      (snapshot) => {
+        const raw = snapshot.val() as Record<string, FbNotification> | null;
+        if (!raw) { 
+          setNotifications([]); 
+          setReadUids(new Set());
+          return; 
+        }
+
+        const list = Object.values(raw).sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+        setNotifications(list);
+        
+        // Clear readUids that are now confirmed as read in Firebase to keep state lean
+        setReadUids(prev => {
+          const next = new Set(prev);
+          list.forEach(n => {
+            if (n.is_read === 'true') next.delete(n.uid);
+          });
+          return next;
+        });
+      },
+      (error) => {
+        console.error('[NotificationBell] Firebase error:', error);
+      }
+    );
+
     return () => off(signalRef);
-  }, [fetchNotifications]);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -49,23 +84,24 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadCount = notifications.filter(n => n.is_read !== 'true' && !readUids.has(n.uid)).length;
 
-  const handleMarkRead = async (uid: string, targetUid: string) => {
+  const handleMarkRead = async (uid: string) => {
+    setReadUids(prev => new Set(prev).add(uid));
     try {
-      await notificationApi.markRead(uid, targetUid);
-      setNotifications(prev =>
-        prev.map(n => n.uid === uid ? { ...n, is_read: true } : n)
-      );
-    } catch { /* ignore */ }
+      await notificationApi.markRead(uid);
+    } catch (error) {
+      console.error('[NotificationBell] Failed to mark as read:', error);
+    }
   };
 
   const handleMarkAllRead = async () => {
+    setReadUids(new Set(notifications.filter(n => n.is_read !== 'true').map(n => n.uid)));
     try {
-      const uniqueTargets = [...new Set(notifications.filter(n => !n.is_read).map(n => n.target_uid))];
-      await Promise.all(uniqueTargets.map(uid => notificationApi.markAllRead(uid)));
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-    } catch { /* ignore */ }
+      await notificationApi.markAllRead();
+    } catch (error) {
+      console.error('[NotificationBell] Failed to mark all as read:', error);
+    }
   };
 
   return (
@@ -85,7 +121,6 @@ export default function NotificationBell() {
 
       {open && (
         <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-slate-200 bg-white shadow-xl">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <span className="text-sm font-semibold text-slate-800">Thông báo</span>
             {unreadCount > 0 && (
@@ -99,41 +134,42 @@ export default function NotificationBell() {
             )}
           </div>
 
-          {/* List */}
           <ul className="max-h-96 overflow-y-auto divide-y divide-slate-50">
             {notifications.length === 0 ? (
               <li className="py-10 text-center text-sm text-slate-400">
                 Chưa có thông báo nào
               </li>
             ) : (
-              notifications.map((n) => (
-                <li
-                  key={n.uid}
-                  onClick={() => !n.is_read && handleMarkRead(n.uid, n.target_uid)}
-                  className={`flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer ${
-                    n.is_read ? 'hover:bg-slate-50' : 'bg-indigo-50/60 hover:bg-indigo-50'
-                  }`}
-                >
-                  {/* Avatar */}
-                  <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                    n.is_read ? 'bg-slate-100 text-slate-500' : 'bg-indigo-100 text-indigo-600'
-                  }`}>
-                    {n.title?.[0]?.toUpperCase() ?? '🔔'}
-                  </div>
+              notifications.map((n) => {
+                const isRead = n.is_read === 'true' || readUids.has(n.uid);
+                return (
+                  <li
+                    key={n.uid}
+                    onClick={() => !isRead && handleMarkRead(n.uid)}
+                    className={`flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer ${
+                      isRead ? 'hover:bg-slate-50' : 'bg-indigo-50/60 hover:bg-indigo-50'
+                    }`}
+                  >
+                    <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                      isRead ? 'bg-slate-100 text-slate-500' : 'bg-indigo-100 text-indigo-600'
+                    }`}>
+                      {n.title?.[0]?.toUpperCase() ?? '🔔'}
+                    </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className={`text-sm truncate ${n.is_read ? 'text-slate-600' : 'text-slate-800 font-medium'}`}>
-                      {n.title}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{n.content}</p>
-                    <p className="text-xs text-slate-400 mt-1">{formatTime(n.created_at)}</p>
-                  </div>
+                    <div className="min-w-0 flex-1">
+                      <p className={`text-sm truncate ${isRead ? 'text-slate-600' : 'text-slate-800 font-medium'}`}>
+                        {n.title}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{n.content}</p>
+                      <p className="text-xs text-slate-400 mt-1">{formatTime(n.created_at)}</p>
+                    </div>
 
-                  {!n.is_read && (
-                    <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-indigo-500" />
-                  )}
-                </li>
-              ))
+                    {!isRead && (
+                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-indigo-500" />
+                    )}
+                  </li>
+                );
+              })
             )}
           </ul>
         </div>

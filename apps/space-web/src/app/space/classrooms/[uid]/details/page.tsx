@@ -540,7 +540,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
   if (fetching) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+      <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
         <Loader2 size={40} className="animate-spin mb-4" />
         <p className="text-sm font-medium">Đang tải dữ liệu phòng học...</p>
       </div>
@@ -562,20 +562,20 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             variant="outline"
             size="icon"
             onClick={() => router.push('/space/classrooms')}
-            className="w-12 h-12 rounded-full border-slate-200 bg-white shadow-sm hover:bg-slate-50 transition-all hover:scale-110 active:scale-95"
+            className="w-12 h-12 rounded-full border-border bg-card shadow-sm hover:bg-accent transition-all hover:scale-110 active:scale-95"
           >
-            <ArrowLeft size={20} className="text-slate-600" />
+            <ArrowLeft size={20} className="text-muted-foreground" />
           </Button>
           <div>
             <div className="flex items-center gap-3 mb-1">
               <span className="text-[10px] font-black bg-indigo-600 text-white px-2.5 py-1 rounded-md uppercase tracking-widest shadow-sm">
                 ID: {classroom.pid}
               </span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em]">
                 PHÒNG HỌC
               </span>
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{classroom.name}</h1>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">{classroom.name}</h1>
           </div>
         </div>
 
@@ -583,7 +583,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           <Button
             variant="outline"
             onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}
-            className="h-12 rounded-xl px-6 gap-2.5 font-bold text-xs border-slate-200 hover:bg-white text-slate-600 uppercase tracking-widest bg-slate-50/50"
+            className="h-12 rounded-xl px-6 gap-2.5 font-bold text-xs border-border hover:bg-card text-muted-foreground uppercase tracking-widest bg-muted/50"
           >
             <Settings size={18} />
             THIẾT LẬP
@@ -609,16 +609,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         <div className={`shrink-0 transition-all duration-300 space-y-3 ${sidebarCollapsed ? 'w-[52px]' : 'w-[268px]'}`}>
           {sidebarCollapsed ? (
             /* ── Collapsed: icon-only ── */
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden py-1">
+            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden py-1">
               {/* Expand button */}
               <button
                 onClick={() => setSidebarCollapsed(false)}
                 title="Mở rộng sidebar"
-                className="w-full flex justify-center py-3 hover:bg-slate-50 transition-colors"
+                className="w-full flex justify-center py-3 hover:bg-muted transition-colors"
               >
-                <ChevronsRight size={16} className="text-slate-400" />
+                <ChevronsRight size={16} className="text-muted-foreground" />
               </button>
-              <div className="mx-3 border-t border-slate-100 mb-1" />
+              <div className="mx-3 border-t border-border mb-1" />
               {/* All tabs as icons */}
               {([
                 { id: 'info',     label: 'Thông tin chung',    icon: Info },
@@ -636,7 +636,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     title={label}
                     onClick={() => setActiveTab(id as typeof activeTab)}
                     className={`w-full flex justify-center py-3 transition-colors relative ${
-                      isActive ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
+                      isActive ? 'text-indigo-600 bg-indigo-50' : 'text-muted-foreground hover:bg-muted hover:text-slate-600'
                     }`}
                   >
                     {isActive && <div className="absolute left-0 w-1 h-5 bg-indigo-600 rounded-r-full top-1/2 -translate-y-1/2" />}
@@ -650,23 +650,23 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             </div>
           ) : (
             /* ── Expanded: full labels ── */
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
               {/* Collapse button */}
-              <div className="flex items-center justify-between px-5 py-2.5 border-b border-slate-100">
-                <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">MENU</span>
+              <div className="flex items-center justify-between px-5 py-2.5 border-b border-border">
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">MENU</span>
                 <button
                   onClick={() => setSidebarCollapsed(true)}
                   title="Thu nhỏ sidebar"
                   className="rounded-lg p-1 hover:bg-slate-100 transition-colors"
                 >
-                  <ChevronsLeft size={15} className="text-slate-400" />
+                  <ChevronsLeft size={15} className="text-muted-foreground" />
                 </button>
               </div>
 
               {/* Nhóm 1: Thông tin lớp */}
               <button
                 onClick={() => toggleGroup('classroom')}
-                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
                 Thông tin lớp
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.classroom ? '' : '-rotate-90'}`} />
@@ -685,11 +685,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         key={id}
                         onClick={() => setActiveTab(id as typeof activeTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'
+                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'} />
+                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-slate-600'} />
                         {label}
                         {id === 'meeting' && activeMeeting && (
                           <span className="ml-auto flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -700,12 +700,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
               )}
 
-              <div className="mx-4 border-t border-slate-100" />
+              <div className="mx-4 border-t border-border" />
 
               {/* Nhóm 2: Học tập & Đánh giá */}
               <button
                 onClick={() => toggleGroup('learning')}
-                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
                 Học tập & Đánh giá
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.learning ? '' : '-rotate-90'}`} />
@@ -722,11 +722,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         key={id}
                         onClick={() => setActiveTab(id as typeof activeTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'
+                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'} />
+                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-slate-600'} />
                         {label}
                       </button>
                     );
@@ -734,12 +734,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
               )}
 
-              <div className="mx-4 border-t border-slate-100" />
+              <div className="mx-4 border-t border-border" />
 
               {/* Nhóm 3: Quản lý sinh viên */}
               <button
                 onClick={() => toggleGroup('students')}
-                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-colors"
+                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
                 Quản lý sinh viên
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.students ? '' : '-rotate-90'}`} />
@@ -752,14 +752,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <button
                         onClick={() => setActiveTab('students')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50'
+                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Users size={18} className={isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'} />
+                        <Users size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-slate-600'} />
                         Danh sách sinh viên
                         {members.filter(m => m.role === 'student').length > 0 && (
-                          <span className="ml-auto text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+                          <span className="ml-auto text-[10px] font-black bg-slate-100 text-muted-foreground px-2 py-0.5 rounded-full">
                             {members.filter(m => m.role === 'student').length}
                           </span>
                         )}
@@ -772,13 +772,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {!sidebarCollapsed && <>
-            <Card className="border-slate-100 shadow-sm rounded-[32px] overflow-hidden bg-white p-8">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">SĨ SỐ LỚP</h3>
+            <Card className="border-border shadow-sm rounded-[32px] overflow-hidden bg-card p-8">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">SĨ SỐ LỚP</h3>
               <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-5xl font-bold text-slate-900 tracking-tighter">0</span>
-                <span className="text-slate-400 font-bold text-lg">/ {classroom.max_students} học sinh</span>
+                <span className="text-5xl font-bold text-foreground tracking-tighter">0</span>
+                <span className="text-muted-foreground font-bold text-lg">/ {classroom.max_students} học sinh</span>
               </div>
-              <div className="w-full h-2.5 bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-0.5">
+              <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden border border-border p-0.5">
                 <div className="h-full bg-indigo-600 rounded-full w-0 shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000" />
               </div>
             </Card>
@@ -793,7 +793,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <Button
                   variant="ghost"
                   onClick={handleDownloadQr}
-                  className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-2xl h-12 font-bold text-xs tracking-widest gap-3 border border-white/10 transition-all uppercase"
+                  className="w-full bg-card/10 hover:bg-card/20 backdrop-blur-md text-white rounded-2xl h-12 font-bold text-xs tracking-widest gap-3 border border-white/10 transition-all uppercase"
                 >
                   <QrCode size={18} /> TẢI MÃ QR
                 </Button>
@@ -807,31 +807,31 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {activeTab === 'info' && (
             <div className="grid grid-cols-1 gap-8 animate-in fade-in duration-300">
               {/* Mô tả Card */}
-              <div className="bg-white rounded-[32px] p-10 border border-slate-100 shadow-sm group">
-                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm group">
+                <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
                     <Info size={22} />
                   </div>
                   Mô tả phòng học
                 </h3>
-                <div className="bg-slate-50/50 p-8 rounded-3xl border border-slate-100 text-slate-500 font-medium leading-relaxed italic text-lg relative">
-                  <span className="absolute -top-4 -left-2 text-6xl text-slate-100 font-serif opacity-50">"</span>
+                <div className="bg-muted/50 p-8 rounded-3xl border border-border text-muted-foreground font-medium leading-relaxed italic text-lg relative">
+                  <span className="absolute -top-4 -left-2 text-6xl text-muted-foreground/10 font-serif opacity-50">"</span>
                   {classroom.description}
-                  <span className="absolute -bottom-10 -right-2 text-6xl text-slate-100 font-serif opacity-50">"</span>
+                  <span className="absolute -bottom-10 -right-2 text-6xl text-muted-foreground/10 font-serif opacity-50">"</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* QR Code Card */}
-                <div className="bg-white rounded-[32px] p-10 border border-slate-100 shadow-sm flex flex-col items-center">
-                  <h3 className="text-lg font-bold text-slate-900 mb-8 self-start flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm flex flex-col items-center">
+                  <h3 className="text-lg font-bold text-foreground mb-8 self-start flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
                       <QrCode size={22} />
                     </div>
                     Mã QR tham gia
                   </h3>
-                  <div className="p-10 bg-white rounded-[40px] border-2 border-dashed border-slate-100 mb-10 shadow-inner group transition-all hover:border-indigo-200">
-                    <div className="p-6 bg-slate-50 rounded-[32px] border border-slate-100 group-hover:scale-105 transition-transform duration-500">
+                  <div className="p-10 bg-card rounded-[40px] border-2 border-dashed border-border mb-10 shadow-inner group transition-all hover:border-indigo-500/50">
+                    <div className="p-6 bg-muted rounded-[32px] border border-border group-hover:scale-105 transition-transform duration-500">
                       {linkData && (
                         <QRCodeSVG
                           id="classroom-qr"
@@ -839,51 +839,52 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           size={200}
                           level="H"
                           includeMargin={true}
+                          className="dark:bg-card dark:p-2 dark:rounded-xl"
                         />
                       )}
                     </div>
                   </div>
                   <Button 
                     onClick={handleDownloadQr} 
-                    className="w-full h-14 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-[20px] font-bold text-xs gap-3 transition-all uppercase tracking-widest"
+                    className="w-full h-14 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 rounded-[20px] font-bold text-xs gap-3 transition-all uppercase tracking-widest"
                   >
                     <Download size={20} /> TẢI ẢNH QR XUỐNG
                   </Button>
                 </div>
 
                 {/* Timeline Card */}
-                <div className="bg-white rounded-[32px] p-10 border border-slate-100 shadow-sm">
-                  <h3 className="text-lg font-bold text-slate-900 mb-10 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm">
+                  <h3 className="text-lg font-bold text-foreground mb-10 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
                       <RotateCcw size={22} />
                     </div>
                     Lịch sử hoạt động
                   </h3>
                   <div className="space-y-12 pl-4">
-                    <div className="flex gap-6 items-start relative before:absolute before:left-[11px] before:top-8 before:bottom-[-48px] before:w-1 before:bg-slate-50">
-                      <div className="w-6 h-6 rounded-full bg-white border-[6px] border-indigo-600 shadow-lg shadow-indigo-200 z-10" />
+                    <div className="flex gap-6 items-start relative before:absolute before:left-[11px] before:top-8 before:bottom-[-48px] before:w-1 before:bg-muted">
+                      <div className="w-6 h-6 rounded-full bg-card border-[6px] border-indigo-500 shadow-lg shadow-indigo-500/20 z-10" />
                       <div className="space-y-1">
-                        <div className="text-base font-bold text-slate-800">Phòng học được khởi tạo</div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(classroom.created_at).toLocaleString('vi-VN')}</div>
+                        <div className="text-base font-bold text-foreground">Phòng học được khởi tạo</div>
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Date(classroom.created_at).toLocaleString('vi-VN')}</div>
                       </div>
                     </div>
-                    <div className="flex gap-6 items-start relative before:absolute before:left-[11px] before:top-8 before:bottom-[-48px] before:w-1 before:bg-slate-50">
-                      <div className="w-6 h-6 rounded-full bg-white border-[6px] border-indigo-600 shadow-lg shadow-indigo-200 z-10 animate-pulse" />
+                    <div className="flex gap-6 items-start relative before:absolute before:left-[11px] before:top-8 before:bottom-[-48px] before:w-1 before:bg-muted">
+                      <div className="w-6 h-6 rounded-full bg-card border-[6px] border-indigo-500 shadow-lg shadow-indigo-500/20 z-10 animate-pulse" />
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
-                          <div className="text-base font-bold text-slate-800">Đang hoạt động</div>
-                          <span className="bg-emerald-50 text-emerald-600 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider border border-emerald-100">Hiện tại</span>
+                          <div className="text-base font-bold text-foreground">Đang hoạt động</div>
+                          <span className="bg-emerald-500/10 text-emerald-500 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider border border-emerald-500/20">Hiện tại</span>
                         </div>
-                        <div className="text-xs text-slate-500 font-medium leading-relaxed">
+                        <div className="text-xs text-muted-foreground font-medium leading-relaxed">
                           Lớp học hiện sẵn sàng cho học sinh tham gia
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-6 items-start opacity-40">
-                      <div className="w-6 h-6 rounded-full bg-slate-100 border-[6px] border-white shadow-sm z-10" />
+                      <div className="w-6 h-6 rounded-full bg-muted border-[6px] border-card shadow-sm z-10" />
                       <div>
-                        <div className="text-base font-bold text-slate-800">Kiểm tra giữa kỳ dự kiến</div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Chưa lên lịch chính thức</div>
+                        <div className="text-base font-bold text-foreground">Kiểm tra giữa kỳ dự kiến</div>
+                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Chưa lên lịch chính thức</div>
                       </div>
                     </div>
                   </div>
@@ -893,11 +894,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'docs' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm">
-              <div className="p-10 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Tài liệu học tập</h3>
-                  <p className="text-sm text-slate-500 font-medium mt-1">Quản lý và chia sẻ học liệu của lớp học</p>
+                  <h3 className="text-xl font-bold text-foreground">Tài liệu học tập</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">Quản lý và chia sẻ học liệu của lớp học</p>
                 </div>
                 <input ref={docInputRef} type="file" className="hidden" onChange={handleDocUpload}
                   accept="image/*,video/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" />
@@ -913,17 +914,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               <div className="flex-1 overflow-y-auto p-10 space-y-4">
                 {documents.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-slate-300">
-                    <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-4 border border-slate-100">
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
+                    <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4 border border-border">
                       <File size={32} className="opacity-40" />
                     </div>
-                    <p className="text-base font-bold text-slate-900">Chưa có tài liệu nào</p>
+                    <p className="text-base font-bold text-foreground">Chưa có tài liệu nào</p>
                     <p className="text-sm font-medium mt-1">Nhấn "Tải lên tệp mới" để thêm học liệu</p>
                   </div>
                 )}
                 {documents.map(doc => (
-                  <div key={doc.uid} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-5 group hover:border-indigo-200 transition-all hover:shadow-lg">
-                    <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                  <div key={doc.uid} className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-5 group hover:border-indigo-200 transition-all hover:shadow-lg">
+                    <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
                       {doc.file_type.match(/^(jpg|jpeg|png|gif|webp|svg)$/) ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={doc.url} alt={doc.name} className="w-14 h-14 rounded-xl object-cover" />
@@ -932,23 +933,23 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-base font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">{doc.name}</div>
-                      <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1 flex items-center gap-3">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">{doc.file_type.toUpperCase()}</span>
+                      <div className="text-base font-bold text-foreground truncate group-hover:text-indigo-600 transition-colors">{doc.name}</div>
+                      <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-1 flex items-center gap-3">
+                        <span className="bg-slate-100 px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
                         <span>{doc.size}</span>
                         <span>Đã tải lên {doc.date}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-11 w-11 text-slate-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100">
+                        <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground hover:text-indigo-600 rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100">
                           <Download size={20} />
                         </Button>
                       </a>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-11 w-11 text-slate-400 hover:text-rose-500 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                        className="h-11 w-11 text-muted-foreground hover:text-rose-500 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100"
                         onClick={() => setDocuments(prev => prev.filter(d => d.uid !== doc.uid))}
                       >
                         <X size={20} />
@@ -961,7 +962,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'chat' && (
-            <div className="bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm h-full flex flex-col">
+            <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm h-full flex flex-col">
               {conversationUid ? (
                 <ClassroomChatPanel
                   conversationUid={conversationUid}
@@ -969,7 +970,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   active={activeTab === 'chat'}
                 />
               ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-slate-400">
+                <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
                   <Loader2 className="animate-spin mb-4 text-indigo-500" size={40} />
                   <p className="text-sm font-bold uppercase tracking-widest">Đang tải kênh thảo luận...</p>
                 </div>
@@ -978,17 +979,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'meeting' && (
-            <div className="flex h-full flex-col animate-in fade-in duration-300 bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm">
-              <div className="p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex h-full flex-col animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Phòng họp trực tuyến</h3>
-                  <p className="text-sm text-slate-500 font-medium mt-1">Mở buổi học trực tuyến và chia sẻ màn hình cho sinh viên</p>
+                  <h3 className="text-xl font-bold text-foreground">Phòng họp trực tuyến</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">Mở buổi học trực tuyến và chia sẻ màn hình cho sinh viên</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
                     activeMeeting
                       ? 'border-emerald-100 bg-emerald-50 text-emerald-600 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                      : 'border-slate-200 bg-white text-slate-400'
+                      : 'border-border bg-card text-muted-foreground'
                   }`}>
                     {activeMeeting ? <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> : <WifiOff size={14} />}
                     {activeMeeting ? 'Đang hoạt động' : 'Ngoại tuyến'}
@@ -1010,7 +1011,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             onClick={() => void handleStartMeeting('camera')}
                             disabled={meetingAction !== null}
                             variant="outline"
-                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-slate-200 hover:bg-slate-50 uppercase tracking-widest"
+                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-border hover:bg-muted uppercase tracking-widest"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
                             Bật camera
@@ -1054,15 +1055,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               <div className="flex-1 overflow-y-auto p-10 space-y-8">
                 {loadingMeetings ? (
-                  <div className="flex h-60 items-center justify-center text-slate-300">
+                  <div className="flex h-60 items-center justify-center text-muted-foreground/50">
                     <Loader2 size={48} className="animate-spin" />
                   </div>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm group hover:border-indigo-100 transition-all">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">Trạng thái</div>
-                        <div className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-indigo-100 transition-all">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Trạng thái</div>
+                        <div className="text-lg font-bold text-foreground flex items-center gap-2">
                           {activeMeeting ? (
                             <>
                               <div className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -1070,30 +1071,30 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             </>
                           ) : 'Sẵn sàng mở lớp'}
                         </div>
-                        <div className="mt-2 text-xs font-medium text-slate-500 leading-relaxed">
+                        <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">
                           {activeMeeting ? `Bắt đầu lúc ${formatDateTime(activeMeeting.started_at || activeMeeting.created_at)}` : 'Sinh viên sẽ thấy thông báo khi bạn mở phòng.'}
                         </div>
                       </div>
-                      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm group hover:border-indigo-100 transition-all">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">Kết nối thời gian thực</div>
-                        <div className="flex items-center gap-3 text-lg font-bold text-slate-900">
-                          {rtcConnected ? <Wifi size={20} className="text-emerald-500" /> : <WifiOff size={20} className="text-slate-300" />}
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-indigo-100 transition-all">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Kết nối thời gian thực</div>
+                        <div className="flex items-center gap-3 text-lg font-bold text-foreground">
+                          {rtcConnected ? <Wifi size={20} className="text-emerald-500" /> : <WifiOff size={20} className="text-muted-foreground/50" />}
                           {rtcConnected ? 'Đã kết nối' : 'Đang chờ...'}
                         </div>
-                        <div className="mt-2 text-xs font-medium text-slate-500 leading-relaxed">Kênh tín hiệu bảo mật dùng mã lớp độc nhất.</div>
+                        <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">Kênh tín hiệu bảo mật dùng mã lớp độc nhất.</div>
                       </div>
-                      <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm group hover:border-indigo-100 transition-all">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-3">Phòng gần nhất</div>
-                        <div className="text-sm font-bold text-slate-900 truncate">
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-indigo-100 transition-all">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Phòng gần nhất</div>
+                        <div className="text-sm font-bold text-foreground truncate">
                           {latestMeeting?.title || 'Chưa có lịch sử'}
                         </div>
-                        <div className="mt-2 text-xs font-medium text-slate-500 leading-relaxed">
+                        <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">
                           {latestMeeting ? `Hoạt động: ${formatDateTime(latestMeeting.created_at)}` : 'Mở phòng để tạo lịch sử dạy học.'}
                         </div>
                       </div>
                     </div>
 
-                    <div className="rounded-[40px] border border-slate-100 bg-slate-950 p-6 shadow-2xl shadow-indigo-900/10">
+                    <div className="rounded-[40px] border border-border bg-slate-950 p-6 shadow-2xl shadow-indigo-900/10">
                       {localStream ? (
                         <div className="rounded-[24px] overflow-hidden border border-slate-800">
                           <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Camera đang phát' : 'Màn hình đang chia sẻ'} />
@@ -1107,8 +1108,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-6">
                             <Video size={32} className="opacity-40" />
                           </div>
-                          <p className="text-base font-bold text-slate-400 uppercase tracking-[0.2em]">Tín hiệu trống</p>
-                          <p className="mt-2 text-sm font-medium text-slate-500">Nhấn "Mở phòng họp" để bắt đầu phiên làm việc trực tuyến.</p>
+                          <p className="text-base font-bold text-muted-foreground uppercase tracking-[0.2em]">Tín hiệu trống</p>
+                          <p className="mt-2 text-sm font-medium text-muted-foreground">Nhấn "Mở phòng họp" để bắt đầu phiên làm việc trực tuyến.</p>
                         </div>
                       )}
                     </div>
@@ -1119,11 +1120,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'exams' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm">
-              <div className="p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Bài kiểm tra</h3>
-                  <p className="text-sm text-slate-500 font-medium mt-1">Quản lý các đợt kiểm tra đánh giá của lớp</p>
+                  <h3 className="text-xl font-bold text-foreground">Bài kiểm tra</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">Quản lý các đợt kiểm tra đánh giá của lớp</p>
                 </div>
                 {canManageExams && (
                   <Button
@@ -1137,15 +1138,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
 
               <div className="p-10 flex-1 overflow-y-auto space-y-8">
-                <div className="flex items-center gap-3 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 w-fit">
+                <div className="flex items-center gap-3 bg-muted p-1.5 rounded-2xl border border-border w-fit">
                   {EXAM_KIND_OPTIONS.map(kind => (
                     <button
                       key={kind.key}
                       onClick={() => setSelectedExamKind(kind.key)}
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
-                        selectedExamKind === kind.key 
-                          ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' 
-                          : 'text-slate-400 hover:text-slate-600'
+                        selectedExamKind === kind.key
+                          ? 'bg-card text-indigo-600 shadow-sm border border-border'
+                          : 'text-muted-foreground hover:text-slate-600'
                       }`}
                     >
                       {kind.label}
@@ -1155,37 +1156,37 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
                 <div className="space-y-4">
                   {loadingExams ? (
-                    <div className="flex h-40 items-center justify-center text-slate-300">
+                    <div className="flex h-40 items-center justify-center text-muted-foreground/50">
                       <Loader2 size={32} className="animate-spin" />
                     </div>
                   ) : filteredExams.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-slate-300 bg-slate-50/30 rounded-[32px] border-2 border-dashed border-slate-100">
-                      <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                      <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <ClipboardList size={24} className="opacity-40" />
                       </div>
-                      <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Không tìm thấy bài kiểm tra</p>
+                      <p className="text-sm font-bold text-foreground uppercase tracking-widest">Không tìm thấy bài kiểm tra</p>
                       <p className="text-xs font-medium mt-1">Chưa có dữ liệu cho mục {selectedKind.label.toLowerCase()}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {filteredExams.map(exam => (
-                        <div key={exam.uid} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-center gap-6 group hover:border-indigo-200 transition-all hover:shadow-lg">
+                        <div key={exam.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-indigo-200 transition-all hover:shadow-lg">
                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm transition-all group-hover:scale-110 ${
-                            exam.status === 'published' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-400'
+                            exam.status === 'published' ? 'bg-indigo-50 text-indigo-600' : 'bg-muted text-muted-foreground'
                           }`}>
                             <FileText size={24} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-1">
-                              <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{exam.title}</h4>
+                              <h4 className="text-base font-bold text-foreground group-hover:text-indigo-600 transition-colors">{exam.title}</h4>
                               <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider border ${
-                                exam.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+                                exam.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-muted text-muted-foreground border-border'
                               }`}>
                                 {exam.status === 'published' ? 'Đã đăng' : 'Bản nháp'}
                               </span>
                             </div>
-                            <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                              <span className="flex items-center gap-1.5"><Clock size={12} /> Hạn: {formatDateTime(exam.due_date)}</span>
+                            <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                              <span className="flex items-center gap-1.5"><Clock size={12} /> Hạn: {exam.due_date ? formatDateTime(exam.due_date) : '--'}</span>
                               <span className="flex items-center gap-1.5"><FileText size={12} /> {exam.content_type}</span>
                               <span className="flex items-center gap-1.5"><Calendar size={12} /> {exam.created_at ? new Date(exam.created_at).toLocaleDateString('vi-VN') : '--'}</span>
                             </div>
@@ -1201,23 +1202,23 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             </Button>
                             <Button
                               onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)}
-                              className="h-10 rounded-xl px-4 font-bold text-xs bg-slate-50 hover:bg-indigo-600 hover:text-white text-slate-600 transition-all border border-slate-100 hover:border-indigo-600 uppercase tracking-widest"
+                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-indigo-600 hover:text-white text-slate-600 transition-all border border-border hover:border-indigo-600 uppercase tracking-widest"
                             >
                               Chi tiết
                             </Button>
                             {canManageExams && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-300 hover:text-slate-900 transition-colors">
+                                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-muted-foreground/50 hover:text-foreground transition-colors">
                                     <MoreVertical size={20} />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-slate-100">
+                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
                                   <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-slate-600 hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
-                                    <Pencil size={16} className="mr-3 text-slate-400" />
+                                    <Pencil size={16} className="mr-3 text-muted-foreground" />
                                     Chỉnh sửa
                                   </DropdownMenuItem>
-                                  <DropdownMenuSeparator className="my-2 bg-slate-50" />
+                                  <DropdownMenuSeparator className="my-2 bg-muted" />
                                   <DropdownMenuItem 
                                     className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-rose-600 cursor-pointer"
                                     onClick={() => void handleDeleteExam(exam)}
@@ -1239,11 +1240,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'quiz' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm">
-              <div className="p-10 border-b border-slate-100 bg-slate-50/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Quiz Game</h3>
-                  <p className="text-sm text-slate-500 font-medium mt-1">Giao quiz cho sinh viên trong lớp chơi trực tuyến</p>
+                  <h3 className="text-xl font-bold text-foreground">Quiz Game</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">Giao quiz cho sinh viên trong lớp chơi trực tuyến</p>
                 </div>
                 <Button
                   onClick={() => setShowAssignModal(true)}
@@ -1256,15 +1257,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               <div className="p-10 flex-1 overflow-y-auto space-y-4">
                 {loadingQuizzes ? (
-                  <div className="flex h-40 items-center justify-center text-slate-300">
+                  <div className="flex h-40 items-center justify-center text-muted-foreground/50">
                     <Loader2 size={32} className="animate-spin" />
                   </div>
                 ) : assignedQuizzes.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-slate-300 bg-slate-50/30 rounded-[32px] border-2 border-dashed border-slate-100">
-                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                    <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Gamepad2 size={24} className="opacity-40" />
                     </div>
-                    <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Chưa có quiz nào được giao</p>
+                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có quiz nào được giao</p>
                     <p className="text-xs font-medium mt-1">Nhấn "Giao Quiz mới" để thêm hoạt động cho lớp</p>
                   </div>
                 ) : (
@@ -1273,14 +1274,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       const assignment = quiz.assigned_classrooms?.[0];
                       const timeLimitMin = assignment?.time_limit_seconds ? Math.round(assignment.time_limit_seconds / 60) : 0;
                       return (
-                        <div key={quiz.uid} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-center gap-6 group hover:border-violet-200 transition-all hover:shadow-lg">
+                        <div key={quiz.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-violet-200 transition-all hover:shadow-lg">
                           <div className="w-14 h-14 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center shadow-sm transition-all group-hover:scale-110">
                             <Gamepad2 size={24} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-slate-900 group-hover:text-violet-600 transition-colors mb-1.5">{quiz.title}</h4>
-                            <div className="flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                              <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">{quiz.questions_count} câu hỏi</span>
+                            <h4 className="text-base font-bold text-foreground group-hover:text-violet-600 transition-colors mb-1.5">{quiz.title}</h4>
+                            <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                              <span className="bg-slate-100 px-2 py-0.5 rounded text-muted-foreground">{quiz.questions_count} câu hỏi</span>
                               <span className="flex items-center gap-1.5"><Clock size={12} /> {timeLimitMin > 0 ? `${timeLimitMin} phút` : 'Không giới hạn'}</span>
                               <span className="flex items-center gap-1.5"><RefreshCw size={12} /> {assignment?.max_attempts ? `${assignment.max_attempts} lần thử` : 'Vô hạn'}</span>
                             </div>
@@ -1289,7 +1290,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             <Button 
                               variant="ghost" 
                               size="icon"
-                              className="h-11 w-11 rounded-xl text-slate-300 hover:text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                              className="h-11 w-11 rounded-xl text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100"
                               onClick={() => void handleUnassignQuiz(quiz)}
                               disabled={unassigningUid === quiz.uid}
                             >
@@ -1307,11 +1308,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {activeTab === 'students' && (
             <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-              <div className="bg-white rounded-[32px] overflow-hidden border border-slate-100 shadow-sm">
-              <div className="p-10 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+              <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">Danh sách sinh viên</h3>
-                  <p className="text-sm text-slate-500 font-medium mt-1">
+                  <h3 className="text-xl font-bold text-foreground">Danh sách sinh viên</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">
                     {loadingMembers ? 'Đang tải...' : `${members.filter(m => m.role === 'student').length} sinh viên trong lớp`}
                   </p>
                 </div>
@@ -1319,22 +1320,22 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               <div className="p-10">
                 {loadingMembers ? (
-                  <div className="flex items-center justify-center h-40 text-slate-400">
+                  <div className="flex items-center justify-center h-40 text-muted-foreground">
                     <Loader2 size={32} className="animate-spin" />
                   </div>
                 ) : members.filter(m => m.role === 'student').length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-slate-300 bg-slate-50/30 rounded-[32px] border-2 border-dashed border-slate-100">
-                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                    <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Users size={24} className="opacity-40" />
                     </div>
-                    <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Chưa có sinh viên nào</p>
+                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có sinh viên nào</p>
                     <p className="text-xs font-medium mt-1">Chia sẻ link tham gia để sinh viên vào lớp</p>
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-sm">
+                  <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-sm">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="border-b border-slate-100 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                        <tr className="border-b border-border text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                           <th className="px-6 py-4">Sinh viên</th>
                           <th className="px-6 py-4">Ngày tham gia</th>
                           <th className="px-6 py-4 text-right">Hành động</th>
@@ -1347,25 +1348,25 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                               <div className="flex items-center gap-4">
                                 {member.member_avatar ? (
                                   // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={member.member_avatar} alt={member.member_name} className="w-10 h-10 rounded-2xl object-cover border border-slate-100" />
+                                  <img src={member.member_avatar} alt={member.member_name} className="w-10 h-10 rounded-2xl object-cover border border-border" />
                                 ) : (
                                   <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 font-black text-sm">
                                     {member.member_name.charAt(0).toUpperCase()}
                                   </div>
                                 )}
                                 <div>
-                                  <div className="text-sm font-bold text-slate-800">{member.member_name}</div>
-                                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sinh viên</div>
+                                  <div className="text-sm font-bold text-foreground">{member.member_name}</div>
+                                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Sinh viên</div>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 text-xs font-bold text-slate-500">
+                            <td className="px-6 py-4 text-xs font-bold text-muted-foreground">
                               {formatDateTime(member.joined_at)}
                             </td>
                             <td className="px-6 py-4 text-right">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:text-slate-700">
+                                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground">
                                     {kickingId === member.member_id
                                       ? <Loader2 size={16} className="animate-spin" />
                                       : <MoreVertical size={16} />}
@@ -1436,7 +1437,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <img
                   src={memberToKick.member_avatar}
                   alt={memberToKick.member_name}
-                  className="w-14 h-14 rounded-2xl object-cover border border-slate-100"
+                  className="w-14 h-14 rounded-2xl object-cover border border-border"
                 />
               ) : (
                 <div className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 font-black text-xl">
@@ -1444,10 +1445,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
               )}
               <div>
-                <DialogTitle className="text-base font-black text-slate-900">
+                <DialogTitle className="text-base font-black text-foreground">
                   {memberToKick?.member_name}
                 </DialogTitle>
-                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">Sinh viên</p>
+                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Sinh viên</p>
               </div>
             </div>
             <DialogDescription className="text-sm text-slate-600 font-medium leading-relaxed">
@@ -1509,12 +1510,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             onClick={() => setShowPendingSheet(false)}
           />
           {/* Panel */}
-          <div className="relative z-10 flex h-full w-full max-w-[480px] flex-col bg-white shadow-2xl">
+          <div className="relative z-10 flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 px-8 py-6">
+            <div className="flex items-center justify-between border-b border-border px-8 py-6">
               <div>
-                <h2 className="text-xl font-black text-slate-900">Phê duyệt thành viên</h2>
-                <p className="mt-1 text-sm font-medium text-slate-500">
+                <h2 className="text-xl font-black text-foreground">Phê duyệt thành viên</h2>
+                <p className="mt-1 text-sm font-medium text-muted-foreground">
                   {loadingPending ? 'Đang tải...' : `${pendingMembers.length} yêu cầu đang chờ`}
                 </p>
               </div>
@@ -1532,7 +1533,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 )}
                 <button
                   onClick={() => setShowPendingSheet(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-slate-100 hover:text-foreground transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -1548,17 +1549,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               ) : pendingMembers.length === 0 ? (
                 <div className="flex h-48 flex-col items-center justify-center gap-3 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                    <Users size={28} className="text-slate-300" />
+                    <Users size={28} className="text-muted-foreground/50" />
                   </div>
-                  <p className="text-sm font-bold text-slate-500">Không có yêu cầu nào</p>
-                  <p className="text-xs font-medium text-slate-400">Tất cả yêu cầu đã được xử lý</p>
+                  <p className="text-sm font-bold text-muted-foreground">Không có yêu cầu nào</p>
+                  <p className="text-xs font-medium text-muted-foreground">Tất cả yêu cầu đã được xử lý</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {pendingMembers.map(member => (
                     <div
                       key={member.member_id}
-                      className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                      className="flex items-center gap-4 rounded-2xl border border-border bg-muted p-4"
                     >
                       {member.member_avatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -1573,8 +1574,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-slate-900">{member.member_name}</p>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <p className="truncate text-sm font-bold text-foreground">{member.member_name}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                           {formatDateTime(member.joined_at)}
                         </p>
                       </div>
@@ -1610,10 +1611,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             </div>
 
             {/* Footer */}
-            <div className="border-t border-slate-100 px-8 py-4">
+            <div className="border-t border-border px-8 py-4">
               <button
                 onClick={() => { loadPendingMembers(); }}
-                className="flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors"
+                className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-slate-600 transition-colors"
               >
                 <RefreshCw size={13} />
                 Làm mới danh sách
@@ -1683,13 +1684,13 @@ function AssignQuizModal({
   if (pendingQuiz) {
     return (
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-8 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Cài đặt giao Quiz</h2>
-              <p className="text-sm text-slate-500 font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
+              <h2 className="text-xl font-bold text-foreground">Cài đặt giao Quiz</h2>
+              <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-slate-400">
+            <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-muted-foreground">
               <X size={20} />
             </Button>
           </div>
@@ -1697,14 +1698,14 @@ function AssignQuizModal({
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
                 <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                  className="w-full h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
               </div>
               <div className="space-y-2.5">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
                 <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                  className="w-full h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
               </div>
             </div>
 
@@ -1714,9 +1715,9 @@ function AssignQuizModal({
                 { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
                 { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
               ].map(item => (
-                <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 cursor-pointer group transition-all">
-                  <div className="flex items-center gap-3 text-sm font-bold text-slate-700">
-                    <item.icon size={16} className="text-slate-400 group-hover:text-indigo-500" /> {item.label}
+                <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
+                  <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+                    <item.icon size={16} className="text-muted-foreground group-hover:text-indigo-500" /> {item.label}
                   </div>
                   <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
                     className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all" />
@@ -1726,7 +1727,7 @@ function AssignQuizModal({
           </div>
 
           <div className="p-8 pt-0 flex gap-4">
-            <Button variant="outline" onClick={() => setPendingQuiz(null)} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-slate-200">
+            <Button variant="outline" onClick={() => setPendingQuiz(null)} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
               Quay lại
             </Button>
             <Button
@@ -1745,26 +1746,26 @@ function AssignQuizModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[80vh] flex flex-col">
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[80vh] flex flex-col">
+        <div className="p-8 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Chọn Quiz để giao</h2>
-            <p className="text-sm text-slate-500 font-medium mt-1">Nhấn vào quiz để cài đặt và giao cho lớp</p>
+            <h2 className="text-xl font-bold text-foreground">Chọn Quiz để giao</h2>
+            <p className="text-sm text-muted-foreground font-medium mt-1">Nhấn vào quiz để cài đặt và giao cho lớp</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground">
             <X size={20} />
           </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-300">
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
               <Loader2 size={40} className="animate-spin text-indigo-500" />
             </div>
           ) : quizzes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-slate-300">
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
               <BookOpen size={48} className="mb-4 opacity-40" />
-              <p className="text-sm font-bold text-slate-900 uppercase tracking-widest">Thư viện quiz trống</p>
+              <p className="text-sm font-bold text-foreground uppercase tracking-widest">Thư viện quiz trống</p>
               <p className="text-xs font-medium mt-1">Hãy tạo quiz mới trong hệ thống trước</p>
             </div>
           ) : (
@@ -1779,20 +1780,20 @@ function AssignQuizModal({
                   className={`w-full text-left rounded-2xl border-2 p-5 transition-all flex items-center gap-5 ${
                     assigned
                       ? 'border-emerald-100 bg-emerald-50 cursor-default opacity-60'
-                      : 'border-slate-50 bg-white hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer group shadow-sm'
+                      : 'border-slate-50 bg-card hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer group shadow-sm'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg'}`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg'}`}>
                     {assigned ? <Check size={24} /> : <BookOpen size={24} />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{quiz.title}</div>
-                    <div className="flex items-center gap-3 mt-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-100">{quiz.questions_count} câu hỏi</span>
+                    <div className="font-bold text-foreground group-hover:text-indigo-600 transition-colors">{quiz.title}</div>
+                    <div className="flex items-center gap-3 mt-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                      <span className="bg-muted px-2 py-0.5 rounded border border-border">{quiz.questions_count} câu hỏi</span>
                     </div>
                   </div>
                   {assigned ? (
-                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-white border border-emerald-100 px-3 py-1 rounded-full shrink-0 tracking-widest">Đã giao</span>
+                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-card border border-emerald-100 px-3 py-1 rounded-full shrink-0 tracking-widest">Đã giao</span>
                   ) : (
                     <span className="text-[10px] font-black text-indigo-500 uppercase bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">Chọn</span>
                   )}
@@ -1802,8 +1803,8 @@ function AssignQuizModal({
           )}
         </div>
 
-        <div className="p-8 border-t border-slate-100">
-          <Button onClick={onClose} variant="outline" className="w-full rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-slate-200">
+        <div className="p-8 border-t border-border">
+          <Button onClick={onClose} variant="outline" className="w-full rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
             Đóng cửa sổ
           </Button>
         </div>
@@ -1855,13 +1856,13 @@ function EditSettingsModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
+        <div className="p-8 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Cài đặt Quiz</h2>
-            <p className="text-sm text-slate-500 font-medium mt-1 truncate max-w-[240px]">{quiz.title}</p>
+            <h2 className="text-xl font-bold text-foreground">Cài đặt Quiz</h2>
+            <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{quiz.title}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground">
             <X size={20} />
           </Button>
         </div>
@@ -1869,20 +1870,20 @@ function EditSettingsModal({
         <div className="p-8 space-y-8">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
               <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                className="w-full h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
             </div>
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
               <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                className="w-full h-12 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Điểm đạt: {passingScore}%</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Điểm đạt: {passingScore}%</label>
             </div>
             <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
               className="w-full accent-indigo-600" />
@@ -1894,9 +1895,9 @@ function EditSettingsModal({
               { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
               { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
-              <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-slate-50 cursor-pointer group transition-all">
-                <div className="flex items-center gap-3 text-sm font-bold text-slate-700">
-                  <item.icon size={16} className="text-slate-400 group-hover:text-indigo-500" /> {item.label}
+              <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
+                <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+                  <item.icon size={16} className="text-muted-foreground group-hover:text-indigo-500" /> {item.label}
                 </div>
                 <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
                   className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all" />
@@ -1906,7 +1907,7 @@ function EditSettingsModal({
         </div>
 
         <div className="p-8 pt-0 flex gap-4">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-slate-200">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
             Hủy
           </Button>
           <Button
@@ -1952,9 +1953,9 @@ function StudentDetailsModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div className="p-8 border-b border-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             {member.member_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -1965,25 +1966,25 @@ function StudentDetailsModal({
               </div>
             )}
             <div>
-              <h2 className="text-xl font-black text-slate-900">{member.member_name}</h2>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">Sinh viên • Tham gia {formatDateTime(member.joined_at)}</p>
+              <h2 className="text-xl font-black text-foreground">{member.member_name}</h2>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Sinh viên • Tham gia {formatDateTime(member.joined_at)}</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400 shrink-0">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground shrink-0">
             <X size={20} />
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 px-8 py-5 border-b border-slate-100 shrink-0">
+        <div className="grid grid-cols-3 gap-4 px-8 py-5 border-b border-border shrink-0">
           {[
-            { label: 'Tổng bài thi', value: records.length, color: 'text-slate-900' },
+            { label: 'Tổng bài thi', value: records.length, color: 'text-foreground' },
             { label: 'Đã nộp', value: submitted, color: 'text-indigo-600' },
             { label: 'Điểm TB', value: avgGrade != null ? avgGrade.toFixed(1) : '--', color: 'text-emerald-600' },
           ].map(s => (
-            <div key={s.label} className="bg-slate-50 rounded-2xl p-4 text-center">
+            <div key={s.label} className="bg-muted rounded-2xl p-4 text-center">
               <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">{s.label}</div>
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{s.label}</div>
             </div>
           ))}
         </div>
@@ -1991,18 +1992,18 @@ function StudentDetailsModal({
         {/* Table */}
         <div className="flex-1 overflow-y-auto p-8">
           {loading ? (
-            <div className="flex items-center justify-center h-40 text-slate-400">
+            <div className="flex items-center justify-center h-40 text-muted-foreground">
               <Loader2 size={32} className="animate-spin" />
             </div>
           ) : records.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-slate-400">
+            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
               <ClipboardCheck size={36} className="mb-3 opacity-30" />
               <p className="text-sm font-medium">Chưa có bài thi nào</p>
             </div>
           ) : (
             <table className="w-full text-left">
               <thead>
-                <tr className="text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="pb-3">Bài kiểm tra</th>
                   <th className="pb-3">Trạng thái</th>
                   <th className="pb-3">Ngày nộp</th>
@@ -2011,18 +2012,18 @@ function StudentDetailsModal({
               </thead>
               <tbody>
                 {records.map(r => (
-                  <tr key={r.exam.uid} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50">
-                    <td className="py-3 pr-4 text-sm font-bold text-slate-800">{r.exam.title}</td>
+                  <tr key={r.exam.uid} className="border-b border-slate-50 last:border-0 hover:bg-muted/50">
+                    <td className="py-3 pr-4 text-sm font-bold text-foreground">{r.exam.title}</td>
                     <td className="py-3 pr-4">
                       {r.submission ? (
                         <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${getSubmissionStatusClass(r.submission.status)}`}>
                           {getSubmissionStatusLabel(r.submission.status)}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-slate-100 text-slate-400">Chưa nộp</span>
+                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-slate-100 text-muted-foreground">Chưa nộp</span>
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-xs font-bold text-slate-500">
+                    <td className="py-3 pr-4 text-xs font-bold text-muted-foreground">
                       {r.submission?.submitted_at ? formatDateTime(r.submission.submitted_at) : '--'}
                     </td>
                     <td className="py-3 text-right">
@@ -2031,7 +2032,7 @@ function StudentDetailsModal({
                           {r.submission.grade.toFixed(1)}
                         </span>
                       ) : (
-                        <span className="text-sm font-black text-slate-300">--</span>
+                        <span className="text-sm font-black text-muted-foreground/50">--</span>
                       )}
                     </td>
                   </tr>
@@ -2086,9 +2087,9 @@ function StudentAnalyzeModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="p-8 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div className="p-8 border-b border-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             {member.member_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -2099,62 +2100,62 @@ function StudentAnalyzeModal({
               </div>
             )}
             <div>
-              <h2 className="text-xl font-black text-slate-900">Phân tích — {member.member_name}</h2>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-0.5">Thống kê học tập</p>
+              <h2 className="text-xl font-black text-foreground">Phân tích — {member.member_name}</h2>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Thống kê học tập</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400 shrink-0">
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground shrink-0">
             <X size={20} />
           </Button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
           {loading ? (
-            <div className="flex items-center justify-center h-40 text-slate-400">
+            <div className="flex items-center justify-center h-40 text-muted-foreground">
               <Loader2 size={32} className="animate-spin" />
             </div>
           ) : (
             <>
               {/* KPI row */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-slate-50 rounded-2xl p-5 text-center">
-                  <div className="text-2xl font-black text-slate-900">{submissionRate}%</div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Tỷ lệ nộp bài</div>
+                <div className="bg-muted rounded-2xl p-5 text-center">
+                  <div className="text-2xl font-black text-foreground">{submissionRate}%</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">Tỷ lệ nộp bài</div>
                 </div>
-                <div className="bg-slate-50 rounded-2xl p-5 text-center">
+                <div className="bg-muted rounded-2xl p-5 text-center">
                   <div className="text-2xl font-black text-emerald-600">{avgGrade}</div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">Điểm trung bình</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">Điểm trung bình</div>
                 </div>
-                <div className="bg-slate-50 rounded-2xl p-5 text-center flex flex-col items-center gap-1">
+                <div className="bg-muted rounded-2xl p-5 text-center flex flex-col items-center gap-1">
                   {trend > 0
                     ? <TrendingUp size={22} className="text-emerald-500" />
                     : trend < 0
                     ? <TrendingDown size={22} className="text-rose-500" />
-                    : <Minus size={22} className="text-slate-400" />}
-                  <div className={`text-2xl font-black ${trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-rose-600' : 'text-slate-400'}`}>
+                    : <Minus size={22} className="text-muted-foreground" />}
+                  <div className={`text-2xl font-black ${trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-rose-600' : 'text-muted-foreground'}`}>
                     {trend > 0 ? `+${trend.toFixed(1)}` : trend.toFixed(1)}
                   </div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xu hướng</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Xu hướng</div>
                 </div>
               </div>
 
               {/* Chart */}
               {chartData.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-40 text-slate-400 bg-slate-50 rounded-2xl">
+                <div className="flex flex-col items-center justify-center h-40 text-muted-foreground bg-muted rounded-2xl">
                   <BarChart2 size={36} className="mb-3 opacity-30" />
                   <p className="text-sm font-medium">Chưa có điểm nào được chấm</p>
                 </div>
               ) : (
-                <div className="bg-slate-50 rounded-2xl p-6">
-                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Điểm theo từng bài kiểm tra</p>
+                <div className="bg-muted rounded-2xl p-6">
+                  <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4">Điểm theo từng bài kiểm tra</p>
                   <GradeLineChart data={chartData} />
                 </div>
               )}
 
               {/* Assessment */}
-              <div className="rounded-2xl border border-slate-100 p-5 space-y-3">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Nhận xét tự động</p>
-                <p className="text-sm font-medium text-slate-700 leading-relaxed">
+              <div className="rounded-2xl border border-border p-5 space-y-3">
+                <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Nhận xét tự động</p>
+                <p className="text-sm font-medium text-foreground leading-relaxed">
                   {submissionRate === 0 && 'Sinh viên chưa nộp bài nào. Cần theo dõi và nhắc nhở.'}
                   {submissionRate > 0 && submissionRate < 50 && 'Tỷ lệ nộp bài thấp. Sinh viên cần chú ý hơn đến deadline.'}
                   {submissionRate >= 50 && submissionRate < 100 && trend >= 0 && 'Sinh viên tích cực, điểm số có xu hướng ổn định hoặc đi lên. Tiếp tục phát huy!'}
@@ -2702,7 +2703,9 @@ function SubmissionGradingDrawer({
 
 function getSubmissionStatusClass(status: string) {
   if (status === 'graded') return 'bg-emerald-50 text-emerald-600';
-  return 'bg-indigo-50 text-indigo-600';
+  if (status === 'submitted') return 'bg-indigo-50 text-indigo-600';
+  if (status === 'late') return 'bg-amber-50 text-amber-600';
+  return 'bg-slate-100 text-muted-foreground';
 }
 
 function getSubmissionStatusLabel(status: string) {
@@ -2721,7 +2724,7 @@ function getExamStatusClass(status: string) {
   if (normalized === 'closed' || normalized === 'expired') {
     return 'bg-rose-50 text-rose-600 border border-rose-100';
   }
-  return 'bg-slate-100 text-slate-600 border border-slate-200';
+  return 'bg-slate-100 text-slate-600 border border-border';
 }
 
 function getExamStatusLabel(status: string) {

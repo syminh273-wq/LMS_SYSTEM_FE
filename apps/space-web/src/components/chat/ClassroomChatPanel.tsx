@@ -73,7 +73,7 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <div className="flex items-center gap-1">
         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-        <span className="text-[10px] font-bold text-slate-400 uppercase">Trực tuyến</span>
+        <span className="text-[10px] font-bold text-muted-foreground uppercase">Trực tuyến</span>
       </div>
     );
   }
@@ -135,17 +135,17 @@ function AttachmentView({
       target="_blank"
       rel="noopener noreferrer"
       className={`flex items-center gap-3 px-4 py-3 ${
-        isMe ? 'hover:bg-indigo-500' : 'hover:bg-slate-50'
+        isMe ? 'hover:bg-indigo-500' : 'hover:bg-muted'
       } transition-colors`}
     >
       <div
         className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-          isMe ? 'bg-indigo-500' : 'bg-slate-100'
+          isMe ? 'bg-indigo-500' : 'bg-muted'
         }`}
       >
         <FileText
           size={20}
-          className={isMe ? 'text-indigo-200' : 'text-slate-500'}
+          className={isMe ? 'text-indigo-200' : 'text-muted-foreground'}
         />
       </div>
       <div className="min-w-0">
@@ -154,7 +154,7 @@ function AttachmentView({
         </div>
         <div
           className={`text-[10px] font-bold uppercase ${
-            isMe ? 'text-indigo-200' : 'text-slate-400'
+            isMe ? 'text-indigo-200' : 'text-muted-foreground'
           }`}
         >
           {attachment.size ? formatFileSize(attachment.size) : ''}
@@ -162,7 +162,7 @@ function AttachmentView({
       </div>
       <Download
         size={16}
-        className={`shrink-0 ${isMe ? 'text-indigo-200' : 'text-slate-400'}`}
+        className={`shrink-0 ${isMe ? 'text-indigo-200' : 'text-muted-foreground'}`}
       />
     </a>
   );
@@ -191,10 +191,10 @@ function MessageBubble({
     <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
       {!isMe && (
         <div className="flex items-center gap-2 mb-1 ml-1">
-          <div className="w-5 h-5 rounded-full bg-slate-200 text-[8px] font-bold flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full bg-muted text-[8px] font-bold flex items-center justify-center">
             {initials}
           </div>
-          <span className="text-[10px] font-bold text-slate-500">
+          <span className="text-[10px] font-bold text-muted-foreground">
             {msg.sender_name}
           </span>
         </div>
@@ -203,7 +203,7 @@ function MessageBubble({
         className={`max-w-[70%] rounded-2xl text-sm font-medium shadow-sm overflow-hidden ${
           isMe
             ? 'bg-indigo-600 text-white rounded-br-none'
-            : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none'
+            : 'bg-card border border-border text-foreground rounded-bl-none'
         }`}
       >
         {msg.attachment && (
@@ -213,7 +213,7 @@ function MessageBubble({
           <div className="px-4 py-3">{msg.content}</div>
         ) : null}
       </div>
-      <div className="text-[9px] font-bold text-slate-400 mt-1.5 px-1 uppercase">
+      <div className="text-[9px] font-bold text-muted-foreground mt-1.5 px-1 uppercase">
         {timeStr}
       </div>
     </div>
@@ -468,19 +468,19 @@ export default function ClassroomChatPanel({
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-300 relative">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 bg-white flex items-center justify-between">
+      <div className="p-4 border-b border-border bg-card flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
             <Users size={20} />
           </div>
           <div>
-            <div className="text-sm font-bold text-slate-900">
+            <div className="text-sm font-bold text-foreground">
               Kênh thảo luận chung
             </div>
             <StatusBadge status={status} />
           </div>
         </div>
-        <Button variant="ghost" size="icon" className="text-slate-400">
+        <Button variant="ghost" size="icon" className="text-muted-foreground">
           <MoreVertical size={20} />
         </Button>
       </div>
@@ -489,12 +489,12 @@ export default function ClassroomChatPanel({
       <div
         ref={messagesAreaRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30"
+        className="flex-1 overflow-y-auto p-6 space-y-6 bg-muted/30"
       >
         {/* Load more indicator */}
         {loadingMore && (
           <div className="flex justify-center">
-            <Loader2 size={18} className="animate-spin text-slate-400" />
+            <Loader2 size={18} className="animate-spin text-muted-foreground" />
           </div>
         )}
 
@@ -506,7 +506,7 @@ export default function ClassroomChatPanel({
         )}
 
         {historyLoaded && messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-32 text-slate-400 text-sm font-medium">
+          <div className="flex flex-col items-center justify-center h-32 text-muted-foreground text-sm font-medium">
             Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!
           </div>
         )}
@@ -521,11 +521,11 @@ export default function ClassroomChatPanel({
 
         {/* Typing indicator */}
         {typingUsers.length > 0 && (
-          <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium italic">
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-medium italic">
             <div className="flex gap-0.5">
-              <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0ms]" />
-              <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:150ms]" />
-              <span className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:300ms]" />
+              <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:0ms]" />
+              <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:150ms]" />
+              <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:300ms]" />
             </div>
             {typingUsers.join(', ')} đang nhập...
           </div>
@@ -535,27 +535,27 @@ export default function ClassroomChatPanel({
       </div>
 
       {/* Input area */}
-      <div className="p-4 bg-white border-t border-slate-100">
+      <div className="p-4 bg-card border-t border-border">
         {/* Pending file preview */}
         {pendingFile && (
-          <div className="mb-2 flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-3 py-2">
+          <div className="mb-2 flex items-center gap-3 bg-muted border border-border rounded-xl px-3 py-2">
             {pendingFile.preview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={pendingFile.preview}
                 alt="preview"
-                className="w-12 h-12 rounded-lg object-cover border border-indigo-200"
+                className="w-12 h-12 rounded-lg object-cover border border-border"
               />
             ) : (
-              <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
                 <FileText size={20} className="text-indigo-500" />
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-slate-700 truncate">
+              <div className="text-xs font-bold text-foreground truncate">
                 {pendingFile.file.name}
               </div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase">
                 {formatFileSize(pendingFile.file.size)}
               </div>
             </div>
@@ -563,7 +563,7 @@ export default function ClassroomChatPanel({
               variant="ghost"
               size="icon"
               onClick={handleRemovePendingFile}
-              className="h-7 w-7 text-slate-400 hover:text-rose-500 rounded-lg"
+              className="h-7 w-7 text-muted-foreground hover:text-rose-500 rounded-lg"
             >
               <X size={14} />
             </Button>
@@ -578,7 +578,7 @@ export default function ClassroomChatPanel({
           onChange={handleFileSelect}
         />
 
-        <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-2xl border border-slate-200 transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-500/5 focus-within:bg-white">
+        <div className="flex items-center gap-2 bg-muted p-2 rounded-2xl border border-border transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-500/5 focus-within:bg-card">
           <Button
             variant="ghost"
             size="icon"
@@ -586,7 +586,7 @@ export default function ClassroomChatPanel({
             className={`h-10 w-10 ${
               pendingFile
                 ? 'text-indigo-600 bg-indigo-50'
-                : 'text-slate-400 hover:text-indigo-600'
+                : 'text-muted-foreground hover:text-indigo-600'
             }`}
             title="Đính kèm file"
           >
@@ -598,7 +598,7 @@ export default function ClassroomChatPanel({
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             placeholder="Nhập tin nhắn thảo luận..."
-            className="flex-1 bg-transparent border-none outline-none text-sm font-medium px-2 h-10"
+            className="flex-1 bg-transparent border-none outline-none text-sm font-medium px-2 h-10 text-foreground"
             disabled={uploading}
           />
           <Button

@@ -5,6 +5,7 @@ import { ReactNode } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@shared/components/ui/button"
+import { ThemeToggle } from "@shared/components/ThemeToggle"
 
 type ProtectedPageShellProps = {
   title: string
@@ -26,14 +27,17 @@ export function ProtectedPageShell({
   maxWidthClassName = "max-w-7xl",
 }: ProtectedPageShellProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-8 py-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-background">
+      <header className="border-b border-gray-200 dark:border-border bg-white dark:bg-card px-8 py-4">
         <div className={`mx-auto flex ${maxWidthClassName} items-center justify-between gap-4`}>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-            {description && <p className="text-sm text-gray-500">{description}</p>}
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-foreground">{title}</h1>
+            {description && <p className="text-sm text-gray-500 dark:text-muted-foreground">{description}</p>}
           </div>
-          {actions && <div className="flex gap-2">{actions}</div>}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {actions && <div className="flex gap-2">{actions}</div>}
+          </div>
         </div>
       </header>
 

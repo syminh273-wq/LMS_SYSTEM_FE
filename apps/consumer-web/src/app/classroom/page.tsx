@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@shared/components/ui/dropdown-menu";
-import { classroomApi, type Classroom } from '@/lib/api';
+import { classroomApi, consumerApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { toast } from 'sonner';
@@ -28,7 +28,7 @@ import { Loader2, QrCode, KeyRound, X, Camera } from 'lucide-react';
 
 type JoinTab = 'code' | 'qr';
 
-function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: Classroom) => void }) {
+function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: () => void }) {
   const [tab, setTab] = useState<JoinTab>('code');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -102,10 +102,17 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
     setError('');
     setLoading(true);
     try {
-      const classroom = await classroomApi.joinByCode(trimmed);
-      void sendJoinClassroomNotification({ classroomId: classroom.uid, classroomName: classroom.name, code: trimmed });
-      toast.success(`Đã tham gia lớp "${classroom.name}" thành công!`);
-      onJoined(classroom);
+      const link = await consumerApi.sharing.resolve(trimmed);
+      await classroomApi.joinByCode(trimmed);
+      if (link.resource_type === 'classroom') {
+        void sendJoinClassroomNotification({
+          classroomId: link.resource_id,
+          classroomName: link.metadata.name || '',
+          code: trimmed,
+        });
+      }
+      toast.success('Yêu cầu tham gia đã được gửi, chờ giáo viên phê duyệt!');
+      onJoined();
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Mã lớp không hợp lệ.');
@@ -229,11 +236,8 @@ export default function ClassroomPage() {
     }
   }, [fetchClassrooms, isAuthenticated]);
 
-  const handleJoined = (classroom: Classroom) => {
-    setClassrooms(prev => {
-      if (prev.find(c => c.uid === classroom.uid)) return prev;
-      return [classroom, ...prev];
-    });
+  const handleJoined = () => {
+    void fetchClassrooms();
   };
 
   if (!mounted) return null;
