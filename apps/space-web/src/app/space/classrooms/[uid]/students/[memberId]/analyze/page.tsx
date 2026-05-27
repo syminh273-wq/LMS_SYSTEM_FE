@@ -49,17 +49,17 @@ const MOCK = {
     ],
   },
   assignment: {
-    total: 24, submitted: 20, onTime: 14, late: 6, missed: 4,
-    submitRate: 83, onTimeRate: 58, lateRate: 25, missRate: 17,
+    total: 24, submitted: 20, onTime: 14, missed: 4,
+    submitRate: 83, onTimeRate: 58, missRate: 17,
     avgSubmitTime: '2.4h trước hạn',
     resubmitCount: 3,
     weekly: [
-      { label: 'T1', onTime: 3, late: 1, miss: 0 },
-      { label: 'T2', onTime: 2, late: 2, miss: 1 },
-      { label: 'T3', onTime: 3, late: 0, miss: 0 },
-      { label: 'T4', onTime: 2, late: 1, miss: 1 },
-      { label: 'T5', onTime: 3, late: 1, miss: 0 },
-      { label: 'T6', onTime: 1, late: 1, miss: 1 },
+      { label: 'T1', onTime: 3, miss: 0 },
+      { label: 'T2', onTime: 2, miss: 1 },
+      { label: 'T3', onTime: 3, miss: 0 },
+      { label: 'T4', onTime: 2, miss: 1 },
+      { label: 'T5', onTime: 3, miss: 0 },
+      { label: 'T6', onTime: 1, miss: 1 },
     ],
   },
   attendance: {
@@ -305,7 +305,6 @@ export default function StudentAnalyzePage({
           {[
             { label: 'Tỉ lệ nộp bài',     value: MOCK.assignment.submitRate,  color: 'bg-indigo-500' },
             { label: 'Nộp đúng hạn',       value: MOCK.assignment.onTimeRate,  color: 'bg-emerald-500' },
-            { label: 'Nộp trễ',            value: MOCK.assignment.lateRate,    color: 'bg-amber-400' },
             { label: 'Không nộp',          value: MOCK.assignment.missRate,    color: 'bg-rose-400' },
           ].map(r => (
             <div key={r.label} className="flex items-center gap-3">
