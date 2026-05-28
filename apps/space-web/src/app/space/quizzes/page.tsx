@@ -19,20 +19,20 @@ export default function QuizLibraryPage() {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
 
   useEffect(() => {
+    const loadQuizzes = async () => {
+      try {
+        setLoading(true);
+        const data = await quizApi.list();
+        setQuizzes(data);
+      } catch (err: unknown) {
+        toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách quiz');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     void loadQuizzes();
   }, []);
-
-  const loadQuizzes = async () => {
-    try {
-      setLoading(true);
-      const data = await quizApi.list();
-      setQuizzes(data);
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách quiz');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (quiz: Quiz) => {
     if (!window.confirm(`Xóa quiz "${quiz.title}"? Thao tác này sẽ hủy tất cả phân công lớp học.`)) return;
@@ -75,7 +75,7 @@ export default function QuizLibraryPage() {
         <div className="flex flex-col items-center justify-center py-32 text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl">
           <BookOpen size={48} className="mb-4 opacity-30" />
           <p className="text-sm font-medium">Chưa có quiz nào</p>
-          <p className="text-xs mt-1 mb-6">Nhấn "Tạo Quiz Mới" để tạo quiz từ tài liệu PDF hoặc văn bản</p>
+          <p className="text-xs mt-1 mb-6">Nhấn &ldquo;Tạo Quiz Mới&rdquo; để tạo quiz từ tài liệu PDF hoặc văn bản</p>
           <Button onClick={() => setShowGenerateModal(true)} variant="outline" className="rounded-xl gap-2 font-bold text-xs">
             <Plus size={16} /> TẠO QUIZ ĐẦU TIÊN
           </Button>
@@ -172,7 +172,6 @@ function GenerateQuizModal({
   // streaming state
   const [phase, setPhase] = useState<StreamPhase>('idle');
   const [streamTitle, setStreamTitle] = useState('');
-  const [streamQuizUid, setStreamQuizUid] = useState('');
   const [progress, setProgress] = useState(0);
   const [lastQuestion, setLastQuestion] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -194,7 +193,6 @@ function GenerateQuizModal({
     setProgress(0);
     setLastQuestion('');
     setStreamTitle('');
-    setStreamQuizUid('');
     setErrorMsg('');
 
     const payload: GenerateQuizRequest = {
@@ -215,7 +213,6 @@ function GenerateQuizModal({
         }
         if (event.type === 'meta') {
           setStreamTitle(event.title);
-          setStreamQuizUid(event.quiz_uid);
           finalUid = event.quiz_uid;
         }
         if (event.type === 'question') {

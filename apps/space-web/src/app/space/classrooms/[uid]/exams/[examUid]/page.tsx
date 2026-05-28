@@ -218,7 +218,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                         </td>
                         <td className="px-4 py-3">
                           <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${row.kind === 'submitted' ? getSubmissionStatusClass(row.submission.status) : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                            {row.kind === 'submitted' ? row.submission.status : 'chưa nộp'}
+                            {row.kind === 'submitted' ? getSubmissionStatusLabel(row.submission.status) : 'chưa nộp'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-xs font-bold text-slate-500">
@@ -382,10 +382,13 @@ function getSubmissionStatusClass(status: string) {
   if (normalized === 'graded' || normalized === 'returned') {
     return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
   }
-  if (normalized === 'late') {
-    return 'bg-amber-50 text-amber-600 border border-amber-100';
-  }
   return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+}
+
+function getSubmissionStatusLabel(status: string) {
+  const normalized = status.toLowerCase();
+  if (normalized === 'graded' || normalized === 'returned') return 'Đã chấm';
+  return 'Đã nộp';
 }
 
 function formatDateTime(value: string | null) {

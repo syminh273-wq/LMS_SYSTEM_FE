@@ -1,18 +1,21 @@
 'use client';
 
 import { use, useEffect, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { DragEvent, FormEvent, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  AlertCircle,
   ArrowLeft,
   Calendar,
+  CheckCircle2,
+  Clock3,
   File,
   FileDown,
   FileText,
+  MessageSquareText,
   Trash2,
   X,
   Image as ImageIcon,
-  Info,
   Loader2,
   UploadCloud,
 } from 'lucide-react';
@@ -35,7 +38,8 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
   const [submitError, setSubmitError] = useState('');
   const [now, setNow] = useState(() => Date.now());
   const [previewFile, setPreviewFile] = useState<PreviewFile | null>(null);
-  const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
+  const [selectedPreviewFile, setSelectedPreviewFile] = useState<PreviewFile | null>(null);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -79,37 +83,24 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
     return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (!answerFile) {
-      setSelectedFileUrl(null);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(answerFile);
-    setSelectedFileUrl(objectUrl);
-
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [answerFile]);
+  useEffect(() => () => {
+    if (selectedPreviewFile?.url.startsWith('blob:')) URL.revokeObjectURL(selectedPreviewFile.url);
+  }, [selectedPreviewFile]);
 
   if (!mounted) return null;
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50">
-        <Loader2 className="mb-4 h-12 w-12 animate-spin text-indigo-600" />
-        <p className="text-sm font-medium text-slate-500">Đang tải bài kiểm tra...</p>
-      </div>
-    );
+    return <ExamResultSkeleton />;
   }
 
   if (error || !exam) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
-        <div className="w-full max-w-md space-y-4 rounded-3xl bg-white p-8 text-center shadow-xl">
+        <div className="w-full max-w-md space-y-4 rounded-3xl border border-rose-100 bg-white p-8 text-center shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-rose-600">
-            <Info size={32} />
+            <AlertCircle size={32} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Lỗi tải dữ liệu</h2>
+          <h2 className="text-xl font-bold text-slate-900">Không thể tải kết quả</h2>
           <p className="text-sm text-slate-500">{error || 'Không tìm thấy bài kiểm tra'}</p>
           <Button onClick={() => router.push(`/classroom/${uid}`)} className="w-full bg-indigo-600">
             Quay lại lớp học
@@ -119,9 +110,9 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
     );
   }
 
-  const ContentIcon = getContentTypeIcon(exam.content_type);
   const deadline = getDeadlineMeta(exam.due_date, now);
   const submissionDisabled = deadline.expired || submitting;
+  const submitActionDisabled = submissionDisabled || !answerFile;
   const submittedFile = submission?.resource_url
     ? {
         url: submission.resource_url,
@@ -129,19 +120,24 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
         type: submission.content_type || 'file',
       }
     : null;
-  const selectedPreviewFile = answerFile && selectedFileUrl
-    ? {
-        url: selectedFileUrl,
-        name: answerFile.name,
-        type: getSubmissionContentType(answerFile),
-      }
-    : null;
+  const handleSelectFile = (file: File | null) => {
+    setAnswerFile(file);
+    setSelectedPreviewFile(file
+      ? { url: URL.createObjectURL(file), name: file.name, type: getSubmissionContentType(file) }
+      : null);
+  };
+  const handleFileDrop = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDraggingFile(false);
+    if (submissionDisabled) return;
+    handleSelectFile(event.dataTransfer.files?.[0] || null);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (deadline.expired || submitting) return;
+    if (deadline.expired || submitting || !answerFile) return;
 
-    if (!answerFile && !submission?.resource_url) {
+    if (!answerFile) {
       setSubmitError('Vui lòng upload file bài làm.');
       setSubmitMessage('');
       return;
@@ -163,6 +159,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
       });
       setSubmission(savedSubmission);
       setAnswerFile(null);
+      setSelectedPreviewFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       setSubmitMessage(submission ? 'Đã cập nhật bài nộp.' : 'Đã nộp bài thành công.');
     } catch (err: unknown) {
@@ -175,6 +172,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
   const handleRemoveFile = async () => {
     if (answerFile) {
       setAnswerFile(null);
+      setSelectedPreviewFile(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
       return;
     }
@@ -199,162 +197,260 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
     }
   };
 
+  const resultStatus = getResultStatusMeta(submission);
+  const isLate = submission ? isLateSubmission(submission, exam.due_date) : false;
+  const grade = typeof submission?.grade === 'number' ? submission.grade : null;
+  const gradePercent = grade === null ? 0 : Math.min(100, Math.max(0, grade * 10));
+  const hasFeedback = Boolean(submission?.feedback?.trim());
+  const assignmentResource = exam.resource_url || (exam.content_type !== 'markdown' ? exam.content : '');
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
-        <div className="flex min-w-0 items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push(`/classroom/${uid}`)}
-            className="shrink-0 rounded-full hover:bg-slate-100"
-          >
-            <ArrowLeft size={20} />
-          </Button>
-          <div className="mx-1 hidden h-8 w-[1px] bg-slate-200 sm:block" />
-          <div className="min-w-0">
-            <p className="truncate text-[10px] font-black uppercase tracking-widest text-indigo-500">
-              {classroom?.name || 'Lớp học'}
-            </p>
-            <h1 className="truncate text-lg font-bold text-slate-900">{exam.title}</h1>
+    <div className="min-h-screen bg-slate-50 pb-20 text-slate-900 lg:pb-0">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push(`/classroom/${uid}`)}
+              className="shrink-0 rounded-xl hover:bg-slate-100"
+            >
+              <ArrowLeft size={20} />
+            </Button>
+            <div className="min-w-0">
+              <p className="truncate text-[10px] font-black uppercase tracking-[0.18em] text-indigo-500">
+                {classroom?.name || 'Lớp học'}
+              </p>
+              <h1 className="truncate text-base font-black text-slate-900 sm:text-lg">{exam.title}</h1>
+            </div>
+          </div>
+          <div className="ml-12 flex flex-wrap items-center gap-2 text-xs font-bold sm:ml-auto">
+            <span className={`rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider ${resultStatus.className}`}>{resultStatus.label}</span>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-slate-500">
+              <Calendar size={13} /> {formatDateTime(exam.due_date)}
+            </span>
+            <span className="rounded-lg bg-slate-50 px-3 py-2 text-slate-500">Tối đa: <strong className="text-slate-800">10</strong></span>
           </div>
         </div>
-
       </header>
 
-      <main className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <div className="border-b border-slate-100 p-6">
-            <div className="mb-3 flex items-start justify-between gap-3">
-              <div className="inline-flex items-center rounded bg-indigo-50 px-2 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-600">
-                Bài kiểm tra
-              </div>
-              <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${getExamStatusClass(exam.status)}`}>
-                {exam.status}
-              </span>
+      <main className="mx-auto grid w-full max-w-7xl items-start gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-5">
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-4 text-slate-800">
+              <ContentTypeIcon contentType={exam.content_type} />
+              <h2 className="text-base font-black">Nội dung đề bài</h2>
             </div>
-            <h2 className="text-2xl font-black tracking-tight text-slate-900 md:text-3xl">{exam.title}</h2>
-            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-500">
-              {exam.description || 'Không có mô tả'}
-            </p>
-          </div>
-
-          <div className="p-6">
-            <div className="mb-3 flex items-center gap-2">
-              <ContentIcon size={17} className="text-indigo-600" />
-              <span className="text-sm font-black uppercase tracking-tighter text-slate-900">Nội dung</span>
-            </div>
-            <ExamContent exam={exam} />
-          </div>
-        </div>
-
-        <aside className="h-fit overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:sticky lg:top-24">
-          <form onSubmit={handleSubmit}>
-            <div className="border-b border-slate-100 p-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="truncate text-lg font-black tracking-tight text-slate-900">Bài làm của bạn</h3>
-                  <span className={`mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-black uppercase leading-none ${deadline.badgeClassName}`}>
-                    <Calendar size={11} />
-                    <span className="truncate">{deadline.label}</span>
-                  </span>
-                </div>
-
-                <div className="shrink-0 text-right">
-                  <div className="text-[10px] font-black uppercase text-slate-400">Due date</div>
-                  <div className="mt-1 max-w-32 text-xs font-black leading-snug text-slate-800">
-                    {formatDateTime(exam.due_date)}
-                  </div>
-                </div>
-              </div>
-
-              {deadline.expired && (
-                <div className="mt-4 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-600">
-                  Đã hết hạn nộp bài
-                </div>
+            <div className="p-4 sm:p-5">
+              {exam.description && (
+                <p className="mb-4 text-sm font-medium leading-6 text-slate-600">{exam.description}</p>
               )}
+              <ExamContent
+                exam={exam}
+                compact
+                onPreview={assignmentResource ? () => setPreviewFile({
+                  url: assignmentResource,
+                  name: exam.resource_name || exam.title,
+                  type: exam.content_type,
+                }) : undefined}
+              />
             </div>
+          </section>
 
-            <div className="space-y-5 p-6">
-              <div className="space-y-2">
-                <span className="px-1 text-sm font-bold text-slate-700">File bài làm</span>
-                <label className={`flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed p-5 text-center transition-all ${
-                  submissionDisabled
-                    ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
-                    : 'border-slate-200 bg-slate-50 text-slate-500 hover:border-indigo-200 hover:bg-indigo-50/40'
-                }`}>
-                  <UploadCloud size={28} className={submissionDisabled ? 'mb-2 text-slate-300' : 'mb-2 text-indigo-500'} />
-                  <span className="text-sm font-black text-slate-700">
-                    {answerFile?.name || submission?.resource_name || 'Chọn file bài làm'}
+          <section className="overflow-hidden rounded-2xl border border-indigo-100 bg-white shadow-sm shadow-indigo-100/40">
+            <form id="exam-submission-form" onSubmit={handleSubmit}>
+              <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+                <div>
+                  <h2 className="text-lg font-black">Bài nộp</h2>
+                  <p className="text-xs font-medium text-slate-500">Upload và gửi bài làm của bạn</p>
+                </div>
+                {submission && (
+                  <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${isLate ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                    {isLate ? 'Trễ hạn' : 'Đúng hạn'}
                   </span>
-                  <span className="mt-1 text-xs font-medium text-slate-400">
-                    {submissionDisabled ? 'Upload đã bị khóa' : submission?.resource_url ? 'Bấm để upload file mới' : 'Bấm để upload file'}
-                  </span>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    disabled={submissionDisabled}
-                    onChange={event => setAnswerFile(event.target.files?.[0] || null)}
-                    className="sr-only"
-                  />
-                </label>
-                {(selectedPreviewFile || submittedFile) && (
-                  <button
-                    type="button"
-                    onClick={() => setPreviewFile(selectedPreviewFile || submittedFile)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/40"
-                  >
-                    <FileText size={18} className="shrink-0 text-indigo-500" />
-                    <span className="min-w-0 flex-1 truncate text-xs font-black text-slate-700">
-                      {(selectedPreviewFile || submittedFile)?.name}
-                    </span>
-                    <span className="text-[10px] font-black uppercase text-indigo-500">Preview</span>
-                  </button>
                 )}
+              </div>
+
+              <div className="space-y-4 p-5">
+                <label
+                  onDragEnter={event => {
+                    event.preventDefault();
+                    if (!submissionDisabled) setIsDraggingFile(true);
+                  }}
+                  onDragOver={event => event.preventDefault()}
+                  onDragLeave={() => setIsDraggingFile(false)}
+                  onDrop={handleFileDrop}
+                  className={`group flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-5 text-center transition-all duration-200 ${
+                  submissionDisabled
+                    ? 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400'
+                    : isDraggingFile
+                      ? '-translate-y-0.5 border-indigo-500 bg-indigo-50 shadow-sm'
+                      : 'border-indigo-200 bg-indigo-50/30 hover:-translate-y-0.5 hover:border-indigo-400 hover:bg-indigo-50 hover:shadow-sm'
+                }`}
+                >
+                  <span className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl transition-transform ${submissionDisabled ? 'bg-slate-100 text-slate-300' : 'bg-white text-indigo-600 shadow-sm group-hover:scale-105'}`}>
+                    <UploadCloud size={23} />
+                  </span>
+                  <span className="text-sm font-black text-slate-800">{answerFile?.name || (submission?.resource_url ? 'Kéo thả file mới để cập nhật bài làm' : 'Kéo thả file bài làm vào đây')}</span>
+                  <span className="mt-1 text-xs font-medium text-slate-500">{submissionDisabled ? 'Đã đóng nhận bài' : 'hoặc bấm để chọn file từ thiết bị'}</span>
+                  <input ref={fileInputRef} type="file" disabled={submissionDisabled} onChange={event => handleSelectFile(event.target.files?.[0] || null)} className="sr-only" />
+                </label>
+
+                {(selectedPreviewFile || submittedFile) ? (
+                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                    <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                      {selectedPreviewFile ? 'File sắp nộp' : 'File đã nộp'}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white text-indigo-600">
+                        <FileText size={18} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-slate-700">{(selectedPreviewFile || submittedFile)?.name}</p>
+                        {submission?.submitted_at && !selectedPreviewFile && <p className="text-xs text-slate-500">Nộp lúc {formatDateTime(submission.submitted_at)}</p>}
+                      </div>
+                      <button type="button" onClick={() => setPreviewFile(selectedPreviewFile || submittedFile)} className="rounded-lg px-2 py-1 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50">
+                        Xem
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="rounded-xl bg-slate-50 p-3 text-center text-xs font-medium text-slate-500">Chưa có file được upload.</p>
+                )}
+
                 {(answerFile || (submission?.resource_url && !deadline.expired)) && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleRemoveFile}
-                    disabled={submitting}
-                    className="h-9 w-full gap-2 rounded-xl border-rose-100 text-xs font-black uppercase text-rose-600 hover:bg-rose-50"
-                  >
-                    <Trash2 size={14} />
-                    Xóa file
+                  <Button type="button" variant="ghost" onClick={handleRemoveFile} disabled={submitting} className="h-9 gap-2 text-xs font-bold text-rose-600 hover:bg-rose-50 hover:text-rose-700">
+                    <Trash2 size={14} /> Xóa file
                   </Button>
                 )}
+                {submitError && <div className="rounded-xl border border-rose-100 bg-rose-50 p-3 text-sm font-bold text-rose-600">{submitError}</div>}
+                {submitMessage && <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{submitMessage}</div>}
               </div>
+              <div className="hidden border-t border-slate-100 bg-slate-50 px-5 py-4 sm:block">
+                <Button type="submit" disabled={submitActionDisabled} className="h-12 w-full rounded-xl bg-indigo-600 font-bold text-white shadow-sm shadow-indigo-200 hover:bg-indigo-700 disabled:bg-slate-300 disabled:shadow-none">
+                  {submitting && <Loader2 size={16} className="mr-2 animate-spin" />}
+                  {submission ? 'Cập nhật bài nộp' : 'Nộp bài'}
+                </Button>
+              </div>
+            </form>
+          </section>
+        </div>
 
-              {submitError && (
-                <div className="rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold text-rose-600">
-                  {submitError}
+        <aside className="space-y-4 lg:sticky lg:top-5">
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="bg-indigo-600 p-5 text-white">
+              <p className="text-xs font-bold text-indigo-100">Điểm số</p>
+              <p className="mt-2 text-4xl font-black">{grade === null ? '--' : grade.toFixed(1)}<span className="ml-1 text-lg text-indigo-200">/ 10</span></p>
+              {grade !== null && (
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-indigo-400/40">
+                  <div className="h-full rounded-full bg-white transition-all duration-700" style={{ width: `${gradePercent}%` }} />
                 </div>
               )}
-
-              {submitMessage && (
-                <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm font-bold text-emerald-600">
-                  {submitMessage}
-                </div>
-              )}
+              <p className="mt-2 text-xs text-indigo-100">{grade === null ? 'Chưa có điểm' : `${gradePercent.toFixed(0)}% tổng điểm`}</p>
             </div>
-
-            <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-end">
-              <Button
-                type="submit"
-                disabled={submissionDisabled}
-                className="h-11 w-full rounded-xl bg-indigo-600 px-6 text-xs font-black uppercase tracking-widest hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                {submitting && <Loader2 size={16} className="mr-2 animate-spin" />}
-                {submission ? 'Cập nhật bài nộp' : 'Nộp bài'}
-              </Button>
+            <div className="divide-y divide-slate-100 px-5">
+              <SidebarRow label="Trạng thái" value={<span className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase ${resultStatus.className}`}>{resultStatus.label}</span>} />
+              <SidebarRow label="Hạn nộp" value={formatDateTime(exam.due_date)} />
+              {submission?.submitted_at && <SidebarRow label="Đã nộp lúc" value={formatDateTime(submission.submitted_at)} />}
             </div>
-          </form>
+          </section>
+
+          <CompactProgress submission={submission} />
+
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="mb-3 flex items-center gap-2">
+              <MessageSquareText size={16} className="text-indigo-500" />
+              <h2 className="text-sm font-black">Feedback giáo viên</h2>
+            </div>
+            {hasFeedback ? (
+              <div className="rounded-xl bg-slate-50 p-3.5">
+                <p className="whitespace-pre-wrap text-sm font-medium leading-6 text-slate-700">{submission?.feedback}</p>
+                {submission?.graded_at && <p className="mt-3 text-xs font-medium text-slate-400">Phản hồi lúc {formatDateTime(submission.graded_at)}</p>}
+              </div>
+            ) : (
+              <div className="flex items-start gap-2.5 rounded-xl bg-slate-50 p-3 text-xs font-medium leading-5 text-slate-500">
+                <Clock3 size={15} className="mt-0.5 shrink-0 text-slate-400" />
+                <span>{grade !== null ? 'Chưa có nhận xét bằng văn bản.' : submission ? 'Feedback sẽ hiển thị sau khi bài được chấm.' : 'Nộp bài để nhận feedback.'}</span>
+              </div>
+            )}
+          </section>
         </aside>
       </main>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white p-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] sm:hidden">
+        <Button form="exam-submission-form" type="submit" disabled={submitActionDisabled} className="h-12 w-full rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-700 disabled:bg-slate-300">
+          {submitting && <Loader2 size={16} className="mr-2 animate-spin" />}
+          {submission ? 'Cập nhật bài nộp' : 'Nộp bài'}
+        </Button>
+      </div>
 
       {previewFile && (
         <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
       )}
+    </div>
+  );
+}
+
+function SidebarRow({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-3.5 text-xs">
+      <span className="font-medium text-slate-500">{label}</span>
+      <span className="text-right font-bold text-slate-800">{value}</span>
+    </div>
+  );
+}
+
+function CompactProgress({ submission }: { submission: ExamSubmission | null }) {
+  const isGraded = typeof submission?.grade === 'number' || Boolean(submission?.graded_at);
+  const hasFeedback = Boolean(submission?.feedback?.trim());
+  const steps = [
+    { label: 'Đề bài', done: true, current: !submission },
+    { label: 'Đã nộp', done: Boolean(submission), current: Boolean(submission) && !isGraded },
+    { label: 'Đã chấm', done: isGraded, current: isGraded && !hasFeedback },
+    { label: 'Feedback', done: hasFeedback, current: false },
+  ] as const;
+
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <h2 className="mb-4 text-sm font-black text-slate-900">Tiến độ</h2>
+      <div className="flex items-start">
+        {steps.map((step, index) => (
+          <div key={step.label} className="relative flex min-w-0 flex-1 flex-col items-center text-center">
+            {index < steps.length - 1 && (
+              <span className={`absolute left-1/2 top-3 h-0.5 w-full ${steps[index + 1].done ? 'bg-emerald-300' : 'bg-slate-200'}`} />
+            )}
+            <span className={`relative z-[1] flex h-6 w-6 items-center justify-center rounded-full ${
+              step.done ? 'bg-emerald-100 text-emerald-600' : step.current ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'
+            }`}>
+              {step.done ? <CheckCircle2 size={14} /> : <span className="h-2 w-2 rounded-full bg-current" />}
+            </span>
+            <div className="relative z-[1] mt-2 bg-white px-1">
+              <p className={`text-[10px] font-bold ${step.done || step.current ? 'text-slate-700' : 'text-slate-400'}`}>{step.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ExamResultSkeleton() {
+  return (
+    <div className="min-h-screen animate-pulse bg-slate-50">
+      <div className="h-16 border-b border-slate-200 bg-white" />
+      <div className="mx-auto grid max-w-7xl gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-5">
+          <div className="h-80 rounded-2xl border border-slate-100 bg-white p-5">
+            <div className="h-full rounded-xl bg-slate-100" />
+          </div>
+          <div className="h-32 rounded-2xl bg-white p-5">
+            <div className="h-full rounded-xl bg-slate-100" />
+          </div>
+        </div>
+        <div className="h-72 rounded-2xl bg-white p-5">
+          <div className="h-full rounded-xl bg-slate-100" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -409,12 +505,12 @@ function FilePreviewModal({ file, onClose }: { file: PreviewFile; onClose: () =>
   );
 }
 
-function ExamContent({ exam }: { exam: Exam }) {
+function ExamContent({ exam, compact = false, onPreview }: { exam: Exam; compact?: boolean; onPreview?: () => void }) {
   const resourceUrl = exam.resource_url || (exam.content_type !== 'markdown' ? exam.content : '');
 
   if (exam.content_type === 'markdown') {
     return (
-      <div className="min-h-40 whitespace-pre-wrap rounded-2xl border border-slate-100 bg-slate-50 p-5 text-sm font-medium leading-relaxed text-slate-700">
+      <div className={`${compact ? 'max-h-72 overflow-y-auto' : 'min-h-40'} whitespace-pre-wrap rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm font-medium leading-relaxed text-slate-700`}>
         {exam.content || 'Chưa có nội dung.'}
       </div>
     );
@@ -431,12 +527,18 @@ function ExamContent({ exam }: { exam: Exam }) {
 
   if (exam.content_type === 'image') {
     return (
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
-        <a href={resourceUrl} target="_blank" rel="noopener noreferrer" className="block">
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-sm">
+        <button type="button" onClick={onPreview} className="group relative block w-full text-left" aria-label="Xem toàn bộ hình ảnh đề bài">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={resourceUrl} alt={exam.resource_name || exam.title} className="max-h-[640px] w-full object-contain" />
-        </a>
-        <div className="border-t border-slate-100 bg-white p-3">
+          <img src={resourceUrl} alt={exam.resource_name || exam.title} className={`${compact ? 'h-72 sm:h-[400px]' : 'max-h-[640px]'} w-full object-contain`} />
+          {compact && (
+            <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/60 to-transparent px-4 pb-3 pt-10 text-xs font-bold text-white opacity-100 transition group-hover:bg-slate-900/45">
+              Xem toàn bộ hình ảnh
+            </span>
+          )}
+        </button>
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-white p-3">
+          <p className="min-w-0 truncate text-xs font-medium text-slate-500">{exam.resource_name || 'Hình ảnh đề bài'}</p>
           <DownloadButton url={resourceUrl} label={exam.resource_name || 'Tải file'} />
         </div>
       </div>
@@ -444,6 +546,20 @@ function ExamContent({ exam }: { exam: Exam }) {
   }
 
   if (exam.content_type === 'pdf') {
+    if (compact) {
+      return (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-slate-100 bg-slate-50 p-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600"><FileDown size={19} /></span>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-slate-700">{exam.resource_name || 'Tài liệu PDF'}</p>
+              <p className="text-xs font-medium text-slate-500">Nhấn để xem nội dung đầy đủ</p>
+            </div>
+          </div>
+          <Button type="button" variant="outline" onClick={onPreview} className="shrink-0 rounded-lg text-xs font-bold">Xem</Button>
+        </div>
+      );
+    }
     return (
       <div className="overflow-hidden rounded-2xl border border-slate-100 bg-slate-50">
         <iframe title={exam.title} src={resourceUrl} className="h-[640px] w-full" />
@@ -498,25 +614,48 @@ function getSubmissionContentType(file: File): ExamContentType {
   return 'file';
 }
 
-function getExamStatusClass(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized === 'published' || normalized === 'active' || normalized === 'open') {
-    return 'border border-emerald-100 bg-emerald-50 text-emerald-600';
+function getResultStatusMeta(submission: ExamSubmission | null) {
+  if (!submission) {
+    return {
+      label: 'Chưa nộp',
+      className: 'border-slate-200 bg-slate-100 text-slate-600',
+    };
   }
-  if (normalized === 'draft') {
-    return 'border border-amber-100 bg-amber-50 text-amber-600';
+
+  if (typeof submission.grade === 'number' || submission.graded_at) {
+    return {
+      label: 'Đã chấm',
+      className: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+    };
   }
-  if (normalized === 'closed' || normalized === 'expired') {
-    return 'border border-rose-100 bg-rose-50 text-rose-600';
+
+  if (['grading', 'reviewing', 'in_review', 'pending_review'].includes(submission.status.toLowerCase())) {
+    return {
+      label: 'Đang chấm',
+      className: 'border-amber-100 bg-amber-50 text-amber-700',
+    };
   }
-  return 'border border-slate-200 bg-slate-100 text-slate-600';
+
+  return {
+    label: 'Đã nộp',
+    className: 'border-indigo-100 bg-indigo-50 text-indigo-700',
+  };
 }
 
-function getContentTypeIcon(contentType: string) {
-  if (contentType === 'image') return ImageIcon;
-  if (contentType === 'pdf') return FileDown;
-  if (contentType === 'file') return File;
-  return FileText;
+function isLateSubmission(submission: ExamSubmission, dueDate: string | null) {
+  if (submission.status.toLowerCase() === 'late') return true;
+  if (!submission.submitted_at || !dueDate) return false;
+
+  const submittedAt = new Date(submission.submitted_at).getTime();
+  const deadline = new Date(dueDate).getTime();
+  return Number.isFinite(submittedAt) && Number.isFinite(deadline) && submittedAt > deadline;
+}
+
+function ContentTypeIcon({ contentType }: { contentType: ExamContentType }) {
+  if (contentType === 'image') return <ImageIcon size={17} />;
+  if (contentType === 'pdf') return <FileDown size={17} />;
+  if (contentType === 'file') return <File size={17} />;
+  return <FileText size={17} />;
 }
 
 function getDeadlineMeta(value: string | null, now: number) {

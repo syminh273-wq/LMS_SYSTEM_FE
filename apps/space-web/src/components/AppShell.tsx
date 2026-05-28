@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   BookOpen,
+  Gamepad2,
   Sparkles,
   Search,
   ChevronsLeft,
@@ -24,9 +25,14 @@ import NotificationBell from '@/components/NotificationBell';
 const navItems = [
   { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
   { name: 'Classrooms', href: '/space/classrooms', icon: BookOpen },
+  { name: 'Quiz Library', href: '/space/quizzes', icon: Gamepad2 },
   { name: 'Staff Management', href: '/space/staff', icon: Users },
   { name: 'Settings', href: '/space/settings', icon: Settings },
 ];
+
+function matchesNavPath(pathname: string, href: string) {
+  return href === '/space' ? pathname === href : pathname.startsWith(href);
+}
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -87,7 +93,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <nav className={`flex-1 space-y-1.5 mt-2 ${sidebarCollapsed ? 'px-2' : 'px-4'}`}>
           {navItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = matchesNavPath(pathname, item.href);
             return (
               <Link
                 key={item.name}
@@ -137,7 +143,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             ) : (
               <h2 className="text-lg font-bold text-foreground uppercase tracking-widest">
-                {navItems.find(i => pathname.startsWith(i.href))?.name || 'Space Admin'}
+                {navItems.find(i => matchesNavPath(pathname, i.href))?.name || 'Space Admin'}
               </h2>
             )}
           </div>
