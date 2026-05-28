@@ -28,6 +28,8 @@ import {
   Image as ImageIcon,
   Trophy,
   ChevronRight,
+  Bot,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
@@ -35,7 +37,7 @@ import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting';
+type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -112,8 +114,14 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [activeTab, setActiveTab] = useState<ClassroomTab>("discussion");
   const [activeRoom, setActiveRoom] = useState<any>(null);
   const [loadingRoom, setLoadingRoom] = useState(false);
-  
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // AI Bot state
+  type AiMsg = { role: 'user' | 'assistant'; text: string; loading?: boolean; sources?: Array<{ document: string; metadata: Record<string, string>; score: number }> };
+  const [aiMessages, setAiMessages] = useState<AiMsg[]>([]);
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiScrollRef = useRef<HTMLDivElement>(null);
+  const [docUrlMap, setDocUrlMap] = useState<Record<string, { name: string; url: string }>>({});
 
   const {
     messages, hasMore, loadingMore, connected, loading: chatLoading,
@@ -185,9 +193,77 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   }, [activeTab, isAuthenticated, uid]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!loadingMore && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  }, [messages, loadingMore, scrollContainerRef]);
 
+  useEffect(() => {
+    if (aiScrollRef.current) aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
+  }, [aiMessages]);
+
+  const handleAiAsk = async () => {
+    if (!aiQuestion.trim() || aiLoading) return;
+    const question = aiQuestion.trim();
+    setAiQuestion('');
+    setAiLoading(true);
+    setAiMessages(prev => [...prev, { role: 'user', text: question }, { role: 'assistant', text: '', loading: true }]);
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/consumer/course/classrooms/${uid}/ask-stream/`, {
+        method: 'POST', headers, body: JSON.stringify({ question }),
+      });
+      if (!res.ok || !res.body) throw new Error('Không thể kết nối AI');
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') break;
+          try {
+            const ev = JSON.parse(raw) as { type: string; text?: string; data?: AiMsg['sources']; message?: string };
+            if (ev.type === 'chunk' && ev.text) {
+              setAiMessages(prev => { const last = prev[prev.length - 1]; const next = (last.text + ev.text!).replace(/\n{3,}/g, '\n\n'); return [...prev.slice(0, -1), { ...last, text: next }]; });
+            } else if (ev.type === 'sources') {
+              setAiMessages(prev => { const last = prev[prev.length - 1]; return [...prev.slice(0, -1), { ...last, loading: false, sources: ev.data }]; });
+            } else if (ev.type === 'error') {
+              setAiMessages(prev => { const last = prev[prev.length - 1]; return [...prev.slice(0, -1), { ...last, loading: false, text: ev.message ?? 'Có lỗi' }]; });
+            }
+          } catch { /* ignore */ }
+        }
+      }
+      setAiMessages(prev => { const last = prev[prev.length - 1]; return last.loading ? [...prev.slice(0, -1), { ...last, loading: false }] : prev; });
+    } catch (err: unknown) {
+      setAiMessages(prev => { const last = prev[prev.length - 1]; return [...prev.slice(0, -1), { ...last, loading: false, text: err instanceof Error ? err.message : 'Có lỗi' }]; });
+    } finally { setAiLoading(false); }
+  };
+
+
+  useEffect(() => {
+    if (!isAuthenticated || !uid || activeTab !== 'ai' || Object.keys(docUrlMap).length > 0) return;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    fetch(`${apiBase}/api/v1/consumer/course/classrooms/${uid}/docs/`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then(r => r.ok ? r.json() : [])
+      .then((docs: Array<{ uid: string; name: string; url: string }>) => {
+        const map: Record<string, { name: string; url: string }> = {};
+        for (const d of docs) map[d.uid] = { name: d.name, url: d.url };
+        setDocUrlMap(map);
+      })
+      .catch(() => {});
+  }, [isAuthenticated, uid, activeTab, docUrlMap]);
 
   useEffect(() => {
     if (isAuthenticated && uid && activeTab === 'meeting') {
@@ -329,7 +405,8 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
                 { key: 'quiz' as const, icon: Trophy, label: 'Quiz Game' },
-                { key: 'meeting' as const, icon: Video, label: 'Phòng họp' }
+                { key: 'meeting' as const, icon: Video, label: 'Phòng họp' },
+                { key: 'ai' as const, icon: Bot, label: 'AI Trợ giảng' },
               ].map((item) => (
                 <button 
                   key={item.key}
@@ -388,7 +465,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   )}
 
                   {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} />)}
-                  <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
@@ -553,7 +629,120 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
-            {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && activeTab !== 'meeting' && (
+            {activeTab === 'ai' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col" style={{ height: '540px' }}>
+                {/* Header */}
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-indigo-50/60 to-violet-50/60">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md">
+                    <Bot size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="font-black text-slate-900 text-sm">AI Trợ giảng</p>
+                    <p className="text-[11px] text-slate-400 font-medium">Hỏi đáp từ tài liệu lớp học</p>
+                  </div>
+                  {aiMessages.length > 0 && (
+                    <button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 font-medium">Xoá</button>
+                  )}
+                </div>
+                {/* Messages */}
+                <div ref={aiScrollRef} className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+                  {aiMessages.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-center py-8">
+                      <Sparkles size={28} className="text-indigo-300 mb-3" />
+                      <p className="text-sm font-bold text-slate-700">AI Trợ giảng</p>
+                      <p className="text-xs text-slate-400 mt-1 max-w-xs">Đặt câu hỏi về tài liệu của lớp học để nhận câu trả lời ngay!</p>
+                    </div>
+                  )}
+                  {aiMessages.map((msg, i) => (
+                    <div key={i} className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      {msg.role === 'assistant' && (
+                        <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+                          <Bot size={14} className="text-white" />
+                        </div>
+                      )}
+                      <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-slate-50 text-slate-800 border border-slate-100 rounded-bl-sm'}`}>
+                        <div className="text-sm font-medium leading-relaxed space-y-1">
+                          {msg.text
+                            ? msg.text.split('\n\n').map((para, pi) => (
+                                <p key={pi}>
+                                  {para.split('\n').map((line, li, arr) => (
+                                    <React.Fragment key={li}>
+                                      {line}
+                                      {li < arr.length - 1 && <br />}
+                                    </React.Fragment>
+                                  ))}
+                                  {pi === msg.text.split('\n\n').length - 1 && msg.loading && (
+                                    <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse rounded align-middle" />
+                                  )}
+                                </p>
+                              ))
+                            : msg.loading && (
+                                <span className="inline-flex gap-1">{[0,1,2].map(d => (
+                                  <span key={d} className="w-1.5 h-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: `${d * 0.15}s` }} />
+                                ))}</span>
+                              )
+                          }
+                        </div>
+                        {msg.sources && msg.sources.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Nguồn tham khảo</p>
+                            {msg.sources.slice(0, 3).map((src, j) => {
+                              const docName = src.metadata?.doc_name ?? 'Tài liệu';
+                              const docUrl = src.metadata?.doc_url
+                                ?? docUrlMap[src.metadata?.resource_uid]?.url
+                                ?? null;
+                              const score = (src.score * 100).toFixed(0);
+                              return (
+                                <div key={j} className="text-[10px] text-slate-500 flex items-center justify-between gap-2">
+                                  {docUrl ? (
+                                    <a
+                                      href={docUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download
+                                      className="truncate text-indigo-500 hover:text-indigo-700 hover:underline font-medium"
+                                      title={`Xem / tải: ${docName}`}
+                                    >
+                                      {docName}
+                                    </a>
+                                  ) : (
+                                    <span className="truncate">{docName}</span>
+                                  )}
+                                  <span className="shrink-0 text-indigo-500 font-bold">{score}%</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Input */}
+                <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/50">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={aiQuestion}
+                      onChange={e => setAiQuestion(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
+                      placeholder="Đặt câu hỏi về tài liệu lớp học..."
+                      disabled={aiLoading}
+                      className="flex-1 h-10 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:opacity-60"
+                    />
+                    <button
+                      onClick={() => void handleAiAsk()}
+                      disabled={!aiQuestion.trim() || aiLoading}
+                      className="h-10 w-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center disabled:opacity-50 transition-colors shrink-0"
+                    >
+                      {aiLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && activeTab !== 'meeting' && activeTab !== 'ai' && (
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="flex h-64 flex-col items-center justify-center text-center text-slate-400">
                   <FileText size={38} className="mb-3 opacity-30" />

@@ -140,8 +140,44 @@ export type ExamSubmission = {
   feedback?: string;
   graded_by?: string | null;
   graded_at?: string | null;
+  grading_method?: 'manual' | 'ai' | string;
+  ai_model?: string;
+  ai_rubric?: string;
+  ai_reason?: string;
+  ai_breakdown?: Array<{
+    question: string;
+    score: number;
+    max_score: number;
+    reason: string;
+  }>;
+  ai_sources?: Array<{
+    resource_uid?: string | null;
+    doc_name?: string;
+    doc_url?: string | null;
+    page?: number | string | null;
+    score?: number;
+  }>;
+  ai_confidence?: number | null;
   created_at?: string;
   updated_at?: string;
+};
+
+export type AIGradeRequest = {
+  rubric?: string;
+  max_grade?: number;
+  overwrite?: boolean;
+  top_k?: number;
+};
+
+export type AIGradeBatchResponse = {
+  total: number;
+  graded: number;
+  failed: number;
+  results: Array<{
+    success: boolean;
+    error: string;
+    submission: ExamSubmission;
+  }>;
 };
 
 export type CreateExamRequest = {

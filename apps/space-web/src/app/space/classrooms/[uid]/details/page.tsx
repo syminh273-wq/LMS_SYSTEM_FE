@@ -16,6 +16,11 @@ import {
   File,
   X,
   UploadCloud,
+  FolderOpen,
+  Tag,
+  Bot,
+  Sparkles,
+  Send,
   ArrowLeft,
   Settings,
   ClipboardList,
@@ -123,7 +128,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [fetching, setFetching] = useState(true);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'quiz' | 'students'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'quiz' | 'students' | 'ai'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [pendingMembers, setPendingMembers] = useState<ClassroomMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
@@ -145,10 +150,21 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [meetingAction, setMeetingAction] = useState<'start' | 'end' | null>(null);
 
-  type DocItem = { uid: string; name: string; size: string; date: string; url: string; file_type: string };
+  type DocItem = { uid: string; name: string; size: string; date: string; url: string; file_type: string; section: string };
   const [documents, setDocuments] = useState<DocItem[]>([]);
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [uploadSection, setUploadSection] = useState('');
+  const [filterSection, setFilterSection] = useState('');
   const docInputRef = useRef<HTMLInputElement>(null);
+
+  // AI Bot state
+  type AiMessage = { role: 'user' | 'assistant'; text: string; loading?: boolean; sources?: Array<{ document: string; metadata: Record<string, string>; score: number }> };
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiScrollRef = useRef<HTMLDivElement>(null);
+
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');
   const [loadingExams, setLoadingExams] = useState(false);
@@ -196,7 +212,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'quiz' || tab === 'students') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'quiz' || tab === 'students' || tab === 'ai') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
       setActiveTab(tab);
     }
@@ -376,34 +392,126 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const callUploadAPI = async (
-    file: File,
-    meta: Record<string, string>,
-    ownerOverride?: { owner_id: string; owner_type: string }
-  ) => {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('metadata', JSON.stringify(meta));
-    if (ownerOverride) {
-      formData.append('owner_id', ownerOverride.owner_id);
-      formData.append('owner_type', ownerOverride.owner_type);
+  const fetchDocs = React.useCallback(async (section?: string) => {
+    setLoadingDocs(true);
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const query = section ? `?section=${encodeURIComponent(section)}` : '';
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/${query}`, { headers });
+      if (!res.ok) throw new Error('Không thể tải danh sách tài liệu');
+      const data = await res.json() as Array<{ uid: string; name: string; file_type: string; url: string; size: number; metadata: Record<string, string>; created_at: string }>;
+      setDocuments(data.map(d => ({
+        uid: d.uid,
+        name: d.name,
+        size: formatFileSize(d.size ?? 0),
+        date: new Date(d.created_at).toLocaleDateString('vi-VN'),
+        url: d.url,
+        file_type: d.file_type,
+        section: d.metadata?.section ?? '',
+      })));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể tải tài liệu');
+    } finally {
+      setLoadingDocs(false);
     }
+  }, [uid]);
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const res = await fetch(`${apiBase}/api/v1/resource/upload/`, {
-      method: 'POST',
-      headers,
-      body: formData,
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({})) as Record<string, unknown>;
-      throw new Error((err.message as string) || (err.detail as string) || 'Upload thất bại');
+  useEffect(() => {
+    if (activeTab === 'docs') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
+      void fetchDocs(filterSection || undefined);
     }
-    return res.json();
+  }, [activeTab, fetchDocs, filterSection]);
+
+  // Auto-scroll AI chat to bottom on new messages
+  useEffect(() => {
+    if (aiScrollRef.current) {
+      aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
+    }
+  }, [aiMessages]);
+
+  const handleAiAsk = async () => {
+    if (!aiQuestion.trim() || aiLoading) return;
+    const question = aiQuestion.trim();
+    setAiQuestion('');
+    setAiLoading(true);
+    setAiMessages(prev => [
+      ...prev,
+      { role: 'user', text: question },
+      { role: 'assistant', text: '', loading: true },
+    ]);
+
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ask-stream/`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ question }),
+      });
+
+      if (!res.ok || !res.body) throw new Error('Không thể kết nối AI');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const raw = line.slice(6).trim();
+          if (raw === '[DONE]') break;
+          try {
+            const event = JSON.parse(raw) as { type: string; text?: string; data?: AiMessage['sources']; message?: string };
+            if (event.type === 'chunk' && event.text) {
+              setAiMessages(prev => {
+                const last = prev[prev.length - 1];
+                const next = (last.text + event.text!).replace(/\n{3,}/g, '\n\n');
+                return [...prev.slice(0, -1), { ...last, text: next }];
+              });
+            } else if (event.type === 'sources') {
+              setAiMessages(prev => {
+                const last = prev[prev.length - 1];
+                return [...prev.slice(0, -1), { ...last, loading: false, sources: event.data }];
+              });
+            } else if (event.type === 'error') {
+              setAiMessages(prev => {
+                const last = prev[prev.length - 1];
+                return [...prev.slice(0, -1), { ...last, loading: false, text: event.message ?? 'Có lỗi xảy ra' }];
+              });
+            }
+          } catch { /* ignore malformed SSE lines */ }
+        }
+      }
+      // Ensure loading cleared
+      setAiMessages(prev => {
+        const last = prev[prev.length - 1];
+        return last.loading ? [...prev.slice(0, -1), { ...last, loading: false }] : prev;
+      });
+    } catch (err: unknown) {
+      setAiMessages(prev => {
+        const last = prev[prev.length - 1];
+        return [...prev.slice(0, -1), {
+          ...last,
+          loading: false,
+          text: err instanceof Error ? err.message : 'Có lỗi xảy ra',
+        }];
+      });
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -412,20 +520,56 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     e.target.value = '';
     setUploadingDoc(true);
     try {
-      const data = await callUploadAPI(file, { context: 'classroom_docs', classroom_uid: uid });
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const formData = new FormData();
+      formData.append('file', file);
+      if (uploadSection) formData.append('section', uploadSection);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({})) as Record<string, unknown>;
+        throw new Error((err.message as string) || (err.detail as string) || 'Upload thất bại');
+      }
+      const data = await res.json() as { uid: string; name: string; file_type: string; url: string; size: number; metadata: Record<string, string>; created_at: string };
       setDocuments(prev => [{
         uid: data.uid,
         name: data.name,
         size: formatFileSize(data.size ?? file.size),
-        date: new Date().toLocaleDateString('vi-VN'),
+        date: new Date(data.created_at).toLocaleDateString('vi-VN'),
         url: data.url,
         file_type: data.file_type,
+        section: data.metadata?.section ?? uploadSection,
       }, ...prev]);
       toast.success('Đã tải lên tài liệu thành công');
     } catch (err: unknown) {
       toast.error(`Lỗi: ${err instanceof Error ? err.message : 'Không thể tải lên'}`);
     } finally {
       setUploadingDoc(false);
+    }
+  };
+
+  const handleDeleteDoc = async (docUid: string) => {
+    if (!window.confirm('Xóa tài liệu này?')) return;
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/${docUid}/`, {
+        method: 'DELETE',
+        headers,
+      });
+      if (!res.ok && res.status !== 204) throw new Error('Không thể xóa tài liệu');
+      setDocuments(prev => prev.filter(d => d.uid !== docUid));
+      toast.success('Đã xóa tài liệu');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể xóa tài liệu');
     }
   };
 
@@ -629,6 +773,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {([
                 { id: 'info',     label: 'Thông tin chung',    icon: Info },
                 { id: 'docs',     label: 'Tài liệu học tập',   icon: FileText },
+                { id: 'ai',       label: 'AI Trợ giảng',       icon: Bot },
                 { id: 'chat',     label: 'Thảo luận lớp học',  icon: MessageSquare },
                 { id: 'meeting',  label: 'Phòng họp',          icon: Video },
                 { id: 'exams',    label: 'Bài kiểm tra',       icon: ClipboardList },
@@ -682,6 +827,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   {[
                     { id: 'info',    label: 'Thông tin chung',   icon: Info },
                     { id: 'docs',    label: 'Tài liệu học tập',  icon: FileText },
+                    { id: 'ai',      label: 'AI Trợ giảng',      icon: Bot },
                     { id: 'chat',    label: 'Thảo luận lớp học', icon: MessageSquare },
                     { id: 'meeting', label: 'Phòng họp',         icon: Video },
                   ].map(({ id, label, icon: Icon }) => {
@@ -901,74 +1047,247 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {activeTab === 'docs' && (
             <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">Tài liệu học tập</h3>
-                  <p className="text-sm text-muted-foreground font-medium mt-1">Quản lý và chia sẻ học liệu của lớp học</p>
+              {/* Header */}
+              <div className="p-8 border-b border-border bg-muted/50">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">Tài liệu học tập</h3>
+                    <p className="text-sm text-muted-foreground font-medium mt-1">Quản lý và chia sẻ học liệu của lớp học</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {/* Section input for upload */}
+                    <div className="relative flex items-center">
+                      <Tag size={14} className="absolute left-3 text-muted-foreground pointer-events-none" />
+                      <input
+                        type="text"
+                        value={uploadSection}
+                        onChange={e => setUploadSection(e.target.value)}
+                        placeholder="Mục (vd: tuần 1)"
+                        className="pl-8 pr-3 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-300 w-40"
+                      />
+                    </div>
+                    <input ref={docInputRef} type="file" className="hidden" onChange={handleDocUpload}
+                      accept="application/pdf,.txt,.md,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*,.zip" />
+                    <Button
+                      onClick={() => docInputRef.current?.click()}
+                      disabled={uploadingDoc}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-indigo-100 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
+                    >
+                      {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={18} />}
+                      {uploadingDoc ? 'ĐANG TẢI...' : 'TẢI LÊN'}
+                    </Button>
+                  </div>
                 </div>
-                <input ref={docInputRef} type="file" className="hidden" onChange={handleDocUpload}
-                  accept="image/*,video/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip" />
-                <Button
-                  onClick={() => docInputRef.current?.click()}
-                  disabled={uploadingDoc}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl h-12 px-8 gap-3 shadow-lg shadow-indigo-100 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
-                >
-                  {uploadingDoc ? <Loader2 size={18} className="animate-spin" /> : <UploadCloud size={20} />}
-                  {uploadingDoc ? 'ĐANG TẢI LÊN...' : 'TẢI LÊN TỆP MỚI'}
-                </Button>
+
+                {/* Section filter pills */}
+                {documents.length > 0 && (() => {
+                  const sections = [...new Set(documents.map(d => d.section).filter(Boolean))];
+                  return sections.length > 0 ? (
+                    <div className="flex items-center gap-2 mt-4 flex-wrap">
+                      <FolderOpen size={14} className="text-muted-foreground" />
+                      <button
+                        onClick={() => setFilterSection('')}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === '' ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600'}`}
+                      >
+                        Tất cả
+                      </button>
+                      {sections.map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setFilterSection(s === filterSection ? '' : s)}
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === s ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600'}`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
               </div>
 
-              <div className="flex-1 overflow-y-auto p-10 space-y-4">
-                {documents.length === 0 && (
+              <div className="flex-1 overflow-y-auto p-8 space-y-4">
+                {loadingDocs && (
+                  <div className="flex items-center justify-center py-16">
+                    <Loader2 size={32} className="animate-spin text-indigo-400" />
+                  </div>
+                )}
+                {!loadingDocs && documents.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
                     <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4 border border-border">
                       <File size={32} className="opacity-40" />
                     </div>
                     <p className="text-base font-bold text-foreground">Chưa có tài liệu nào</p>
-                    <p className="text-sm font-medium mt-1">Nhấn &ldquo;Tải lên tệp mới&rdquo; để thêm học liệu</p>
+                    <p className="text-sm font-medium mt-1">Nhấn &ldquo;Tải lên&rdquo; để thêm học liệu</p>
                   </div>
                 )}
-                {documents.map(doc => (
-                  <div key={doc.uid} className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-5 group hover:border-indigo-200 transition-all hover:shadow-lg">
-                    <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
-                      {doc.file_type.match(/^(jpg|jpeg|png|gif|webp|svg)$/) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={doc.url} alt={doc.name} className="w-14 h-14 rounded-xl object-cover" />
-                      ) : (
-                        <File size={28} />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-base font-bold text-foreground truncate group-hover:text-indigo-600 transition-colors">{doc.name}</div>
-                      <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-1 flex items-center gap-3">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
-                        <span>{doc.size}</span>
-                        <span>Đã tải lên {doc.date}</span>
+                {!loadingDocs && documents
+                  .filter(d => !filterSection || d.section === filterSection)
+                  .map(doc => (
+                    <div key={doc.uid} className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-5 group hover:border-indigo-200 transition-all hover:shadow-lg">
+                      <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                        {doc.file_type.match(/^(jpg|jpeg|png|gif|webp|svg)$/) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={doc.url} alt={doc.name} className="w-14 h-14 rounded-xl object-cover" />
+                        ) : (
+                          <File size={28} />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-base font-bold text-foreground truncate group-hover:text-indigo-600 transition-colors">{doc.name}</div>
+                        <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-1 flex items-center gap-3 flex-wrap">
+                          <span className="bg-slate-100 px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
+                          {doc.section && (
+                            <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded flex items-center gap-1">
+                              <Tag size={10} />{doc.section}
+                            </span>
+                          )}
+                          <span>{doc.size}</span>
+                          <span>Đã tải lên {doc.date}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer">
+                          <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground hover:text-indigo-600 rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100">
+                            <Download size={20} />
+                          </Button>
+                        </a>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-11 w-11 text-muted-foreground hover:text-rose-500 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                          onClick={() => void handleDeleteDoc(doc.uid)}
+                        >
+                          <X size={20} />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground hover:text-indigo-600 rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100">
-                          <Download size={20} />
-                        </Button>
-                      </a>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-11 w-11 text-muted-foreground hover:text-rose-500 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100"
-                        onClick={() => setDocuments(prev => prev.filter(d => d.uid !== doc.uid))}
-                      >
-                        <X size={20} />
-                      </Button>
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'ai' && (
+            <div className="flex flex-col h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              {/* Header */}
+              <div className="p-8 border-b border-border bg-gradient-to-r from-indigo-50/80 to-violet-50/80 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
+                  <Bot size={24} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-foreground">AI Trợ giảng</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-0.5">Đặt câu hỏi về tài liệu đã tải lên trong lớp học</p>
+                </div>
+                {aiMessages.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setAiMessages([])}
+                    className="ml-auto text-xs text-muted-foreground hover:text-foreground rounded-xl"
+                  >
+                    Xoá lịch sử
+                  </Button>
+                )}
+              </div>
+
+              {/* Messages */}
+              <div ref={aiScrollRef} className="flex-1 overflow-y-auto p-8 space-y-6">
+                {aiMessages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="w-20 h-20 rounded-full bg-indigo-50 flex items-center justify-center mb-4 border border-indigo-100">
+                      <Sparkles size={32} className="text-indigo-400" />
                     </div>
+                    <p className="text-lg font-bold text-foreground">Xin chào! Tôi là AI Trợ giảng</p>
+                    <p className="text-sm text-muted-foreground mt-2 max-w-sm leading-relaxed">
+                      Tôi có thể trả lời câu hỏi dựa trên tài liệu đã tải lên.
+                      Hãy vào tab &ldquo;Tài liệu học tập&rdquo; để tải lên tài liệu trước, rồi đặt câu hỏi!
+                    </p>
+                  </div>
+                )}
+
+                {aiMessages.map((msg, i) => (
+                  <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    {msg.role === 'assistant' && (
+                      <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md shrink-0 mt-0.5">
+                        <Bot size={16} className="text-white" />
+                      </div>
+                    )}
+                    <div className={`max-w-[76%] rounded-2xl px-5 py-3.5 ${
+                      msg.role === 'user'
+                        ? 'bg-indigo-600 text-white rounded-br-md shadow-md shadow-indigo-100'
+                        : 'bg-muted text-foreground rounded-bl-md border border-border'
+                    }`}>
+                      <div className="text-sm font-medium leading-relaxed space-y-1.5">
+                        {msg.text
+                          ? msg.text.split('\n\n').map((para, pi) => (
+                              <p key={pi}>
+                                {para.split('\n').map((line, li, arr) => (
+                                  <React.Fragment key={li}>
+                                    {line}
+                                    {li < arr.length - 1 && <br />}
+                                  </React.Fragment>
+                                ))}
+                                {pi === msg.text.split('\n\n').length - 1 && msg.loading && (
+                                  <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse rounded align-middle" />
+                                )}
+                              </p>
+                            ))
+                          : msg.loading && (
+                              <span className="inline-flex gap-1">{[0,1,2].map(d => (
+                                <span key={d} className="w-1.5 h-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: `${d * 0.15}s` }} />
+                              ))}</span>
+                            )
+                        }
+                      </div>
+                      {msg.sources && msg.sources.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nguồn tham khảo</p>
+                          {msg.sources.slice(0, 3).map((src, j) => (
+                            <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center justify-between gap-3">
+                              <span className="truncate">{src.metadata?.doc_name ?? src.metadata?.resource_uid ?? 'Tài liệu'}</span>
+                              <span className="shrink-0 font-bold text-indigo-500">{(src.score * 100).toFixed(0)}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {msg.role === 'user' && (
+                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                        <Users size={16} className="text-slate-400" />
+                      </div>
+                    )}
                   </div>
                 ))}
+              </div>
+
+              {/* Input */}
+              <div className="p-6 border-t border-border bg-muted/30">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={aiQuestion}
+                    onChange={e => setAiQuestion(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
+                    placeholder="Đặt câu hỏi về tài liệu của lớp..."
+                    disabled={aiLoading}
+                    className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-60"
+                  />
+                  <Button
+                    onClick={() => void handleAiAsk()}
+                    disabled={!aiQuestion.trim() || aiLoading}
+                    className="h-12 w-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white p-0 shadow-lg shadow-indigo-100 disabled:opacity-50 shrink-0"
+                  >
+                    {aiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                  </Button>
+                </div>
+                <p className="text-[11px] text-muted-foreground/70 mt-2 text-center">
+                  AI trả lời dựa trên tài liệu đã tải lên trong lớp học
+                </p>
               </div>
             </div>
           )}
 
           {activeTab === 'chat' && (
-            <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm h-full flex flex-col">
+            <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm h-[calc(100vh-260px)] flex flex-col">
               {conversationUid ? (
                 <ClassroomChatPanel
                   conversationUid={conversationUid}
@@ -2242,6 +2561,7 @@ function ExamGradeTableModal({
   const [grade, setGrade] = useState('');
   const [feedback, setFeedback] = useState('');
   const [saving, setSaving] = useState(false);
+  const [aiGradingTarget, setAiGradingTarget] = useState<string | null>(null);
 
   const loadGradeTable = React.useCallback(async () => {
     setLoading(true);
@@ -2349,6 +2669,67 @@ function ExamGradeTableModal({
     }
   };
 
+  const buildAIGradeRequest = (defaultOverwrite: boolean) => {
+    const rubric = window.prompt(
+      'Nhập rubric cho AI chấm điểm. Có thể để trống để dùng rubric mặc định.',
+      'Thang điểm 10. Chấm đúng ý, đầy đủ dẫn chứng, lập luận rõ ràng. Trừ điểm nếu thiếu ý chính hoặc không dựa trên tài liệu.'
+    );
+    if (rubric === null) return null;
+    return {
+      rubric: rubric.trim(),
+      max_grade: 10,
+      overwrite: defaultOverwrite,
+      top_k: 5,
+    };
+  };
+
+  const handleAIGradeSubmission = async (row: GradeRow) => {
+    if (!row.submission || aiGradingTarget) return;
+    const request = buildAIGradeRequest(row.submission.grade != null);
+    if (!request) return;
+
+    setAiGradingTarget(row.submission.uid);
+    try {
+      const updated = await spaceApi.exams.aiGradeSubmission(row.submission.uid, request);
+      setSubmissions(previous => previous.map(submission => submission.uid === updated.uid ? updated : submission));
+      if (activeStudentId === row.member.member_id) {
+        setGrade(updated.grade != null ? String(updated.grade) : '');
+        setFeedback(updated.feedback || '');
+      }
+      toast.success(`AI đã chấm bài của ${row.member.member_name}`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'AI không thể chấm bài này');
+    } finally {
+      setAiGradingTarget(null);
+    }
+  };
+
+  const handleAIGradeAll = async () => {
+    if (aiGradingTarget) return;
+    const ungradedCount = rows.filter(row => row.submission && row.submission.grade == null).length;
+    if (ungradedCount === 0) {
+      const overwrite = window.confirm('Tất cả bài đã có điểm. Bạn có muốn AI chấm lại và ghi đè điểm hiện tại không?');
+      if (!overwrite) return;
+    }
+    const request = buildAIGradeRequest(ungradedCount === 0);
+    if (!request) return;
+
+    setAiGradingTarget('all');
+    try {
+      const result = await spaceApi.exams.aiGradeExamSubmissions(exam.uid, request);
+      const updatedByUid = new Map(result.results.map(item => [item.submission.uid, item.submission]));
+      setSubmissions(previous => previous.map(submission => updatedByUid.get(submission.uid) || submission));
+      toast.success(`AI đã chấm ${result.graded}/${result.total} bài`);
+      if (result.failed > 0) {
+        toast.warning(`${result.failed} bài chưa chấm được. Kiểm tra bài nộp dạng file hoặc bài đã có điểm.`);
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể chấm tất cả bằng AI');
+    } finally {
+      setAiGradingTarget(null);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-0 backdrop-blur-sm sm:p-4">
       <div className="flex h-full w-full flex-col overflow-hidden bg-slate-50 shadow-2xl animate-in fade-in zoom-in-95 duration-200 sm:h-[min(88vh,800px)] sm:max-w-[1180px] sm:rounded-2xl">
@@ -2444,6 +2825,15 @@ function ExamGradeTableModal({
                 </button>
               ))}
             </div>
+            <Button
+              type="button"
+              onClick={() => void handleAIGradeAll()}
+              disabled={loading || aiGradingTarget !== null || submitted === 0}
+              className="h-9 shrink-0 rounded-lg bg-violet-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-violet-700 disabled:opacity-60"
+            >
+              {aiGradingTarget === 'all' ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+              AI chấm tất cả
+            </Button>
           </div>
 
           {loading ? (
@@ -2499,12 +2889,29 @@ function ExamGradeTableModal({
                           ) : <span className="text-sm font-medium text-slate-300">--</span>}
                         </td>
                         <td className="px-4 py-3">
-                          <GradingBadge submission={submission} />
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <GradingBadge submission={submission} />
+                            {submission?.grading_method === 'ai' && (
+                              <span className="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[10px] font-semibold text-violet-700">
+                                AI chấm
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex justify-end gap-1.5">
                             {submission ? (
                               <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={aiGradingTarget !== null}
+                                  className="h-8 rounded-lg border-violet-200 px-3 text-xs font-medium text-violet-700 hover:bg-violet-50"
+                                  onClick={() => void handleAIGradeSubmission(row)}
+                                >
+                                  {aiGradingTarget === submission.uid ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
+                                  AI chấm
+                                </Button>
                                 <Button size="sm" className="h-8 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700" onClick={() => openSubmission(row)}>
                                   {submission.grade == null ? 'Chấm điểm' : 'Xem điểm'}
                                 </Button>
@@ -2550,9 +2957,11 @@ function ExamGradeTableModal({
           grade={grade}
           feedback={feedback}
           saving={saving}
+          aiGrading={aiGradingTarget === activeRow.submission.uid}
           onGradeChange={setGrade}
           onFeedbackChange={setFeedback}
           onSave={() => void handleSaveGrade()}
+          onAIGrade={() => void handleAIGradeSubmission(activeRow)}
           onClose={() => setActiveStudentId(null)}
         />
       )}
@@ -2611,18 +3020,22 @@ function SubmissionGradingDrawer({
   grade,
   feedback,
   saving,
+  aiGrading,
   onGradeChange,
   onFeedbackChange,
   onSave,
+  onAIGrade,
   onClose,
 }: {
   row: { member: ClassroomMember; submission: import('@/lib/api/types').ExamSubmission };
   grade: string;
   feedback: string;
   saving: boolean;
+  aiGrading: boolean;
   onGradeChange: (value: string) => void;
   onFeedbackChange: (value: string) => void;
   onSave: () => void;
+  onAIGrade: () => void;
   onClose: () => void;
 }) {
   const { member, submission } = row;
@@ -2674,6 +3087,50 @@ function SubmissionGradingDrawer({
           </section>
 
           <section className="space-y-3 border-t border-slate-100 pt-4">
+            {submission.grading_method === 'ai' && (
+              <div className="rounded-xl border border-violet-100 bg-violet-50/70 p-3.5">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-100">
+                    <Wand2 size={12} />
+                    AI đã chấm
+                  </span>
+                  {submission.ai_confidence != null && (
+                    <span className="text-[11px] font-medium text-violet-700">
+                      Tin cậy {(submission.ai_confidence * 100).toFixed(0)}%
+                    </span>
+                  )}
+                </div>
+                {submission.ai_reason && (
+                  <p className="text-xs font-medium leading-relaxed text-slate-700">{submission.ai_reason}</p>
+                )}
+                {submission.ai_breakdown && submission.ai_breakdown.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {submission.ai_breakdown.map((item, index) => (
+                      <div key={`${item.question}-${index}`} className="rounded-lg border border-violet-100 bg-white p-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-xs font-semibold text-slate-800">{item.question || `Ý ${index + 1}`}</p>
+                          <span className="shrink-0 text-xs font-semibold text-violet-700">{item.score}/{item.max_score}</span>
+                        </div>
+                        <p className="mt-1 text-[11px] font-medium leading-relaxed text-slate-500">{item.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {submission.ai_sources && submission.ai_sources.length > 0 && (
+                  <div className="mt-3 border-t border-violet-100 pt-2">
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700">Nguồn tài liệu</p>
+                    <div className="space-y-1">
+                      {submission.ai_sources.slice(0, 3).map((source, index) => (
+                        <div key={`${source.resource_uid || source.doc_name}-${index}`} className="flex items-center justify-between gap-2 text-[11px] font-medium text-slate-500">
+                          <span className="truncate">{source.doc_name || source.resource_uid || 'Tài liệu lớp học'}</span>
+                          {typeof source.score === 'number' && <span>{(source.score * 100).toFixed(0)}%</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <label className="block">
               <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Điểm (0 - 10)</span>
               <input
@@ -2700,10 +3157,16 @@ function SubmissionGradingDrawer({
           </section>
         </div>
         <div className="border-t border-slate-100 bg-white p-4 sm:p-5">
-          <Button onClick={onSave} disabled={saving} className="h-11 w-full rounded-lg bg-indigo-600 font-medium text-white shadow-sm hover:bg-indigo-700">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-            {submission.grade == null ? 'Lưu điểm' : 'Cập nhật điểm'}
-          </Button>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <Button onClick={onAIGrade} disabled={saving || aiGrading} variant="outline" className="h-11 rounded-lg border-violet-200 font-medium text-violet-700 hover:bg-violet-50">
+              {aiGrading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
+              AI chấm
+            </Button>
+            <Button onClick={onSave} disabled={saving || aiGrading} className="h-11 rounded-lg bg-indigo-600 font-medium text-white shadow-sm hover:bg-indigo-700">
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+              {submission.grade == null ? 'Lưu điểm' : 'Cập nhật điểm'}
+            </Button>
+          </div>
         </div>
       </aside>
     </div>
