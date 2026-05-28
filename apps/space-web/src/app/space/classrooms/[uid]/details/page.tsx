@@ -47,12 +47,16 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Search,
+  AlertCircle,
+  Save,
+  Wand2,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import { Button } from '@shared/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { Card } from '@shared/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -75,6 +79,16 @@ import { chatApi } from '@/lib/api/chat';
 import ClassroomChatPanel from '@/components/chat/ClassroomChatPanel';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { useRTC } from '@/lib/hooks/use-rtc';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 interface ClassroomDetailsPageProps {
   params: Promise<{ uid: string }>;
@@ -109,7 +123,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [fetching, setFetching] = useState(true);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'quiz' | 'students'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [pendingMembers, setPendingMembers] = useState<ClassroomMember[]>([]);
@@ -138,7 +151,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const docInputRef = useRef<HTMLInputElement>(null);
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');
-  const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [loadingExams, setLoadingExams] = useState(false);
   const [deletingExamUid, setDeletingExamUid] = useState<string | null>(null);
   const [canManageExams, setCanManageExams] = useState(true);
@@ -175,6 +187,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   }, [uid]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Permissions are read from browser storage after mount.
     setCanManageExams(getCanManageExams());
   }, []);
 
@@ -184,6 +197,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const kind = query.get('kind');
 
     if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'quiz' || tab === 'students') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
       setActiveTab(tab);
     }
     if (isExamKind(kind)) {
@@ -227,6 +241,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
   useEffect(() => {
     if (activeTab === 'meeting') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
       void fetchMeetingRooms();
     }
   }, [activeTab, fetchMeetingRooms]);
@@ -245,12 +260,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
   useEffect(() => {
     if (activeTab === 'quiz') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
       void fetchAssignedQuizzes();
     }
   }, [activeTab, fetchAssignedQuizzes]);
 
   useEffect(() => {
     if (activeTab !== 'students') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
     setLoadingMembers(true);
     spaceApi.classrooms.members(uid)
       .then(setMembers)
@@ -267,6 +284,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Load pending requests when the classroom changes.
     loadPendingMembers();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
@@ -347,6 +365,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
   useEffect(() => {
     if (activeTab === 'exams') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
       void fetchExams();
     }
   }, [activeTab, fetchExams]);
@@ -419,7 +438,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     try {
       await spaceApi.exams.deleteExam(exam.uid);
       setExams(prev => prev.filter(item => item.uid !== exam.uid));
-      setSelectedExam(prev => prev?.uid === exam.uid ? null : prev);
       toast.success('Đã xóa bài kiểm tra');
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Không thể xóa bài kiểm tra');
@@ -466,15 +484,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     } finally {
       setMeetingAction(null);
     }
-  };
-
-  const copyToClipboard = () => {
-    if (!linkData) return;
-    const url = `${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    toast.success("Đã copy link tham gia");
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownloadQr = () => {
@@ -812,9 +821,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   Mô tả phòng học
                 </h3>
                 <div className="bg-muted/50 p-8 rounded-3xl border border-border text-muted-foreground font-medium leading-relaxed italic text-lg relative">
-                  <span className="absolute -top-4 -left-2 text-6xl text-muted-foreground/10 font-serif opacity-50">"</span>
+                  <span className="absolute -top-4 -left-2 text-6xl text-muted-foreground/10 font-serif opacity-50">&ldquo;</span>
                   {classroom.description}
-                  <span className="absolute -bottom-10 -right-2 text-6xl text-muted-foreground/10 font-serif opacity-50">"</span>
+                  <span className="absolute -bottom-10 -right-2 text-6xl text-muted-foreground/10 font-serif opacity-50">&rdquo;</span>
                 </div>
               </div>
 
@@ -916,7 +925,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <File size={32} className="opacity-40" />
                     </div>
                     <p className="text-base font-bold text-foreground">Chưa có tài liệu nào</p>
-                    <p className="text-sm font-medium mt-1">Nhấn "Tải lên tệp mới" để thêm học liệu</p>
+                    <p className="text-sm font-medium mt-1">Nhấn &ldquo;Tải lên tệp mới&rdquo; để thêm học liệu</p>
                   </div>
                 )}
                 {documents.map(doc => (
@@ -1106,7 +1115,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             <Video size={32} className="opacity-40" />
                           </div>
                           <p className="text-base font-bold text-muted-foreground uppercase tracking-[0.2em]">Tín hiệu trống</p>
-                          <p className="mt-2 text-sm font-medium text-muted-foreground">Nhấn "Mở phòng họp" để bắt đầu phiên làm việc trực tuyến.</p>
+                          <p className="mt-2 text-sm font-medium text-muted-foreground">Nhấn &ldquo;Mở phòng họp&rdquo; để bắt đầu phiên làm việc trực tuyến.</p>
                         </div>
                       )}
                     </div>
@@ -1183,9 +1192,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                               </span>
                             </div>
                             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                              <span className="flex items-center gap-1.5"><Clock size={12} /> {exam.duration_minutes} phút</span>
-                              <span className="flex items-center gap-1.5"><Users size={12} /> {exam.total_questions || 0} câu hỏi</span>
-                              <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(exam.created_at).toLocaleDateString('vi-VN')}</span>
+                              <span className="flex items-center gap-1.5"><FileText size={12} /> {exam.content_type}</span>
+                              <span className="flex items-center gap-1.5"><Clock size={12} /> {formatDateTime(exam.due_date)}</span>
+                              {exam.created_at && (
+                                <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(exam.created_at).toLocaleDateString('vi-VN')}</span>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1243,13 +1254,23 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <h3 className="text-xl font-bold text-foreground">Quiz Game</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-1">Giao quiz cho sinh viên trong lớp chơi trực tuyến</p>
                 </div>
-                <Button
-                  onClick={() => setShowAssignModal(true)}
-                  className="h-12 rounded-2xl bg-violet-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-violet-100 hover:bg-violet-700 uppercase tracking-widest transition-all"
-                >
-                  <Plus size={20} />
-                  Giao Quiz mới
-                </Button>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push('/space/quizzes')}
+                    className="h-12 rounded-2xl px-6 gap-3 text-xs font-bold uppercase tracking-widest transition-all"
+                  >
+                    <Wand2 size={18} />
+                    Tạo Quiz mới
+                  </Button>
+                  <Button
+                    onClick={() => setShowAssignModal(true)}
+                    className="h-12 rounded-2xl bg-violet-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-violet-100 hover:bg-violet-700 uppercase tracking-widest transition-all"
+                  >
+                    <Plus size={20} />
+                    Giao Quiz mới
+                  </Button>
+                </div>
               </div>
 
               <div className="p-10 flex-1 overflow-y-auto space-y-4">
@@ -1263,7 +1284,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <Gamepad2 size={24} className="opacity-40" />
                     </div>
                     <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có quiz nào được giao</p>
-                    <p className="text-xs font-medium mt-1">Nhấn "Giao Quiz mới" để thêm hoạt động cho lớp</p>
+                    <p className="text-xs font-medium mt-1">Nhấn &ldquo;Giao Quiz mới&rdquo; để thêm hoạt động cho lớp</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4">
@@ -1493,7 +1514,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       {gradeTableExam && (
         <ExamGradeTableModal
           exam={gradeTableExam}
-          members={members.filter(m => m.role === 'student')}
+          classroomUid={uid}
           onClose={() => setGradeTableExam(null)}
         />
       )}
@@ -1649,7 +1670,7 @@ function AssignQuizModal({
   const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
-    quizApi.listAll().then(data => {
+    quizApi.list().then(data => {
       setQuizzes(data);
       setLoading(false);
     }).catch(() => {
@@ -1671,8 +1692,8 @@ function AssignQuizModal({
         passing_score_pct: 50,
       });
       onAssigned({ ...pendingQuiz, assigned_classrooms: [assignment] });
-    } catch (err: any) {
-      toast.error(err.message || 'Không thể giao quiz');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể giao quiz');
     } finally {
       setAssigning(false);
     }
@@ -1687,7 +1708,7 @@ function AssignQuizModal({
               <h2 className="text-xl font-bold text-foreground">Cài đặt giao Quiz</h2>
               <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-muted-foreground">
+            <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-slate-400">
               <X size={20} />
             </Button>
           </div>
@@ -1844,8 +1865,8 @@ function EditSettingsModal({
         passing_score_pct: passingScore,
       });
       onSaved({ ...quiz, assigned_classrooms: [assignment] });
-    } catch (err: any) {
-      toast.error(err.message || 'Không thể cập nhật');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể cập nhật');
     } finally {
       setSaving(false);
     }
@@ -2014,7 +2035,7 @@ function StudentDetailsModal({
                     <td className="py-3 pr-4">
                       {r.submission ? (
                         <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${getSubmissionStatusClass(r.submission.status)}`}>
-                          {r.submission.status}
+                          {getSubmissionStatusLabel(r.submission.status)}
                         </span>
                       ) : (
                         <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-slate-100 text-muted-foreground">Chưa nộp</span>
@@ -2173,17 +2194,6 @@ function StudentAnalyzeModal({
 // ── Grade Line Chart (recharts) ───────────────────────────────────────────────
 
 function GradeLineChart({ data }: { data: { name: string; grade: number; index: number }[] }) {
-  const {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    ReferenceLine,
-  } = require('recharts');
-
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
@@ -2192,7 +2202,7 @@ function GradeLineChart({ data }: { data: { name: string; grade: number; index: 
         <YAxis domain={[0, 10]} tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} />
         <Tooltip
           contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 12, fontWeight: 700 }}
-          formatter={(v: number) => [v.toFixed(1), 'Điểm']}
+          formatter={value => [typeof value === 'number' ? value.toFixed(1) : String(value ?? '--'), 'Điểm']}
         />
         <ReferenceLine y={5} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: 'Đạt', fontSize: 10, fill: '#f59e0b' }} />
         <Line
@@ -2212,127 +2222,490 @@ function GradeLineChart({ data }: { data: { name: string; grade: number; index: 
 
 function ExamGradeTableModal({
   exam,
-  members,
+  classroomUid,
   onClose,
 }: {
   exam: Exam;
-  members: ClassroomMember[];
+  classroomUid: string;
   onClose: () => void;
 }) {
+  type GradeFilter = 'all' | 'submitted' | 'missing' | 'graded' | 'ungraded';
+  type GradeRow = { member: ClassroomMember; submission: import('@/lib/api/types').ExamSubmission | null };
+
+  const [students, setStudents] = useState<ClassroomMember[]>([]);
   const [submissions, setSubmissions] = useState<import('@/lib/api/types').ExamSubmission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<GradeFilter>('all');
+  const [activeStudentId, setActiveStudentId] = useState<string | null>(null);
+  const [grade, setGrade] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const loadGradeTable = React.useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const [memberData, submissionData] = await Promise.all([
+        spaceApi.classrooms.members(classroomUid),
+        spaceApi.exams.listSubmissions(exam.uid),
+      ]);
+      setStudents(memberData.filter(member => member.role === 'student' && member.status === 'approved'));
+      setSubmissions(submissionData);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Không thể tải bảng điểm');
+    } finally {
+      setLoading(false);
+    }
+  }, [classroomUid, exam.uid]);
 
   useEffect(() => {
-    spaceApi.exams.listSubmissions(exam.uid)
-      .then(setSubmissions)
-      .catch(() => toast.error('Không thể tải bảng điểm'))
-      .finally(() => setLoading(false));
-  }, [exam.uid]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Opening the modal initiates its data request.
+    void loadGradeTable();
+  }, [loadGradeTable]);
 
-  const subMap = new Map(submissions.map(s => [s.student_id, s]));
-  const submitted = submissions.length;
-  const graded = submissions.filter(s => s.grade != null).length;
-  const avg = graded > 0
-    ? (submissions.filter(s => s.grade != null).reduce((acc, s) => acc + (s.grade ?? 0), 0) / graded).toFixed(1)
-    : '--';
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (activeStudentId) setActiveStudentId(null);
+        else onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeStudentId, onClose]);
+
+  const subMap = React.useMemo(() => new Map(submissions.map(submission => [submission.student_id, submission])), [submissions]);
+  const rows = React.useMemo<GradeRow[]>(
+    () => students.map(member => ({ member, submission: subMap.get(member.member_id) || null })),
+    [students, subMap]
+  );
+  const activeRow = rows.find(row => row.member.member_id === activeStudentId) || null;
+
+  const openSubmission = (row: GradeRow) => {
+    setActiveStudentId(row.member.member_id);
+    setGrade(row.submission?.grade != null ? String(row.submission.grade) : '');
+    setFeedback(row.submission?.feedback || '');
+  };
+
+  const submitted = rows.filter(row => row.submission).length;
+  const missing = Math.max(0, students.length - submitted);
+  const gradedSubmissions = rows
+    .map(row => row.submission)
+    .filter(submission => submission?.grade != null);
+  const graded = gradedSubmissions.length;
+  const submissionRate = students.length > 0 ? Math.round((submitted / students.length) * 100) : 0;
+  const gradingRate = submitted > 0 ? Math.round((graded / submitted) * 100) : 0;
+  const averageScore = graded > 0
+    ? gradedSubmissions.reduce((acc, submission) => acc + (submission?.grade ?? 0), 0) / graded
+    : null;
+  const avg = averageScore != null ? averageScore.toFixed(1) : '--';
+  const averageRate = averageScore != null ? Math.round(averageScore * 10) : 0;
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleRows = rows.filter(row => {
+    const submission = row.submission;
+    const searchable = `${row.member.member_name} ${row.member.member_id}`.toLowerCase();
+    if (normalizedQuery && !searchable.includes(normalizedQuery)) return false;
+    if (filter === 'submitted') return Boolean(submission);
+    if (filter === 'missing') return !submission;
+    if (filter === 'graded') return submission?.grade != null;
+    if (filter === 'ungraded') return Boolean(submission) && submission?.grade == null;
+    return true;
+  });
+
+  const filters: { value: GradeFilter; label: string; count: number }[] = [
+    { value: 'all', label: 'Tất cả', count: rows.length },
+    { value: 'submitted', label: 'Đã nộp', count: submitted },
+    { value: 'missing', label: 'Chưa nộp', count: missing },
+    { value: 'graded', label: 'Đã chấm', count: graded },
+    { value: 'ungraded', label: 'Chưa chấm', count: Math.max(0, submitted - graded) },
+  ];
+
+  const handleSaveGrade = async () => {
+    if (!activeRow?.submission) return;
+    const score = Number(grade);
+    if (grade.trim() === '' || !Number.isFinite(score) || score < 0 || score > 10) {
+      toast.error('Điểm cần nằm trong khoảng 0 đến 10');
+      return;
+    }
+    try {
+      setSaving(true);
+      const updated = await spaceApi.exams.gradeSubmission(activeRow.submission.uid, {
+        grade: score,
+        feedback: feedback.trim(),
+      });
+      setSubmissions(previous => previous.map(submission => submission.uid === updated.uid ? updated : submission));
+      toast.success('Đã lưu điểm và nhận xét');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể lưu điểm');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-8 border-b border-border flex items-start justify-between shrink-0">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-1">Bảng điểm</p>
-            <h2 className="text-xl font-black text-foreground">{exam.title}</h2>
-            <p className="text-xs font-bold text-muted-foreground mt-0.5">Hạn nộp: {exam.due_date ? formatDateTime(exam.due_date) : '--'}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-0 backdrop-blur-sm sm:p-4">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-slate-50 shadow-2xl animate-in fade-in zoom-in-95 duration-200 sm:h-[min(88vh,800px)] sm:max-w-[1180px] sm:rounded-2xl">
+        <div className="shrink-0 border-b border-slate-200/70 bg-white px-5 py-4 sm:px-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Bảng điểm</p>
+              <h2 className="truncate text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">{exam.title}</h2>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
+                <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getExamStatusClass(exam.status)}`}>
+                  {getExamStatusLabel(exam.status)}
+                </span>
+                <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50/80 px-2.5 py-1.5">
+                  <Calendar size={13} />
+                  Hạn nộp: {exam.due_date ? formatDateTime(exam.due_date) : '--'}
+                </span>
+                <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50/80 px-2.5 py-1.5">
+                  <Users size={13} />
+                  {loading ? '--' : students.length} sinh viên
+                </span>
+                <span className="flex items-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50/70 px-2.5 py-1.5 text-indigo-700">
+                  <ClipboardCheck size={13} />
+                  {loading ? '--' : submitted} đã nộp
+                </span>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+              <X size={18} />
+            </Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground shrink-0">
-            <X size={20} />
-          </Button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 px-8 py-4 border-b border-border shrink-0">
+        <div className="grid shrink-0 gap-3 border-b border-slate-200/70 bg-white px-5 py-4 md:grid-cols-4 sm:px-6">
+          <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 shadow-sm">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-slate-500">Tỉ lệ nộp bài</p>
+              <span className="text-lg font-semibold tracking-tight text-indigo-700">{loading ? '--' : `${submissionRate}%`}</span>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-500">{loading ? 'Đang tải...' : `${submitted}/${students.length} sinh viên`}</p>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-indigo-100">
+              <div className="h-full rounded-full bg-indigo-600 transition-all duration-500" style={{ width: `${submissionRate}%` }} />
+            </div>
+          </div>
+          <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 shadow-sm">
+            <div className="flex items-start justify-between">
+              <p className="text-[11px] font-medium text-slate-500">Điểm trung bình</p>
+              <span className="text-lg font-semibold tracking-tight text-emerald-700">{loading ? '--' : avg}</span>
+            </div>
+            <p className="mt-1 text-[11px] text-slate-500">{graded > 0 ? `${graded} bài đã chấm` : 'Chưa có điểm'}</p>
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-emerald-100">
+              <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${averageRate}%` }} />
+            </div>
+          </div>
           {[
-            { label: 'Tổng SV', value: members.length },
-            { label: 'Đã nộp', value: submitted },
-            { label: 'Đã chấm', value: graded },
-            { label: 'Điểm TB', value: avg },
-          ].map(s => (
-            <div key={s.label} className="bg-muted rounded-2xl p-3 text-center">
-              <div className="text-xl font-black text-foreground">{s.value}</div>
-              <div className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">{s.label}</div>
+            { label: 'Đang chờ chấm', value: Math.max(0, submitted - graded), detail: `${gradingRate}% hoàn tất`, color: 'text-indigo-700', surface: 'border-slate-200 bg-white' },
+            { label: 'Chưa nộp', value: missing, detail: 'Cần theo dõi', color: 'text-rose-600', surface: 'border-rose-100 bg-rose-50/30' },
+          ].map(metric => (
+            <div key={metric.label} className={`rounded-xl border p-3 shadow-sm ${metric.surface}`}>
+              <p className="text-[11px] font-medium text-slate-500">{metric.label}</p>
+              <p className={`mt-1 text-xl font-semibold tracking-tight ${metric.color}`}>{loading ? '--' : metric.value}</p>
+              <p className="mt-1 text-[11px] text-slate-400">{metric.detail}</p>
             </div>
           ))}
         </div>
 
-        {/* Table */}
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 p-4 sm:p-5">
+          <div className="flex shrink-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <label className="relative w-full xl:max-w-sm">
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                value={query}
+                onChange={event => setQuery(event.target.value)}
+                placeholder="Tìm theo tên hoặc MSSV..."
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-800 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+              />
+            </label>
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
+              {filters.map(option => (
+                <button
+                  type="button"
+                  key={option.value}
+                  onClick={() => setFilter(option.value)}
+                  className={`flex h-9 shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-medium transition ${
+                    filter === option.value
+                      ? 'border-indigo-600 bg-indigo-600 text-white'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-indigo-50/40 hover:text-indigo-700'
+                  }`}
+                >
+                  {option.label}
+                  <span className={`rounded px-1.5 py-0.5 text-[10px] ${filter === option.value ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                    {loading ? '--' : option.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {loading ? (
-            <div className="flex items-center justify-center h-40 text-muted-foreground">
-              <Loader2 size={32} className="animate-spin" />
+            <div className="flex min-h-56 flex-1 items-center justify-center rounded-2xl border border-slate-100 bg-white text-slate-400">
+              <Loader2 size={32} className="animate-spin text-indigo-500" />
+              <p className="ml-3 text-sm font-bold">Đang tải bảng điểm...</p>
             </div>
-          ) : members.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-              <Users size={32} className="mb-2 opacity-30" />
-              <p className="text-sm font-medium">Chưa có sinh viên trong lớp</p>
+          ) : error ? (
+            <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-2xl border border-rose-100 bg-white p-6 text-center">
+              <AlertCircle size={32} className="mb-3 text-rose-400" />
+              <p className="text-sm font-black text-slate-800">Không thể tải bảng điểm</p>
+              <p className="mt-1 max-w-md text-xs font-medium text-slate-500">{error}</p>
+              <Button onClick={() => void loadGradeTable()} className="mt-4 rounded-xl bg-indigo-600 px-5 text-white">
+                Tải lại
+              </Button>
             </div>
+          ) : students.length === 0 ? (
+            <GradeTableEmptyState title="Chưa có sinh viên trong lớp" description="Sinh viên tham gia lớp sẽ xuất hiện tại bảng điểm." />
+          ) : visibleRows.length === 0 ? (
+            <GradeTableEmptyState title="Không có kết quả phù hợp" description="Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái." />
           ) : (
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
-                  <th className="pb-3">Sinh viên</th>
-                  <th className="pb-3">Trạng thái</th>
-                  <th className="pb-3">Ngày nộp</th>
-                  <th className="pb-3 text-right">Điểm</th>
-                </tr>
-              </thead>
-              <tbody>
-                {members.map(m => {
-                  const sub = subMap.get(m.member_id);
-                  return (
-                    <tr key={m.member_id} className="border-b border-slate-50 last:border-0 hover:bg-muted/50">
-                      <td className="py-3 pr-4">
-                        <div className="flex items-center gap-3">
-                          {m.member_avatar ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={m.member_avatar} alt={m.member_name} className="w-8 h-8 rounded-xl object-cover" />
-                          ) : (
-                            <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 font-black text-xs">
-                              {m.member_name.charAt(0).toUpperCase()}
-                            </div>
-                          )}
-                          <span className="text-sm font-bold text-foreground">{m.member_name}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 pr-4">
-                        {sub ? (
-                          <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${getSubmissionStatusClass(sub.status)}`}>
-                            {sub.status}
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-slate-100 text-muted-foreground">Chưa nộp</span>
-                        )}
-                      </td>
-                      <td className="py-3 pr-4 text-xs font-bold text-muted-foreground">
-                        {sub?.submitted_at ? formatDateTime(sub.submitted_at) : '--'}
-                      </td>
-                      <td className="py-3 text-right">
-                        {sub?.grade != null ? (
-                          <span className={`text-sm font-black ${sub.grade >= 5 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            {sub.grade.toFixed(1)}
-                          </span>
-                        ) : (
-                          <span className="text-sm font-black text-muted-foreground/50">--</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+              <table className="w-full min-w-[850px] text-left">
+                <thead className="sticky top-0 z-[1] border-b border-slate-200 bg-slate-50/95 backdrop-blur">
+                  <tr className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                    <th className="px-4 py-3">Sinh viên</th>
+                    <th className="px-4 py-3">Bài nộp</th>
+                    <th className="px-4 py-3">Thời gian nộp</th>
+                    <th className="px-4 py-3">Điểm</th>
+                    <th className="px-4 py-3">Chấm điểm</th>
+                    <th className="px-4 py-3 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleRows.map(row => {
+                    const submission = row.submission;
+                    return (
+                      <tr key={row.member.member_id} className="border-b border-slate-100 last:border-b-0 transition-colors hover:bg-indigo-50/30">
+                        <td className="px-4 py-3">
+                          <StudentIdentity member={row.member} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <SubmissionBadge submission={submission} />
+                        </td>
+                        <td className="px-4 py-3 text-xs font-medium text-slate-600">
+                          {submission?.submitted_at ? formatDateTime(submission.submitted_at) : '--'}
+                        </td>
+                        <td className="px-4 py-3">
+                          {submission?.grade != null ? (
+                            <span className={`text-sm font-semibold ${submission.grade >= 5 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                              {submission.grade.toFixed(1)}
+                            </span>
+                          ) : <span className="text-sm font-medium text-slate-300">--</span>}
+                        </td>
+                        <td className="px-4 py-3">
+                          <GradingBadge submission={submission} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-1.5">
+                            {submission ? (
+                              <>
+                                <Button size="sm" className="h-8 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700" onClick={() => openSubmission(row)}>
+                                  {submission.grade == null ? 'Chấm điểm' : 'Xem điểm'}
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                                      <MoreVertical size={14} />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-44 rounded-lg border-slate-200 p-1 shadow-lg">
+                                    <DropdownMenuItem onClick={() => openSubmission(row)} className="gap-2 rounded-md text-xs font-medium">
+                                      <Eye size={14} /> Xem chi tiết
+                                    </DropdownMenuItem>
+                                    {submission.resource_url && (
+                                      <DropdownMenuItem
+                                        onClick={() => window.open(submission.resource_url!, '_blank', 'noopener,noreferrer')}
+                                        className="gap-2 rounded-md text-xs font-medium"
+                                      >
+                                        <Download size={14} /> Mở file nộp
+                                      </DropdownMenuItem>
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </>
+                            ) : (
+                              <span className="text-xs font-medium text-slate-400">Không có bài nộp</span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       </div>
+
+      {activeRow?.submission && (
+        <SubmissionGradingDrawer
+          row={{ member: activeRow.member, submission: activeRow.submission }}
+          grade={grade}
+          feedback={feedback}
+          saving={saving}
+          onGradeChange={setGrade}
+          onFeedbackChange={setFeedback}
+          onSave={() => void handleSaveGrade()}
+          onClose={() => setActiveStudentId(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function GradeTableEmptyState({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="flex min-h-52 flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-white p-6 text-center text-slate-400 shadow-sm">
+      <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-50">
+        <Users size={21} className="text-slate-400" />
+      </span>
+      <p className="text-sm font-semibold text-slate-800">{title}</p>
+      <p className="mt-1 text-xs font-medium">{description}</p>
+    </div>
+  );
+}
+
+function StudentIdentity({ member }: { member: ClassroomMember }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      {member.member_avatar ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={member.member_avatar} alt={member.member_name} className="h-8 w-8 rounded-lg object-cover shadow-sm ring-1 ring-slate-100" />
+      ) : (
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-50 to-violet-100 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-100">
+          {member.member_name.charAt(0).toUpperCase()}
+        </div>
+      )}
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-slate-900">{member.member_name}</p>
+        <p className="mt-0.5 truncate text-[11px] text-slate-400">{member.member_id}</p>
+      </div>
+    </div>
+  );
+}
+
+function SubmissionBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
+  if (!submission) {
+    return <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">Chưa nộp</span>;
+  }
+  return <span className="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold text-indigo-700">Đã nộp</span>;
+}
+
+function GradingBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
+  if (!submission) return <span className="text-xs font-medium text-slate-300">--</span>;
+  if (submission.grade != null) {
+    return <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">Đã chấm</span>;
+  }
+  return <span className="rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold text-orange-700">Chờ chấm</span>;
+}
+
+function SubmissionGradingDrawer({
+  row,
+  grade,
+  feedback,
+  saving,
+  onGradeChange,
+  onFeedbackChange,
+  onSave,
+  onClose,
+}: {
+  row: { member: ClassroomMember; submission: import('@/lib/api/types').ExamSubmission };
+  grade: string;
+  feedback: string;
+  saving: boolean;
+  onGradeChange: (value: string) => void;
+  onFeedbackChange: (value: string) => void;
+  onSave: () => void;
+  onClose: () => void;
+}) {
+  const { member, submission } = row;
+  const resourceUrl = submission.resource_url || (submission.content_type !== 'markdown' ? submission.content : '');
+
+  return (
+    <div className="absolute inset-0 z-10 flex justify-end bg-slate-950/30">
+      <button type="button" aria-label="Đóng chi tiết bài nộp" className="absolute inset-0" onClick={onClose} />
+      <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
+        <div className="flex items-start justify-between gap-4 border-b border-slate-100 p-4 sm:p-5">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Chi tiết bài nộp</p>
+            <div className="mt-3"><StudentIdentity member={member} /></div>
+          </div>
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-slate-400" onClick={onClose}>
+            <X size={18} />
+          </Button>
+        </div>
+
+        <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Nộp lúc</p>
+              <p className="mt-1 text-xs font-medium text-slate-700">{submission.submitted_at ? formatDateTime(submission.submitted_at) : '--'}</p>
+            </div>
+            <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Trạng thái</p>
+              <p className="mt-1 text-xs font-medium text-slate-700">{submission.grade != null ? 'Đã chấm điểm' : 'Chờ chấm điểm'}</p>
+            </div>
+          </div>
+
+          <section>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Nội dung bài nộp</h3>
+            {submission.content_type === 'markdown' && submission.content ? (
+              <div className="max-h-44 overflow-y-auto whitespace-pre-wrap rounded-lg border border-slate-100 bg-slate-50 p-3.5 text-sm font-medium leading-relaxed text-slate-700">
+                {submission.content}
+              </div>
+            ) : (
+              <p className="rounded-lg border border-dashed border-slate-200 p-3.5 text-sm font-medium text-slate-400">
+                Bài nộp không có nội dung văn bản.
+              </p>
+            )}
+            {resourceUrl && (
+              <a href={resourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-between rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-sm font-medium text-indigo-700 transition hover:border-indigo-200 hover:bg-indigo-50/70">
+                <span className="flex items-center gap-2"><FileText size={16} /> {submission.resource_name || 'File đính kèm'}</span>
+                <Download size={15} />
+              </a>
+            )}
+          </section>
+
+          <section className="space-y-3 border-t border-slate-100 pt-4">
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Điểm (0 - 10)</span>
+              <input
+                value={grade}
+                onChange={event => onGradeChange(event.target.value)}
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                placeholder="Nhập điểm"
+                className="h-11 w-full rounded-lg border border-slate-200 px-3.5 text-base font-semibold text-slate-800 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nhận xét</span>
+              <textarea
+                value={feedback}
+                onChange={event => onFeedbackChange(event.target.value)}
+                rows={4}
+                placeholder="Nhập nhận xét cho sinh viên..."
+                className="w-full resize-none rounded-lg border border-slate-200 p-3.5 text-sm font-medium text-slate-800 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+              />
+            </label>
+          </section>
+        </div>
+        <div className="border-t border-slate-100 bg-white p-4 sm:p-5">
+          <Button onClick={onSave} disabled={saving} className="h-11 w-full rounded-lg bg-indigo-600 font-medium text-white shadow-sm hover:bg-indigo-700">
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {submission.grade == null ? 'Lưu điểm' : 'Cập nhật điểm'}
+          </Button>
+        </div>
+      </aside>
     </div>
   );
 }
@@ -2342,6 +2715,11 @@ function getSubmissionStatusClass(status: string) {
   if (status === 'submitted') return 'bg-indigo-50 text-indigo-600';
   if (status === 'late') return 'bg-amber-50 text-amber-600';
   return 'bg-slate-100 text-muted-foreground';
+}
+
+function getSubmissionStatusLabel(status: string) {
+  if (status.toLowerCase() === 'graded') return 'Đã chấm';
+  return 'Đã nộp';
 }
 
 function getExamStatusClass(status: string) {
@@ -2356,6 +2734,14 @@ function getExamStatusClass(status: string) {
     return 'bg-rose-50 text-rose-600 border border-rose-100';
   }
   return 'bg-slate-100 text-slate-600 border border-border';
+}
+
+function getExamStatusLabel(status: string) {
+  const normalized = status.toLowerCase();
+  if (normalized === 'active' || normalized === 'published' || normalized === 'open') return 'Đang mở';
+  if (normalized === 'draft') return 'Bản nháp';
+  if (normalized === 'closed' || normalized === 'expired') return 'Đã đóng';
+  return status;
 }
 
 function isExamInKind(exam: Exam, kind: ExamKind) {
