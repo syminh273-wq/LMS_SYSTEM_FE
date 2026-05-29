@@ -6,7 +6,9 @@ import type {
   PaginatedResponse,
   CreateClassroomRequest,
   UpdateClassroomRequest,
-  SharingLink
+  SharingLink,
+  ActivityLog,
+  StudentPublicProfile,
 } from './types';
 
 export class ClassroomApiClient extends BaseRestApiClient {
@@ -62,9 +64,24 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/submissions/`);
   }
 
+  public async getStudentPublicProfile(consumerUid: string): Promise<StudentPublicProfile> {
+    return this.get(`/api/v1/consumer/account/profile/${consumerUid}/public/`);
+  }
+
   // Consumer side
   public async mine(page: number = 1): Promise<PaginatedResponse<Classroom>> {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/space/course/classrooms/?page=${page}`);
+  }
+
+  public async getActivity(
+    uid: string,
+    level: 'major' | 'detail' = 'major',
+    limit = 50,
+    before?: string,
+  ): Promise<ActivityLog[]> {
+    const params = new URLSearchParams({ level, limit: String(limit) });
+    if (before) params.set('before', before);
+    return this.get<ActivityLog[]>(`/api/v1/space/course/classrooms/${uid}/activity/?${params}`);
   }
 }
 

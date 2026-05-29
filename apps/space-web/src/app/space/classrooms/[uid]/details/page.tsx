@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState, useEffect, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { spaceApi, SharingLink, Classroom, Exam } from '@/lib/api';
-import type { ClassroomMember, StudentExamRecord } from '@/lib/api/types';
+import type { ClassroomMember, StudentExamRecord, ActivityLog } from '@/lib/api/types';
 import {
   QrCode,
   Download,
@@ -45,6 +45,7 @@ import {
   Users,
   UserX,
   ChevronDown,
+  ChevronRight,
   ChevronsLeft,
   ChevronsRight,
   BarChart2,
@@ -57,6 +58,11 @@ import {
   Save,
   Wand2,
   Timer,
+  UserPlus,
+  FileCheck,
+  GraduationCap,
+  CheckCircle2,
+  Clock as ClockIcon,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
@@ -98,6 +104,36 @@ import {
 
 interface ClassroomDetailsPageProps {
   params: Promise<{ uid: string }>;
+}
+
+import type { ActivityLogEventType } from '@/lib/api/types';
+
+function getActivityMeta(eventType: ActivityLogEventType): {
+  icon: React.ElementType;
+  color: string;
+  bg: string;
+  label: string;
+} {
+  const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; label: string }> = {
+    classroom_created:  { icon: GraduationCap, color: 'text-indigo-600', bg: 'bg-indigo-100',  label: 'Lớp học được tạo' },
+    document_uploaded:  { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-100',    label: 'Tài liệu mới được tải lên' },
+    document_deleted:   { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: 'Xóa tài liệu' },
+    exam_created:       { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-100',  label: 'Tạo bài kiểm tra' },
+    exam_published:     { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-100',   label: 'Phát hành bài kiểm tra' },
+    exam_opened:        { icon: Timer,         color: 'text-emerald-600',bg: 'bg-emerald-100', label: 'Mở ca thi trực tuyến' },
+    exam_closed:        { icon: ClockIcon,     color: 'text-muted-foreground',  bg: 'bg-muted',   label: 'Đóng ca thi' },
+    exam_deleted:       { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: 'Xóa bài kiểm tra' },
+    quiz_assigned:      { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-100',  label: 'Giao đề thi trắc nghiệm' },
+    meeting_started:    { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-100',     label: 'Mở buổi học trực tuyến' },
+    meeting_ended:      { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted',   label: 'Kết thúc buổi học' },
+    member_joined:      { icon: UserPlus,      color: 'text-blue-500',   bg: 'bg-blue-100',    label: 'Học sinh đăng ký' },
+    member_approved:    { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-100',   label: 'Duyệt học sinh vào lớp' },
+    member_rejected:    { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-100',     label: 'Từ chối yêu cầu' },
+    member_kicked:      { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-100',     label: 'Học sinh bị kick' },
+    member_left:        { icon: Users,         color: 'text-muted-foreground',  bg: 'bg-muted',   label: 'Học sinh rời lớp' },
+    exam_submitted:     { icon: FileCheck,     color: 'text-teal-600',   bg: 'bg-teal-100',    label: 'Học sinh nộp bài' },
+  };
+  return map[eventType] ?? { icon: ClipboardList, color: 'text-muted-foreground', bg: 'bg-muted', label: eventType };
 }
 
 const EXAM_KIND_OPTIONS = [
@@ -150,6 +186,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [meetingRooms, setMeetingRooms] = useState<MeetingRoom[]>([]);
   const [loadingMeetings, setLoadingMeetings] = useState(false);
   const [meetingAction, setMeetingAction] = useState<'start' | 'end' | null>(null);
+
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  const [activityLevel, setActivityLevel] = useState<'major' | 'detail'>('major');
+  const [loadingActivity, setLoadingActivity] = useState(false);
 
   type DocItem = { uid: string; name: string; size: string; date: string; url: string; file_type: string; section: string };
   const [documents, setDocuments] = useState<DocItem[]>([]);
@@ -246,6 +286,25 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       });
   }, [activeTab, uid, conversationUid]);
 
+  const fetchActivity = React.useCallback(async (level: 'major' | 'detail') => {
+    setLoadingActivity(true);
+    try {
+      const logs = await spaceApi.classrooms.getActivity(uid, level, 30);
+      setActivityLogs(logs);
+    } catch {
+      // silently fail — activity log is non-critical
+    } finally {
+      setLoadingActivity(false);
+    }
+  }, [uid]);
+
+  useEffect(() => {
+    if (activeTab === 'info') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
+      void fetchActivity(activityLevel);
+    }
+  }, [activeTab, activityLevel, fetchActivity]);
+
   const fetchMeetingRooms = React.useCallback(async () => {
     setLoadingMeetings(true);
     try {
@@ -283,6 +342,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       void fetchAssignedQuizzes();
     }
   }, [activeTab, fetchAssignedQuizzes]);
+
+  useEffect(() => {
+    // Load members on mount for sidebar count, then reload when tab is opened for full list.
+    spaceApi.classrooms.members(uid)
+      .then(setMembers)
+      .catch(() => {/* silently fail for sidebar count */});
+  }, [uid]);
 
   useEffect(() => {
     if (activeTab !== 'students') return;
@@ -817,7 +883,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     title={label}
                     onClick={() => setActiveTab(id as typeof activeTab)}
                     className={`w-full flex justify-center py-3 transition-colors relative ${
-                      isActive ? 'text-indigo-600 bg-indigo-50' : 'text-muted-foreground hover:bg-muted hover:text-slate-600'
+                      isActive ? 'text-indigo-600 bg-indigo-50' : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
                     }`}
                   >
                     {isActive && <div className="absolute left-0 w-1 h-5 bg-indigo-600 rounded-r-full top-1/2 -translate-y-1/2" />}
@@ -838,7 +904,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <button
                   onClick={() => setSidebarCollapsed(true)}
                   title="Thu nhỏ sidebar"
-                  className="rounded-lg p-1 hover:bg-slate-100 transition-colors"
+                  className="rounded-lg p-1 hover:bg-muted transition-colors"
                 >
                   <ChevronsLeft size={15} className="text-muted-foreground" />
                 </button>
@@ -871,7 +937,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-slate-600'} />
+                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         {label}
                         {id === 'meeting' && activeMeeting && (
                           <span className="ml-auto flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -909,7 +975,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-slate-600'} />
+                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         {label}
                       </button>
                     );
@@ -939,10 +1005,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Users size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-slate-600'} />
+                        <Users size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         Danh sách sinh viên
                         {members.filter(m => m.role === 'student').length > 0 && (
-                          <span className="ml-auto text-[10px] font-black bg-slate-100 text-muted-foreground px-2 py-0.5 rounded-full">
+                          <span className="ml-auto text-[10px] font-black bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
                             {members.filter(m => m.role === 'student').length}
                           </span>
                         )}
@@ -958,11 +1024,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <Card className="border-border shadow-sm rounded-[32px] overflow-hidden bg-card p-8">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">SĨ SỐ LỚP</h3>
               <div className="flex items-baseline gap-2 mb-6">
-                <span className="text-5xl font-bold text-foreground tracking-tighter">0</span>
+                <span className="text-5xl font-bold text-foreground tracking-tighter">
+                  {members.filter(m => m.role === 'student').length}
+                </span>
                 <span className="text-muted-foreground font-bold text-lg">/ {classroom.max_students} học sinh</span>
               </div>
               <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden border border-border p-0.5">
-                <div className="h-full bg-indigo-600 rounded-full w-0 shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000" />
+                <div
+                  className="h-full bg-indigo-600 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000"
+                  style={{ width: `${classroom.max_students > 0 ? Math.min(100, (members.filter(m => m.role === 'student').length / classroom.max_students) * 100) : 0}%` }}
+                />
               </div>
             </Card>
 
@@ -1035,42 +1106,81 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   </Button>
                 </div>
 
-                {/* Timeline Card */}
-                <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm">
-                  <h3 className="text-lg font-bold text-foreground mb-10 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
-                      <RotateCcw size={22} />
-                    </div>
-                    Lịch sử hoạt động
-                  </h3>
-                  <div className="space-y-12 pl-4">
-                    <div className="flex gap-6 items-start relative before:absolute before:left-[11px] before:top-8 before:bottom-[-48px] before:w-1 before:bg-muted">
-                      <div className="w-6 h-6 rounded-full bg-card border-[6px] border-indigo-500 shadow-lg shadow-indigo-500/20 z-10" />
-                      <div className="space-y-1">
-                        <div className="text-base font-bold text-foreground">Phòng học được khởi tạo</div>
-                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{new Date(classroom.created_at).toLocaleString('vi-VN')}</div>
+                {/* Activity Log Timeline Card */}
+                <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm flex flex-col">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                        <RotateCcw size={22} />
                       </div>
-                    </div>
-                    <div className="flex gap-6 items-start relative before:absolute before:left-[11px] before:top-8 before:bottom-[-48px] before:w-1 before:bg-muted">
-                      <div className="w-6 h-6 rounded-full bg-card border-[6px] border-indigo-500 shadow-lg shadow-indigo-500/20 z-10 animate-pulse" />
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-3">
-                          <div className="text-base font-bold text-foreground">Đang hoạt động</div>
-                          <span className="bg-emerald-500/10 text-emerald-500 text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider border border-emerald-500/20">Hiện tại</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground font-medium leading-relaxed">
-                          Lớp học hiện sẵn sàng cho học sinh tham gia
-                        </div>
+                      Lịch sử hoạt động
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <div className="flex bg-muted rounded-xl p-1 gap-1">
+                        {(['major', 'detail'] as const).map((lvl) => (
+                          <button
+                            key={lvl}
+                            onClick={() => setActivityLevel(lvl)}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                              activityLevel === lvl
+                                ? 'bg-card text-indigo-600 shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            {lvl === 'major' ? 'Chính' : 'Chi tiết'}
+                          </button>
+                        ))}
                       </div>
-                    </div>
-                    <div className="flex gap-6 items-start opacity-40">
-                      <div className="w-6 h-6 rounded-full bg-muted border-[6px] border-card shadow-sm z-10" />
-                      <div>
-                        <div className="text-base font-bold text-foreground">Kiểm tra giữa kỳ dự kiến</div>
-                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Chưa lên lịch chính thức</div>
-                      </div>
+                      <button
+                        onClick={() => router.push(`/space/classrooms/${uid}/activity`)}
+                        className="flex items-center gap-1.5 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-indigo-50 transition-all"
+                      >
+                        Xem tất cả
+                        <ChevronRight size={13} />
+                      </button>
                     </div>
                   </div>
+
+                  {loadingActivity ? (
+                    <div className="flex items-center justify-center py-10">
+                      <Loader2 size={28} className="animate-spin text-indigo-400" />
+                    </div>
+                  ) : activityLogs.length === 0 ? (
+                    <div className="text-center py-10 text-muted-foreground">
+                      <RotateCcw size={32} className="mx-auto mb-3 opacity-20" />
+                      <p className="text-sm font-medium">Chưa có hoạt động nào được ghi lại</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-0 pl-3 overflow-y-auto max-h-80">
+                      {activityLogs.map((log, idx) => {
+                        const { icon: Icon, color, bg, label } = getActivityMeta(log.event_type);
+                        const isLast = idx === activityLogs.length - 1;
+                        return (
+                          <div
+                            key={log.uid}
+                            className={`flex gap-4 items-start relative ${!isLast ? 'pb-6' : ''}`}
+                          >
+                            {!isLast && (
+                              <div className="absolute left-[13px] top-7 bottom-0 w-0.5 bg-muted" />
+                            )}
+                            <div className={`w-7 h-7 rounded-full ${bg} flex items-center justify-center shrink-0 z-10 border-2 border-card`}>
+                              <Icon size={13} className={color} />
+                            </div>
+                            <div className="flex-1 min-w-0 pt-0.5">
+                              <div className="text-sm font-semibold text-foreground leading-snug">
+                                {label}{log.target_name ? `: ${log.target_name}` : ''}
+                              </div>
+                              <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-2">
+                                {log.actor_name && <span className="font-bold">{log.actor_name}</span>}
+                                <span>•</span>
+                                <span>{new Date(log.created_at).toLocaleString('vi-VN')}</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1102,7 +1212,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <Button
                       onClick={() => docInputRef.current?.click()}
                       disabled={uploadingDoc}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-indigo-100 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-indigo-500/20 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
                     >
                       {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={18} />}
                       {uploadingDoc ? 'ĐANG TẢI...' : 'TẢI LÊN'}
@@ -1166,7 +1276,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <div className="flex-1 min-w-0">
                         <div className="text-base font-bold text-foreground truncate group-hover:text-indigo-600 transition-colors">{doc.name}</div>
                         <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-1 flex items-center gap-3 flex-wrap">
-                          <span className="bg-slate-100 px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
+                          <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
                           {doc.section && (
                             <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded flex items-center gap-1">
                               <Tag size={10} />{doc.section}
@@ -1244,7 +1354,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     )}
                     <div className={`max-w-[76%] rounded-2xl px-5 py-3.5 ${
                       msg.role === 'user'
-                        ? 'bg-indigo-600 text-white rounded-br-md shadow-md shadow-indigo-100'
+                        ? 'bg-indigo-600 text-white rounded-br-md shadow-md shadow-indigo-500/20'
                         : 'bg-muted text-foreground rounded-bl-md border border-border'
                     }`}>
                       <div className="text-sm font-medium leading-relaxed space-y-1.5">
@@ -1282,8 +1392,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       )}
                     </div>
                     {msg.role === 'user' && (
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                        <Users size={16} className="text-slate-400" />
+                      <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                        <Users size={16} className="text-muted-foreground" />
                       </div>
                     )}
                   </div>
@@ -1305,7 +1415,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <Button
                     onClick={() => void handleAiAsk()}
                     disabled={!aiQuestion.trim() || aiLoading}
-                    className="h-12 w-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white p-0 shadow-lg shadow-indigo-100 disabled:opacity-50 shrink-0"
+                    className="h-12 w-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white p-0 shadow-lg shadow-indigo-500/20 disabled:opacity-50 shrink-0"
                   >
                     {aiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                   </Button>
@@ -1358,7 +1468,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <Button
                             onClick={() => void handleStartMeeting('screen')}
                             disabled={meetingAction !== null}
-                            className="h-12 rounded-2xl bg-indigo-600 px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                            className="h-12 rounded-2xl bg-indigo-600 px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest transition-all"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
                             Chia sẻ màn hình
@@ -1399,7 +1509,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <Button
                         onClick={() => void handleStartMeeting('screen')}
                         disabled={meetingAction !== null}
-                        className="h-12 rounded-2xl bg-indigo-600 px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 uppercase tracking-widest"
+                        className="h-12 rounded-2xl bg-indigo-600 px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest"
                       >
                         {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
                         Mở phòng họp
@@ -1460,7 +1570,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <ScreenShareViewer stream={remoteStream} label="Nguồn phát từ người tham gia" />
                         </div>
                       ) : (
-                        <div className="flex aspect-video flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-800 text-center text-slate-600 bg-slate-900/50">
+                        <div className="flex aspect-video flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-800 text-center text-muted-foreground bg-slate-900/50">
                           <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-6">
                             <Video size={32} className="opacity-40" />
                           </div>
@@ -1485,7 +1595,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {canManageExams && (
                   <Button
                     onClick={() => router.push(`/space/classrooms/${uid}/exams/create`)}
-                    className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                    className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest transition-all"
                   >
                     <Plus size={20} />
                     Tạo bài kiểm tra
@@ -1502,7 +1612,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
                         selectedExamKind === kind.key 
                           ? 'bg-card text-indigo-600 shadow-sm border border-border' 
-                          : 'text-muted-foreground hover:text-slate-600'
+                          : 'text-muted-foreground hover:text-muted-foreground'
                       }`}
                     >
                       {kind.label}
@@ -1560,7 +1670,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             </Button>
                             <Button
                               onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)}
-                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-indigo-600 hover:text-white text-slate-600 transition-all border border-border hover:border-indigo-600 uppercase tracking-widest"
+                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-indigo-600 hover:text-white text-muted-foreground transition-all border border-border hover:border-indigo-600 uppercase tracking-widest"
                             >
                               Chi tiết
                             </Button>
@@ -1572,7 +1682,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
-                                  <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-slate-600 hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
+                                  <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
                                     <Pencil size={16} className="mr-3 text-muted-foreground" />
                                     Chỉnh sửa
                                   </DropdownMenuItem>
@@ -1614,7 +1724,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     </div>
                     <Button
                       onClick={() => setShowOpenExamModal(true)}
-                      className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                      className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest transition-all"
                     >
                       <Wifi size={20} />
                       Mở ca thi
@@ -1715,7 +1825,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                     <Clock size={9} />
                                     Muộn: {exam.late_threshold_seconds ? `${Math.round(exam.late_threshold_seconds / 60)}p` : 'Không'}
                                   </span>
-                                  <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${exam.camera_required ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                                  <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${exam.camera_required ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-muted/50 border-border text-muted-foreground'}`}>
                                     <Camera size={9} />
                                     {exam.camera_required ? 'Camera' : 'Không camera'}
                                   </span>
@@ -1739,7 +1849,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         /* ── ĐÃ THI cards ── */
                         tabExams.map(exam => (
                           <div key={exam.uid} className="bg-muted/40 rounded-[20px] border border-border flex items-center gap-5 p-5 hover:bg-card hover:border-indigo-100 transition-all group">
-                            <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors">
+                            <div className="w-12 h-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors">
                               <FileText size={20} />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -1817,7 +1927,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <div className="flex-1 min-w-0">
                             <h4 className="text-base font-bold text-foreground group-hover:text-violet-600 transition-colors mb-1.5">{quiz.title}</h4>
                             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                              <span className="bg-slate-100 px-2 py-0.5 rounded text-muted-foreground">{quiz.questions_count} câu hỏi</span>
+                              <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{quiz.questions_count} câu hỏi</span>
                               <span className="flex items-center gap-1.5"><Clock size={12} /> {timeLimitMin > 0 ? `${timeLimitMin} phút` : 'Không giới hạn'}</span>
                               <span className="flex items-center gap-1.5"><RefreshCw size={12} /> {assignment?.max_attempts ? `${assignment.max_attempts} lần thử` : 'Vô hạn'}</span>
                             </div>
@@ -2000,7 +2110,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Sinh viên</p>
               </div>
             </div>
-            <DialogDescription className="text-sm text-slate-600 font-medium leading-relaxed">
+            <DialogDescription className="text-sm text-muted-foreground font-medium leading-relaxed">
               Bạn có chắc muốn <span className="font-black text-rose-600">kick</span> sinh viên này ra khỏi lớp?
               Sinh viên vẫn có thể tham gia lại qua link mời.
             </DialogDescription>
@@ -2082,7 +2192,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 )}
                 <button
                   onClick={() => setShowPendingSheet(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-slate-100 hover:text-foreground transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 >
                   <X size={18} />
                 </button>
@@ -2097,7 +2207,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
               ) : pendingMembers.length === 0 ? (
                 <div className="flex h-48 flex-col items-center justify-center gap-3 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                     <Users size={28} className="text-muted-foreground/50" />
                   </div>
                   <p className="text-sm font-bold text-muted-foreground">Không có yêu cầu nào</p>
@@ -2163,7 +2273,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="border-t border-border px-8 py-4">
               <button
                 onClick={() => { loadPendingMembers(); }}
-                className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-slate-600 transition-colors"
+                className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-muted-foreground transition-colors"
               >
                 <RefreshCw size={13} />
                 Làm mới danh sách
@@ -2239,7 +2349,7 @@ function AssignQuizModal({
               <h2 className="text-xl font-bold text-foreground">Cài đặt giao đề thi</h2>
               <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-slate-400">
+            <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-muted-foreground">
               <X size={20} />
             </Button>
           </div>
@@ -2269,7 +2379,7 @@ function AssignQuizModal({
                     <item.icon size={16} className="text-muted-foreground group-hover:text-indigo-500" /> {item.label}
                   </div>
                   <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
-                    className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all" />
+                    className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-border transition-all" />
                 </label>
               ))}
             </div>
@@ -2282,7 +2392,7 @@ function AssignQuizModal({
             <Button
               onClick={() => void handleConfirmAssign()}
               disabled={assigning}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all"
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-indigo-500/20 uppercase tracking-widest transition-all"
             >
               {assigning ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
               Giao cho lớp
@@ -2332,7 +2442,7 @@ function AssignQuizModal({
                       : 'border-slate-50 bg-card hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer group shadow-sm'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg'}`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg'}`}>
                     {assigned ? <Check size={24} /> : <BookOpen size={24} />}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -2473,11 +2583,11 @@ function OpenOnlineExamModal({
                       className={`rounded-2xl border-2 p-4 text-left transition-all ${
                         active
                           ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-slate-100 bg-card hover:border-indigo-200 hover:bg-indigo-50/40'
+                          : 'border-border bg-card hover:border-indigo-200 hover:bg-indigo-50/40'
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-muted-foreground'}`}>
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground'}`}>
                           {active ? <Check size={18} /> : <FileText size={18} />}
                         </div>
                         <div className="min-w-0">
@@ -2524,7 +2634,7 @@ function OpenOnlineExamModal({
               {/* Camera toggle */}
               <div className={`flex items-center justify-between rounded-2xl border-2 px-5 py-4 transition-colors ${cameraRequired ? 'border-indigo-300 bg-indigo-50' : 'border-border bg-muted/40'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground'}`}>
                     <Camera size={20} />
                   </div>
                   <div>
@@ -2543,7 +2653,7 @@ function OpenOnlineExamModal({
                   className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${cameraRequired ? 'bg-indigo-600' : 'bg-slate-300'}`}
                   style={{ width: 52 }}
                 >
-                  <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
+                  <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
                 </button>
               </div>
             </div>
@@ -2557,7 +2667,7 @@ function OpenOnlineExamModal({
           <Button
             onClick={() => void handleOpenExam()}
             disabled={opening || loading || !selectedExam}
-            className="rounded-[20px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-12 px-8 gap-3 shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all"
+            className="rounded-[20px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-12 px-8 gap-3 shadow-lg shadow-indigo-500/20 uppercase tracking-widest transition-all"
           >
             {opening ? <Loader2 size={18} className="animate-spin" /> : <Wifi size={18} />}
             Bắt đầu ca thi
@@ -2655,7 +2765,7 @@ function EditSettingsModal({
                   <item.icon size={16} className="text-muted-foreground group-hover:text-indigo-500" /> {item.label}
                 </div>
                 <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
-                  className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-slate-300 transition-all" />
+                  className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-border transition-all" />
               </label>
             ))}
           </div>
@@ -2668,7 +2778,7 @@ function EditSettingsModal({
           <Button
             onClick={() => void handleSave()}
             disabled={saving}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all"
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-indigo-500/20 uppercase tracking-widest transition-all"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
             Lưu cài đặt
@@ -2775,7 +2885,7 @@ function StudentDetailsModal({
                           {getSubmissionStatusLabel(r.submission.status)}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-slate-100 text-muted-foreground">Chưa nộp</span>
+                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-muted text-muted-foreground">Chưa nộp</span>
                       )}
                     </td>
                     <td className="py-3 pr-4 text-xs font-bold text-muted-foreground">
@@ -3150,21 +3260,21 @@ function ExamGradeTableModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-0 backdrop-blur-sm sm:p-4">
-      <div className="flex h-full w-full flex-col overflow-hidden bg-slate-50 shadow-2xl animate-in fade-in zoom-in-95 duration-200 sm:h-[min(88vh,800px)] sm:max-w-[1180px] sm:rounded-2xl">
-        <div className="shrink-0 border-b border-slate-200/70 bg-white px-5 py-4 sm:px-6">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-muted/50 shadow-2xl animate-in fade-in zoom-in-95 duration-200 sm:h-[min(88vh,800px)] sm:max-w-[1180px] sm:rounded-2xl">
+        <div className="shrink-0 border-b border-border/70 bg-card px-5 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Bảng điểm</p>
               <h2 className="truncate text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">{exam.title}</h2>
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                 <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getExamStatusClass(exam.status)}`}>
                   {getExamStatusLabel(exam.status)}
                 </span>
-                <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50/80 px-2.5 py-1.5">
+                <span className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50/80 px-2.5 py-1.5">
                   <Calendar size={13} />
                   Hạn nộp: {exam.due_date ? formatDateTime(exam.due_date) : '--'}
                 </span>
-                <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50/80 px-2.5 py-1.5">
+                <span className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50/80 px-2.5 py-1.5">
                   <Users size={13} />
                   {loading ? '--' : students.length} sinh viên
                 </span>
@@ -3174,41 +3284,41 @@ function ExamGradeTableModal({
                 </span>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9 shrink-0 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground">
               <X size={18} />
             </Button>
           </div>
         </div>
 
-        <div className="grid shrink-0 gap-3 border-b border-slate-200/70 bg-white px-5 py-4 md:grid-cols-4 sm:px-6">
+        <div className="grid shrink-0 gap-3 border-b border-border/70 bg-card px-5 py-4 md:grid-cols-4 sm:px-6">
           <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 shadow-sm">
             <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-slate-500">Tỉ lệ nộp bài</p>
+              <p className="text-[11px] font-medium text-muted-foreground">Tỉ lệ nộp bài</p>
               <span className="text-lg font-semibold tracking-tight text-indigo-700">{loading ? '--' : `${submissionRate}%`}</span>
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">{loading ? 'Đang tải...' : `${submitted}/${students.length} sinh viên`}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{loading ? 'Đang tải...' : `${submitted}/${students.length} sinh viên`}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-indigo-100">
               <div className="h-full rounded-full bg-indigo-600 transition-all duration-500" style={{ width: `${submissionRate}%` }} />
             </div>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 shadow-sm">
             <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-slate-500">Điểm trung bình</p>
+              <p className="text-[11px] font-medium text-muted-foreground">Điểm trung bình</p>
               <span className="text-lg font-semibold tracking-tight text-emerald-700">{loading ? '--' : avg}</span>
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">{graded > 0 ? `${graded} bài đã chấm` : 'Chưa có điểm'}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{graded > 0 ? `${graded} bài đã chấm` : 'Chưa có điểm'}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-emerald-100">
               <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${averageRate}%` }} />
             </div>
           </div>
           {[
-            { label: 'Đang chờ chấm', value: Math.max(0, submitted - graded), detail: `${gradingRate}% hoàn tất`, color: 'text-indigo-700', surface: 'border-slate-200 bg-white' },
+            { label: 'Đang chờ chấm', value: Math.max(0, submitted - graded), detail: `${gradingRate}% hoàn tất`, color: 'text-indigo-700', surface: 'border-border bg-card' },
             { label: 'Chưa nộp', value: missing, detail: 'Cần theo dõi', color: 'text-rose-600', surface: 'border-rose-100 bg-rose-50/30' },
           ].map(metric => (
             <div key={metric.label} className={`rounded-xl border p-3 shadow-sm ${metric.surface}`}>
-              <p className="text-[11px] font-medium text-slate-500">{metric.label}</p>
+              <p className="text-[11px] font-medium text-muted-foreground">{metric.label}</p>
               <p className={`mt-1 text-xl font-semibold tracking-tight ${metric.color}`}>{loading ? '--' : metric.value}</p>
-              <p className="mt-1 text-[11px] text-slate-400">{metric.detail}</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">{metric.detail}</p>
             </div>
           ))}
         </div>
@@ -3216,12 +3326,12 @@ function ExamGradeTableModal({
         <div className="flex min-h-0 flex-1 flex-col gap-3 p-4 sm:p-5">
           <div className="flex shrink-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <label className="relative w-full xl:max-w-sm">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 value={query}
                 onChange={event => setQuery(event.target.value)}
                 placeholder="Tìm theo tên hoặc MSSV..."
-                className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium text-slate-800 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-4 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
               />
             </label>
             <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -3233,11 +3343,11 @@ function ExamGradeTableModal({
                   className={`flex h-9 shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-medium transition ${
                     filter === option.value
                       ? 'border-indigo-600 bg-indigo-600 text-white'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-indigo-200 hover:bg-indigo-50/40 hover:text-indigo-700'
+                      : 'border-border bg-card text-muted-foreground hover:border-indigo-200 hover:bg-indigo-50/40 hover:text-indigo-700'
                   }`}
                 >
                   {option.label}
-                  <span className={`rounded px-1.5 py-0.5 text-[10px] ${filter === option.value ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                  <span className={`rounded px-1.5 py-0.5 text-[10px] ${filter === option.value ? 'bg-card/20 text-white' : 'bg-muted text-muted-foreground'}`}>
                     {loading ? '--' : option.count}
                   </span>
                 </button>
@@ -3255,15 +3365,15 @@ function ExamGradeTableModal({
           </div>
 
           {loading ? (
-            <div className="flex min-h-56 flex-1 items-center justify-center rounded-2xl border border-slate-100 bg-white text-slate-400">
+            <div className="flex min-h-56 flex-1 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground">
               <Loader2 size={32} className="animate-spin text-indigo-500" />
               <p className="ml-3 text-sm font-bold">Đang tải bảng điểm...</p>
             </div>
           ) : error ? (
-            <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-2xl border border-rose-100 bg-white p-6 text-center">
+            <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-2xl border border-rose-100 bg-card p-6 text-center">
               <AlertCircle size={32} className="mb-3 text-rose-400" />
-              <p className="text-sm font-black text-slate-800">Không thể tải bảng điểm</p>
-              <p className="mt-1 max-w-md text-xs font-medium text-slate-500">{error}</p>
+              <p className="text-sm font-black text-foreground">Không thể tải bảng điểm</p>
+              <p className="mt-1 max-w-md text-xs font-medium text-muted-foreground">{error}</p>
               <Button onClick={() => void loadGradeTable()} className="mt-4 rounded-xl bg-indigo-600 px-5 text-white">
                 Tải lại
               </Button>
@@ -3273,10 +3383,10 @@ function ExamGradeTableModal({
           ) : visibleRows.length === 0 ? (
             <GradeTableEmptyState title="Không có kết quả phù hợp" description="Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái." />
           ) : (
-            <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-slate-200/80 bg-white shadow-sm">
+            <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border/80 bg-card shadow-sm">
               <table className="w-full min-w-[850px] text-left">
-                <thead className="sticky top-0 z-[1] border-b border-slate-200 bg-slate-50/95 backdrop-blur">
-                  <tr className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                <thead className="sticky top-0 z-[1] border-b border-border bg-muted/50/95 backdrop-blur">
+                  <tr className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     <th className="px-4 py-3">Sinh viên</th>
                     <th className="px-4 py-3">Bài nộp</th>
                     <th className="px-4 py-3">Thời gian nộp</th>
@@ -3289,14 +3399,14 @@ function ExamGradeTableModal({
                   {visibleRows.map(row => {
                     const submission = row.submission;
                     return (
-                      <tr key={row.member.member_id} className="border-b border-slate-100 last:border-b-0 transition-colors hover:bg-indigo-50/30">
+                      <tr key={row.member.member_id} className="border-b border-border last:border-b-0 transition-colors hover:bg-indigo-50/30">
                         <td className="px-4 py-3">
                           <StudentIdentity member={row.member} />
                         </td>
                         <td className="px-4 py-3">
                           <SubmissionBadge submission={submission} />
                         </td>
-                        <td className="px-4 py-3 text-xs font-medium text-slate-600">
+                        <td className="px-4 py-3 text-xs font-medium text-muted-foreground">
                           {submission?.submitted_at ? formatDateTime(submission.submitted_at) : '--'}
                         </td>
                         <td className="px-4 py-3">
@@ -3304,7 +3414,7 @@ function ExamGradeTableModal({
                             <span className={`text-sm font-semibold ${submission.grade >= 5 ? 'text-emerald-700' : 'text-rose-600'}`}>
                               {submission.grade.toFixed(1)}
                             </span>
-                          ) : <span className="text-sm font-medium text-slate-300">--</span>}
+                          ) : <span className="text-sm font-medium text-muted-foreground/60">--</span>}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap items-center gap-1.5">
@@ -3335,11 +3445,11 @@ function ExamGradeTableModal({
                                 </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg border-border text-muted-foreground hover:bg-muted/50 hover:text-foreground">
                                       <MoreVertical size={14} />
                                     </Button>
                                   </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end" className="w-44 rounded-lg border-slate-200 p-1 shadow-lg">
+                                  <DropdownMenuContent align="end" className="w-44 rounded-lg border-border p-1 shadow-lg">
                                     <DropdownMenuItem onClick={() => openSubmission(row)} className="gap-2 rounded-md text-xs font-medium">
                                       <Eye size={14} /> Xem chi tiết
                                     </DropdownMenuItem>
@@ -3355,7 +3465,7 @@ function ExamGradeTableModal({
                                 </DropdownMenu>
                               </>
                             ) : (
-                              <span className="text-xs font-medium text-slate-400">Không có bài nộp</span>
+                              <span className="text-xs font-medium text-muted-foreground">Không có bài nộp</span>
                             )}
                           </div>
                         </td>
@@ -3389,11 +3499,11 @@ function ExamGradeTableModal({
 
 function GradeTableEmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-52 flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-white p-6 text-center text-slate-400 shadow-sm">
-      <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-50">
-        <Users size={21} className="text-slate-400" />
+    <div className="flex min-h-52 flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card p-6 text-center text-muted-foreground shadow-sm">
+      <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-muted/50">
+        <Users size={21} className="text-muted-foreground" />
       </span>
-      <p className="text-sm font-semibold text-slate-800">{title}</p>
+      <p className="text-sm font-semibold text-foreground">{title}</p>
       <p className="mt-1 text-xs font-medium">{description}</p>
     </div>
   );
@@ -3411,8 +3521,8 @@ function StudentIdentity({ member }: { member: ClassroomMember }) {
         </div>
       )}
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-slate-900">{member.member_name}</p>
-        <p className="mt-0.5 truncate text-[11px] text-slate-400">{member.member_id}</p>
+        <p className="truncate text-sm font-medium text-foreground">{member.member_name}</p>
+        <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{member.member_id}</p>
       </div>
     </div>
   );
@@ -3420,13 +3530,13 @@ function StudentIdentity({ member }: { member: ClassroomMember }) {
 
 function SubmissionBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
   if (!submission) {
-    return <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold text-slate-500">Chưa nộp</span>;
+    return <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">Chưa nộp</span>;
   }
   return <span className="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold text-indigo-700">Đã nộp</span>;
 }
 
 function GradingBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
-  if (!submission) return <span className="text-xs font-medium text-slate-300">--</span>;
+  if (!submission) return <span className="text-xs font-medium text-muted-foreground/60">--</span>;
   if (submission.grade != null) {
     return <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">Đã chấm</span>;
   }
@@ -3462,37 +3572,37 @@ function SubmissionGradingDrawer({
   return (
     <div className="absolute inset-0 z-10 flex justify-end bg-slate-950/30">
       <button type="button" aria-label="Đóng chi tiết bài nộp" className="absolute inset-0" onClick={onClose} />
-      <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-200">
-        <div className="flex items-start justify-between gap-4 border-b border-slate-100 p-4 sm:p-5">
+      <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl animate-in slide-in-from-right duration-200">
+        <div className="flex items-start justify-between gap-4 border-b border-border p-4 sm:p-5">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Chi tiết bài nộp</p>
             <div className="mt-3"><StudentIdentity member={member} /></div>
           </div>
-          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-slate-400" onClick={onClose}>
+          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-muted-foreground" onClick={onClose}>
             <X size={18} />
           </Button>
         </div>
 
         <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Nộp lúc</p>
-              <p className="mt-1 text-xs font-medium text-slate-700">{submission.submitted_at ? formatDateTime(submission.submitted_at) : '--'}</p>
+            <div className="rounded-lg border border-border bg-muted/50 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Nộp lúc</p>
+              <p className="mt-1 text-xs font-medium text-foreground">{submission.submitted_at ? formatDateTime(submission.submitted_at) : '--'}</p>
             </div>
-            <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">Trạng thái</p>
-              <p className="mt-1 text-xs font-medium text-slate-700">{submission.grade != null ? 'Đã chấm điểm' : 'Chờ chấm điểm'}</p>
+            <div className="rounded-lg border border-border bg-muted/50 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Trạng thái</p>
+              <p className="mt-1 text-xs font-medium text-foreground">{submission.grade != null ? 'Đã chấm điểm' : 'Chờ chấm điểm'}</p>
             </div>
           </div>
 
           <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Nội dung bài nộp</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Nội dung bài nộp</h3>
             {submission.content_type === 'markdown' && submission.content ? (
-              <div className="max-h-44 overflow-y-auto whitespace-pre-wrap rounded-lg border border-slate-100 bg-slate-50 p-3.5 text-sm font-medium leading-relaxed text-slate-700">
+              <div className="max-h-44 overflow-y-auto whitespace-pre-wrap rounded-lg border border-border bg-muted/50 p-3.5 text-sm font-medium leading-relaxed text-foreground">
                 {submission.content}
               </div>
             ) : (
-              <p className="rounded-lg border border-dashed border-slate-200 p-3.5 text-sm font-medium text-slate-400">
+              <p className="rounded-lg border border-dashed border-border p-3.5 text-sm font-medium text-muted-foreground">
                 Bài nộp không có nội dung văn bản.
               </p>
             )}
@@ -3504,11 +3614,11 @@ function SubmissionGradingDrawer({
             )}
           </section>
 
-          <section className="space-y-3 border-t border-slate-100 pt-4">
+          <section className="space-y-3 border-t border-border pt-4">
             {submission.grading_method === 'ai' && (
               <div className="rounded-xl border border-violet-100 bg-violet-50/70 p-3.5">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-100">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-100">
                     <Wand2 size={12} />
                     AI đã chấm
                   </span>
@@ -3519,17 +3629,17 @@ function SubmissionGradingDrawer({
                   )}
                 </div>
                 {submission.ai_reason && (
-                  <p className="text-xs font-medium leading-relaxed text-slate-700">{submission.ai_reason}</p>
+                  <p className="text-xs font-medium leading-relaxed text-foreground">{submission.ai_reason}</p>
                 )}
                 {submission.ai_breakdown && submission.ai_breakdown.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {submission.ai_breakdown.map((item, index) => (
-                      <div key={`${item.question}-${index}`} className="rounded-lg border border-violet-100 bg-white p-2.5">
+                      <div key={`${item.question}-${index}`} className="rounded-lg border border-violet-100 bg-card p-2.5">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-xs font-semibold text-slate-800">{item.question || `Ý ${index + 1}`}</p>
+                          <p className="text-xs font-semibold text-foreground">{item.question || `Ý ${index + 1}`}</p>
                           <span className="shrink-0 text-xs font-semibold text-violet-700">{item.score}/{item.max_score}</span>
                         </div>
-                        <p className="mt-1 text-[11px] font-medium leading-relaxed text-slate-500">{item.reason}</p>
+                        <p className="mt-1 text-[11px] font-medium leading-relaxed text-muted-foreground">{item.reason}</p>
                       </div>
                     ))}
                   </div>
@@ -3539,7 +3649,7 @@ function SubmissionGradingDrawer({
                     <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700">Nguồn tài liệu</p>
                     <div className="space-y-1">
                       {submission.ai_sources.slice(0, 3).map((source, index) => (
-                        <div key={`${source.resource_uid || source.doc_name}-${index}`} className="flex items-center justify-between gap-2 text-[11px] font-medium text-slate-500">
+                        <div key={`${source.resource_uid || source.doc_name}-${index}`} className="flex items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground">
                           <span className="truncate">{source.doc_name || source.resource_uid || 'Tài liệu lớp học'}</span>
                           {typeof source.score === 'number' && <span>{(source.score * 100).toFixed(0)}%</span>}
                         </div>
@@ -3550,7 +3660,7 @@ function SubmissionGradingDrawer({
               </div>
             )}
             <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Điểm (0 - 10)</span>
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Điểm (0 - 10)</span>
               <input
                 value={grade}
                 onChange={event => onGradeChange(event.target.value)}
@@ -3559,22 +3669,22 @@ function SubmissionGradingDrawer({
                 max="10"
                 step="0.1"
                 placeholder="Nhập điểm"
-                className="h-11 w-full rounded-lg border border-slate-200 px-3.5 text-base font-semibold text-slate-800 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                className="h-11 w-full rounded-lg border border-border px-3.5 text-base font-semibold text-foreground outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
               />
             </label>
             <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">Nhận xét</span>
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Nhận xét</span>
               <textarea
                 value={feedback}
                 onChange={event => onFeedbackChange(event.target.value)}
                 rows={4}
                 placeholder="Nhập nhận xét cho sinh viên..."
-                className="w-full resize-none rounded-lg border border-slate-200 p-3.5 text-sm font-medium text-slate-800 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full resize-none rounded-lg border border-border p-3.5 text-sm font-medium text-foreground outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
               />
             </label>
           </section>
         </div>
-        <div className="border-t border-slate-100 bg-white p-4 sm:p-5">
+        <div className="border-t border-border bg-card p-4 sm:p-5">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Button onClick={onAIGrade} disabled={saving || aiGrading} variant="outline" className="h-11 rounded-lg border-violet-200 font-medium text-violet-700 hover:bg-violet-50">
               {aiGrading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
@@ -3595,7 +3705,7 @@ function getSubmissionStatusClass(status: string) {
   if (status === 'graded') return 'bg-emerald-50 text-emerald-600';
   if (status === 'submitted') return 'bg-indigo-50 text-indigo-600';
   if (status === 'late') return 'bg-amber-50 text-amber-600';
-  return 'bg-slate-100 text-muted-foreground';
+  return 'bg-muted text-muted-foreground';
 }
 
 function getSubmissionStatusLabel(status: string) {
@@ -3614,7 +3724,7 @@ function getExamStatusClass(status: string) {
   if (normalized === 'closed' || normalized === 'expired') {
     return 'bg-rose-50 text-rose-600 border border-rose-100';
   }
-  return 'bg-slate-100 text-slate-600 border border-border';
+  return 'bg-muted text-muted-foreground border border-border';
 }
 
 function getExamStatusLabel(status: string) {

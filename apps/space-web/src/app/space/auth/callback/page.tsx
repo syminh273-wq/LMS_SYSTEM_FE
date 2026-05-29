@@ -50,10 +50,10 @@ function SpaceAuthCallbackContent() {
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100">
+    <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="text-center">
         <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-slate-700 border-t-transparent mx-auto" />
-        <p className="text-slate-500 text-sm">Đang xử lý đăng nhập...</p>
+        <p className="text-muted-foreground text-sm">Đang xử lý đăng nhập...</p>
       </div>
     </div>
   );
@@ -63,7 +63,7 @@ export default function SpaceAuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-slate-100">
+        <div className="flex min-h-screen items-center justify-center bg-muted">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-700 border-t-transparent" />
         </div>
       }

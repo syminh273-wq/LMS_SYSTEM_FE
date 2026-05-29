@@ -179,7 +179,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl border-none shadow-2xl overflow-hidden p-0 bg-white rounded-3xl flex flex-col h-[600px]">
+      <DialogContent className="sm:max-w-xl border-none shadow-2xl overflow-hidden p-0 bg-card rounded-3xl flex flex-col h-[600px]">
         {/* Header Section */}
         <div className="bg-slate-900 px-6 py-6 text-white shrink-0">
           <div className="flex justify-between items-start">
@@ -188,13 +188,13 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                 <span className="text-[10px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded uppercase tracking-wider">
                   ID: {classroom.pid}
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   Phòng học
                 </span>
               </div>
               <h3 className="text-xl font-bold tracking-tight">{classroom.name}</h3>
             </div>
-            <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+            <button onClick={onClose} className="text-muted-foreground hover:text-white transition-colors">
               <X size={20} />
             </button>
           </div>
@@ -203,54 +203,54 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
           <div className="flex gap-1 mt-6 bg-slate-800/50 p-1 rounded-xl w-fit">
             <button 
               onClick={() => setActiveTab('info')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'info' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'info' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-muted-foreground hover:text-white'}`}
             >
               Thông tin
             </button>
             <button 
               onClick={() => setActiveTab('docs')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'docs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'docs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-muted-foreground hover:text-white'}`}
             >
               Tài liệu
             </button>
             <button 
               onClick={() => setActiveTab('chat')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chat' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chat' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-muted-foreground hover:text-white'}`}
             >
               Tin nhắn
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50">
+        <div className="flex-1 overflow-y-auto p-6 bg-muted/30">
           {activeTab === 'info' && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Mô tả</div>
-                <p className="text-sm text-slate-600 leading-relaxed font-medium">{classroom.description}</p>
+              <div className="bg-card p-4 rounded-2xl border border-border shadow-sm">
+                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Mô tả</div>
+                <p className="text-sm text-muted-foreground leading-relaxed font-medium">{classroom.description}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="bg-card p-4 rounded-2xl border border-border shadow-sm">
                   <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 mb-2">
                     <Users size={16} />
                   </div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sĩ số tối đa</div>
-                  <div className="text-sm font-bold text-slate-700">{classroom.max_students} học sinh</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Sĩ số tối đa</div>
+                  <div className="text-sm font-bold text-foreground">{classroom.max_students} học sinh</div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="bg-card p-4 rounded-2xl border border-border shadow-sm">
                   <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                     <Info size={16} />
                   </div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ngày tạo</div>
-                  <div className="text-sm font-bold text-slate-700">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Ngày tạo</div>
+                  <div className="text-sm font-bold text-foreground">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</div>
                 </div>
               </div>
 
               {!showQr ? (
                 <Button 
                   onClick={handleShowQr}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 rounded-xl gap-2 font-bold shadow-lg shadow-indigo-100"
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 rounded-xl gap-2 font-bold shadow-lg shadow-indigo-500/20"
                   disabled={loading}
                 >
                   {loading ? <Loader2 size={18} className="animate-spin" /> : <QrCode size={18} />}
@@ -258,8 +258,8 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                 </Button>
               ) : (
                 <div className="space-y-4 pt-2">
-                  <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center">
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4">
+                  <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col items-center">
+                    <div className="p-4 bg-muted/50 rounded-2xl border border-border mb-4">
                       {linkData && (
                         <QRCodeSVG 
                           id="classroom-qr"
@@ -269,7 +269,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                         />
                       )}
                     </div>
-                    <div className="text-3xl font-black tracking-[0.3em] text-slate-900 uppercase mb-6">{linkData?.code}</div>
+                    <div className="text-3xl font-black tracking-[0.3em] text-foreground uppercase mb-6">{linkData?.code}</div>
                     <div className="flex gap-2 w-full">
                       <Button variant="outline" onClick={handleDownload} className="flex-1 h-11 rounded-xl font-bold text-xs gap-2">
                         <Download size={16} /> TẢI QR
@@ -290,7 +290,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                 <div className="relative z-10">
                   <h4 className="font-bold mb-1">Tải lên tài liệu</h4>
                   <p className="text-xs text-indigo-100 mb-4">Chia sẻ tài liệu học tập với tất cả học sinh trong lớp</p>
-                  <Button className="bg-white text-indigo-600 hover:bg-indigo-50 font-bold text-xs rounded-xl h-9 px-4">
+                  <Button className="bg-card text-indigo-600 hover:bg-indigo-50 font-bold text-xs rounded-xl h-9 px-4">
                     <UploadCloud size={16} className="mr-2" /> CHỌN TỆP
                   </Button>
                 </div>
@@ -299,18 +299,18 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                 </div>
               </div>
 
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1 mb-2">Tài liệu đã tải lên ({documents.length})</div>
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1 mb-2">Tài liệu đã tải lên ({documents.length})</div>
               <div className="space-y-3">
                 {documents.map(doc => (
-                  <div key={doc.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 group hover:border-indigo-200 transition-colors">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                  <div key={doc.id} className="bg-card p-4 rounded-2xl border border-border shadow-sm flex items-center gap-4 group hover:border-indigo-200 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                       <File size={20} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold text-slate-800 truncate">{doc.name}</div>
-                      <div className="text-[10px] font-medium text-slate-400">{doc.size} • {doc.date}</div>
+                      <div className="text-sm font-bold text-foreground truncate">{doc.name}</div>
+                      <div className="text-[10px] font-medium text-muted-foreground">{doc.size} • {doc.date}</div>
                     </div>
-                    <button className="p-2 text-slate-300 hover:text-rose-500 transition-colors">
+                    <button className="p-2 text-muted-foreground/60 hover:text-rose-500 transition-colors">
                       <Trash size={16} />
                     </button>
                   </div>
@@ -324,18 +324,18 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
               <div className="flex-1 space-y-4 mb-4">
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
-                    {!msg.isMe && <div className="text-[10px] font-bold text-slate-400 ml-3 mb-1">{msg.sender}</div>}
-                    <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium ${msg.isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white border border-slate-100 text-slate-700 rounded-bl-none shadow-sm'}`}>
+                    {!msg.isMe && <div className="text-[10px] font-bold text-muted-foreground ml-3 mb-1">{msg.sender}</div>}
+                    <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium ${msg.isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-card border border-border text-foreground rounded-bl-none shadow-sm'}`}>
                       {msg.text}
                     </div>
-                    <div className="text-[9px] font-bold text-slate-400 mt-1 px-1">{msg.time}</div>
+                    <div className="text-[9px] font-bold text-muted-foreground mt-1 px-1">{msg.time}</div>
                   </div>
                 ))}
               </div>
               
-              <div className="sticky bottom-0 bg-slate-50/80 backdrop-blur-md pt-2">
-                <div className="flex items-center gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-lg">
-                  <button className="p-2 text-slate-400 hover:text-indigo-600">
+              <div className="sticky bottom-0 bg-muted/50/80 backdrop-blur-md pt-2">
+                <div className="flex items-center gap-2 bg-card p-2 rounded-2xl border border-border shadow-lg">
+                  <button className="p-2 text-muted-foreground hover:text-indigo-600">
                     <Paperclip size={20} />
                   </button>
                   <input 

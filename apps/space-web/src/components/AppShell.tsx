@@ -48,7 +48,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   if (isAuthPage) {
-    return <div className="min-h-screen bg-slate-50 dark:bg-background">{children}</div>;
+    return <div className="min-h-screen bg-muted/50 dark:bg-background">{children}</div>;
   }
 
   return (
@@ -63,7 +63,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setSidebarCollapsed(false)}
               title="Mở rộng menu"
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-white hover:bg-white/10 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-white hover:bg-card/10 transition-colors"
             >
               <ChevronsRight size={16} />
             </button>
@@ -78,13 +78,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 <h1 className="text-xl font-bold tracking-tight flex items-center gap-1.5">
                   Space <span className="font-medium opacity-90 text-slate-100">Admin</span>
                 </h1>
-                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-[0.2em] mt-0.5">LMS Management</p>
+                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-[0.2em] mt-0.5">LMS Management</p>
               </div>
             </div>
             <button
               onClick={() => setSidebarCollapsed(true)}
               title="Thu nhỏ menu"
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-white hover:bg-white/10 transition-colors mt-1"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-white hover:bg-card/10 transition-colors mt-1"
             >
               <ChevronsLeft size={16} />
             </button>
@@ -104,10 +104,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 } ${
                   isActive
                     ? 'bg-[#3b3254] text-white shadow-lg shadow-black/10'
-                    : 'text-slate-400 hover:bg-[#3b3254]/50 hover:text-white'
+                    : 'text-muted-foreground hover:bg-[#3b3254]/50 hover:text-white'
                 }`}
               >
-                <item.icon size={20} className={isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'} />
+                <item.icon size={20} className={isActive ? 'text-indigo-400' : 'text-muted-foreground group-hover:text-muted-foreground/60'} />
                 {!sidebarCollapsed && <span className="text-sm font-semibold tracking-wide">{item.name}</span>}
               </Link>
             );
@@ -118,7 +118,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className={`text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all ${
+            className={`text-muted-foreground hover:text-white hover:bg-card/5 rounded-xl transition-all ${
               sidebarCollapsed ? 'w-10 h-10 p-0 justify-center' : 'w-full justify-start gap-3'
             }`}
           >
@@ -130,14 +130,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-20 bg-white dark:bg-card border-b border-slate-100 dark:border-border flex items-center justify-between px-10">
+        <header className="h-20 bg-card dark:bg-card border-b border-border dark:border-border flex items-center justify-between px-10">
           <div className="flex items-center gap-6 flex-1">
             {pathname.includes('/classrooms/') ? (
               <div className="relative w-96 max-w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <input
                   type="text"
-                  className="w-full pl-12 pr-4 py-2.5 bg-slate-50 dark:bg-muted border border-slate-100 dark:border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white dark:focus:bg-muted/80 dark:text-foreground dark:placeholder:text-muted-foreground transition-all"
+                  className="w-full pl-12 pr-4 py-2.5 bg-muted/50 dark:bg-muted border border-border dark:border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-card dark:focus:bg-muted/80 dark:text-foreground dark:placeholder:text-muted-foreground transition-all"
                   placeholder="Tìm kiếm tài liệu, lớp học..."
                 />
               </div>

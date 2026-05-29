@@ -245,7 +245,6 @@ export default function ClassroomChatPanel({
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSendingRef = useRef(false);
 
-  const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesAreaRef = useRef<HTMLDivElement>(null);
 
@@ -267,9 +266,9 @@ export default function ClassroomChatPanel({
 
   // ── Auto-scroll to bottom ─────────────────
   useEffect(() => {
-    if (active) {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (!active || !messagesAreaRef.current) return;
+    const el = messagesAreaRef.current;
+    el.scrollTop = el.scrollHeight;
   }, [messages, active]);
 
   // ── WS callbacks ─────────────────────────
@@ -531,7 +530,6 @@ export default function ClassroomChatPanel({
           </div>
         )}
 
-        <div ref={chatEndRef} />
       </div>
 
       {/* Input area */}

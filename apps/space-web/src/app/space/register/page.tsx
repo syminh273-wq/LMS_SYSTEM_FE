@@ -53,15 +53,15 @@ export default function SpaceRegisterPage() {
   };
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-slate-100 px-4 py-12'>
+    <div className='flex min-h-screen items-center justify-center bg-muted px-4 py-12'>
       <div className='max-w-md w-full'>
-        <div className='bg-white rounded-2xl shadow-xl overflow-hidden'>
+        <div className='bg-card rounded-2xl shadow-xl overflow-hidden'>
           <div className='bg-slate-900 py-8 px-10 text-center'>
             <div className="flex justify-center mb-4">
               <Image src="/logo.jpg" alt="LMS LOGO" width={150} height={50} className="h-12 w-auto object-contain brightness-0 invert" />
             </div>
             <h2 className='text-white text-2xl font-bold'>Đăng ký Space</h2>
-            <p className='text-slate-400 text-sm mt-1'>Bắt đầu quản lý tổ chức của bạn</p>
+            <p className='text-muted-foreground text-sm mt-1'>Bắt đầu quản lý tổ chức của bạn</p>
           </div>
 
           <div className='p-10'>
@@ -73,15 +73,15 @@ export default function SpaceRegisterPage() {
 
             <form onSubmit={handleSubmit(onRegister)} className='space-y-5'>
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-2'>Email quản trị</label>
+                <label className='block text-sm font-semibold text-foreground mb-2'>Email quản trị</label>
                 <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400'>
+                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
                     <Mail size={18} />
                   </div>
                   <input 
                     type='email' 
                     {...register('email', { required: 'Vui lòng nhập email' })} 
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-slate-200'}`} 
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-border'}`} 
                     placeholder='admin@your-space.com' 
                   />
                 </div>
@@ -89,15 +89,15 @@ export default function SpaceRegisterPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-2'>Mật khẩu hệ thống</label>
+                <label className='block text-sm font-semibold text-foreground mb-2'>Mật khẩu hệ thống</label>
                 <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400'>
+                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
                     <Lock size={18} />
                   </div>
                   <input 
                     type='password' 
                     {...register('password', { required: 'Vui lòng nhập mật khẩu' })} 
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-slate-200'}`} 
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-border'}`} 
                     placeholder='••••••••' 
                   />
                 </div>
@@ -113,10 +113,10 @@ export default function SpaceRegisterPage() {
               </button>
             </form>
 
-            <div className='mt-8 pt-6 border-t border-slate-100 text-center'>
-              <p className='text-slate-500 text-sm'>
+            <div className='mt-8 pt-6 border-t border-border text-center'>
+              <p className='text-muted-foreground text-sm'>
                 Đã có Space? {' '}
-                <Link href='/space/login' className='text-slate-900 font-bold hover:underline'>
+                <Link href='/space/login' className='text-foreground font-bold hover:underline'>
                   Đăng nhập quản trị
                 </Link>
               </p>

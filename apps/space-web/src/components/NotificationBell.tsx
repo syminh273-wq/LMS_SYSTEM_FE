@@ -108,10 +108,10 @@ export default function NotificationBell() {
     <div className="relative" ref={panelRef}>
       <button
         onClick={() => setOpen(prev => !prev)}
-        className="relative p-2 rounded-full hover:bg-slate-100 transition-colors"
+        className="relative p-2 rounded-full hover:bg-muted transition-colors"
         aria-label="Thông báo"
       >
-        <Bell size={20} className="text-slate-600" />
+        <Bell size={20} className="text-muted-foreground" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -120,9 +120,9 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-slate-200 bg-white shadow-xl">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <span className="text-sm font-semibold text-slate-800">Thông báo</span>
+        <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-border bg-card shadow-xl">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <span className="text-sm font-semibold text-foreground">Thông báo</span>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
@@ -134,9 +134,9 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <ul className="max-h-96 overflow-y-auto divide-y divide-slate-50">
+          <ul className="max-h-96 overflow-y-auto divide-y divide-border">
             {notifications.length === 0 ? (
-              <li className="py-10 text-center text-sm text-slate-400">
+              <li className="py-10 text-center text-sm text-muted-foreground">
                 Chưa có thông báo nào
               </li>
             ) : (
@@ -147,21 +147,21 @@ export default function NotificationBell() {
                     key={n.uid}
                     onClick={() => !isRead && handleMarkRead(n.uid)}
                     className={`flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer ${
-                      isRead ? 'hover:bg-slate-50' : 'bg-indigo-50/60 hover:bg-indigo-50'
+                      isRead ? 'hover:bg-muted/50' : 'bg-indigo-50/60 hover:bg-indigo-50'
                     }`}
                   >
                     <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      isRead ? 'bg-slate-100 text-slate-500' : 'bg-indigo-100 text-indigo-600'
+                      isRead ? 'bg-muted text-muted-foreground' : 'bg-indigo-100 text-indigo-600'
                     }`}>
                       {n.title?.[0]?.toUpperCase() ?? '🔔'}
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm truncate ${isRead ? 'text-slate-600' : 'text-slate-800 font-medium'}`}>
+                      <p className={`text-sm truncate ${isRead ? 'text-muted-foreground' : 'text-foreground font-medium'}`}>
                         {n.title}
                       </p>
-                      <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{n.content}</p>
-                      <p className="text-xs text-slate-400 mt-1">{formatTime(n.created_at)}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.content}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
                     </div>
 
                     {!isRead && (

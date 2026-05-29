@@ -27,7 +27,7 @@ export function ProtectedPageShell({
 }: ProtectedPageShellProps) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-8 py-4">
+      <header className="border-b border-gray-200 bg-card px-8 py-4">
         <div className={`mx-auto flex ${maxWidthClassName} items-center justify-between gap-4`}>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{title}</h1>

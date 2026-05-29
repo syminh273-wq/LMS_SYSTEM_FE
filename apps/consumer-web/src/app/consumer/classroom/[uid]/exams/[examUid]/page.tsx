@@ -223,7 +223,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
   const maxGrade = exam.max_grade || 10;
   const gradePercent = grade === null ? 0 : Math.min(100, Math.max(0, (grade / maxGrade) * 100));
   const hasFeedback = Boolean(submission?.feedback?.trim());
-  const assignmentResource = exam.resource_url || (exam.content_type !== 'markdown' ? exam.content : '');
+  const assignmentResource = exam.meta?.url || (exam.content_type !== 'markdown' ? exam.body : '');
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20 text-slate-900 lg:pb-0">
@@ -389,7 +389,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                     )}
                     {exam.content_type === 'markdown' ? (
                       <div className="prose prose-slate max-w-none text-sm font-medium leading-relaxed">
-                        {exam.content}
+                        {exam.body}
                       </div>
                     ) : (
                       <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4">
@@ -398,7 +398,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                             <FileText size={20} />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-800">{exam.resource_name || 'Đề bài đính kèm'}</p>
+                            <p className="text-sm font-bold text-slate-800">{exam.meta?.name || 'Đề bài đính kèm'}</p>
                             <p className="text-[10px] font-black uppercase text-slate-400">{exam.content_type}</p>
                           </div>
                         </div>

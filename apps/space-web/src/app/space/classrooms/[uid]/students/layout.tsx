@@ -39,15 +39,15 @@ export default function StudentsLayout({
       <div className={`shrink-0 transition-all duration-300 space-y-3 ${sidebarCollapsed ? 'w-[52px]' : 'w-[268px]'}`}>
         {sidebarCollapsed ? (
           /* ── Collapsed: icon-only ── */
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden py-1">
+          <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden py-1">
             <button
               onClick={() => setSidebarCollapsed(false)}
               title="Mở rộng sidebar"
-              className="w-full flex justify-center py-3 hover:bg-slate-50 transition-colors"
+              className="w-full flex justify-center py-3 hover:bg-muted/50 transition-colors"
             >
-              <ChevronsRight size={16} className="text-slate-400" />
+              <ChevronsRight size={16} className="text-muted-foreground" />
             </button>
-            <div className="mx-3 border-t border-slate-100 mb-1" />
+            <div className="mx-3 border-t border-border mb-1" />
             {([
               { id: 'info',     label: 'Thông tin chung',    icon: Info },
               { id: 'docs',     label: 'Tài liệu học tập',   icon: FileText },
@@ -66,7 +66,7 @@ export default function StudentsLayout({
                   className={`w-full flex justify-center py-3 transition-colors relative ${
                     isActive
                       ? 'text-indigo-600 bg-indigo-50'
-                      : 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
+                      : 'text-muted-foreground hover:bg-muted/50 hover:text-muted-foreground'
                   }`}
                 >
                   {isActive && (
@@ -79,23 +79,23 @@ export default function StudentsLayout({
           </div>
         ) : (
           /* ── Expanded: full labels ── */
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
             {/* Collapse button */}
-            <div className="flex items-center justify-between px-5 py-2.5 border-b border-slate-100">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">MENU</span>
+            <div className="flex items-center justify-between px-5 py-2.5 border-b border-border">
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">MENU</span>
               <button
                 onClick={() => setSidebarCollapsed(true)}
                 title="Thu nhỏ sidebar"
-                className="rounded-lg p-1 hover:bg-slate-100 transition-colors"
+                className="rounded-lg p-1 hover:bg-muted transition-colors"
               >
-                <ChevronsLeft size={15} className="text-slate-400" />
+                <ChevronsLeft size={15} className="text-muted-foreground" />
               </button>
             </div>
 
             {/* Nhóm 1: Thông tin lớp */}
             <button
               onClick={() => toggleGroup('classroom')}
-              className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               Thông tin lớp
               <ChevronDown
@@ -114,21 +114,21 @@ export default function StudentsLayout({
                   <button
                     key={id}
                     onClick={() => goToTab(id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-slate-500 hover:bg-slate-50 group"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-muted-foreground hover:bg-muted/50 group"
                   >
-                    <Icon size={18} className="text-slate-400 group-hover:text-slate-600" />
+                    <Icon size={18} className="text-muted-foreground group-hover:text-muted-foreground" />
                     {label}
                   </button>
                 ))}
               </div>
             )}
 
-            <div className="mx-4 border-t border-slate-100" />
+            <div className="mx-4 border-t border-border" />
 
             {/* Nhóm 2: Học tập & Đánh giá */}
             <button
               onClick={() => toggleGroup('learning')}
-              className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               Học tập & Đánh giá
               <ChevronDown
@@ -145,21 +145,21 @@ export default function StudentsLayout({
                   <button
                     key={id}
                     onClick={() => goToTab(id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-slate-500 hover:bg-slate-50 group"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-muted-foreground hover:bg-muted/50 group"
                   >
-                    <Icon size={18} className="text-slate-400 group-hover:text-slate-600" />
+                    <Icon size={18} className="text-muted-foreground group-hover:text-muted-foreground" />
                     {label}
                   </button>
                 ))}
               </div>
             )}
 
-            <div className="mx-4 border-t border-slate-100" />
+            <div className="mx-4 border-t border-border" />
 
             {/* Nhóm 3: Quản lý sinh viên — always active */}
             <button
               onClick={() => toggleGroup('students')}
-              className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-colors"
+              className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               Quản lý sinh viên
               <ChevronDown

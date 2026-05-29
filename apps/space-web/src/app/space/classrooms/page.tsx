@@ -169,47 +169,47 @@ export default function ClassroomsPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       {/* Search and Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center gap-4">
+      <div className="bg-card p-4 rounded-2xl border border-border shadow-sm flex flex-col md:flex-row items-center gap-4">
         <div className="relative flex-1 w-full md:w-auto">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
           <input 
             type="text"
-            className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:bg-white transition-all font-medium placeholder:text-slate-400"
+            className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:bg-card transition-all font-medium placeholder:text-muted-foreground"
             placeholder="Tìm kiếm theo tên hoặc mã phòng..."
           />
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <Button variant="outline" className="h-12 px-5 gap-2.5 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider">
+          <Button variant="outline" className="h-12 px-5 gap-2.5 rounded-xl border-border text-muted-foreground hover:bg-muted/50 font-bold text-xs uppercase tracking-wider">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
             Tất cả
-            <Plus size={16} className="text-slate-400 ml-1" />
+            <Plus size={16} className="text-muted-foreground ml-1" />
           </Button>
           
-          <Button variant="outline" className="h-12 px-5 gap-2.5 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs uppercase tracking-wider">
+          <Button variant="outline" className="h-12 px-5 gap-2.5 rounded-xl border-border text-muted-foreground hover:bg-muted/50 font-bold text-xs uppercase tracking-wider">
             <Filter size={16} />
             Trạng thái
           </Button>
 
-          <Button variant="ghost" className="h-12 px-4 text-slate-400 hover:text-slate-900 font-bold text-xs uppercase tracking-wider" onClick={() => fetchClassrooms(1)}>
+          <Button variant="ghost" className="h-12 px-4 text-muted-foreground hover:text-foreground font-bold text-xs uppercase tracking-wider" onClick={() => fetchClassrooms(1)}>
             <RotateCcw size={16} />
             <span className="ml-2 hidden lg:inline">Đặt lại</span>
           </Button>
         </div>
 
-        <div className="h-8 w-[1px] bg-slate-100 hidden md:block mx-2" />
+        <div className="h-8 w-[1px] bg-muted hidden md:block mx-2" />
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-          <div className="flex bg-slate-100/80 p-1.5 rounded-xl border border-slate-100">
+          <div className="flex bg-muted/80 p-1.5 rounded-xl border border-border">
             <button 
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-indigo-600 shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <List size={18} />
             </button>
             <button 
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-indigo-600 shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <LayoutGrid size={18} />
             </button>
@@ -234,17 +234,17 @@ export default function ClassroomsPage() {
       )}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-40 text-slate-300">
+        <div className="flex flex-col items-center justify-center py-40 text-muted-foreground/60">
           <Loader2 size={48} className="animate-spin mb-4 text-indigo-500" />
           <p className="text-sm font-bold uppercase tracking-widest">Đang tải dữ liệu...</p>
         </div>
       ) : classrooms.length === 0 ? (
-        <div className="text-center py-32 bg-white border border-slate-100 rounded-3xl shadow-sm">
-          <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-100 text-slate-300">
+        <div className="text-center py-32 bg-card border border-border rounded-3xl shadow-sm">
+          <div className="bg-muted/50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border border-border text-muted-foreground/60">
             <List size={40} />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Không có dữ liệu</h3>
-          <p className="text-slate-500 mb-8 font-medium">Chưa có phòng học nào được tạo trong hệ thống của bạn.</p>
+          <h3 className="text-xl font-bold text-foreground mb-2">Không có dữ liệu</h3>
+          <p className="text-muted-foreground mb-8 font-medium">Chưa có phòng học nào được tạo trong hệ thống của bạn.</p>
           <Button 
             onClick={() => router.push('/space/classrooms/create')}
             className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-8 h-12 shadow-lg shadow-indigo-500/20 font-bold uppercase tracking-widest"
@@ -254,30 +254,30 @@ export default function ClassroomsPage() {
           </Button>
         </div>
       ) : viewMode === 'list' ? (
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50/50 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                  <th className="px-8 py-5 border-b border-slate-100">Thông tin phòng</th>
-                  <th className="px-6 py-5 border-b border-slate-100 text-center">Mã phòng</th>
-                  <th className="px-6 py-5 border-b border-slate-100 text-center">Sĩ số tối đa</th>
-                  <th className="px-6 py-5 border-b border-slate-100 text-center">Ngày tạo</th>
-                  <th className="px-6 py-5 border-b border-slate-100 text-center">Trạng thái</th>
-                  <th className="px-8 py-5 border-b border-slate-100 text-right">Thao tác</th>
+                <tr className="bg-muted/30 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
+                  <th className="px-8 py-5 border-b border-border">Thông tin phòng</th>
+                  <th className="px-6 py-5 border-b border-border text-center">Mã phòng</th>
+                  <th className="px-6 py-5 border-b border-border text-center">Sĩ số tối đa</th>
+                  <th className="px-6 py-5 border-b border-border text-center">Ngày tạo</th>
+                  <th className="px-6 py-5 border-b border-border text-center">Trạng thái</th>
+                  <th className="px-8 py-5 border-b border-border text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-border">
                 {classrooms.map((classroom) => (
-                  <tr key={classroom.uid} className="hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}>
+                  <tr key={classroom.uid} className="hover:bg-muted/50/50 transition-colors group cursor-pointer" onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs border-2 border-white shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all uppercase">
+                        <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs border-2 border-white shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all uppercase">
                           {classroom.name.substring(0, 2)}
                         </div>
                         <div className="space-y-0.5">
-                          <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{classroom.name}</div>
-                          <div className="text-[11px] text-slate-400 font-semibold line-clamp-1 max-w-[300px]">{classroom.description}</div>
+                          <div className="font-bold text-foreground group-hover:text-indigo-600 transition-colors">{classroom.name}</div>
+                          <div className="text-[11px] text-muted-foreground font-semibold line-clamp-1 max-w-[300px]">{classroom.description}</div>
                         </div>
                       </div>
                     </td>
@@ -287,9 +287,9 @@ export default function ClassroomsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <div className="text-sm font-bold text-slate-700">{classroom.max_students}</div>
+                      <div className="text-sm font-bold text-foreground">{classroom.max_students}</div>
                     </td>
-                    <td className="px-6 py-5 text-center text-xs text-slate-500 font-bold">
+                    <td className="px-6 py-5 text-center text-xs text-muted-foreground font-bold">
                       {new Date(classroom.created_at).toLocaleDateString('vi-VN')}
                     </td>
                     <td className="px-6 py-5 text-center">
@@ -302,27 +302,27 @@ export default function ClassroomsPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button 
                           onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
-                          className="text-slate-300 hover:text-indigo-600 p-2 transition-all rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100"
+                          className="text-muted-foreground/60 hover:text-indigo-600 p-2 transition-all rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100"
                           title="Xem chi tiết"
                         >
                           <ChevronRight size={20} />
                         </button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="text-slate-300 hover:text-slate-900 p-2 transition-all rounded-xl hover:bg-slate-100 border border-transparent">
+                            <button className="text-muted-foreground/60 hover:text-foreground p-2 transition-all rounded-xl hover:bg-muted border border-transparent">
                               <MoreVertical size={20} />
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-slate-100">
-                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-slate-600 hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
-                              <Pencil size={16} className="mr-3 text-slate-400" />
+                          <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
+                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
+                              <Pencil size={16} className="mr-3 text-muted-foreground" />
                               <span>Chỉnh sửa</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-slate-600 hover:text-indigo-600 cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
-                              <Download size={16} className="mr-3 text-slate-400" />
+                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
+                              <Download size={16} className="mr-3 text-muted-foreground" />
                               <span>Tải mã QR</span>
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator className="my-2 bg-slate-50" />
+                            <DropdownMenuSeparator className="my-2 bg-muted/50" />
                             <DropdownMenuItem 
                               variant="destructive"
                               className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase cursor-pointer"
@@ -342,31 +342,31 @@ export default function ClassroomsPage() {
           </div>
 
           {/* Footer with Pagination */}
-          <div className="px-8 py-5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+          <div className="px-8 py-5 bg-muted/30 border-t border-border flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Số hàng mỗi trang</span>
-              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 cursor-pointer hover:border-indigo-500 transition-colors">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Số hàng mỗi trang</span>
+              <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground cursor-pointer hover:border-indigo-500 transition-colors">
                 20
-                <ChevronLeft size={16} className="-rotate-90 text-slate-400" />
+                <ChevronLeft size={16} className="-rotate-90 text-muted-foreground" />
               </div>
             </div>
 
             <div className="flex items-center gap-8">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Trang <span className="text-slate-900 text-xs mx-1">{data?.current_page}</span> trên {data?.total_pages}
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                Trang <span className="text-foreground text-xs mx-1">{data?.current_page}</span> trên {data?.total_pages}
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-slate-200 rounded-xl transition-all shadow-none" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
                   <ChevronsLeft size={18} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-slate-200 rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                   <ChevronLeft size={18} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-slate-200 rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === data?.total_pages}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === data?.total_pages}>
                   <ChevronRight size={18} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-slate-200 rounded-xl transition-all shadow-none" onClick={() => handlePageChange(data?.total_pages || 1)} disabled={currentPage === data?.total_pages}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(data?.total_pages || 1)} disabled={currentPage === data?.total_pages}>
                   <ChevronsRight size={18} />
                 </Button>
               </div>
@@ -376,10 +376,10 @@ export default function ClassroomsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {classrooms.map((classroom) => (
-            <Card key={classroom.uid} className="group overflow-hidden border-slate-100 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 rounded-2xl flex flex-col bg-white">
+            <Card key={classroom.uid} className="group overflow-hidden border-border hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 rounded-2xl flex flex-col bg-card">
               <div className="p-6 flex-1 flex flex-col relative">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 font-bold text-lg border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all uppercase shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground font-bold text-lg border border-border group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all uppercase shadow-sm">
                     {classroom.name ? classroom.name.substring(0, 2) : '??'}
                   </div>
                   
@@ -389,20 +389,20 @@ export default function ClassroomsPage() {
                     </span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="text-slate-300 hover:text-slate-900 p-1.5 transition-all rounded-lg hover:bg-slate-50 border border-transparent">
+                        <button className="text-muted-foreground/60 hover:text-foreground p-1.5 transition-all rounded-lg hover:bg-muted/50 border border-transparent">
                           <MoreVertical size={18} />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-slate-100">
-                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-slate-600 hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
-                          <Pencil size={16} className="mr-3 text-slate-400" />
+                      <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
+                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
+                          <Pencil size={16} className="mr-3 text-muted-foreground" />
                           <span>Chỉnh sửa</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-slate-600 hover:text-indigo-600 cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
-                          <Download size={16} className="mr-3 text-slate-400" />
+                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
+                          <Download size={16} className="mr-3 text-muted-foreground" />
                           <span>Tải mã QR</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="my-2 bg-slate-50" />
+                        <DropdownMenuSeparator className="my-2 bg-muted/50" />
                         <DropdownMenuItem 
                           variant="destructive"
                           className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase cursor-pointer"
@@ -416,31 +416,31 @@ export default function ClassroomsPage() {
                   </div>
                 </div>
                 
-                <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors text-lg mb-2 line-clamp-1 leading-tight">
+                <h3 className="font-bold text-foreground group-hover:text-indigo-600 transition-colors text-lg mb-2 line-clamp-1 leading-tight">
                   {classroom.name}
                 </h3>
                 
-                <p className="text-xs text-slate-500 line-clamp-2 mb-8 font-medium leading-relaxed">
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-8 font-medium leading-relaxed">
                   {classroom.description}
                 </p>
 
                 <div className="mt-auto pt-5 border-t border-slate-50 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-                      <Users size={14} className="text-slate-400" />
+                    <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center border border-border">
+                      <Users size={14} className="text-muted-foreground" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none mb-1">Học sinh</span>
-                      <span className="text-xs font-bold text-slate-900 leading-none">0 / {classroom.max_students}</span>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter leading-none mb-1">Học sinh</span>
+                      <span className="text-xs font-bold text-foreground leading-none">0 / {classroom.max_students}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter leading-none block mb-1">Ngày tạo</span>
-                    <span className="text-[10px] font-bold text-slate-500 leading-none">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter leading-none block mb-1">Ngày tạo</span>
+                    <span className="text-[10px] font-bold text-muted-foreground leading-none">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</span>
                   </div>
                 </div>
               </div>
-              <div className="p-4 bg-slate-50/50 border-t border-slate-100">
+              <div className="p-4 bg-muted/30 border-t border-border">
                 <Button 
                   onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
                   variant="ghost" 
@@ -465,9 +465,9 @@ export default function ClassroomsPage() {
             
             <div className="relative">
               <p className="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2 opacity-80">Tổng số lớp học</p>
-              <h2 className="text-6xl font-bold mb-8">148</h2>
+              <h2 className="text-6xl font-bold mb-8">{data?.count ?? classrooms.length}</h2>
               
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-card/10 backdrop-blur-md rounded-full border border-white/10">
                 <TrendingUp size={16} className="text-emerald-400" />
                 <span className="text-xs font-bold">+12% <span className="text-indigo-200 font-medium">so với tháng trước</span></span>
               </div>
@@ -481,11 +481,11 @@ export default function ClassroomsPage() {
           </div>
 
           {/* Resource Allocation Card */}
-          <div className="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-100 shadow-sm flex flex-col">
+          <div className="lg:col-span-2 bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Phân bổ nguồn lực</h3>
-                <p className="text-sm text-slate-500 font-medium mt-1">Thống kê sĩ số trung bình theo khối</p>
+                <h3 className="text-lg font-bold text-foreground">Phân bổ nguồn lực</h3>
+                <p className="text-sm text-muted-foreground font-medium mt-1">Thống kê sĩ số trung bình theo khối</p>
               </div>
               <button className="text-indigo-600 text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
                 Chi tiết
@@ -501,13 +501,13 @@ export default function ClassroomsPage() {
                 { label: 'IELTS', value: 25, color: 'bg-indigo-100' }
               ].map((item, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-4 group">
-                  <div className="w-full relative h-48 bg-slate-50 rounded-xl overflow-hidden">
+                  <div className="w-full relative h-48 bg-muted/50 rounded-xl overflow-hidden">
                     <div 
                       className={`absolute bottom-0 left-0 w-full transition-all duration-700 ease-out group-hover:brightness-110 shadow-lg ${item.color}`}
                       style={{ height: `${item.value}%` }}
                     />
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.label}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{item.label}</span>
                 </div>
               ))}
             </div>

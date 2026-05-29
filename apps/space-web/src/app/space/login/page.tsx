@@ -62,15 +62,15 @@ export default function SpaceLoginPage() {
   };
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-slate-100 px-4'>
+    <div className='flex min-h-screen items-center justify-center bg-muted px-4'>
       <div className='max-w-md w-full'>
-        <div className='bg-white rounded-2xl shadow-xl overflow-hidden'>
+        <div className='bg-card rounded-2xl shadow-xl overflow-hidden'>
           <div className='bg-slate-900 py-8 px-10 text-center'>
             <div className="flex justify-center mb-4">
               <Image src="/logo.jpg" alt="LMS LOGO" width={150} height={50} className="h-12 w-auto object-contain brightness-0 invert" />
             </div>
             <h2 className='text-white text-2xl font-bold'>Space Administrator</h2>
-            <p className='text-slate-400 text-sm mt-1'>Đăng nhập để quản lý tổ chức của bạn</p>
+            <p className='text-muted-foreground text-sm mt-1'>Đăng nhập để quản lý tổ chức của bạn</p>
           </div>
 
           <div className='p-10'>
@@ -82,15 +82,15 @@ export default function SpaceLoginPage() {
 
             <form onSubmit={handleSubmit(onLogin)} className='space-y-6'>
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-2'>Email quản trị</label>
+                <label className='block text-sm font-semibold text-foreground mb-2'>Email quản trị</label>
                 <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400'>
+                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
                     <Mail size={18} />
                   </div>
                   <input 
                     type='email' 
                     {...register('email', { required: 'Vui lòng nhập email' })} 
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-slate-200'}`} 
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-border'}`} 
                     placeholder='admin@your-space.com' 
                   />
                 </div>
@@ -98,21 +98,21 @@ export default function SpaceLoginPage() {
               </div>
 
               <div>
-                <label className='block text-sm font-semibold text-slate-700 mb-2'>Mật khẩu</label>
+                <label className='block text-sm font-semibold text-foreground mb-2'>Mật khẩu</label>
                 <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400'>
+                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
                     <Lock size={18} />
                   </div>
                   <input 
                     type={showPassword ? 'text' : 'password'} 
                     {...register('password', { required: 'Vui lòng nhập mật khẩu' })} 
-                    className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-slate-200'}`} 
+                    className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-border'}`} 
                     placeholder='••••••••' 
                   />
                   <button
                     type='button'
                     onClick={() => setShowPassword(!showPassword)}
-                    className='absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600'
+                    className='absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-muted-foreground'
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -130,9 +130,9 @@ export default function SpaceLoginPage() {
             </form>
 
             <div className='mt-6 flex items-center gap-3'>
-              <div className='h-px flex-1 bg-slate-200' />
-              <span className='text-xs text-slate-400 font-medium'>hoặc</span>
-              <div className='h-px flex-1 bg-slate-200' />
+              <div className='h-px flex-1 bg-muted' />
+              <span className='text-xs text-muted-foreground font-medium'>hoặc</span>
+              <div className='h-px flex-1 bg-muted' />
             </div>
 
             <button
@@ -141,7 +141,7 @@ export default function SpaceLoginPage() {
                 const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
                 window.location.href = `${backendUrl}/api/v1/space/account/auth/google/login/`;
               }}
-              className='mt-4 w-full flex items-center justify-center gap-3 border border-slate-200 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 active:scale-[0.98] transform transition-all shadow-sm'
+              className='mt-4 w-full flex items-center justify-center gap-3 border border-border rounded-lg px-4 py-2.5 text-sm font-medium text-foreground bg-card hover:bg-muted/50 active:scale-[0.98] transform transition-all shadow-sm'
             >
               <svg width='20' height='20' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
                 <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
@@ -151,12 +151,12 @@ export default function SpaceLoginPage() {
               </svg>
               Đăng nhập với Google
             </button>
-            <p className='mt-2 text-center text-xs text-slate-400'>Chỉ dành cho Space đã đăng ký</p>
+            <p className='mt-2 text-center text-xs text-muted-foreground'>Chỉ dành cho Space đã đăng ký</p>
 
-            <div className='mt-8 pt-6 border-t border-slate-100 text-center'>
-              <p className='text-slate-500 text-sm'>
+            <div className='mt-8 pt-6 border-t border-border text-center'>
+              <p className='text-muted-foreground text-sm'>
                 Chưa có Space? {' '}
-                <Link href='/space/register' className='text-slate-900 font-bold hover:underline'>
+                <Link href='/space/register' className='text-foreground font-bold hover:underline'>
                   Tạo Space mới
                 </Link>
               </p>
@@ -165,7 +165,7 @@ export default function SpaceLoginPage() {
         </div>
         
         <div className='mt-6 text-center'>
-          <Link href='http://localhost:3000/login' className='text-slate-500 text-xs hover:text-slate-800 font-medium transition-colors'>
+          <Link href='http://localhost:3000/login' className='text-muted-foreground text-xs hover:text-foreground font-medium transition-colors'>
             &larr; Quay lại trang người dùng
           </Link>
         </div>

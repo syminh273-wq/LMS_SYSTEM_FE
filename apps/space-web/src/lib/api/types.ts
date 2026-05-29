@@ -428,3 +428,59 @@ export type StudentExamRecord = {
   };
   submission: ExamSubmission | null;
 };
+
+
+export type ActivityLogLevel = 'major' | 'detail';
+
+export type ActivityLogEventType =
+  | 'classroom_created'
+  | 'document_uploaded' | 'document_deleted'
+  | 'exam_created' | 'exam_published' | 'exam_opened' | 'exam_closed' | 'exam_deleted'
+  | 'quiz_assigned'
+  | 'meeting_started' | 'meeting_ended'
+  | 'member_joined' | 'member_approved' | 'member_rejected' | 'member_kicked' | 'member_left'
+  | 'exam_submitted';
+
+export type ActivityLog = {
+  uid: string;
+  log_level: ActivityLogLevel;
+  event_type: ActivityLogEventType;
+  actor_id: string;
+  actor_name: string;
+  actor_role: string;
+  target_id: string | null;
+  target_name: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+};
+
+// ── Student Public Profile (teacher view) ────────────────────────────────────
+
+export type StudentPublicProfile = {
+  consumer_uid: string;
+  bio: string;
+  address: string;
+  city: string;
+  country: string;
+  theme_color: string;
+  show_stats: boolean;
+  show_address: boolean;
+  show_links: boolean;
+  show_hobbies: boolean;
+  show_certificates: boolean;
+  profile_visibility: 'public' | 'class_only' | 'private';
+  metadata: {
+    hobbies?: string[];
+    social_links?: { platform: string; url: string; label: string }[];
+    certificates?: { title: string; issuer: string; issued_date: string; url: string }[];
+    custom_fields?: { key: string; value: string }[];
+  };
+  consumer: {
+    uid: string;
+    username: string;
+    email: string;
+    full_name: string;
+    phone: string;
+    avatar_url: string;
+  } | null;
+};

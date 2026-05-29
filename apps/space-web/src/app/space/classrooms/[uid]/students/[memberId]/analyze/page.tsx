@@ -154,7 +154,7 @@ export default function StudentAnalyzePage({
           <Button
             variant="outline" size="icon"
             onClick={() => router.push(`/space/classrooms/${uid}/students/${memberId}`)}
-            className="h-10 w-10 rounded-full border-slate-200 bg-white shadow-sm hover:bg-slate-50"
+            className="h-10 w-10 rounded-full border-border bg-card shadow-sm hover:bg-muted/50"
           >
             <ArrowLeft size={18} />
           </Button>
@@ -170,7 +170,7 @@ export default function StudentAnalyzePage({
             )}
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Phân tích toàn diện</p>
-              <h1 className="text-xl font-black text-slate-900">{member?.member_name ?? 'Sinh viên'}</h1>
+              <h1 className="text-xl font-black text-foreground">{member?.member_name ?? 'Sinh viên'}</h1>
             </div>
           </div>
         </div>
@@ -206,8 +206,8 @@ export default function StudentAnalyzePage({
         </div>
 
         {/* Breakdown bars */}
-        <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Breakdown by category</p>
+        <div className="lg:col-span-2 rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Breakdown by category</p>
           <div className="space-y-3">
             {[
               { label: 'Academic Performance', value: MOCK.composite.academic, weight: '35%', color: 'bg-indigo-500' },
@@ -218,14 +218,14 @@ export default function StudentAnalyzePage({
             ].map(c => (
               <div key={c.label} className="flex items-center gap-3">
                 <div className="w-40 shrink-0 flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-600 truncate">{c.label}</span>
+                  <span className="text-xs font-bold text-muted-foreground truncate">{c.label}</span>
                 </div>
-                <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                   <div className={`h-full rounded-full ${c.color} transition-all duration-700`}
                     style={{ width: `${c.value}%` }} />
                 </div>
-                <span className="w-8 text-right text-xs font-black text-slate-700">{c.value}</span>
-                <span className="w-8 text-right text-[10px] font-bold text-slate-400">{c.weight}</span>
+                <span className="w-8 text-right text-xs font-black text-foreground">{c.value}</span>
+                <span className="w-8 text-right text-[10px] font-bold text-muted-foreground">{c.weight}</span>
               </div>
             ))}
           </div>
@@ -248,7 +248,7 @@ export default function StudentAnalyzePage({
                 a.type === 'warning' ? 'text-amber-700' :
                 a.type === 'info'    ? 'text-blue-700' : 'text-emerald-700'
               }`}>{a.label}</p>
-              <p className="text-[10px] text-slate-500 mt-0.5 font-medium">{a.sub}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{a.sub}</p>
             </div>
           </div>
         ))}
@@ -260,14 +260,14 @@ export default function StudentAnalyzePage({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
             { label: 'GPA hiện tại', value: MOCK.academic.currentGPA.toFixed(1), sub: `↑ từ ${MOCK.academic.previousGPA}`, color: 'text-indigo-600' },
-            { label: 'GPA kỳ trước', value: MOCK.academic.previousGPA.toFixed(1), sub: 'Baseline', color: 'text-slate-500' },
+            { label: 'GPA kỳ trước', value: MOCK.academic.previousGPA.toFixed(1), sub: 'Baseline', color: 'text-muted-foreground' },
             { label: 'Tỉ lệ pass', value: `${MOCK.academic.passRate}%`, sub: `Fail ${100 - MOCK.academic.passRate}%`, color: 'text-emerald-600' },
             { label: 'Tăng trưởng', value: `+${(MOCK.academic.currentGPA - MOCK.academic.previousGPA).toFixed(1)}`, sub: 'so kỳ trước', color: 'text-emerald-600' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+            <div key={s.label} className="rounded-xl border border-border bg-muted/30 p-4 text-center">
               <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{s.label}</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">{s.sub}</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">{s.label}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">{s.sub}</div>
             </div>
           ))}
         </div>
@@ -288,14 +288,14 @@ export default function StudentAnalyzePage({
         title="Assignment Behavior" sub="Tình trạng nộp bài chi tiết">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
-            { label: 'Tổng bài',   value: MOCK.assignment.total,        color: 'text-slate-700' },
+            { label: 'Tổng bài',   value: MOCK.assignment.total,        color: 'text-foreground' },
             { label: 'Đã nộp',     value: MOCK.assignment.submitted,    color: 'text-indigo-600' },
             { label: 'Đúng hạn',   value: MOCK.assignment.onTime,       color: 'text-emerald-600' },
             { label: 'Không nộp',  value: MOCK.assignment.missed,       color: 'text-rose-500' },
           ].map(s => (
-            <div key={s.label} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+            <div key={s.label} className="rounded-xl border border-border bg-muted/30 p-4 text-center">
               <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{s.label}</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">{s.label}</div>
             </div>
           ))}
         </div>
@@ -308,18 +308,18 @@ export default function StudentAnalyzePage({
             { label: 'Không nộp',          value: MOCK.assignment.missRate,    color: 'bg-rose-400' },
           ].map(r => (
             <div key={r.label} className="flex items-center gap-3">
-              <span className="w-32 text-xs font-bold text-slate-600 shrink-0">{r.label}</span>
-              <div className="flex-1 h-2 rounded-full bg-slate-100">
+              <span className="w-32 text-xs font-bold text-muted-foreground shrink-0">{r.label}</span>
+              <div className="flex-1 h-2 rounded-full bg-muted">
                 <div className={`h-full rounded-full ${r.color}`} style={{ width: `${r.value}%` }} />
               </div>
-              <span className="w-10 text-right text-xs font-black text-slate-700">{r.value}%</span>
+              <span className="w-10 text-right text-xs font-black text-foreground">{r.value}%</span>
             </div>
           ))}
         </div>
 
-        <div className="flex items-center gap-6 text-xs font-bold text-slate-500">
-          <span className="flex items-center gap-1.5"><Clock size={13} className="text-slate-400" />Trung bình nộp: <span className="text-slate-700">{MOCK.assignment.avgSubmitTime}</span></span>
-          <span className="flex items-center gap-1.5"><BarChart2 size={13} className="text-slate-400" />Resubmit: <span className="text-slate-700">{MOCK.assignment.resubmitCount} lần</span></span>
+        <div className="flex items-center gap-6 text-xs font-bold text-muted-foreground">
+          <span className="flex items-center gap-1.5"><Clock size={13} className="text-muted-foreground" />Trung bình nộp: <span className="text-foreground">{MOCK.assignment.avgSubmitTime}</span></span>
+          <span className="flex items-center gap-1.5"><BarChart2 size={13} className="text-muted-foreground" />Resubmit: <span className="text-foreground">{MOCK.assignment.resubmitCount} lần</span></span>
         </div>
       </SectionCard>
 
@@ -333,11 +333,11 @@ export default function StudentAnalyzePage({
               { label: 'Tỉ lệ đi học', value: `${MOCK.attendance.rate}%`, color: MOCK.attendance.rate >= 80 ? 'text-emerald-600' : 'text-rose-500' },
               { label: 'Buổi nghỉ',    value: MOCK.attendance.absent,      color: 'text-rose-500' },
               { label: 'Đi trễ',       value: MOCK.attendance.lateIn,     color: 'text-amber-500' },
-              { label: 'Nghỉ liên tiếp', value: MOCK.attendance.consecutiveAbsent, color: 'text-slate-700' },
+              { label: 'Nghỉ liên tiếp', value: MOCK.attendance.consecutiveAbsent, color: 'text-foreground' },
             ].map(s => (
-              <div key={s.label} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 text-center">
+              <div key={s.label} className="rounded-xl border border-border bg-muted/30 p-3 text-center">
                 <div className={`text-xl font-black ${s.color}`}>{s.value}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{s.label}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
@@ -355,9 +355,9 @@ export default function StudentAnalyzePage({
               { label: 'Video đã xem',   value: `${MOCK.engagement.videoWatchPct}%`, color: 'text-amber-600' },
               { label: 'Bài tập TH',     value: MOCK.engagement.exercisesDone,   color: 'text-emerald-600' },
             ].map(s => (
-              <div key={s.label} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 text-center">
+              <div key={s.label} className="rounded-xl border border-border bg-muted/30 p-3 text-center">
                 <div className={`text-xl font-black ${s.color}`}>{s.value}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-0.5">{s.label}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
@@ -373,15 +373,15 @@ export default function StudentAnalyzePage({
             <div className="text-3xl font-black text-emerald-600">+{MOCK.improvement.monthlyDelta}%</div>
             <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mt-1">Cải thiện tháng này</div>
           </div>
-          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+          <div className="rounded-xl border border-border bg-muted/30 p-4 text-center">
             <div className="text-3xl font-black text-indigo-600">{MOCK.discipline.learningStreak}</div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">Ngày học liên tiếp</div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">Ngày học liên tiếp</div>
           </div>
-          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center">
+          <div className="rounded-xl border border-border bg-muted/30 p-4 text-center">
             <div className={`text-3xl font-black ${MOCK.overall.status === 'Improving' ? 'text-emerald-600' : 'text-amber-500'}`}>
               {STATUS_MAP[status].label}
             </div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">Trạng thái</div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">Trạng thái</div>
           </div>
         </div>
         <DeltaBarChart data={MOCK.improvement.trend} />
@@ -400,18 +400,18 @@ export default function StudentAnalyzePage({
             ].map(d => (
               <div key={d.label}>
                 <div className="flex justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-600">{d.label}</span>
+                  <span className="text-xs font-bold text-muted-foreground">{d.label}</span>
                   <span className={`text-xs font-black ${d.value >= 70 ? 'text-emerald-600' : d.value >= 50 ? 'text-amber-600' : 'text-rose-500'}`}>
                     {d.value}/100
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100">
+                <div className="h-2 rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${d.value >= 70 ? 'bg-emerald-500' : d.value >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
                     style={{ width: `${d.value}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-0.5">{d.desc}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{d.desc}</p>
               </div>
             ))}
           </div>
@@ -427,16 +427,16 @@ export default function StudentAnalyzePage({
             ].map(r => (
               <div key={r.label}>
                 <div className="flex justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-600">{r.label}</span>
+                  <span className="text-xs font-bold text-muted-foreground">{r.label}</span>
                   <span className={`text-xs font-black ${r.textColor}`}>{r.value}%</span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100">
+                <div className="h-2 rounded-full bg-muted">
                   <div className={`h-full rounded-full ${r.color}`} style={{ width: `${r.value}%` }} />
                 </div>
               </div>
             ))}
-            <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-4">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Risk Level</p>
+            <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Risk Level</p>
               <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-black border ${
                 MOCK.risk.level === 'high'   ? 'bg-rose-50 text-rose-600 border-rose-200' :
                 MOCK.risk.level === 'medium' ? 'bg-amber-50 text-amber-600 border-amber-200' :
@@ -445,8 +445,8 @@ export default function StudentAnalyzePage({
                 <ShieldAlert size={12} />
                 {MOCK.risk.level === 'high' ? 'Nguy cơ cao' : MOCK.risk.level === 'medium' ? 'Nguy cơ trung bình' : 'An toàn'}
               </div>
-              <p className="text-[10px] text-slate-400 mt-2">
-                Không active: <span className="font-bold text-slate-600">{MOCK.risk.inactiveDays} ngày</span>
+              <p className="text-[10px] text-muted-foreground mt-2">
+                Không active: <span className="font-bold text-muted-foreground">{MOCK.risk.inactiveDays} ngày</span>
               </p>
             </div>
           </div>
@@ -473,12 +473,12 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-100 px-6 py-4 flex items-center gap-3">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+      <div className="border-b border-border px-6 py-4 flex items-center gap-3">
         {icon}
         <div>
-          <h2 className="text-sm font-black text-slate-900">{title}</h2>
-          <p className="text-xs font-medium text-slate-400 mt-0.5">{sub}</p>
+          <h2 className="text-sm font-black text-foreground">{title}</h2>
+          <p className="text-xs font-medium text-muted-foreground mt-0.5">{sub}</p>
         </div>
       </div>
       <div className="p-6">{children}</div>

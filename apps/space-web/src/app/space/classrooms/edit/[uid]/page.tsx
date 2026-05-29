@@ -161,7 +161,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
 
   if (fetching) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 text-slate-400">
+      <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
         <Loader2 size={40} className="animate-spin mb-4" />
         <p className="text-sm font-medium">Đang tải thông tin phòng học...</p>
       </div>
@@ -175,25 +175,25 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
           variant="ghost" 
           size="icon" 
           onClick={() => router.push('/space/classrooms')}
-          className="rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 transition-all"
+          className="rounded-xl border border-border bg-card shadow-sm hover:bg-muted/50 transition-all"
         >
-          <ArrowLeft size={18} className="text-slate-600" />
+          <ArrowLeft size={18} className="text-muted-foreground" />
         </Button>
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Chỉnh sửa phòng học</h1>
-          <p className="text-slate-500 text-sm font-medium">Cập nhật thông tin cấu hình cho phòng học {classroom?.name}</p>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">Chỉnh sửa phòng học</h1>
+          <p className="text-muted-foreground text-sm font-medium">Cập nhật thông tin cấu hình cho phòng học {classroom?.name}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
           <div className="h-2 bg-indigo-500" />
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-800">
+            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Info size={20} className="text-indigo-500" />
               Thông tin cấu hình
             </CardTitle>
-            <CardDescription className="font-medium text-slate-400">Chỉnh sửa các thông tin cần thiết bên dưới</CardDescription>
+            <CardDescription className="font-medium text-muted-foreground">Chỉnh sửa các thông tin cần thiết bên dưới</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {globalError && (
@@ -204,16 +204,16 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
                 Tên phòng học <span className="text-rose-500">*</span>
               </label>
               <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-indigo-500 transition-colors">
                   <BookOpen size={18} />
                 </div>
                 <input 
                   {...register('name', { required: 'Tên phòng học là bắt buộc' })}
-                  className={`w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-500 transition-all font-medium text-slate-900 ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-slate-200'}`}
+                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                   placeholder="Ví dụ: Toán học nâng cao lớp 12A1"
                 />
               </div>
@@ -221,22 +221,22 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 px-1">Mô tả khóa học <span className="text-rose-500">*</span></label>
+              <label className="text-sm font-bold text-foreground px-1">Mô tả khóa học <span className="text-rose-500">*</span></label>
               <textarea 
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 rows={4}
-                className={`w-full px-4 py-3 bg-slate-50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-500 transition-all font-medium text-slate-900 resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-slate-200'}`}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                 placeholder="Mô tả tóm tắt về mục tiêu, kiến thức sẽ đạt được trong khóa học này..."
               />
               {errors.description && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.description.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 flex items-center gap-2 px-1">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
                 Giới hạn học sinh <span className="text-rose-500">*</span>
               </label>
               <div className="relative group max-w-[240px]">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-indigo-500 transition-colors">
                   <Users size={18} />
                 </div>
                 <input 
@@ -245,7 +245,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                     required: 'Vui lòng nhập số lượng',
                     min: { value: 1, message: 'Tối thiểu 1 học sinh' }
                   })}
-                  className={`w-full pl-10 pr-4 py-3 bg-slate-50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-white focus:border-indigo-500 transition-all font-bold text-slate-900 ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-slate-200'}`}
+                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                 />
               </div>
               {errors.max_students && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.max_students.message}</p>}
@@ -254,17 +254,17 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         </Card>
 
         {/* QR Code Section */}
-        <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden">
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-slate-800">
+            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <QrCode size={20} className="text-indigo-500" />
               Mã QR tham gia
             </CardTitle>
-            <CardDescription className="font-medium text-slate-400">Học sinh có thể quét mã này để tham gia phòng học nhanh chóng</CardDescription>
+            <CardDescription className="font-medium text-muted-foreground">Học sinh có thể quét mã này để tham gia phòng học nhanh chóng</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row items-center gap-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-              <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+            <div className="flex flex-col sm:flex-row items-center gap-8 p-4 bg-muted/50 rounded-2xl border border-border">
+              <div className="bg-card p-3 rounded-xl shadow-sm border border-border">
                 {linkData ? (
                   <QRCodeSVG 
                     value={`${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`}
@@ -273,16 +273,16 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                     includeMargin={false}
                   />
                 ) : (
-                  <div className="w-[140px] h-[140px] flex items-center justify-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                    <Loader2 size={24} className="animate-spin text-slate-300" />
+                  <div className="w-[140px] h-[140px] flex items-center justify-center bg-muted/50 rounded-lg border border-dashed border-border">
+                    <Loader2 size={24} className="animate-spin text-muted-foreground/60" />
                   </div>
                 )}
               </div>
               
               <div className="flex-1 space-y-4 text-center sm:text-left w-full">
                 <div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mã tham gia</div>
-                  <div className="text-3xl font-black text-slate-900 tracking-[0.2em] uppercase">
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Mã tham gia</div>
+                  <div className="text-3xl font-black text-foreground tracking-[0.2em] uppercase">
                     {linkData?.code || '------'}
                   </div>
                 </div>
@@ -292,7 +292,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                   variant="outline"
                   onClick={handleDownloadQr}
                   disabled={!linkData}
-                  className="w-full sm:w-auto border-slate-200 hover:bg-white hover:border-indigo-500 hover:text-indigo-600 h-10 rounded-xl px-6 font-bold text-xs gap-2 transition-all shadow-sm"
+                  className="w-full sm:w-auto border-border hover:bg-card hover:border-indigo-500 hover:text-indigo-600 h-10 rounded-xl px-6 font-bold text-xs gap-2 transition-all shadow-sm"
                 >
                   <Download size={16} />
                   TẢI ẢNH QR
@@ -308,14 +308,14 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
             variant="ghost" 
             onClick={() => router.push('/space/classrooms')}
             disabled={loading}
-            className="text-slate-500 font-bold text-xs tracking-widest hover:bg-slate-100 rounded-xl px-6"
+            className="text-muted-foreground font-bold text-xs tracking-widest hover:bg-muted rounded-xl px-6"
           >
             HỦY BỎ
           </Button>
           <Button 
             type="submit" 
             disabled={loading}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-indigo-100 transition-all active:scale-95"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
           >
             {loading ? (
               <>

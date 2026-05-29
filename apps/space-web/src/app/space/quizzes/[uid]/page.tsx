@@ -97,7 +97,7 @@ export default function QuizDetailPage({ params }: Props) {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center py-32 text-slate-400"><Loader2 size={36} className="animate-spin" /></div>;
+    return <div className="flex items-center justify-center py-32 text-muted-foreground"><Loader2 size={36} className="animate-spin" /></div>;
   }
   if (!quiz) return null;
 
@@ -114,18 +114,18 @@ export default function QuizDetailPage({ params }: Props) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.push('/space/quizzes')}
-          className="rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50">
-          <ArrowLeft size={18} className="text-slate-600" />
+          className="rounded-xl border border-border bg-card shadow-sm hover:bg-muted/50">
+          <ArrowLeft size={18} className="text-muted-foreground" />
         </Button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
               quiz.status === 'published' ? 'bg-emerald-50 text-emerald-600' :
-              quiz.status === 'archived' ? 'bg-slate-100 text-slate-500' : 'bg-amber-50 text-amber-600'
+              quiz.status === 'archived' ? 'bg-muted text-muted-foreground' : 'bg-amber-50 text-amber-600'
             }`}>{quiz.status}</span>
-            <span className="text-[10px] font-bold text-slate-400 uppercase">{quiz.questions_count} câu hỏi</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">{quiz.questions_count} câu hỏi</span>
           </div>
-          <h1 className="text-xl font-black text-slate-900 tracking-tight truncate">{quiz.title}</h1>
+          <h1 className="text-xl font-black text-foreground tracking-tight truncate">{quiz.title}</h1>
         </div>
         <Button onClick={() => setShowAssignModal(true)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl h-10 px-4 gap-2 shrink-0">
@@ -134,7 +134,7 @@ export default function QuizDetailPage({ params }: Props) {
       </div>
 
       {quiz.description && (
-        <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-sm text-slate-600 font-medium leading-relaxed">
+        <div className="bg-muted/50 rounded-2xl p-4 border border-border text-sm text-muted-foreground font-medium leading-relaxed">
           {quiz.description}
         </div>
       )}
@@ -146,20 +146,20 @@ export default function QuizDetailPage({ params }: Props) {
           <div className="flex flex-wrap gap-2">
             {assignments.map(a => (
               <div key={a.classroom_id}
-                className="flex items-center gap-2 bg-white rounded-xl px-3 py-2 border border-indigo-100 text-xs font-bold text-indigo-700">
+                className="flex items-center gap-2 bg-card rounded-xl px-3 py-2 border border-indigo-100 text-xs font-bold text-indigo-700">
                 <BookOpen size={12} />
                 <span className="font-mono">{a.classroom_id.slice(0, 8)}…</span>
                 {a.time_limit_seconds > 0 && (
-                  <span className="flex items-center gap-0.5 text-slate-400 font-medium">
+                  <span className="flex items-center gap-0.5 text-muted-foreground font-medium">
                     <Clock size={11} />{Math.round(a.time_limit_seconds / 60)}p
                   </span>
                 )}
                 <button type="button" onClick={() => setEditingAssignment(a)}
-                  className="text-slate-300 hover:text-indigo-500 transition-colors">
+                  className="text-muted-foreground/60 hover:text-indigo-500 transition-colors">
                   <Settings size={12} />
                 </button>
                 <button type="button" onClick={() => void handleUnassign(a.classroom_id)}
-                  className="text-slate-300 hover:text-rose-500 transition-colors">
+                  className="text-muted-foreground/60 hover:text-rose-500 transition-colors">
                   <X size={12} />
                 </button>
               </div>
@@ -169,11 +169,11 @@ export default function QuizDetailPage({ params }: Props) {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 rounded-2xl p-1">
+      <div className="flex gap-1 bg-muted rounded-2xl p-1">
         {TABS.map(tab => (
           <button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black transition-all ${
-              activeTab === tab.key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              activeTab === tab.key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
             }`}>
             {tab.icon}{tab.label}
           </button>
@@ -184,22 +184,22 @@ export default function QuizDetailPage({ params }: Props) {
       {activeTab === 'questions' && (
         <div className="space-y-4">
           {quiz.questions.sort((a, b) => a.order - b.order).map((q, idx) => (
-            <div key={q.uid} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div key={q.uid} className="bg-card rounded-2xl border border-border shadow-sm p-5 space-y-4">
               <div className="flex items-start gap-3">
                 <span className="w-7 h-7 rounded-lg bg-indigo-600 text-white text-xs font-black flex items-center justify-center shrink-0">
                   {idx + 1}
                 </span>
-                <p className="text-sm font-bold text-slate-900 leading-relaxed">{q.question_text}</p>
+                <p className="text-sm font-bold text-foreground leading-relaxed">{q.question_text}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-10">
                 {(['a', 'b', 'c', 'd'] as const).map(opt => {
                   const isCorrect = q.correct_answer === opt;
                   return (
                     <div key={opt} className={`flex items-center gap-3 rounded-xl px-4 py-3 border text-sm font-medium ${
-                      isCorrect ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-slate-100 bg-slate-50 text-slate-700'
+                      isCorrect ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-border bg-muted/50 text-foreground'
                     }`}>
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                        isCorrect ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'
+                        isCorrect ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'
                       }`}>{OPTION_LABELS[opt]}</span>
                       {q[`option_${opt}` as keyof typeof q] as string}
                       {isCorrect && <CheckCircle2 size={15} className="ml-auto text-emerald-500 shrink-0" />}
@@ -208,7 +208,7 @@ export default function QuizDetailPage({ params }: Props) {
                 })}
               </div>
               {q.explanation && (
-                <div className="pl-10 text-xs text-slate-500 font-medium bg-amber-50 rounded-xl px-4 py-2 border border-amber-100">
+                <div className="pl-10 text-xs text-muted-foreground font-medium bg-amber-50 rounded-xl px-4 py-2 border border-amber-100">
                   <span className="font-black text-amber-600">Giải thích: </span>{q.explanation}
                 </div>
               )}
@@ -222,7 +222,7 @@ export default function QuizDetailPage({ params }: Props) {
         <div className="space-y-4">
           {assignments.length > 1 && (
             <div className="flex items-center gap-3">
-              <span className="text-xs font-black text-slate-500">Lớp học:</span>
+              <span className="text-xs font-black text-muted-foreground">Lớp học:</span>
               <div className="flex gap-2 flex-wrap">
                 {assignments.map(a => (
                   <button key={a.classroom_id} type="button"
@@ -230,7 +230,7 @@ export default function QuizDetailPage({ params }: Props) {
                     className={`text-xs font-black rounded-xl px-3 py-1.5 transition-all ${
                       selectedClassroomId === a.classroom_id
                         ? 'bg-indigo-600 text-white'
-                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                        : 'bg-muted text-muted-foreground hover:bg-muted'
                     }`}>
                     {a.classroom_id.slice(0, 8)}…
                   </button>
@@ -240,24 +240,24 @@ export default function QuizDetailPage({ params }: Props) {
           )}
 
           {!selectedClassroomId ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center text-slate-400">
+            <div className="bg-card rounded-2xl border border-border p-16 text-center text-muted-foreground">
               <BarChart2 size={40} className="mx-auto mb-3 opacity-30" />
               <p className="text-sm font-medium">Chọn lớp học để xem lượt làm</p>
             </div>
           ) : loadingAttempts ? (
-            <div className="flex justify-center py-16"><Loader2 size={28} className="animate-spin text-slate-400" /></div>
+            <div className="flex justify-center py-16"><Loader2 size={28} className="animate-spin text-muted-foreground" /></div>
           ) : attempts.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center text-slate-400">
+            <div className="bg-card rounded-2xl border border-border p-16 text-center text-muted-foreground">
               <BarChart2 size={40} className="mx-auto mb-3 opacity-30" />
               <p className="text-sm font-medium">Chưa có lượt làm nào</p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50">
+                  <tr className="border-b border-border bg-muted/50">
                     {['STT', 'Sinh viên', 'Lần thứ', 'Điểm', 'Thời gian', 'Nộp lúc'].map(h => (
-                      <th key={h} className="px-5 py-3 text-[10px] font-black uppercase text-slate-400 text-center tracking-wider">
+                      <th key={h} className="px-5 py-3 text-[10px] font-black uppercase text-muted-foreground text-center tracking-wider">
                         {h}
                       </th>
                     ))}
@@ -265,9 +265,9 @@ export default function QuizDetailPage({ params }: Props) {
                 </thead>
                 <tbody>
                   {attempts.map((a, idx) => (
-                    <tr key={a.uid} className="border-b border-slate-50 hover:bg-slate-50">
-                      <td className="px-5 py-3 text-slate-400 font-bold text-center">{idx + 1}</td>
-                      <td className="px-5 py-3 font-mono text-xs text-slate-500 text-center">{a.student_id.slice(0, 8)}…</td>
+                    <tr key={a.uid} className="border-b border-slate-50 hover:bg-muted/50">
+                      <td className="px-5 py-3 text-muted-foreground font-bold text-center">{idx + 1}</td>
+                      <td className="px-5 py-3 font-mono text-xs text-muted-foreground text-center">{a.student_id.slice(0, 8)}…</td>
                       <td className="px-5 py-3 text-center">
                         <span className="text-xs font-black text-indigo-600 bg-indigo-50 rounded-lg px-2 py-0.5">#{a.attempt_number}</span>
                       </td>
@@ -276,8 +276,8 @@ export default function QuizDetailPage({ params }: Props) {
                           {a.score_pct}%
                         </span>
                       </td>
-                      <td className="px-5 py-3 text-center text-xs font-bold text-slate-500">{fmtSeconds(a.time_taken_seconds)}</td>
-                      <td className="px-5 py-3 text-center text-xs text-slate-400 font-medium">{fmtTime(a.submitted_at)}</td>
+                      <td className="px-5 py-3 text-center text-xs font-bold text-muted-foreground">{fmtSeconds(a.time_taken_seconds)}</td>
+                      <td className="px-5 py-3 text-center text-xs text-muted-foreground font-medium">{fmtTime(a.submitted_at)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -359,32 +359,32 @@ function AssignToClassroomModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="font-black text-slate-900 flex items-center gap-2"><Link2 size={20} className="text-indigo-600" /> Phân công cho lớp</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400"><X size={20} /></Button>
+      <div className="bg-card rounded-3xl shadow-2xl w-full max-w-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <h2 className="font-black text-foreground flex items-center gap-2"><Link2 size={20} className="text-indigo-600" /> Phân công cho lớp</h2>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground"><X size={20} /></Button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Cấu hình làm bài</h3>
+            <h3 className="text-xs font-black text-muted-foreground uppercase tracking-wider">Cấu hình làm bài</h3>
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</label>
                   <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</label>
+                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</label>
                   <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt (%)</label>
+                <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt (%)</label>
                 <div className="flex items-center gap-4">
                   <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
                     className="flex-1 accent-indigo-600" />
@@ -393,30 +393,30 @@ function AssignToClassroomModal({
               </div>
 
               <div className="space-y-3 pt-2">
-                <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                <label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
                   <input type="checkbox" checked={shuffleQuestions} onChange={e => setShuffleQuestions(e.target.checked)}
                     className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
                   <div className="flex-1">
-                    <div className="text-xs font-black text-slate-800 flex items-center gap-1.5"><Shuffle size={12} /> Trộn câu hỏi</div>
-                    <p className="text-[10px] text-slate-400 font-medium">Thay đổi thứ tự câu hỏi cho mỗi lượt làm</p>
+                    <div className="text-xs font-black text-foreground flex items-center gap-1.5"><Shuffle size={12} /> Trộn câu hỏi</div>
+                    <p className="text-[10px] text-muted-foreground font-medium">Thay đổi thứ tự câu hỏi cho mỗi lượt làm</p>
                   </div>
                 </label>
 
-                <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                <label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
                   <input type="checkbox" checked={shuffleOptions} onChange={e => setShuffleOptions(e.target.checked)}
                     className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
                   <div className="flex-1">
-                    <div className="text-xs font-black text-slate-800 flex items-center gap-1.5"><Shuffle size={12} /> Trộn đáp án</div>
-                    <p className="text-[10px] text-slate-400 font-medium">Thay đổi thứ tự A/B/C/D</p>
+                    <div className="text-xs font-black text-foreground flex items-center gap-1.5"><Shuffle size={12} /> Trộn đáp án</div>
+                    <p className="text-[10px] text-muted-foreground font-medium">Thay đổi thứ tự A/B/C/D</p>
                   </div>
                 </label>
 
-                <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors">
+                <label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
                   <input type="checkbox" checked={showExplanation} onChange={e => setShowExplanation(e.target.checked)}
                     className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
                   <div className="flex-1">
-                    <div className="text-xs font-black text-slate-800 flex items-center gap-1.5"><HelpCircle size={12} /> Hiện giải thích</div>
-                    <p className="text-[10px] text-slate-400 font-medium">Hiển thị giải thích sau khi hoàn thành</p>
+                    <div className="text-xs font-black text-foreground flex items-center gap-1.5"><HelpCircle size={12} /> Hiện giải thích</div>
+                    <p className="text-[10px] text-muted-foreground font-medium">Hiển thị giải thích sau khi hoàn thành</p>
                   </div>
                 </label>
               </div>
@@ -424,17 +424,17 @@ function AssignToClassroomModal({
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">Chọn lớp học</h3>
+            <h3 className="text-xs font-black text-muted-foreground uppercase tracking-wider">Chọn lớp học</h3>
             <div className="space-y-2">
               {loading ? (
-                <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-slate-300" /></div>
+                <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-muted-foreground/60" /></div>
               ) : classrooms.map(classroom => {
                 const isAssigned = assignedIds.has(classroom.uid);
                 return (
-                  <div key={classroom.uid} className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition">
+                  <div key={classroom.uid} className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 transition">
                     <div className="min-w-0">
-                      <div className="text-sm font-bold text-slate-900 truncate">{classroom.name}</div>
-                      <div className="text-[10px] font-bold text-slate-400 font-mono uppercase">ID: {classroom.pid}</div>
+                      <div className="text-sm font-bold text-foreground truncate">{classroom.name}</div>
+                      <div className="text-[10px] font-bold text-muted-foreground font-mono uppercase">ID: {classroom.pid}</div>
                     </div>
                     {isAssigned ? (
                       <span className="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg shrink-0">ĐÃ GIAO</span>
@@ -452,7 +452,7 @@ function AssignToClassroomModal({
           </div>
         </div>
 
-        <div className="p-6 border-t border-slate-100 bg-slate-50/50">
+        <div className="p-6 border-t border-border bg-muted/30">
           <Button variant="outline" onClick={onClose} className="w-full rounded-xl font-bold text-xs h-11">ĐÓNG</Button>
         </div>
       </div>
@@ -499,31 +499,31 @@ function EditAssignmentModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-200 overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-card rounded-3xl shadow-2xl w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-200 overflow-hidden">
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="font-black text-slate-900">Cài đặt lớp học</h2>
-            <p className="text-[10px] text-slate-400 font-mono mt-0.5 truncate max-w-[200px]">{assignment.classroom_id}</p>
+            <h2 className="font-black text-foreground">Cài đặt lớp học</h2>
+            <p className="text-[10px] text-muted-foreground font-mono mt-0.5 truncate max-w-[200px]">{assignment.classroom_id}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-slate-400"><X size={20} /></Button>
+          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground"><X size={20} /></Button>
         </div>
 
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian</label>
               <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Lần thử</label>
+              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Lần thử</label>
               <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
+                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-indigo-100" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt: {passingScore}%</label>
+            <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt: {passingScore}%</label>
             <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
               className="w-full accent-indigo-600" />
           </div>
@@ -534,9 +534,9 @@ function EditAssignmentModal({
               { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
               { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
-              <label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-slate-50 cursor-pointer">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <item.icon size={14} className="text-slate-400" /> {item.label}
+              <label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-muted/50 cursor-pointer">
+                <div className="flex items-center gap-2 text-xs font-bold text-foreground">
+                  <item.icon size={14} className="text-muted-foreground" /> {item.label}
                 </div>
                 <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
                   className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
