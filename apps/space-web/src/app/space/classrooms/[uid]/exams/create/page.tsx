@@ -2,7 +2,7 @@
 
 import { ChangeEvent, FormEvent, use, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Check, ChevronDown, CircleDashed, Clock, ClipboardList, File, FileImage, FileText, Loader2, LockKeyhole, Save, Send, UploadCloud } from 'lucide-react';
+import { ArrowLeft, Calendar, Check, ChevronDown, CircleDashed, Clock, ClipboardList, File, FileImage, FileText, Loader2, LockKeyhole, Monitor, Save, Send, UploadCloud, Wifi, WifiOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -12,11 +12,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import { Classroom, ExamContentType, ExamStatus, spaceApi } from '@/lib/api';
+import { Classroom, ExamContentType, ExamStatus, quizApi, spaceApi, Quiz } from '@/lib/api';
 
 interface CreateExamPageProps {
   params: Promise<{ uid: string }>;
 }
+
+const EXAM_TYPE_OPTIONS = [
+  { value: 'assignment', label: 'Thi tự luận (Nộp bài)', description: 'Học sinh nộp file hoặc viết bài', icon: FileText },
+  { value: 'quiz', label: 'Thi trắc nghiệm (Hệ thống)', description: 'Sử dụng bộ câu hỏi có sẵn, tự động chấm điểm', icon: ClipboardList },
+] as const;
 
 const EXAM_KIND_OPTIONS = [
   {
@@ -40,9 +45,9 @@ const EXAM_KIND_OPTIONS = [
 ] as const;
 
 const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Draft', icon: CircleDashed, activeClassName: 'bg-amber-50 text-amber-700', iconClassName: 'text-amber-500' },
-  { value: 'published', label: 'Published', icon: Send, activeClassName: 'bg-emerald-50 text-emerald-700', iconClassName: 'text-emerald-500' },
-  { value: 'closed', label: 'Closed', icon: LockKeyhole, activeClassName: 'bg-rose-50 text-rose-700', iconClassName: 'text-rose-500' },
+  { value: 'draft', label: 'Bản nháp', icon: CircleDashed, activeClassName: 'bg-amber-50 text-amber-700', iconClassName: 'text-amber-500' },
+  { value: 'published', label: 'Công bố', icon: Send, activeClassName: 'bg-emerald-50 text-emerald-700', iconClassName: 'text-emerald-500' },
+  { value: 'closed', label: 'Đóng bài', icon: LockKeyhole, activeClassName: 'bg-rose-50 text-rose-700', iconClassName: 'text-rose-500' },
 ] as const;
 
 const CONTENT_TYPE_OPTIONS = [
@@ -50,18 +55,25 @@ const CONTENT_TYPE_OPTIONS = [
   { value: 'pdf', label: 'PDF', icon: FileText },
   { value: 'image', label: 'Hình ảnh', icon: FileImage },
   { value: 'file', label: 'File', icon: File },
+  { value: 'quiz', label: 'Trắc nghiệm', icon: ClipboardList },
 ] as const;
 
 type ExamKind = typeof EXAM_KIND_OPTIONS[number]['key'];
 
 type ExamForm = {
   exam_kind: ExamKind;
+  exam_type: 'assignment' | 'quiz';
+  ref_id: string;       // quiz_id OR resource_uid — generic FK
+  max_grade: number;
   title: string;
   description: string;
   content_type: ExamContentType;
-  content: string;
+  body: string;         // inline content (markdown)
   due_date: string;
   status: ExamStatus;
+  exam_mode: 'online' | 'offline';
+  duration_seconds: number;
+  camera_required: boolean;
 };
 
 export default function CreateExamPage({ params }: CreateExamPageProps) {
@@ -69,20 +81,30 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [form, setForm] = useState<ExamForm>({
     exam_kind: 'midterm',
+    exam_type: 'assignment',
+    ref_id: '',
+    max_grade: 10,
     title: '',
     description: '',
     content_type: 'markdown',
-    content: '',
+    body: '',
     due_date: '',
-    status: 'draft',
+    status: 'published',
+    exam_mode: 'offline',
+    duration_seconds: 0,
+    camera_required: false,
   });
 
   useEffect(() => {
+    // Permission check placeholder
+    const getCanManageExams = () => true;
+
     if (!getCanManageExams()) {
       toast.error('Bạn không có quyền tạo bài kiểm tra');
       router.replace(`/space/classrooms/${uid}/details?tab=exams`);
@@ -91,25 +113,29 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
 
     const query = new URLSearchParams(window.location.search);
     const kind = query.get('kind');
-    if (isExamKind(kind)) {
-      setForm(prev => ({ ...prev, exam_kind: kind }));
+    if (kind && EXAM_KIND_OPTIONS.some(o => o.key === kind)) {
+      setForm(prev => ({ ...prev, exam_kind: kind as ExamKind }));
     }
   }, [router, uid]);
 
   useEffect(() => {
-    const fetchClassroom = async () => {
+    const fetchData = async () => {
       try {
         setFetching(true);
-        const details = await spaceApi.classrooms.retrieve(uid);
+        const [details, quizList] = await Promise.all([
+          spaceApi.classrooms.retrieve(uid),
+          quizApi.list(uid),
+        ]);
         setClassroom(details);
+        setQuizzes(quizList);
       } catch (err: unknown) {
-        toast.error(err instanceof Error ? err.message : 'Không thể tải thông tin lớp học');
+        toast.error(err instanceof Error ? err.message : 'Không thể tải dữ liệu');
       } finally {
         setFetching(false);
       }
     };
 
-    void fetchClassroom();
+    void fetchData();
   }, [uid]);
 
   const updateForm = <TKey extends keyof ExamForm>(key: TKey, value: ExamForm[TKey]) => {
@@ -131,19 +157,24 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
       return;
     }
 
-    if (!form.due_date) {
+    if (form.exam_mode !== 'online' && !form.due_date) {
       toast.error('Vui lòng chọn hạn nộp');
       return;
     }
 
-    const needsResource = ['file', 'pdf', 'image'].includes(form.content_type);
-    if (form.content_type === 'markdown' && !form.content.trim()) {
-      toast.error('Vui lòng nhập nội dung markdown cho bài kiểm tra');
+    if (form.exam_type === 'quiz' && !form.ref_id) {
+      toast.error('Vui lòng chọn bộ đề trắc nghiệm');
+      return;
+    }
+
+    const needsResource = form.exam_type === 'assignment' && ['file', 'pdf', 'image'].includes(form.content_type);
+    if (form.exam_type === 'assignment' && form.content_type === 'markdown' && !form.body.trim()) {
+      toast.error('Vui lòng nhập hướng dẫn làm bài');
       return;
     }
 
     if (needsResource && !selectedFile) {
-      toast.error('Vui lòng chọn tệp cho loại nội dung này');
+      toast.error('Vui lòng chọn tệp đính kèm');
       return;
     }
 
@@ -163,13 +194,16 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
         classroom_id: uid,
         title,
         description: form.description.trim(),
-        content_type: form.content_type,
-        content: needsResource ? uploadedResource?.url || '' : form.content.trim(),
-        due_date: new Date(form.due_date).toISOString(),
+        exam_type: form.exam_type,
+        ref_id: form.exam_type === 'quiz' ? form.ref_id : (uploadedResource?.uid ?? null),
+        max_grade: form.exam_type === 'quiz' ? form.max_grade : 10,
+        content_type: form.exam_type === 'quiz' ? 'quiz' : form.content_type,
+        body: form.exam_type === 'quiz' ? '' : (needsResource ? '' : form.body.trim()),
+        due_date: form.due_date ? new Date(form.due_date).toISOString() : null,
         status: form.status,
-        resource_uid: uploadedResource?.uid || null,
-        resource_url: uploadedResource?.url || null,
-        resource_name: uploadedResource?.name || '',
+        exam_mode: form.exam_mode,
+        duration_seconds: form.exam_mode === 'online' ? form.duration_seconds : 0,
+        camera_required: form.exam_mode === 'online' ? form.camera_required : false,
       });
 
       toast.success('Đã tạo bài kiểm tra');
@@ -190,16 +224,16 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
     );
   }
 
-  const needsResource = ['file', 'pdf', 'image'].includes(form.content_type);
+  const needsResource = form.exam_type === 'assignment' && ['file', 'pdf', 'image'].includes(form.content_type);
+  const selectedExamType = EXAM_TYPE_OPTIONS.find(option => option.value === form.exam_type) || EXAM_TYPE_OPTIONS[0];
+  const SelectedExamTypeIcon = selectedExamType.icon;
   const selectedExamKind = EXAM_KIND_OPTIONS.find(option => option.key === form.exam_kind) || EXAM_KIND_OPTIONS[0];
   const SelectedExamKindIcon = selectedExamKind.icon;
   const selectedStatus = STATUS_OPTIONS.find(option => option.value === form.status) || STATUS_OPTIONS[0];
   const SelectedStatusIcon = selectedStatus.icon;
-  const selectedContentType = CONTENT_TYPE_OPTIONS.find(option => option.value === form.content_type) || CONTENT_TYPE_OPTIONS[0];
+  const selectedContentType = CONTENT_TYPE_OPTIONS.find(option => option.value === (form.exam_type === 'quiz' ? 'quiz' : form.content_type)) || CONTENT_TYPE_OPTIONS[0];
   const SelectedContentTypeIcon = selectedContentType.icon;
-  const dueDateDate = form.due_date ? form.due_date.slice(0, 10) : '';
-  const dueDateTime = form.due_date ? form.due_date.slice(11, 16) : '';
-  const dueDateLabel = formatDueDateLabel(form.due_date);
+  const selectedQuiz = quizzes.find(q => q.uid === form.ref_id);
 
   return (
     <div className="mx-auto max-w-4xl py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -219,11 +253,68 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
             {classroom?.name || 'Lớp học'}
           </div>
           <h1 className="text-2xl font-black tracking-tight text-slate-900">Tạo bài kiểm tra mới</h1>
-          <p className="text-sm font-medium text-slate-500">Nhập thông tin bài kiểm tra và chọn trạng thái công bố</p>
+          <p className="text-sm font-medium text-slate-500">Nhập thông tin bài kiểm tra và chọn hình thức thi</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* ── Hình thức thi — section đầu tiên ── */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200 shadow-sm">
+          <div className="h-2 bg-violet-600" />
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
+              <Monitor size={20} className="text-violet-500" />
+              Hình thức thi
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => updateForm('exam_mode', 'offline')}
+                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'offline' ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-slate-50 hover:border-slate-300'}`}
+              >
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${form.exam_mode === 'offline' ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                  <WifiOff size={18} />
+                </div>
+                <div>
+                  <div className="text-sm font-black text-slate-900">Ngoại tuyến</div>
+                  <div className="text-[11px] font-bold text-slate-400">Học sinh nộp bài thông thường</div>
+                </div>
+                {form.exam_mode === 'offline' && <Check size={16} className="ml-auto text-indigo-500" />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  updateForm('exam_mode', 'online');
+                  updateForm('exam_type', 'quiz');
+                  updateForm('content_type', 'quiz');
+                }}
+                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'online' ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-slate-50 hover:border-slate-300'}`}
+              >
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${form.exam_mode === 'online' ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                  <Wifi size={18} />
+                </div>
+                <div>
+                  <div className="text-sm font-black text-slate-900">Trực tuyến</div>
+                  <div className="text-[11px] font-bold text-slate-400">Thi trắc nghiệm, có camera & đếm giờ</div>
+                </div>
+                {form.exam_mode === 'online' && <Check size={16} className="ml-auto text-violet-500" />}
+              </button>
+            </div>
+
+            {form.exam_mode === 'online' && (
+              <div className="rounded-2xl bg-amber-50 p-4 border border-amber-100">
+                <p className="text-xs font-bold text-amber-700 leading-relaxed">
+                  Thời gian làm bài, yêu cầu Camera và giới hạn vào trễ sẽ được thiết lập khi bạn bấm nút &quot;Mở ca thi&quot; tại danh sách bài kiểm tra.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ── Thông tin bài kiểm tra ── */}
         <Card className="overflow-hidden rounded-2xl border-slate-200 shadow-sm">
           <div className="h-2 bg-indigo-600" />
           <CardHeader>
@@ -233,14 +324,65 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="space-y-2">
-                <span className="px-1 text-sm font-bold text-slate-700">Loại kiểm tra</span>
+                <span className="px-1 text-sm font-bold text-slate-700">Hình thức bài thi</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild disabled={form.exam_mode === 'online'}>
+                    <button
+                      type="button"
+                      disabled={form.exam_mode === 'online'}
+                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      <span className="flex min-w-0 items-center gap-2">
+                        <SelectedExamTypeIcon size={17} className="shrink-0 text-indigo-500" />
+                        <span className="truncate">{selectedExamType.label}</span>
+                      </span>
+                      {form.exam_mode !== 'online' && <ChevronDown size={16} className="shrink-0 text-slate-400" />}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/60">
+                    {EXAM_TYPE_OPTIONS.map(option => {
+                      const Icon = option.icon;
+                      const active = form.exam_type === option.value;
+
+                      return (
+                        <DropdownMenuItem
+                          key={option.value}
+                          onClick={() => {
+                            updateForm('exam_type', option.value as 'assignment' | 'quiz');
+                            if (option.value === 'quiz') {
+                              updateForm('content_type', 'quiz');
+                            } else {
+                              updateForm('content_type', 'markdown');
+                            }
+                          }}
+                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 focus:bg-slate-50'}`}
+                        >
+                          <span className="flex min-w-0 items-center gap-2">
+                            <Icon size={16} className={active ? 'text-indigo-500' : 'text-slate-400'} />
+                            <span className="truncate">{option.label}</span>
+                          </span>
+                          {active && <Check size={15} className="text-indigo-500" />}
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {form.exam_mode === 'online' && (
+                  <p className="px-1 text-[10px] font-bold text-violet-600 italic">
+                    * Chế độ trực tuyến bắt buộc thi trắc nghiệm
+                  </p>
+                )}
+              </label>
+
+              <label className="space-y-2">
+                <span className="px-1 text-sm font-bold text-slate-700">Phân loại</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
                     >
                       <span className="flex min-w-0 items-center gap-2">
                         <SelectedExamKindIcon size={17} className="shrink-0 text-indigo-500" />
@@ -270,21 +412,72 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <p className="px-1 text-[11px] font-bold uppercase tracking-tighter text-slate-400">
-                  {selectedExamKind.description}
-                </p>
-              </label>
-
-              <label className="space-y-2 md:col-span-2">
-                <span className="px-1 text-sm font-bold text-slate-700">Tiêu đề <span className="text-rose-500">*</span></span>
-                <input
-                  value={form.title}
-                  onChange={event => updateForm('title', event.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                  placeholder="Ví dụ: Chương 1 - Hàm số"
-                />
               </label>
             </div>
+
+            <label className="block space-y-2">
+              <span className="px-1 text-sm font-bold text-slate-700">Tiêu đề <span className="text-rose-500">*</span></span>
+              <input
+                value={form.title}
+                onChange={event => updateForm('title', event.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+                placeholder="Ví dụ: Kiểm tra giữa kỳ - Chương 1"
+              />
+            </label>
+
+            {form.exam_type === 'quiz' && (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-slate-700">Bộ đề trắc nghiệm <span className="text-rose-500">*</span></span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <ClipboardList size={17} className="shrink-0 text-indigo-500" />
+                          <span className="truncate">{selectedQuiz?.title || 'Chọn bộ đề trắc nghiệm'}</span>
+                        </span>
+                        <ChevronDown size={16} className="shrink-0 text-slate-400" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" sideOffset={6} className="max-h-[300px] overflow-y-auto rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/60">
+                      {quizzes.length === 0 ? (
+                        <div className="px-3 py-2 text-xs text-slate-400">Không có bộ đề nào khả dụng</div>
+                      ) : (
+                        quizzes.map(quiz => (
+                          <DropdownMenuItem
+                            key={quiz.uid}
+                            onClick={() => updateForm('ref_id', quiz.uid)}
+                            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${form.ref_id === quiz.uid ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 focus:bg-slate-50'}`}
+                          >
+                            <span className="flex min-w-0 flex-col">
+                              <span className="truncate">{quiz.title}</span>
+                              <span className="text-[10px] text-slate-400 font-medium">{quiz.questions_count} câu hỏi</span>
+                            </span>
+                            {form.ref_id === quiz.uid && <Check size={15} className="text-indigo-500" />}
+                          </DropdownMenuItem>
+                        ))
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-slate-700">Thang điểm tối đa</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={0.5}
+                    value={form.max_grade}
+                    onChange={event => updateForm('max_grade', parseFloat(event.target.value) || 0)}
+                    className="w-full h-12 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+                  />
+                </label>
+              </div>
+            )}
 
             <label className="block space-y-2">
               <span className="px-1 text-sm font-bold text-slate-700">Mô tả</span>
@@ -293,193 +486,158 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
                 onChange={event => updateForm('description', event.target.value)}
                 rows={4}
                 className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                placeholder="Mô tả ngắn về yêu cầu, phạm vi hoặc lưu ý cho học sinh"
+                placeholder="Mô tả ngắn về yêu cầu bài thi"
               />
             </label>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <label className="space-y-2">
-                <span className="px-1 text-sm font-bold text-slate-700">Hạn nộp <span className="text-rose-500">*</span></span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-left text-sm font-semibold text-slate-900 outline-none transition-all hover:border-slate-300 hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <Calendar size={17} className="shrink-0 text-indigo-500" />
-                        <span className={`truncate ${dueDateLabel ? 'text-slate-900' : 'text-slate-400'}`}>
-                          {dueDateLabel || 'Chọn ngày và giờ'}
-                        </span>
-                      </span>
-                      <ChevronDown size={16} className="shrink-0 text-slate-400" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" sideOffset={6} className="z-50 rounded-xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-200/70">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-                          <Calendar size={16} />
-                        </div>
-                        <div>
-                          <div className="text-sm font-black text-slate-900">Hạn nộp</div>
-                          <div className="text-[11px] font-bold uppercase text-slate-400">Chọn ngày và giờ kết thúc</div>
-                        </div>
-                      </div>
-
-                      <label className="block space-y-1.5">
-                        <span className="px-1 text-[11px] font-black uppercase tracking-wider text-slate-500">Ngày</span>
-                        <div className="relative">
-                          <Calendar size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500" />
-                          <input
-                            type="date"
-                            value={dueDateDate}
-                            onChange={event => updateForm('due_date', combineDueDate(event.target.value, dueDateTime))}
-                            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm font-semibold text-slate-900 outline-none [color-scheme:light] hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                          />
-                        </div>
-                      </label>
-
-                      <label className="block space-y-1.5">
-                        <span className="px-1 text-[11px] font-black uppercase tracking-wider text-slate-500">Giờ</span>
-                        <div className="relative">
-                          <Clock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500" />
-                          <input
-                            type="time"
-                            value={dueDateTime}
-                            onChange={event => updateForm('due_date', combineDueDate(dueDateDate, event.target.value))}
-                            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm font-semibold text-slate-900 outline-none [color-scheme:light] hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                          />
-                        </div>
-                      </label>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </label>
-
-              <label className="space-y-2">
-                <span className="px-1 text-sm font-bold text-slate-700">Trạng thái</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <SelectedStatusIcon size={17} className={`shrink-0 ${selectedStatus.iconClassName}`} />
-                        <span className="truncate">{selectedStatus.label}</span>
-                      </span>
-                      <ChevronDown size={16} className="shrink-0 text-slate-400" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/60">
-                    {STATUS_OPTIONS.map(status => {
-                      const Icon = status.icon;
-                      const active = form.status === status.value;
-
-                      return (
-                        <DropdownMenuItem
-                          key={status.value}
-                          onClick={() => updateForm('status', status.value as ExamStatus)}
-                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? status.activeClassName : 'text-slate-600 hover:bg-slate-50 focus:bg-slate-50'}`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <Icon size={16} className={active ? status.iconClassName : 'text-slate-400'} />
-                            {status.label}
-                          </span>
-                          {active && <Check size={15} className={status.iconClassName} />}
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </label>
-
-              <label className="space-y-2">
-                <span className="px-1 text-sm font-bold text-slate-700">Loại nội dung</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                    >
-                      <span className="flex min-w-0 items-center gap-2">
-                        <SelectedContentTypeIcon size={17} className="shrink-0 text-indigo-500" />
-                        <span className="truncate">{selectedContentType.label}</span>
-                      </span>
-                      <ChevronDown size={16} className="shrink-0 text-slate-400" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/60">
-                    {CONTENT_TYPE_OPTIONS.map(option => {
-                      const Icon = option.icon;
-                      const active = form.content_type === option.value;
-
-                      return (
-                        <DropdownMenuItem
-                          key={option.value}
-                          onClick={() => {
-                            setSelectedFile(null);
-                            setForm(prev => ({ ...prev, content_type: option.value as ExamContentType, content: '' }));
-                          }}
-                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 focus:bg-slate-50'}`}
-                        >
-                          <span className="flex items-center gap-2">
-                            <Icon size={16} className={active ? 'text-indigo-500' : 'text-slate-400'} />
-                            {option.label}
-                          </span>
-                          {active && <Check size={15} className="text-indigo-500" />}
-                        </DropdownMenuItem>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </label>
-            </div>
-
-            <label className="block space-y-2">
-              <span className="px-1 text-sm font-bold text-slate-700">Nội dung <span className="text-rose-500">*</span></span>
-              <textarea
-                value={form.content}
-                onChange={event => updateForm('content', event.target.value)}
-                rows={needsResource ? 2 : 6}
-                disabled={needsResource}
-                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
-                placeholder={needsResource ? 'File sẽ được upload khi bấm Lưu bài kiểm tra' : 'Nhập nội dung markdown hoặc hướng dẫn làm bài'}
-              />
-            </label>
-
-            {needsResource && (
-              <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-bold text-slate-800">
-                    {selectedFile?.name || 'Chưa chọn tệp nào'}
-                  </div>
-                  <div className="text-[11px] font-bold uppercase text-slate-400">
-                    {selectedFile ? 'Sẽ upload khi lưu' : form.content_type === 'image' ? 'Ảnh' : form.content_type === 'pdf' ? 'PDF' : 'Tệp đính kèm'}
-                  </div>
-                </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  accept={form.content_type === 'image' ? 'image/*' : form.content_type === 'pdf' ? 'application/pdf' : 'image/*,video/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip'}
-                  onChange={handleResourceSelect}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={saving}
-                  className="rounded-xl text-xs font-bold"
-                >
-                  <UploadCloud size={16} className="mr-2" />
-                  Chọn tệp
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
+
+        {form.exam_mode !== 'online' && (
+          <Card className="overflow-hidden rounded-2xl border-slate-200 shadow-sm">
+            <div className="h-2 bg-indigo-600" />
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-bold text-slate-800">
+                <Calendar size={20} className="text-indigo-500" />
+                Thời hạn & Trạng thái
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-slate-700">Hạn nộp <span className="text-rose-500">*</span></span>
+                  <input
+                    type="datetime-local"
+                    value={form.due_date}
+                    onChange={event => updateForm('due_date', event.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-slate-700">Trạng thái</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10"
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <SelectedStatusIcon size={17} className={`shrink-0 ${selectedStatus.iconClassName}`} />
+                          <span className="truncate">{selectedStatus.label}</span>
+                        </span>
+                        <ChevronDown size={16} className="shrink-0 text-slate-400" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/60">
+                      {STATUS_OPTIONS.map(status => {
+                        const Icon = status.icon;
+                        const active = form.status === status.value;
+
+                        return (
+                          <DropdownMenuItem
+                            key={status.value}
+                            onClick={() => updateForm('status', status.value as ExamStatus)}
+                            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? status.activeClassName : 'text-slate-600 hover:bg-slate-50 focus:bg-slate-50'}`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Icon size={16} className={active ? status.iconClassName : 'text-slate-400'} />
+                              {status.label}
+                            </span>
+                            {active && <Check size={15} className={status.iconClassName} />}
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-slate-700">Loại nội dung</span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild disabled={form.exam_type === 'quiz'}>
+                      <button
+                        type="button"
+                        disabled={form.exam_type === 'quiz'}
+                        className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 outline-none transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-70"
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <SelectedContentTypeIcon size={17} className="shrink-0 text-indigo-500" />
+                          <span className="truncate">{selectedContentType.label}</span>
+                        </span>
+                        <ChevronDown size={16} className="shrink-0 text-slate-400" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg shadow-slate-200/60">
+                      {CONTENT_TYPE_OPTIONS.map(option => {
+                        const Icon = option.icon;
+                        const active = form.content_type === option.value;
+
+                        return (
+                          <DropdownMenuItem
+                            key={option.value}
+                            onClick={() => {
+                              setSelectedFile(null);
+                              setForm(prev => ({ ...prev, content_type: option.value as ExamContentType, content: '' }));
+                            }}
+                            disabled={option.value === 'quiz'}
+                            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50 focus:bg-slate-50'} ${option.value === 'quiz' ? 'opacity-50' : ''}`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Icon size={16} className={active ? 'text-indigo-500' : 'text-slate-400'} />
+                              {option.label}
+                            </span>
+                            {active && <Check size={15} className="text-indigo-500" />}
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </label>
+              </div>
+
+              <label className="block space-y-2">
+                <span className="px-1 text-sm font-bold text-slate-700">Hướng dẫn làm bài <span className="text-rose-500">*</span></span>
+                <textarea
+                  value={form.body}
+                  onChange={event => updateForm('body', event.target.value)}
+                  rows={needsResource ? 2 : 6}
+                  disabled={needsResource || form.exam_type === 'quiz'}
+                  className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-70"
+                  placeholder={form.exam_type === 'quiz' ? 'Nội dung sẽ được lấy từ bộ đề trắc nghiệm' : needsResource ? 'File đính kèm sẽ được upload khi lưu' : 'Nhập hướng dẫn làm bài cho học sinh'}
+                />
+              </label>
+
+              {needsResource && (
+                <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-bold text-slate-800">
+                      {selectedFile?.name || 'Chưa chọn tệp nào'}
+                    </div>
+                    <div className="text-[11px] font-bold uppercase text-slate-400">
+                      {selectedFile ? 'Sẽ upload khi lưu' : 'Yêu cầu tệp đính kèm'}
+                    </div>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleResourceSelect}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={saving}
+                    className="rounded-xl text-xs font-bold"
+                  >
+                    <UploadCloud size={16} className="mr-2" />
+                    Chọn tệp
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button
@@ -497,7 +655,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
             className="h-12 min-w-[180px] rounded-xl bg-indigo-600 px-6 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700"
           >
             {saving ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Save size={16} className="mr-2" />}
-            LƯU BÀI KIỂM TRA
+            TẠO BÀI THI
           </Button>
         </div>
       </form>
@@ -535,44 +693,10 @@ function getExamKindLabel(kind: ExamKind) {
   return EXAM_KIND_OPTIONS.find(option => option.key === kind)?.label || EXAM_KIND_OPTIONS[0].label;
 }
 
-function isExamKind(value: string | null): value is ExamKind {
-  return EXAM_KIND_OPTIONS.some(option => option.key === value);
-}
-
-function combineDueDate(date: string, time: string) {
-  if (!date) return '';
-  return `${date}T${time || '23:59'}`;
-}
-
-function formatDueDateLabel(value: string) {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleString('vi-VN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-}
-
 function normalizeText(value: string) {
   return value
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
-}
-
-function getCanManageExams() {
-  try {
-    const raw = localStorage.getItem('userProfile');
-    if (!raw) return true;
-    const profile = JSON.parse(raw) as { role?: string; user_type?: string; is_admin?: boolean; is_staff?: boolean };
-    const role = (profile.role || profile.user_type || '').toLowerCase();
-    return profile.is_admin === true || profile.is_staff === true || role === 'admin' || role === 'teacher' || role === 'space' || !role;
-  } catch {
-    return true;
-  }
 }

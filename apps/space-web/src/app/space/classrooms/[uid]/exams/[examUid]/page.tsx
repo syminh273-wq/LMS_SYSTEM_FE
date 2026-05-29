@@ -6,17 +6,29 @@ import {
   ArrowLeft,
   BarChart3,
   Calendar,
+  Camera,
+  Clock,
   Download,
   FileText,
   Loader2,
+  Monitor,
   Search,
+  Timer,
   Users,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { classroomApi, examApi, Classroom, ClassroomMember, Exam, ExamSubmission } from '@/lib/api';
+import { classroomApi, examApi, Classroom, ClassroomMember, Exam, ExamSession, ExamSubmission } from '@/lib/api';
 
 type SubmissionFilter = 'submitted' | 'missing';
-type ExamDetailTab = 'submissions';
+type ExamDetailTab = 'submissions' | 'online';
+
+interface OpenExamSettings {
+  camera_required: boolean;
+  duration_minutes: number;
+  late_threshold_minutes: number;
+}
 
 export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid: string; examUid: string }> }) {
   const { uid, examUid } = use(params);
@@ -30,6 +42,15 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<SubmissionFilter>('submitted');
   const [query, setQuery] = useState('');
+  const [sessions, setSessions] = useState<ExamSession[]>([]);
+  const [sessionLoading, setSessionLoading] = useState(false);
+  const [sessionError, setSessionError] = useState('');
+  const [sessionAction, setSessionAction] = useState(false);
+  const [openSettings, setOpenSettings] = useState<OpenExamSettings>({
+    camera_required: false,
+    duration_minutes: 60,
+    late_threshold_minutes: 5,
+  });
   const activeTab = (searchParams.get('tab') as ExamDetailTab) || 'submissions';
 
   useEffect(() => {
@@ -56,6 +77,64 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
 
     void load();
   }, [examUid, uid]);
+
+  // Pre-fill modal settings from exam data
+  useEffect(() => {
+    if (!exam) return;
+    setOpenSettings({
+      camera_required: exam.camera_required ?? false,
+      duration_minutes: exam.duration_seconds ? Math.round(exam.duration_seconds / 60) : 60,
+      late_threshold_minutes: exam.late_threshold_seconds ? Math.round(exam.late_threshold_seconds / 60) : 5,
+    });
+  }, [exam]);
+
+  useEffect(() => {
+    if (activeTab !== 'online') return;
+    const loadSessions = async () => {
+      try {
+        setSessionLoading(true);
+        setSessionError('');
+        const data = await examApi.listOnlineSessions(examUid);
+        setSessions(data);
+      } catch (err: unknown) {
+        setSessionError(err instanceof Error ? err.message : 'Không thể tải phiên thi');
+      } finally {
+        setSessionLoading(false);
+      }
+    };
+    void loadSessions();
+  }, [activeTab, examUid]);
+
+  const handleOpenOnline = async () => {
+    try {
+      setSessionAction(true);
+      setSessionError('');
+      const result = await examApi.openOnline(examUid, {
+        camera_required: openSettings.camera_required,
+        duration_seconds: openSettings.duration_minutes * 60,
+        late_threshold_seconds: openSettings.late_threshold_minutes * 60,
+      });
+      setSessions(result.sessions);
+    } catch (err: unknown) {
+      setSessionError(err instanceof Error ? err.message : 'Không thể mở phiên thi');
+    } finally {
+      setSessionAction(false);
+    }
+  };
+
+  const handleCloseOnline = async () => {
+    try {
+      setSessionAction(true);
+      setSessionError('');
+      await examApi.closeOnline(examUid);
+      const data = await examApi.listOnlineSessions(examUid);
+      setSessions(data);
+    } catch (err: unknown) {
+      setSessionError(err instanceof Error ? err.message : 'Không thể đóng phiên thi');
+    } finally {
+      setSessionAction(false);
+    }
+  };
 
   const submittedStudentIds = useMemo(
     () => new Set(submissions.map(submission => submission.student_id)),
@@ -158,13 +237,173 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
             <div className="flex gap-2">
               <button
                 type="button"
-                className={`border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'submissions' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400'}`}
+                onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=submissions`)}
+                className={`border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'submissions' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
               >
                 Danh sách bài nộp
               </button>
+              {exam.exam_mode === 'online' && (
+                <button
+                  type="button"
+                  onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=online`)}
+                  className={`flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'online' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                >
+                  <Monitor size={13} />
+                  Thi trực tuyến
+                </button>
+              )}
             </div>
           </div>
 
+          {activeTab === 'online' ? (
+            <div className="space-y-5 p-6">
+              {exam.exam_mode !== 'online' ? (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-12 text-center">
+                  <Monitor size={32} className="mx-auto mb-3 text-slate-300" />
+                  <p className="text-sm font-bold text-slate-400">Bài kiểm tra này không phải hình thức online</p>
+                </div>
+              ) : (
+                <>
+                  {/* ── Inline settings card ── */}
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50">
+                    <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-3">
+                      <Monitor size={14} className="text-indigo-500" />
+                      <span className="text-[11px] font-black uppercase tracking-widest text-slate-700">Cài đặt phiên thi</span>
+                      <span className="ml-auto text-[10px] font-bold text-slate-400">Áp dụng khi nhấn "Mở phiên thi"</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-0 divide-y divide-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+                      {/* Duration */}
+                      <div className="flex flex-col gap-2 px-5 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <Timer size={13} className="text-indigo-500" />
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Thời gian làm bài</span>
+                          <span className="text-rose-500 text-[10px] font-black">*</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            max={360}
+                            value={openSettings.duration_minutes}
+                            onChange={e => setOpenSettings(s => ({ ...s, duration_minutes: Math.max(1, Number(e.target.value)) }))}
+                            className="h-9 w-20 rounded-lg border border-slate-200 bg-white px-2 text-sm font-black text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10"
+                          />
+                          <span className="text-xs font-bold text-slate-500">phút</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">Tính từ lúc học sinh bắt đầu</p>
+                      </div>
+
+                      {/* Late threshold */}
+                      <div className="flex flex-col gap-2 px-5 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={13} className="text-amber-500" />
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Cho phép vào muộn</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            max={60}
+                            value={openSettings.late_threshold_minutes}
+                            onChange={e => setOpenSettings(s => ({ ...s, late_threshold_minutes: Math.max(0, Number(e.target.value)) }))}
+                            className="h-9 w-20 rounded-lg border border-slate-200 bg-white px-2 text-sm font-black text-slate-900 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10"
+                          />
+                          <span className="text-xs font-bold text-slate-500">phút</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">0 = không cho vào sau khi mở</p>
+                      </div>
+
+                      {/* Camera */}
+                      <div className="flex flex-col gap-2 px-5 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <Camera size={13} className="text-emerald-500" />
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500">Yêu cầu camera</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOpenSettings(s => ({ ...s, camera_required: !s.camera_required }))}
+                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${openSettings.camera_required ? 'bg-indigo-600' : 'bg-slate-200'}`}
+                        >
+                          <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${openSettings.camera_required ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                        <p className="text-[10px] text-slate-400">
+                          {openSettings.camera_required ? 'Bắt buộc nhận diện khuôn mặt' : 'Không bắt buộc camera'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center justify-between border-t border-slate-200 px-5 py-3">
+                      {sessionError && (
+                        <p className="text-xs font-bold text-rose-600">{sessionError}</p>
+                      )}
+                      <div className="ml-auto flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleCloseOnline}
+                          disabled={sessionAction || sessions.every(s => s.token_status !== 'pending' && s.token_status !== 'active')}
+                          className="rounded-xl gap-1.5 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50"
+                        >
+                          {sessionAction ? <Loader2 size={13} className="animate-spin" /> : <WifiOff size={13} />}
+                          Đóng phiên
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => void handleOpenOnline()}
+                          disabled={sessionAction || openSettings.duration_minutes <= 0}
+                          className="rounded-xl gap-1.5 bg-indigo-600 text-xs font-bold hover:bg-indigo-700"
+                        >
+                          {sessionAction ? <Loader2 size={13} className="animate-spin" /> : <Wifi size={13} />}
+                          Mở phiên thi
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="overflow-hidden rounded-2xl border border-slate-100">
+                    {sessionLoading ? (
+                      <div className="py-12 text-center"><Loader2 size={24} className="mx-auto animate-spin text-indigo-400" /></div>
+                    ) : sessions.length === 0 ? (
+                      <div className="py-12 text-center text-sm font-bold text-slate-400">Chưa có phiên thi nào. Nhấn "Mở phiên thi" để bắt đầu.</div>
+                    ) : (
+                      <table className="w-full min-w-[640px] text-left">
+                        <thead className="bg-slate-50">
+                          <tr className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                            <th className="px-4 py-3">Học sinh</th>
+                            <th className="px-4 py-3">Token</th>
+                            <th className="px-4 py-3">Trạng thái</th>
+                            <th className="px-4 py-3">Hết hạn link</th>
+                            <th className="px-4 py-3">Bắt đầu</th>
+                            <th className="px-4 py-3">Kết thúc</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sessions.map(s => (
+                            <tr key={s.uid} className="border-t border-slate-100">
+                              <td className="px-4 py-3 text-xs font-bold text-slate-600">{s.student_id.slice(0, 8)}…</td>
+                              <td className="px-4 py-3">
+                                <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-bold text-slate-700">{s.token.slice(0, 8)}…</code>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${getSessionStatusClass(s.token_status)}`}>
+                                  {getSessionStatusLabel(s.token_status)}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-xs font-bold text-slate-500">{formatDateTime(s.token_expires_at)}</td>
+                              <td className="px-4 py-3 text-xs font-bold text-slate-500">{formatDateTime(s.started_at)}</td>
+                              <td className="px-4 py-3 text-xs font-bold text-slate-500">{formatDateTime(s.ends_at)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
           <div className="space-y-4 p-6">
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="inline-flex w-fit rounded-xl border border-slate-200 bg-slate-50 p-1">
@@ -246,6 +485,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
               </table>
             </div>
           </div>
+          )}
         </section>
 
         <aside className="h-fit space-y-4 lg:sticky lg:top-24">
@@ -305,6 +545,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
           </div>
         </aside>
       </main>
+
     </div>
   );
 }
@@ -361,6 +602,20 @@ function buildAnalytics(members: ClassroomMember[], submissions: ExamSubmission[
       };
     }),
   };
+}
+
+function getSessionStatusClass(status: string) {
+  if (status === 'pending') return 'bg-amber-50 text-amber-600 border border-amber-100';
+  if (status === 'active') return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+  if (status === 'completed') return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
+  return 'bg-rose-50 text-rose-600 border border-rose-100';
+}
+
+function getSessionStatusLabel(status: string) {
+  if (status === 'pending') return 'Chờ vào';
+  if (status === 'active') return 'Đang thi';
+  if (status === 'completed') return 'Đã nộp';
+  return 'Hết hạn';
 }
 
 function getExamStatusClass(status: string) {

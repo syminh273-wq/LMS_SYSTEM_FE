@@ -1,13 +1,21 @@
 import BaseRestApiClient from './client';
-import type { AIGradeBatchResponse, AIGradeRequest, CreateExamRequest, Exam, ExamSubmission, UpdateExamRequest } from './types';
+import type { AIGradeBatchResponse, AIGradeRequest, CreateExamRequest, Exam, ExamSession, ExamSubmission, OpenOnlineResponse, UpdateExamRequest } from './types';
 
 export class ExamApiClient extends BaseRestApiClient {
-  public async listByClassroom(classroomUid: string): Promise<Exam[]> {
+  public async listByClassroom(
+    classroomUid: string,
+    params?: { status?: string | string[]; exam_mode?: string }
+  ): Promise<Exam[]> {
+    const qs = new URLSearchParams({ classroom_id: classroomUid });
+    if (params?.exam_mode) qs.set('exam_mode', params.exam_mode);
+    if (params?.status) {
+      const statuses = Array.isArray(params.status) ? params.status : [params.status];
+      statuses.forEach(s => qs.append('status', s));
+    }
     const response = await this.get<Exam[] | { results: Exam[] }>(
-      `/api/v1/space/course/exams/?classroom_id=${encodeURIComponent(classroomUid)}`
+      `/api/v1/space/course/exams/?${qs.toString()}`
     );
     const exams = Array.isArray(response) ? response : response.results;
-
     return exams.filter((exam) => String(exam.classroom_id) === classroomUid);
   }
 
@@ -48,6 +56,21 @@ export class ExamApiClient extends BaseRestApiClient {
 
   public async aiGradeClassroomSubmissions(classroomUid: string, data: AIGradeRequest): Promise<AIGradeBatchResponse> {
     return this.post<AIGradeBatchResponse>(`/api/v1/space/course/classrooms/${classroomUid}/exams/ai-grade/`, data);
+  }
+
+  public async openOnline(
+    examUid: string,
+    settings: { late_threshold_seconds: number; duration_seconds: number; camera_required: boolean }
+  ): Promise<OpenOnlineResponse> {
+    return this.post<OpenOnlineResponse>(`/api/v1/space/course/exams/${examUid}/open-online/`, settings);
+  }
+
+  public async closeOnline(examUid: string): Promise<{ message: string }> {
+    return this.post<{ message: string }>(`/api/v1/space/course/exams/${examUid}/close-online/`, {});
+  }
+
+  public async listOnlineSessions(examUid: string): Promise<ExamSession[]> {
+    return this.get<ExamSession[]>(`/api/v1/space/course/exams/${examUid}/online-sessions/`);
   }
 }
 

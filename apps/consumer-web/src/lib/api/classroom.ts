@@ -58,6 +58,25 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/me/`);
   }
 
+  public async examQuestions(examUid: string): Promise<{
+    exam_uid: string;
+    title: string;
+    total_questions: number;
+    duration_seconds?: number;
+    max_grade: number;
+    questions: Array<{
+      uid: string;
+      question_text: string;
+      option_a: string;
+      option_b: string;
+      option_c: string;
+      option_d: string;
+      order: number;
+    }>;
+  }> {
+    return this.get<any>(`/api/v1/consumer/course/exams/${examUid}/questions/`);
+  }
+
   public async submitExam(examUid: string, data: SubmitExamRequest): Promise<ExamSubmission> {
     return this.post<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/`, data);
   }

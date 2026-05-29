@@ -1,14 +1,19 @@
 import { authApi } from './auth';
-import { classroomApi } from './classroom';import { meetingRoomApi } from './meeting-room';
+import { classroomApi } from './classroom';
+import { meetingRoomApi } from './meeting-room';
+import { faceApi } from './face';
 import { consumerQuizApi } from './quiz';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
+import { examSessionApi } from './exam-session';
 import { SharingLink } from './types';
 
 export * from './types';
 export * from './exceptions';
 export { consumerQuizApi };
+export { faceApi };
+export { examSessionApi };
 
 // For backward compatibility and centralized access
 export const api = {

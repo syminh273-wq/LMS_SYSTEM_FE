@@ -134,23 +134,54 @@ export type Message = {
   created_at: string;
 };
 
-export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image';
-export type ExamStatus = 'draft' | 'published' | 'closed';
+export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image' | 'quiz';
+export type ExamStatus = 'draft' | 'published' | 'closed' | 'ongoing';
+export type ExamSessionStatus = 'pending' | 'active' | 'expired' | 'completed';
+
+export type ExamMeta = {
+  url?: string;
+  name?: string;
+  size?: number;
+  mime?: string;
+  [key: string]: unknown;
+};
 
 export type Exam = {
   uid: string;
   classroom_id: string;
+  teacher_id?: string;
   title: string;
   description: string;
   content_type: ExamContentType;
-  content: string;
+  body: string;
+  ref_id?: string | null;
+  meta?: ExamMeta;
   status: ExamStatus;
+  exam_mode?: 'online' | 'offline';
+  duration_seconds?: number;
+  camera_required?: boolean;
+  is_online_active?: boolean;
+  opened_at?: string | null;
+  late_threshold_seconds?: number;
   due_date: string;
-  resource_uid?: string | null;
-  resource_url?: string | null;
-  resource_name?: string;
+  exam_type?: 'assignment' | 'quiz';
+  max_grade?: number;
   created_at?: string;
   updated_at?: string;
+};
+
+export type ExamSessionInfo = {
+  uid: string;
+  token: string;
+  token_status: ExamSessionStatus;
+  started_at: string | null;
+  ends_at: string | null;
+  time_remaining_seconds: number | null;
+};
+
+export type JoinSessionResponse = {
+  exam: Exam;
+  session: ExamSessionInfo;
 };
 
 export type ExamSubmission = {
@@ -169,6 +200,12 @@ export type ExamSubmission = {
   feedback?: string;
   graded_by?: string | null;
   graded_at?: string | null;
+  quiz_result?: {
+    grade: number;
+    correct_count: number;
+    total: number;
+    feedback: string;
+  } | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -177,6 +214,7 @@ export type SubmitExamRequest = {
   content_type: ExamContentType;
   content?: string;
   resource_uid?: string | null;
+  answers?: Record<string, string>;
 };
 
 export type UploadedResource = {
@@ -248,6 +286,39 @@ export type QuizResult = {
     is_correct: boolean;
     explanation: string;
   }>;
+};
+
+export type FaceClassroomSessionResponse = {
+  is_verified: boolean;
+  verified_at: string | null;
+};
+
+export type FaceClassroomVerifyResponse = {
+  camera_open: boolean;
+  recognized: boolean;
+  multiple_faces: boolean;
+  face_count: number;
+  similarity: number;
+  is_verified: boolean;
+  error?: string;
+};
+
+export type FaceEnrollResponse = {
+  message: string;
+  enrolled_at: string;
+};
+
+export type FaceEnrollStatusResponse = {
+  enrolled: boolean;
+};
+
+export type FaceVerifyResponse = {
+  camera_open: boolean;
+  recognized: boolean;
+  multiple_faces: boolean;
+  face_count: number;
+  similarity: number;
+  error?: string;
 };
 
 export type SharingLink = {

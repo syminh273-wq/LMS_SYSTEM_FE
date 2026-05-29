@@ -56,6 +56,7 @@ import {
   AlertCircle,
   Save,
   Wand2,
+  Timer,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
@@ -125,10 +126,10 @@ type ExamKind = typeof EXAM_KIND_OPTIONS[number]['key'];
 export default function ClassroomDetailsPage({ params }: ClassroomDetailsPageProps) {
   const { uid } = use(params);
   const router = useRouter();
-  const [fetching, setFetching] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'quiz' | 'students' | 'ai'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [pendingMembers, setPendingMembers] = useState<ClassroomMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
@@ -168,13 +169,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');
   const [loadingExams, setLoadingExams] = useState(false);
+  const [examSubTab, setExamSubTab] = useState<'ongoing' | 'closed'>('ongoing');
   const [deletingExamUid, setDeletingExamUid] = useState<string | null>(null);
-  const [canManageExams, setCanManageExams] = useState(true);
+  const [canManageExams, setCanManageExams] = useState(false);
 
   // Quiz tab state
   const [assignedQuizzes, setAssignedQuizzes] = useState<Quiz[]>([]);
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showOpenExamModal, setShowOpenExamModal] = useState(false);
   const [unassigningUid, setUnassigningUid] = useState<string | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare, stopScreenShare } = useRTC(uid);
@@ -212,7 +215,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'quiz' || tab === 'students' || tab === 'ai') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
       setActiveTab(tab);
     }
@@ -268,7 +271,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       const data = await quizApi.list(uid);
       setAssignedQuizzes(data);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách quiz');
+      toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách bài thi trắc nghiệm');
     } finally {
       setLoadingQuizzes(false);
     }
@@ -354,16 +357,42 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   };
 
   const handleUnassignQuiz = async (quiz: Quiz) => {
-    if (!window.confirm(`Bỏ giao quiz "${quiz.title}" khỏi lớp này?`)) return;
+    if (!window.confirm(`Bỏ giao bài thi "${quiz.title}" khỏi lớp này?`)) return;
     setUnassigningUid(quiz.uid);
     try {
       await quizApi.unassignFromClassroom(quiz.uid, uid);
       setAssignedQuizzes(prev => prev.filter(q => q.uid !== quiz.uid));
-      toast.success('Đã bỏ giao quiz');
+      toast.success('Đã bỏ giao đề thi');
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể bỏ giao quiz');
+      toast.error(err instanceof Error ? err.message : 'Không thể bỏ giao đề thi');
     } finally {
       setUnassigningUid(null);
+    }
+  };
+
+  const handleOpenOnlineForExam = async (exam: Exam) => {
+    try {
+      const opened = await spaceApi.exams.openOnline(exam.uid, {
+        late_threshold_seconds: 15 * 60,
+        duration_seconds: (exam.duration_seconds || 45 * 60),
+        camera_required: exam.camera_required ?? false,
+      });
+      setExams(prev => prev.map(e => e.uid === exam.uid ? opened.exam : e));
+      toast.success(`Đã mở ca thi cho ${opened.sessions.length} sinh viên`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể mở ca thi");
+    }
+  };
+
+  const handleCloseOnline = async (exam: Exam) => {
+    try {
+      await spaceApi.exams.closeOnline(exam.uid);
+      setExams(prev => prev.map(e =>
+        e.uid === exam.uid ? { ...e, is_online_active: false, status: 'closed' } : e
+      ));
+      toast.success("Đã đóng ca thi");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Không thể đóng ca thi");
     }
   };
 
@@ -380,7 +409,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   }, [uid]);
 
   useEffect(() => {
-    if (activeTab === 'exams') {
+    if (activeTab === 'exams' || activeTab === 'final_exams') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
       void fetchExams();
     }
@@ -776,8 +805,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 { id: 'ai',       label: 'AI Trợ giảng',       icon: Bot },
                 { id: 'chat',     label: 'Thảo luận lớp học',  icon: MessageSquare },
                 { id: 'meeting',  label: 'Phòng họp',          icon: Video },
-                { id: 'exams',    label: 'Bài kiểm tra',       icon: ClipboardList },
-                { id: 'quiz',     label: 'Quiz Game',           icon: Gamepad2 },
+                { id: 'exams',    label: 'Bài tập',       icon: ClipboardList },
+                { id: 'final_exams', label: 'Kì Thi',           icon: BarChart2 },
+                { id: 'quiz',     label: 'Thi trắc nghiệm',     icon: Gamepad2 },
                 { id: 'students', label: 'Danh sách sinh viên', icon: Users },
               ] as const).map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === id;
@@ -865,8 +895,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {openGroups.learning && (
                 <div className="pb-1 px-1">
                   {[
-                    { id: 'exams', label: 'Bài kiểm tra', icon: ClipboardList },
-                    { id: 'quiz',  label: 'Quiz Game',    icon: Gamepad2 },
+                    { id: 'final_exams', label: 'Kì Thi', icon: BarChart2 },
+                    { id: 'exams', label: 'Bài tập', icon: ClipboardList },
+                    { id: 'quiz',  label: 'Thi trắc nghiệm',    icon: Gamepad2 },
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
@@ -1566,12 +1597,180 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             </div>
           )}
 
+          {activeTab === 'final_exams' && (() => {
+            const activeExams = exams.filter(e => e.status === 'ongoing');
+            const completedExams = exams.filter(e => e.status === 'closed');
+            const hasAnySession = activeExams.length > 0 || completedExams.length > 0;
+            const tabExams = examSubTab === 'ongoing' ? activeExams : completedExams;
+
+            return (
+              <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+                {/* Header */}
+                <div className="px-10 pt-10 pb-0 border-b border-border bg-muted/50">
+                  <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between mb-6">
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground">Kì Thi</h3>
+                      <p className="text-sm text-muted-foreground font-medium mt-1">Tổ chức và quản lý các kì thi trực tuyến</p>
+                    </div>
+                    <Button
+                      onClick={() => setShowOpenExamModal(true)}
+                      className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                    >
+                      <Wifi size={20} />
+                      Mở ca thi
+                    </Button>
+                  </div>
+
+                  {/* Tab bar */}
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setExamSubTab('ongoing')}
+                      className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
+                        examSubTab === 'ongoing'
+                          ? 'border-indigo-600 text-indigo-600'
+                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <span className="relative flex h-2 w-2">
+                        {activeExams.length > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />}
+                        <span className={`relative inline-flex rounded-full h-2 w-2 ${activeExams.length > 0 ? 'bg-rose-500' : 'bg-muted-foreground/30'}`} />
+                      </span>
+                      Đang thi
+                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'ongoing' ? 'bg-indigo-100 text-indigo-600' : 'bg-muted text-muted-foreground'}`}>
+                        {activeExams.length}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setExamSubTab('closed')}
+                      className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
+                        examSubTab === 'closed'
+                          ? 'border-indigo-600 text-indigo-600'
+                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      Đã thi
+                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'closed' ? 'bg-indigo-100 text-indigo-600' : 'bg-muted text-muted-foreground'}`}>
+                        {completedExams.length}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-10 flex-1 overflow-y-auto">
+                  {loadingExams ? (
+                    <div className="flex h-40 items-center justify-center">
+                      <Loader2 size={32} className="animate-spin text-muted-foreground/40" />
+                    </div>
+                  ) : !hasAnySession ? (
+                    <div className="flex flex-col items-center justify-center py-24 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                      <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
+                        <BarChart2 size={24} className="opacity-40 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm font-black text-foreground uppercase tracking-widest">Chưa có ca thi nào</p>
+                      <p className="text-xs font-medium mt-1 mb-6 text-muted-foreground">Nhấn &ldquo;Mở ca thi&rdquo; để bắt đầu kì thi đầu tiên</p>
+                      <Button
+                        onClick={() => setShowOpenExamModal(true)}
+                        className="h-10 rounded-xl bg-indigo-600 px-6 gap-2 text-xs font-bold text-white hover:bg-indigo-700 uppercase tracking-widest"
+                      >
+                        <Wifi size={15} />
+                        Mở ca thi đầu tiên
+                      </Button>
+                    </div>
+                  ) : tabExams.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-[28px] border border-dashed border-border">
+                      <BarChart2 size={28} className="opacity-20 text-muted-foreground mb-3" />
+                      <p className="text-sm font-bold text-muted-foreground">
+                        {examSubTab === 'ongoing' ? 'Không có ca thi nào đang diễn ra' : 'Chưa có ca thi nào kết thúc'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {examSubTab === 'ongoing' ? (
+                        /* ── ĐANG THI cards ── */
+                        tabExams.map(exam => (
+                          <div key={exam.uid} className="bg-card rounded-[20px] border-2 border-indigo-200 shadow-md shadow-indigo-50">
+                            <div className="flex items-center gap-5 p-5">
+                              <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-200">
+                                <FileText size={20} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h4 className="text-sm font-black text-foreground truncate">{exam.title}</h4>
+                                  <span className="shrink-0 text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100 uppercase animate-pulse">
+                                    • LIVE
+                                  </span>
+                                </div>
+                                <p className="text-[10px] font-bold text-muted-foreground">
+                                  Bắt đầu: {exam.opened_at ? formatDateTime(exam.opened_at) : '--'}
+                                </p>
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  <span className="flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-[10px] font-black text-indigo-600">
+                                    <Timer size={9} />
+                                    {exam.duration_seconds ? `${Math.round(exam.duration_seconds / 60)} phút` : 'Không giới hạn'}
+                                  </span>
+                                  <span className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-600">
+                                    <Clock size={9} />
+                                    Muộn: {exam.late_threshold_seconds ? `${Math.round(exam.late_threshold_seconds / 60)}p` : 'Không'}
+                                  </span>
+                                  <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${exam.camera_required ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+                                    <Camera size={9} />
+                                    {exam.camera_required ? 'Camera' : 'Không camera'}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Button onClick={() => setGradeTableExam(exam)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
+                                  <ClipboardCheck size={13} />Bảng điểm
+                                </Button>
+                                <Button onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
+                                  Chi tiết
+                                </Button>
+                                <Button onClick={() => void handleCloseOnline(exam)} size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5 bg-rose-600 hover:bg-rose-700 text-white">
+                                  <WifiOff size={13} />Đóng thi
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        /* ── ĐÃ THI cards ── */
+                        tabExams.map(exam => (
+                          <div key={exam.uid} className="bg-muted/40 rounded-[20px] border border-border flex items-center gap-5 p-5 hover:bg-card hover:border-indigo-100 transition-all group">
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors">
+                              <FileText size={20} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="text-sm font-black text-foreground truncate group-hover:text-indigo-600 transition-colors">{exam.title}</h4>
+                              <p className="text-[10px] font-bold text-muted-foreground mt-0.5">
+                                Đã thi: {exam.opened_at ? formatDateTime(exam.opened_at) : '--'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <Button onClick={() => setGradeTableExam(exam)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
+                                <ClipboardCheck size={13} />Bảng điểm
+                              </Button>
+                              <Button onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
+                                Chi tiết
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
           {activeTab === 'quiz' && (
             <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
               <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">Quiz Game</h3>
-                  <p className="text-sm text-muted-foreground font-medium mt-1">Giao quiz cho sinh viên trong lớp chơi trực tuyến</p>
+                  <h3 className="text-xl font-bold text-foreground">Thi trắc nghiệm</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">Giao bài tập trắc nghiệm cho sinh viên trong lớp</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -1580,14 +1779,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     className="h-12 rounded-2xl px-6 gap-3 text-xs font-bold uppercase tracking-widest transition-all"
                   >
                     <Wand2 size={18} />
-                    Tạo Quiz mới
+                    Tạo đề mới
                   </Button>
                   <Button
                     onClick={() => setShowAssignModal(true)}
                     className="h-12 rounded-2xl bg-violet-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-violet-100 hover:bg-violet-700 uppercase tracking-widest transition-all"
                   >
                     <Plus size={20} />
-                    Giao Quiz mới
+                    Giao đề mới
                   </Button>
                 </div>
               </div>
@@ -1602,8 +1801,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Gamepad2 size={24} className="opacity-40" />
                     </div>
-                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có quiz nào được giao</p>
-                    <p className="text-xs font-medium mt-1">Nhấn &ldquo;Giao Quiz mới&rdquo; để thêm hoạt động cho lớp</p>
+                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có đề thi nào được giao</p>
+                    <p className="text-xs font-medium mt-1">Nhấn &ldquo;Giao đề mới&rdquo; để thêm hoạt động cho lớp</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4">
@@ -1749,6 +1948,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             toast.success('Đã giao quiz thành công');
           }}
           localAssigned={new Set(assignedQuizzes.map(q => q.uid))}
+        />
+      )}
+
+      {showOpenExamModal && (
+        <OpenOnlineExamModal
+          classroomUid={uid}
+          onClose={() => setShowOpenExamModal(false)}
+          onOpened={(exam, studentCount) => {
+            setExams(prev => [exam, ...prev.filter(item => item.uid !== exam.uid)]);
+            setShowOpenExamModal(false);
+            setActiveTab('final_exams');
+            toast.success(`Đã mở ca thi cho ${studentCount} sinh viên`);
+          }}
         />
       )}
 
@@ -1978,14 +2190,14 @@ function AssignQuizModal({
   localAssigned: Set<string>;
 }) {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [pendingQuiz, setPendingQuiz] = useState<Quiz | null>(null);
 
   const [timeLimitMin, setTimeLimitMin] = useState(0);
   const [maxAttempts, setMaxAttempts] = useState(0);
   const [shuffleQuestions, setShuffleQuestions] = useState(false);
   const [shuffleOptions, setShuffleOptions] = useState(false);
-  const [showExplanation, setShowExplanation] = useState(true);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
@@ -1993,7 +2205,7 @@ function AssignQuizModal({
       setQuizzes(data);
       setLoading(false);
     }).catch(() => {
-      toast.error('Không thể tải thư viện quiz');
+      toast.error('Không thể tải thư viện đề thi');
       setLoading(false);
     });
   }, []);
@@ -2012,7 +2224,7 @@ function AssignQuizModal({
       });
       onAssigned({ ...pendingQuiz, assigned_classrooms: [assignment] });
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể giao quiz');
+      toast.error(err instanceof Error ? err.message : 'Không thể giao đề thi');
     } finally {
       setAssigning(false);
     }
@@ -2024,7 +2236,7 @@ function AssignQuizModal({
         <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
           <div className="p-8 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-foreground">Cài đặt giao Quiz</h2>
+              <h2 className="text-xl font-bold text-foreground">Cài đặt giao đề thi</h2>
               <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-slate-400">
@@ -2086,8 +2298,8 @@ function AssignQuizModal({
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[80vh] flex flex-col">
         <div className="p-8 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-foreground">Chọn Quiz để giao</h2>
-            <p className="text-sm text-muted-foreground font-medium mt-1">Nhấn vào quiz để cài đặt và giao cho lớp</p>
+            <h2 className="text-xl font-bold text-foreground">Chọn đề thi để giao</h2>
+            <p className="text-sm text-muted-foreground font-medium mt-1">Nhấn vào đề thi để cài đặt và giao cho lớp</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground">
             <X size={20} />
@@ -2102,8 +2314,8 @@ function AssignQuizModal({
           ) : quizzes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
               <BookOpen size={48} className="mb-4 opacity-40" />
-              <p className="text-sm font-bold text-foreground uppercase tracking-widest">Thư viện quiz trống</p>
-              <p className="text-xs font-medium mt-1">Hãy tạo quiz mới trong hệ thống trước</p>
+              <p className="text-sm font-bold text-foreground uppercase tracking-widest">Thư viện đề thi trống</p>
+              <p className="text-xs font-medium mt-1">Hãy tạo đề thi mới trong hệ thống trước</p>
             </div>
           ) : (
             quizzes.map(quiz => {
@@ -2143,6 +2355,212 @@ function AssignQuizModal({
         <div className="p-8 border-t border-border">
           <Button onClick={onClose} variant="outline" className="w-full rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
             Đóng cửa sổ
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OpenOnlineExamModal({
+  classroomUid,
+  onClose,
+  onOpened,
+}: {
+  classroomUid: string;
+  onClose: () => void;
+  onOpened: (exam: Exam, studentCount: number) => void;
+}) {
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedExamUid, setSelectedExamUid] = useState('');
+  const [durationMin, setDurationMin] = useState(45);
+  const [lateThresholdMin, setLateThresholdMin] = useState(15);
+  const [cameraRequired, setCameraRequired] = useState(false);
+  const [opening, setOpening] = useState(false);
+
+  useEffect(() => {
+    spaceApi.exams.listByClassroom(classroomUid, {
+      status: 'published',
+      exam_mode: 'online',
+    }).then(data => {
+      // Client-side: bỏ exam đã hết hạn (due_date < now)
+      const now = Date.now();
+      const valid = data.filter(e => !e.due_date || new Date(e.due_date).getTime() > now);
+      setExams(valid);
+      if (valid[0]) {
+        setSelectedExamUid(valid[0].uid);
+        setDurationMin(Math.round((valid[0].duration_seconds || 2700) / 60));
+        setLateThresholdMin(Math.round((valid[0].late_threshold_seconds || 900) / 60));
+        setCameraRequired(valid[0].camera_required ?? false);
+      }
+      setLoading(false);
+    }).catch(() => {
+      toast.error('Không thể tải danh sách bài thi');
+      setLoading(false);
+    });
+  }, [classroomUid]);
+
+  const selectedExam = exams.find(e => e.uid === selectedExamUid);
+
+  const handleSelectExam = (exam: Exam) => {
+    setSelectedExamUid(exam.uid);
+    setDurationMin(Math.round((exam.duration_seconds || 2700) / 60));
+    setLateThresholdMin(Math.round((exam.late_threshold_seconds || 900) / 60));
+    setCameraRequired(exam.camera_required ?? false);
+  };
+
+  const handleOpenExam = async () => {
+    if (!selectedExam) {
+      toast.error('Vui lòng chọn bài thi để mở ca thi');
+      return;
+    }
+
+    setOpening(true);
+    try {
+      const opened = await spaceApi.exams.openOnline(selectedExam.uid, {
+        late_threshold_seconds: lateThresholdMin * 60,
+        duration_seconds: durationMin * 60,
+        camera_required: cameraRequired,
+      });
+      onOpened(opened.exam, opened.sessions.length);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể mở ca thi');
+    } finally {
+      setOpening(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="w-full max-w-4xl h-[90vh] bg-card rounded-[40px] shadow-2xl border border-border flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="flex items-center justify-between p-8 border-b border-border bg-muted/30">
+          <div>
+            <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Mở ca thi trực tuyến</h2>
+            <p className="text-sm font-medium text-muted-foreground">Chọn bài thi từ danh sách lớp để bắt đầu ca thi</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} disabled={opening} className="rounded-xl text-muted-foreground">
+            <X size={20} />
+          </Button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              <ClipboardList size={14} />
+              Chọn bài thi trực tuyến
+            </div>
+            {loading ? (
+              <div className="flex h-32 items-center justify-center rounded-2xl border border-border bg-muted/40">
+                <Loader2 size={28} className="animate-spin text-indigo-500" />
+              </div>
+            ) : exams.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center">
+                <ClipboardList size={36} className="mx-auto mb-3 text-muted-foreground/40" />
+                <p className="text-sm font-bold text-foreground">Chưa có bài thi trực tuyến nào</p>
+                <p className="mt-1 text-xs font-medium text-muted-foreground">Hãy tạo bài thi trong phần Quản lý đề thi trước</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {exams.map(exam => {
+                  const active = exam.uid === selectedExamUid;
+                  return (
+                    <button
+                      key={exam.uid}
+                      type="button"
+                      onClick={() => handleSelectExam(exam)}
+                      disabled={opening}
+                      className={`rounded-2xl border-2 p-4 text-left transition-all ${
+                        active
+                          ? 'border-indigo-500 bg-indigo-50'
+                          : 'border-slate-100 bg-card hover:border-indigo-200 hover:bg-indigo-50/40'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-muted-foreground'}`}>
+                          {active ? <Check size={18} /> : <FileText size={18} />}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-bold text-foreground">{exam.title}</div>
+                          <div className="mt-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">{exam.duration_seconds ? Math.round(exam.duration_seconds / 60) : 0} phút</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {selectedExam && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-foreground">Thời gian làm bài (phút) <span className="text-rose-500">*</span></span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={durationMin}
+                    onChange={event => setDurationMin(Math.max(1, Number(event.target.value)))}
+                    disabled={opening}
+                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-indigo-100 disabled:opacity-60"
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="px-1 text-sm font-bold text-foreground">Vào trễ tối đa (phút)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={lateThresholdMin}
+                    onChange={event => setLateThresholdMin(Number(event.target.value))}
+                    disabled={opening}
+                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-indigo-100 disabled:opacity-60"
+                    placeholder="0 = Không giới hạn"
+                  />
+                </label>
+              </div>
+
+              {/* Camera toggle */}
+              <div className={`flex items-center justify-between rounded-2xl border-2 px-5 py-4 transition-colors ${cameraRequired ? 'border-indigo-300 bg-indigo-50' : 'border-border bg-muted/40'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'}`}>
+                    <Camera size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-black text-foreground">Yêu cầu camera & nhận diện khuôn mặt</div>
+                    <div className="mt-0.5 text-xs font-medium text-muted-foreground">
+                      {cameraRequired
+                        ? 'Học sinh bắt buộc bật camera và xác thực khuôn mặt trong suốt bài thi'
+                        : 'Học sinh không bắt buộc dùng camera — nhấn để bật'}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={opening}
+                  onClick={() => setCameraRequired(v => !v)}
+                  className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${cameraRequired ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                  style={{ width: 52 }}
+                >
+                  <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-8 border-t border-border flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={onClose} disabled={opening} className="rounded-[20px] font-bold text-xs h-12 px-6 uppercase tracking-widest border-border">
+            Hủy
+          </Button>
+          <Button
+            onClick={() => void handleOpenExam()}
+            disabled={opening || loading || !selectedExam}
+            className="rounded-[20px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-12 px-8 gap-3 shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all"
+          >
+            {opening ? <Loader2 size={18} className="animate-spin" /> : <Wifi size={18} />}
+            Bắt đầu ca thi
           </Button>
         </div>
       </div>
@@ -2273,7 +2691,7 @@ function StudentDetailsModal({
   onClose: () => void;
 }) {
   const [records, setRecords] = useState<StudentExamRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     spaceApi.classrooms.studentSubmissions(classroomUid, member.member_id)
@@ -2395,7 +2813,7 @@ function StudentAnalyzeModal({
   onClose: () => void;
 }) {
   const [records, setRecords] = useState<StudentExamRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     spaceApi.classrooms.studentSubmissions(classroomUid, member.member_id)
@@ -2553,7 +2971,7 @@ function ExamGradeTableModal({
 
   const [students, setStudents] = useState<ClassroomMember[]>([]);
   const [submissions, setSubmissions] = useState<import('@/lib/api/types').ExamSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<GradeFilter>('all');

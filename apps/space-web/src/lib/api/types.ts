@@ -105,23 +105,58 @@ export type CreateClassroomRequest = {
 
 export type UpdateClassroomRequest = Partial<CreateClassroomRequest>;
 
-export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image';
-export type ExamStatus = 'draft' | 'published' | 'closed';
+export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image' | 'quiz';
+export type ExamStatus = 'draft' | 'published' | 'closed' | 'ongoing';
+export type ExamMode = 'online' | 'offline';
+export type ExamSessionStatus = 'pending' | 'active' | 'expired' | 'completed';
+
+export type ExamMeta = {
+  url?: string;
+  name?: string;
+  size?: number;
+  mime?: string;
+  [key: string]: unknown;
+};
 
 export type Exam = {
   uid: string;
   classroom_id: string;
+  teacher_id?: string;
   title: string;
   description: string;
   content_type: ExamContentType;
-  content: string;
+  body: string;
+  ref_id?: string | null;
+  meta?: ExamMeta;
   status: ExamStatus;
+  exam_mode?: ExamMode;
+  duration_seconds?: number;
+  camera_required?: boolean;
+  is_online_active?: boolean;
+  opened_at?: string | null;
+  late_threshold_seconds?: number;
   due_date: string;
-  resource_uid?: string | null;
-  resource_url?: string | null;
-  resource_name?: string;
+  exam_type?: 'assignment' | 'quiz';
+  max_grade?: number;
   created_at?: string;
   updated_at?: string;
+};
+
+export type ExamSession = {
+  uid: string;
+  exam_id: string;
+  student_id: string;
+  token: string;
+  token_status: ExamSessionStatus;
+  token_expires_at: string | null;
+  started_at: string | null;
+  ends_at: string | null;
+};
+
+export type OpenOnlineResponse = {
+  exam: Exam;
+  sessions: ExamSession[];
+  expires_in_minutes: number;
 };
 
 export type ExamSubmission = {
@@ -185,12 +220,15 @@ export type CreateExamRequest = {
   title: string;
   description: string;
   content_type: ExamContentType;
-  content: string;
-  due_date: string;
+  body: string;
+  ref_id?: string | null;
+  due_date: string | null;
   status?: ExamStatus;
-  resource_uid?: string | null;
-  resource_url?: string | null;
-  resource_name?: string;
+  exam_mode?: ExamMode;
+  duration_seconds?: number;
+  camera_required?: boolean;
+  exam_type?: 'assignment' | 'quiz';
+  max_grade?: number;
 };
 
 export type UpdateExamRequest = Partial<Omit<CreateExamRequest, 'classroom_id'>> & {

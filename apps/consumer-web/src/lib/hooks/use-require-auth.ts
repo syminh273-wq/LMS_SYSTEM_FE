@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useDispatch } from "react-redux"
-import { clearProfile } from "@/lib/redux/userSlice"
+import { useDispatch, useSelector } from "react-redux"
+import { clearProfile, setFaceEnrolled } from "@/lib/redux/userSlice"
+import { faceApi } from "@/lib/api/face"
+import type { RootState } from "@/lib/redux/store"
 
 export function useRequireAuth() {
   const router = useRouter()
   const dispatch = useDispatch()
-  // Start false on both server and client to avoid hydration mismatch.
-  // Set to real value after mount (client-only).
+  const faceEnrolled = useSelector((state: RootState) => state.user.faceEnrolled)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -18,13 +19,21 @@ export function useRequireAuth() {
     setIsAuthenticated(Boolean(token))
     setMounted(true)
     if (!token) {
-      router.push("/login")
+      router.push("/consumer/login")
+      return
     }
-  }, [router])
+
+    // Chỉ fetch 1 lần — nếu Redux đã có giá trị thì bỏ qua
+    if (faceEnrolled !== null) return
+
+    faceApi.enrollmentStatus()
+      .then(({ enrolled }) => { dispatch(setFaceEnrolled(enrolled)) })
+      .catch(() => {})
+  }, [router, dispatch, faceEnrolled])
 
   const logout = () => {
     dispatch(clearProfile())
-    router.push("/login")
+    router.push("/consumer/login")
   }
 
   return { isAuthenticated, mounted, logout }
