@@ -21,8 +21,11 @@ import {
 import { classroomApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/lib/redux/store';
 import { toast } from 'sonner';
 import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
+import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
 import { Loader2, QrCode, KeyRound, X, Camera } from 'lucide-react';
 
 
@@ -206,6 +209,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
 export default function ClassroomPage() {
   const router = useRouter();
   const { isAuthenticated, mounted, logout } = useRequireAuth();
+  const userId = useSelector((state: RootState) => state.user.profile?.uid);
   const [userName] = useState("Student");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
@@ -228,6 +232,12 @@ export default function ClassroomPage() {
       queueMicrotask(() => { void fetchClassrooms(); });
     }
   }, [fetchClassrooms, isAuthenticated]);
+
+  // Realtime Firebase: khi giáo viên approve → tự động refresh danh sách lớp
+  useMembershipRealtime({
+    userId,
+    onApproved: useCallback(() => { void fetchClassrooms(); }, [fetchClassrooms]),
+  });
 
   const handleJoined = (classroom: Classroom) => {
     setClassrooms(prev => {

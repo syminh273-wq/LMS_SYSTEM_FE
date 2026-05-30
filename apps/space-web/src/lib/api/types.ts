@@ -23,6 +23,8 @@ export type Consumer = {
   uid: string;
   username: string;
   email: string;
+  first_name: string;
+  last_name: string;
   full_name: string;
   phone: string;
   avatar_url: string;
@@ -452,6 +454,43 @@ export type ActivityLog = {
   target_name: string;
   metadata: Record<string, unknown>;
   created_at: string;
+};
+
+// ── Teacher Contact / Student Roster ─────────────────────────────────────────
+
+export type TeacherContact = {
+  consumer_uid: string;
+  consumer_name: string;
+  first_name: string;
+  last_name: string;
+  consumer_email: string;
+  consumer_avatar: string;
+  first_joined_at: string | null;
+};
+
+export type StudentClassroomStat = {
+  classroom: {
+    uid: string;
+    name: string;
+    description: string;
+    status: string;
+    pid: string;
+  };
+  joined_at: string | null;
+  total_exams: number;
+  submitted_count: number;
+  avg_grade: number | null;
+};
+
+export type StudentDetail = {
+  consumer: {
+    uid: string;
+    full_name: string;
+    email: string;
+    avatar_url: string;
+    first_joined_at: string | null;
+  };
+  classrooms: StudentClassroomStat[];
 };
 
 // ── Student Public Profile (teacher view) ────────────────────────────────────

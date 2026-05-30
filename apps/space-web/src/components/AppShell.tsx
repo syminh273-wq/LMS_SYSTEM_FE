@@ -14,19 +14,19 @@ import {
   BookOpen,
   Gamepad2,
   Sparkles,
-  Search,
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import NotificationBell from '@/components/NotificationBell';
+import GlobalSearch from '@/components/GlobalSearch';
 
 const navItems = [
   { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
   { name: 'Classrooms', href: '/space/classrooms', icon: BookOpen },
   { name: 'Quiz Library', href: '/space/quizzes', icon: Gamepad2 },
-  { name: 'Staff Management', href: '/space/staff', icon: Users },
+  { name: 'Students', href: '/space/student', icon: Users },
   { name: 'Settings', href: '/space/settings', icon: Settings },
 ];
 
@@ -132,20 +132,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="h-20 bg-card dark:bg-card border-b border-border dark:border-border flex items-center justify-between px-10">
           <div className="flex items-center gap-6 flex-1">
-            {pathname.includes('/classrooms/') ? (
-              <div className="relative w-96 max-w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                <input
-                  type="text"
-                  className="w-full pl-12 pr-4 py-2.5 bg-muted/50 dark:bg-muted border border-border dark:border-border rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-card dark:focus:bg-muted/80 dark:text-foreground dark:placeholder:text-muted-foreground transition-all"
-                  placeholder="Tìm kiếm tài liệu, lớp học..."
-                />
-              </div>
-            ) : (
-              <h2 className="text-lg font-bold text-foreground uppercase tracking-widest">
-                {navItems.find(i => matchesNavPath(pathname, i.href))?.name || 'Space Admin'}
-              </h2>
-            )}
+            <h2 className="text-lg font-bold text-foreground uppercase tracking-widest">
+              {navItems.find(i => matchesNavPath(pathname, i.href))?.name || 'Space Admin'}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-4 mr-4">
+            <GlobalSearch />
           </div>
 
           <div className="flex items-center gap-8">

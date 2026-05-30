@@ -6,7 +6,8 @@ export type LoginRequest = {
 export type RegisterRequest = {
   email: string;
   password: string;
-  full_name?: string;
+  first_name: string;
+  last_name: string;
 };
 
 export type AuthTokenResponse = {
@@ -21,8 +22,11 @@ export type ApiMessageResponse = {
 
 export type Consumer = {
   uid: string;
+  pid: string;
   username: string;
   email: string;
+  first_name: string;
+  last_name: string;
   full_name: string;
   phone: string;
   avatar_url: string;
@@ -40,6 +44,8 @@ export type CreateConsumerRequest = {
 };
 
 export type UpdateConsumerRequest = {
+  first_name?: string;
+  last_name?: string;
   full_name?: string;
   phone?: string;
   avatar_url?: string;

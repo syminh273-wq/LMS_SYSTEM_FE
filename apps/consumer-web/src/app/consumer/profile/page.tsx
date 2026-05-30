@@ -364,6 +364,15 @@ export default function ProfilePage() {
                       </div>
                     )}
                     <p className="text-sm text-muted-foreground">@{profile?.username} · 🎓 Học sinh</p>
+                    {profile?.pid && (
+                      <button
+                        onClick={() => { navigator.clipboard.writeText(profile.pid); toast.success('Đã copy PID!'); }}
+                        className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/60 border border-border hover:bg-muted transition-all text-xs font-mono font-bold text-muted-foreground hover:text-foreground"
+                        title="Click để copy PID"
+                      >
+                        🪪 {profile.pid}
+                      </button>
+                    )}
                   </div>
 
                   {/* Action Buttons */}

@@ -14,6 +14,8 @@ type AuthFormValues = {
   email: string;
   password: string;
   confirm_password?: string;
+  first_name?: string;
+  last_name?: string;
   root?: {
     server?: string;
   };
@@ -95,16 +97,15 @@ export default function LoginPage() {
     setGlobalError('');
     setLoading(true);
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('email', data.email);
-      formData.append('password', data.password);
-      formData.append('confirm_password', data.confirm_password || '');
-
-      const response = await consumerApi.auth.register(formData);
+      const response = await consumerApi.auth.register({
+        email: data.email,
+        password: data.password,
+        first_name: data.first_name || '',
+        last_name: data.last_name || '',
+      });
       setSuccess(response.message || 'Đăng ký thành công. Vui lòng đăng nhập.');
       setIsLogin(true);
-      reset({ email: data.email, password: '', confirm_password: '' });
+      reset({ email: data.email, password: '', confirm_password: '', first_name: '', last_name: '' });
     } catch (err: any) {
       handleApiError(err, 'Đăng ký');
     } finally { setLoading(false); }
@@ -156,6 +157,31 @@ export default function LoginPage() {
             </div>
             {errors.password && <p className={errorClass}>{errors.password.message}</p>}
           </div>
+
+          {!isLogin && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">Họ</label>
+                <input
+                  type="text"
+                  {...register('last_name', { required: !isLogin ? 'Thông tin bắt buộc' : false })}
+                  className={`w-full px-4 py-2 border rounded-lg outline-none transition-all focus:ring-2 ${errors.last_name ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-500'}`}
+                  placeholder="Nguyễn"
+                />
+                {errors.last_name && <p className={errorClass}>{errors.last_name.message}</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700">Tên</label>
+                <input
+                  type="text"
+                  {...register('first_name', { required: !isLogin ? 'Thông tin bắt buộc' : false })}
+                  className={`w-full px-4 py-2 border rounded-lg outline-none transition-all focus:ring-2 ${errors.first_name ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-500'}`}
+                  placeholder="Văn A"
+                />
+                {errors.first_name && <p className={errorClass}>{errors.first_name.message}</p>}
+              </div>
+            </div>
+          )}
 
           {!isLogin && (
             <div>

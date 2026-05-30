@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect, use, useRef } from 'react';
+import { useState, useEffect, useCallback, use, useRef } from 'react';
+import { usePendingRealtime } from '@/lib/hooks/use-pending-realtime';
 import { useRouter } from 'next/navigation';
 import { spaceApi, SharingLink, Classroom, Exam } from '@/lib/api';
 import type { ClassroomMember, StudentExamRecord, ActivityLog } from '@/lib/api/types';
@@ -360,19 +361,20 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       .finally(() => setLoadingMembers(false));
   }, [activeTab, uid]);
 
-  const loadPendingMembers = () => {
+  const loadPendingMembers = useCallback(() => {
     setLoadingPending(true);
     spaceApi.classrooms.pendingMembers(uid)
       .then(setPendingMembers)
       .catch(() => toast.error('Không thể tải danh sách chờ duyệt'))
       .finally(() => setLoadingPending(false));
-  };
+  }, [uid]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Load pending requests when the classroom changes.
     loadPendingMembers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uid]);
+  }, [loadPendingMembers]);
+
+  // Realtime Firebase: khi học sinh join → badge tự cập nhật không cần refresh
+  usePendingRealtime({ classroomUid: uid, onNewRequest: loadPendingMembers });
 
   const handleApproveMember = async (member: ClassroomMember) => {
     setApprovingId(member.member_id);

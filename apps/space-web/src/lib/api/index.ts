@@ -7,10 +7,11 @@ import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
 import { notificationApi } from './notification';
+import { studentApi } from './student';
 
 export * from './types';
 export * from './exceptions';
-export { quizApi };
+export { quizApi, studentApi };
 
 // For backward compatibility and centralized access
 export const api = {

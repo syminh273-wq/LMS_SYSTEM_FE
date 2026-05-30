@@ -274,6 +274,11 @@ export default function PublicProfilePage() {
                     <CheckCircle size={22} className={cn("shrink-0", theme.accent)} />
                   </div>
                   <p className="text-sm text-muted-foreground">@{consumer.username}</p>
+                  {consumer.pid && (
+                    <span className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/60 border border-border text-xs font-mono font-bold text-muted-foreground">
+                      🪪 {consumer.pid}
+                    </span>
+                  )}
                 </div>
 
                 {/* Actions */}
