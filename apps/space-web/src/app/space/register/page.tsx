@@ -2,16 +2,27 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import type { FieldPath } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Lock, Mail, User, Building, Globe } from 'lucide-react';
+import { Lock, Mail, User } from 'lucide-react';
 import Link from 'next/link';
+import { getAvatarText } from '@/lib/avatar';
 
 type RegisterFormValues = {
+  full_name: string;
   email: string;
   password: string;
 };
+
+function createSpaceSlug(name: string) {
+  return `${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${Math.random().toString(36).substring(2, 7)}`;
+}
+
+function getErrorMessage(err: unknown, fallback: string) {
+  return err instanceof Error ? err.message : fallback;
+}
 
 export default function SpaceRegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -19,35 +30,37 @@ export default function SpaceRegisterPage() {
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<RegisterFormValues>({
-    defaultValues: { email: '', password: '' }
+    defaultValues: { full_name: '', email: '', password: '' }
   });
 
-  const handleApiError = (err: any) => {
+  const handleApiError = (err: unknown) => {
     if (err instanceof ValidationException) {
       Object.entries(err.errors).forEach(([field, message]) => {
-        setFormError(field as any, { type: 'server', message });
+        setFormError(field as FieldPath<RegisterFormValues>, { type: 'server', message });
       });
     } else {
-      setGlobalError(err.message || 'Đăng ký thất bại');
+      setGlobalError(getErrorMessage(err, 'Đăng ký thất bại'));
     }
   };
 
   const onRegister = async (data: RegisterFormValues) => {
     setGlobalError('');
     setLoading(true);
-    try {
-      // Tự động tạo name và slug từ email nếu API yêu cầu
-      const name = data.email.split('@')[0];
-      const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
+      try {
+      // Tự động tạo name, slug và avatar text từ họ tên nếu API yêu cầu
+      const name = data.full_name.trim();
+      const slug = createSpaceSlug(name);
       
       await spaceApi.auth.register({
-        ...data,
         name: name,
         slug: slug,
-        full_name: name
+        email: data.email,
+        password: data.password,
+        full_name: name,
+        avatar_text: getAvatarText(name)
       });
       router.push('/space/login?registered=true');
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleApiError(err);
     } finally { setLoading(false); }
   };
@@ -72,6 +85,22 @@ export default function SpaceRegisterPage() {
             )}
 
             <form onSubmit={handleSubmit(onRegister)} className='space-y-5'>
+              <div>
+                <label className='block text-sm font-semibold text-foreground mb-2'>Họ và tên</label>
+                <div className='relative'>
+                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
+                    <User size={18} />
+                  </div>
+                  <input 
+                    type='text' 
+                    {...register('full_name', { required: 'Vui lòng nhập họ và tên' })} 
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.full_name ? 'border-red-500 ring-red-100' : 'border-border'}`} 
+                    placeholder='Nguyen Van An' 
+                  />
+                </div>
+                {errors.full_name && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.full_name.message}</p>}
+              </div>
+
               <div>
                 <label className='block text-sm font-semibold text-foreground mb-2'>Email quản trị</label>
                 <div className='relative'>

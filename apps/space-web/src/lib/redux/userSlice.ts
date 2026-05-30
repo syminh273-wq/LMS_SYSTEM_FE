@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Consumer } from '@/lib/api';
+import type { SpaceAccountProfile } from '@/lib/api/account';
 
 interface UserState {
-  profile: Consumer | null;
+  profile: SpaceAccountProfile | null;
   isAuthenticated: boolean;
 }
 
@@ -29,7 +29,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setProfile: (state, action: PayloadAction<Consumer>) => {
+    setProfile: (state, action: PayloadAction<SpaceAccountProfile>) => {
       state.profile = action.payload;
       state.isAuthenticated = true;
       if (typeof window !== 'undefined') {
