@@ -65,12 +65,12 @@ export default function StudentsLayout({
                   onClick={() => goToTab(id)}
                   className={`w-full flex justify-center py-3 transition-colors relative ${
                     isActive
-                      ? 'text-indigo-600 bg-indigo-50'
+                      ? 'text-primary-brand bg-primary-brand-light'
                       : 'text-muted-foreground hover:bg-muted/50 hover:text-muted-foreground'
                   }`}
                 >
                   {isActive && (
-                    <div className="absolute left-0 w-1 h-5 bg-indigo-600 rounded-r-full top-1/2 -translate-y-1/2" />
+                    <div className="absolute left-0 w-1 h-5 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />
                   )}
                   <Icon size={18} />
                 </button>
@@ -171,10 +171,10 @@ export default function StudentsLayout({
               <div className="pb-2 px-1">
                 <button
                   onClick={() => goToTab('students')}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative bg-indigo-50 text-indigo-600"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative bg-primary-brand-light text-primary-brand"
                 >
-                  <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />
-                  <Users size={18} className="text-indigo-600" />
+                  <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />
+                  <Users size={18} className="text-primary-brand" />
                   Danh sách sinh viên
                 </button>
               </div>

@@ -171,7 +171,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/50">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary-brand" />
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
           <h1 className="text-lg font-black text-foreground">Không thể tải dữ liệu</h1>
           <p className="mt-2 text-sm font-bold text-muted-foreground">{error || 'Không tìm thấy bài kiểm tra'}</p>
-          <Button onClick={() => router.push(`/space/classrooms/${uid}/details?tab=exams`)} className="mt-5 w-full rounded-xl bg-indigo-600">
+          <Button onClick={() => router.push(`/space/classrooms/${uid}/details?tab=exams`)} className="mt-5 w-full rounded-xl bg-primary-brand">
             Quay lại lớp học
           </Button>
         </div>
@@ -203,7 +203,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
             <ArrowLeft size={20} />
           </Button>
           <div className="min-w-0">
-            <p className="truncate text-[10px] font-black uppercase tracking-widest text-indigo-500">
+            <p className="truncate text-[10px] font-black uppercase tracking-widest text-primary-brand">
               {classroom?.name || 'Lớp học'}
             </p>
             <h1 className="truncate text-lg font-black text-foreground">{exam.title}</h1>
@@ -219,7 +219,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
           <div className="border-b border-border p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="min-w-0">
-                <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Chi tiết bài kiểm tra</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-primary-brand">Chi tiết bài kiểm tra</div>
                 <h2 className="mt-1 text-2xl font-black tracking-tight text-foreground">{exam.title}</h2>
                 <p className="mt-2 text-sm font-medium leading-relaxed text-muted-foreground">{exam.description || 'Không có mô tả'}</p>
               </div>
@@ -238,7 +238,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
               <button
                 type="button"
                 onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=submissions`)}
-                className={`border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'submissions' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-muted-foreground hover:text-muted-foreground'}`}
+                className={`border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'submissions' ? 'border-primary-brand text-primary-brand' : 'border-transparent text-muted-foreground hover:text-muted-foreground'}`}
               >
                 Danh sách bài nộp
               </button>
@@ -246,7 +246,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                 <button
                   type="button"
                   onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=online`)}
-                  className={`flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'online' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-muted-foreground hover:text-muted-foreground'}`}
+                  className={`flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'online' ? 'border-primary-brand text-primary-brand' : 'border-transparent text-muted-foreground hover:text-muted-foreground'}`}
                 >
                   <Monitor size={13} />
                   Thi trực tuyến
@@ -267,7 +267,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                   {/* ── Inline settings card ── */}
                   <div className="rounded-2xl border border-border bg-muted/50">
                     <div className="flex items-center gap-2 border-b border-border px-5 py-3">
-                      <Monitor size={14} className="text-indigo-500" />
+                      <Monitor size={14} className="text-primary-brand" />
                       <span className="text-[11px] font-black uppercase tracking-widest text-foreground">Cài đặt phiên thi</span>
                       <span className="ml-auto text-[10px] font-bold text-muted-foreground">Áp dụng khi nhấn "Mở phiên thi"</span>
                     </div>
@@ -276,7 +276,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                       {/* Duration */}
                       <div className="flex flex-col gap-2 px-5 py-4">
                         <div className="flex items-center gap-1.5">
-                          <Timer size={13} className="text-indigo-500" />
+                          <Timer size={13} className="text-primary-brand" />
                           <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Thời gian làm bài</span>
                           <span className="text-rose-500 text-[10px] font-black">*</span>
                         </div>
@@ -287,7 +287,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                             max={360}
                             value={openSettings.duration_minutes}
                             onChange={e => setOpenSettings(s => ({ ...s, duration_minutes: Math.max(1, Number(e.target.value)) }))}
-                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10"
+                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
                           />
                           <span className="text-xs font-bold text-muted-foreground">phút</span>
                         </div>
@@ -307,7 +307,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                             max={60}
                             value={openSettings.late_threshold_minutes}
                             onChange={e => setOpenSettings(s => ({ ...s, late_threshold_minutes: Math.max(0, Number(e.target.value)) }))}
-                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10"
+                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
                           />
                           <span className="text-xs font-bold text-muted-foreground">phút</span>
                         </div>
@@ -323,7 +323,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                         <button
                           type="button"
                           onClick={() => setOpenSettings(s => ({ ...s, camera_required: !s.camera_required }))}
-                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${openSettings.camera_required ? 'bg-indigo-600' : 'bg-muted'}`}
+                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${openSettings.camera_required ? 'bg-primary-brand' : 'bg-muted'}`}
                         >
                           <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${openSettings.camera_required ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
@@ -353,7 +353,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                           size="sm"
                           onClick={() => void handleOpenOnline()}
                           disabled={sessionAction || openSettings.duration_minutes <= 0}
-                          className="rounded-xl gap-1.5 bg-indigo-600 text-xs font-bold hover:bg-indigo-700"
+                          className="rounded-xl gap-1.5 bg-primary-brand text-xs font-bold hover:bg-primary-brand-dark"
                         >
                           {sessionAction ? <Loader2 size={13} className="animate-spin" /> : <Wifi size={13} />}
                           Mở phiên thi
@@ -364,7 +364,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
 
                   <div className="overflow-hidden rounded-2xl border border-border">
                     {sessionLoading ? (
-                      <div className="py-12 text-center"><Loader2 size={24} className="mx-auto animate-spin text-indigo-400" /></div>
+                      <div className="py-12 text-center"><Loader2 size={24} className="mx-auto animate-spin text-primary-brand" /></div>
                     ) : sessions.length === 0 ? (
                       <div className="py-12 text-center text-sm font-bold text-muted-foreground">Chưa có phiên thi nào. Nhấn "Mở phiên thi" để bắt đầu.</div>
                     ) : (
@@ -421,7 +421,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                   value={query}
                   onChange={event => setQuery(event.target.value)}
                   placeholder="Tìm học sinh..."
-                  className="h-10 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm font-bold text-foreground outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                  className="h-10 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm font-bold text-foreground outline-none focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
                 />
               </label>
             </div>
@@ -491,7 +491,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         <aside className="h-fit space-y-4 lg:sticky lg:top-24">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-indigo-600" />
+              <BarChart3 size={18} className="text-primary-brand" />
               <h3 className="text-sm font-black uppercase text-foreground">Dashboard</h3>
             </div>
 
@@ -508,14 +508,14 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                 <span>{analytics.submitRate}%</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-indigo-600" style={{ width: `${analytics.submitRate}%` }} />
+                <div className="h-full rounded-full bg-primary-brand" style={{ width: `${analytics.submitRate}%` }} />
               </div>
             </div>
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
-              <Users size={18} className="text-indigo-600" />
+              <Users size={18} className="text-primary-brand" />
               <h3 className="text-sm font-black uppercase text-foreground">Cột điểm</h3>
             </div>
             <div className="space-y-3">
@@ -527,7 +527,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                   </div>
                   <div className="h-8 overflow-hidden rounded-lg bg-muted">
                     <div
-                      className="flex h-full items-center justify-end rounded-lg bg-indigo-500 px-2 text-[10px] font-black text-white"
+                      className="flex h-full items-center justify-end rounded-lg bg-primary-brand px-2 text-[10px] font-black text-white"
                       style={{ width: `${Math.max(bucket.percent, bucket.count > 0 ? 10 : 0)}%` }}
                     >
                       {bucket.count > 0 ? bucket.count : ''}
@@ -555,7 +555,7 @@ function FilterButton({ active, onClick, children }: { active: boolean; onClick:
     <button
       type="button"
       onClick={onClick}
-      className={`h-8 rounded-lg px-3 text-xs font-black uppercase transition-colors ${active ? 'bg-card text-indigo-600 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+      className={`h-8 rounded-lg px-3 text-xs font-black uppercase transition-colors ${active ? 'bg-card text-primary-brand shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
     >
       {children}
     </button>
@@ -607,7 +607,7 @@ function buildAnalytics(members: ClassroomMember[], submissions: ExamSubmission[
 function getSessionStatusClass(status: string) {
   if (status === 'pending') return 'bg-amber-50 text-amber-600 border border-amber-100';
   if (status === 'active') return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-  if (status === 'completed') return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
+  if (status === 'completed') return 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted';
   return 'bg-rose-50 text-rose-600 border border-rose-100';
 }
 
@@ -635,7 +635,7 @@ function getExamStatusClass(status: string) {
 function getSubmissionStatusClass(status: string) {
   const normalized = status.toLowerCase();
   if (normalized === 'graded' || normalized === 'returned') {
-    return 'bg-indigo-50 text-indigo-600 border border-indigo-100';
+    return 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted';
   }
   return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
 }

@@ -116,7 +116,7 @@ function getActivityMeta(eventType: ActivityLogEventType): {
   label: string;
 } {
   const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; label: string }> = {
-    classroom_created:  { icon: GraduationCap, color: 'text-indigo-600', bg: 'bg-indigo-100',  label: 'Lớp học được tạo' },
+    classroom_created:  { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light',  label: 'Lớp học được tạo' },
     document_uploaded:  { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-100',    label: 'Tài liệu mới được tải lên' },
     document_deleted:   { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: 'Xóa tài liệu' },
     exam_created:       { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-100',  label: 'Tạo bài kiểm tra' },
@@ -815,7 +815,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           </Button>
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <span className="text-[10px] font-black bg-indigo-600 text-white px-2.5 py-1 rounded-md uppercase tracking-widest shadow-sm">
+              <span className="text-[10px] font-black bg-primary-brand text-white px-2.5 py-1 rounded-md uppercase tracking-widest shadow-sm">
                 ID: {classroom.pid}
               </span>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em]">
@@ -885,10 +885,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     title={label}
                     onClick={() => setActiveTab(id as typeof activeTab)}
                     className={`w-full flex justify-center py-3 transition-colors relative ${
-                      isActive ? 'text-indigo-600 bg-indigo-50' : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
+                      isActive ? 'text-primary-brand bg-primary-brand-light' : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
                     }`}
                   >
-                    {isActive && <div className="absolute left-0 w-1 h-5 bg-indigo-600 rounded-r-full top-1/2 -translate-y-1/2" />}
+                    {isActive && <div className="absolute left-0 w-1 h-5 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />}
                     <Icon size={18} />
                     {id === 'meeting' && activeMeeting && (
                       <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -935,11 +935,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         key={id}
                         onClick={() => setActiveTab(id as typeof activeTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted'
+                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
-                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
+                        <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         {label}
                         {id === 'meeting' && activeMeeting && (
                           <span className="ml-auto flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -973,11 +973,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         key={id}
                         onClick={() => setActiveTab(id as typeof activeTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted'
+                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
-                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
+                        <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         {label}
                       </button>
                     );
@@ -1003,11 +1003,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <button
                         onClick={() => setActiveTab('students')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted'
+                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
                       >
-                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-indigo-600 rounded-r-full" />}
-                        <Users size={18} className={isActive ? 'text-indigo-600' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
+                        <Users size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         Danh sách sinh viên
                         {members.filter(m => m.role === 'student').length > 0 && (
                           <span className="ml-auto text-[10px] font-black bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
@@ -1033,18 +1033,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
               <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden border border-border p-0.5">
                 <div
-                  className="h-full bg-indigo-600 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000"
+                  className="h-full bg-primary-brand rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000"
                   style={{ width: `${classroom.max_students > 0 ? Math.min(100, (members.filter(m => m.role === 'student').length / classroom.max_students) * 100) : 0}%` }}
                 />
               </div>
             </Card>
 
-            <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-gradient-to-br from-indigo-600 to-indigo-800 text-white p-8 relative group">
+            <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-gradient-to-br from-primary-brand to-primary-brand-dark text-white p-8 relative group">
               <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <QrCode size={140} />
               </div>
               <div className="relative">
-                <h3 className="text-[10px] font-bold text-indigo-200 uppercase tracking-[0.3em] mb-4">MÃ THAM GIA</h3>
+                <h3 className="text-[10px] font-bold text-primary-brand-muted uppercase tracking-[0.3em] mb-4">MÃ THAM GIA</h3>
                 <div className="text-4xl font-bold tracking-[0.2em] mb-8">{linkData?.code || '------'}</div>
                 <Button
                   variant="ghost"
@@ -1065,7 +1065,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {/* Mô tả Card */}
               <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm group">
                 <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                  <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                     <Info size={22} />
                   </div>
                   Mô tả phòng học
@@ -1081,12 +1081,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {/* QR Code Card */}
                 <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm flex flex-col items-center">
                   <h3 className="text-lg font-bold text-foreground mb-8 self-start flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                    <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                       <QrCode size={22} />
                     </div>
                     Mã QR tham gia
                   </h3>
-                  <div className="p-10 bg-card rounded-[40px] border-2 border-dashed border-border mb-10 shadow-inner group transition-all hover:border-indigo-500/50">
+                  <div className="p-10 bg-card rounded-[40px] border-2 border-dashed border-border mb-10 shadow-inner group transition-all hover:border-primary-brand/50">
                     <div className="p-6 bg-muted rounded-[32px] border border-border group-hover:scale-105 transition-transform duration-500">
                       {linkData && (
                         <QRCodeSVG
@@ -1102,7 +1102,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   </div>
                   <Button 
                     onClick={handleDownloadQr} 
-                    className="w-full h-14 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-500 rounded-[20px] font-bold text-xs gap-3 transition-all uppercase tracking-widest"
+                    className="w-full h-14 bg-primary-brand/10 hover:bg-primary-brand/20 text-primary-brand rounded-[20px] font-bold text-xs gap-3 transition-all uppercase tracking-widest"
                   >
                     <Download size={20} /> TẢI ẢNH QR XUỐNG
                   </Button>
@@ -1112,7 +1112,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm flex flex-col">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                      <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                         <RotateCcw size={22} />
                       </div>
                       Lịch sử hoạt động
@@ -1125,7 +1125,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             onClick={() => setActivityLevel(lvl)}
                             className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
                               activityLevel === lvl
-                                ? 'bg-card text-indigo-600 shadow-sm'
+                                ? 'bg-card text-primary-brand shadow-sm'
                                 : 'text-muted-foreground hover:text-foreground'
                             }`}
                           >
@@ -1135,7 +1135,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </div>
                       <button
                         onClick={() => router.push(`/space/classrooms/${uid}/activity`)}
-                        className="flex items-center gap-1.5 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-indigo-50 transition-all"
+                        className="flex items-center gap-1.5 text-[10px] font-black text-primary-brand hover:text-primary-brand uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-primary-brand-light transition-all"
                       >
                         Xem tất cả
                         <ChevronRight size={13} />
@@ -1145,7 +1145,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
                   {loadingActivity ? (
                     <div className="flex items-center justify-center py-10">
-                      <Loader2 size={28} className="animate-spin text-indigo-400" />
+                      <Loader2 size={28} className="animate-spin text-primary-brand" />
                     </div>
                   ) : activityLogs.length === 0 ? (
                     <div className="text-center py-10 text-muted-foreground">
@@ -1206,7 +1206,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         value={uploadSection}
                         onChange={e => setUploadSection(e.target.value)}
                         placeholder="Mục (vd: tuần 1)"
-                        className="pl-8 pr-3 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-300 w-40"
+                        className="pl-8 pr-3 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 w-40"
                       />
                     </div>
                     <input ref={docInputRef} type="file" className="hidden" onChange={handleDocUpload}
@@ -1214,7 +1214,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <Button
                       onClick={() => docInputRef.current?.click()}
                       disabled={uploadingDoc}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-indigo-500/20 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
+                      className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-primary-brand/20 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
                     >
                       {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={18} />}
                       {uploadingDoc ? 'ĐANG TẢI...' : 'TẢI LÊN'}
@@ -1230,7 +1230,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <FolderOpen size={14} className="text-muted-foreground" />
                       <button
                         onClick={() => setFilterSection('')}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === '' ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600'}`}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === '' ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'}`}
                       >
                         Tất cả
                       </button>
@@ -1238,7 +1238,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         <button
                           key={s}
                           onClick={() => setFilterSection(s === filterSection ? '' : s)}
-                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === s ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600'}`}
+                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === s ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'}`}
                         >
                           {s}
                         </button>
@@ -1251,7 +1251,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="flex-1 overflow-y-auto p-8 space-y-4">
                 {loadingDocs && (
                   <div className="flex items-center justify-center py-16">
-                    <Loader2 size={32} className="animate-spin text-indigo-400" />
+                    <Loader2 size={32} className="animate-spin text-primary-brand" />
                   </div>
                 )}
                 {!loadingDocs && documents.length === 0 && (
@@ -1266,8 +1266,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {!loadingDocs && documents
                   .filter(d => !filterSection || d.section === filterSection)
                   .map(doc => (
-                    <div key={doc.uid} className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-5 group hover:border-indigo-200 transition-all hover:shadow-lg">
-                      <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                    <div key={doc.uid} className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-5 group hover:border-primary-brand-muted transition-all hover:shadow-lg">
+                      <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary-brand group-hover:text-white transition-all shadow-sm">
                         {doc.file_type.match(/^(jpg|jpeg|png|gif|webp|svg)$/) ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={doc.url} alt={doc.name} className="w-14 h-14 rounded-xl object-cover" />
@@ -1276,11 +1276,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-base font-bold text-foreground truncate group-hover:text-indigo-600 transition-colors">{doc.name}</div>
+                        <div className="text-base font-bold text-foreground truncate group-hover:text-primary-brand transition-colors">{doc.name}</div>
                         <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-1 flex items-center gap-3 flex-wrap">
                           <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
                           {doc.section && (
-                            <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded flex items-center gap-1">
+                            <span className="bg-primary-brand-light text-primary-brand px-2 py-0.5 rounded flex items-center gap-1">
                               <Tag size={10} />{doc.section}
                             </span>
                           )}
@@ -1290,7 +1290,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </div>
                       <div className="flex items-center gap-2">
                         <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                          <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground hover:text-indigo-600 rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100">
+                          <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground hover:text-primary-brand rounded-xl hover:bg-primary-brand-light border border-transparent hover:border-primary-brand-muted">
                             <Download size={20} />
                           </Button>
                         </a>
@@ -1312,8 +1312,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {activeTab === 'ai' && (
             <div className="flex flex-col h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
               {/* Header */}
-              <div className="p-8 border-b border-border bg-gradient-to-r from-indigo-50/80 to-violet-50/80 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
+              <div className="p-8 border-b border-border bg-gradient-to-r from-primary-brand-light/80 to-violet-50/80 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary-brand flex items-center justify-center shadow-lg shadow-primary-brand-muted shrink-0">
                   <Bot size={24} className="text-white" />
                 </div>
                 <div>
@@ -1336,8 +1336,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div ref={aiScrollRef} className="flex-1 overflow-y-auto p-8 space-y-6">
                 {aiMessages.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <div className="w-20 h-20 rounded-full bg-indigo-50 flex items-center justify-center mb-4 border border-indigo-100">
-                      <Sparkles size={32} className="text-indigo-400" />
+                    <div className="w-20 h-20 rounded-full bg-primary-brand-light flex items-center justify-center mb-4 border border-primary-brand-muted">
+                      <Sparkles size={32} className="text-primary-brand" />
                     </div>
                     <p className="text-lg font-bold text-foreground">Xin chào! Tôi là AI Trợ giảng</p>
                     <p className="text-sm text-muted-foreground mt-2 max-w-sm leading-relaxed">
@@ -1350,13 +1350,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {aiMessages.map((msg, i) => (
                   <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role === 'assistant' && (
-                      <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md shrink-0 mt-0.5">
+                      <div className="w-9 h-9 rounded-xl bg-primary-brand flex items-center justify-center shadow-md shrink-0 mt-0.5">
                         <Bot size={16} className="text-white" />
                       </div>
                     )}
                     <div className={`max-w-[76%] rounded-2xl px-5 py-3.5 ${
                       msg.role === 'user'
-                        ? 'bg-indigo-600 text-white rounded-br-md shadow-md shadow-indigo-500/20'
+                        ? 'bg-primary-brand text-white rounded-br-md shadow-md shadow-primary-brand/20'
                         : 'bg-muted text-foreground rounded-bl-md border border-border'
                     }`}>
                       <div className="text-sm font-medium leading-relaxed space-y-1.5">
@@ -1387,7 +1387,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           {msg.sources.slice(0, 3).map((src, j) => (
                             <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center justify-between gap-3">
                               <span className="truncate">{src.metadata?.doc_name ?? src.metadata?.resource_uid ?? 'Tài liệu'}</span>
-                              <span className="shrink-0 font-bold text-indigo-500">{(src.score * 100).toFixed(0)}%</span>
+                              <span className="shrink-0 font-bold text-primary-brand">{(src.score * 100).toFixed(0)}%</span>
                             </div>
                           ))}
                         </div>
@@ -1412,12 +1412,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
                     placeholder="Đặt câu hỏi về tài liệu của lớp..."
                     disabled={aiLoading}
-                    className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-60"
+                    className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
                   />
                   <Button
                     onClick={() => void handleAiAsk()}
                     disabled={!aiQuestion.trim() || aiLoading}
-                    className="h-12 w-12 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white p-0 shadow-lg shadow-indigo-500/20 disabled:opacity-50 shrink-0"
+                    className="h-12 w-12 rounded-2xl bg-primary-brand hover:bg-primary-brand-dark text-white p-0 shadow-lg shadow-primary-brand/20 disabled:opacity-50 shrink-0"
                   >
                     {aiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                   </Button>
@@ -1439,7 +1439,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 />
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
-                  <Loader2 className="animate-spin mb-4 text-indigo-500" size={40} />
+                  <Loader2 className="animate-spin mb-4 text-primary-brand" size={40} />
                   <p className="text-sm font-bold uppercase tracking-widest">Đang tải kênh thảo luận...</p>
                 </div>
               )}
@@ -1470,7 +1470,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <Button
                             onClick={() => void handleStartMeeting('screen')}
                             disabled={meetingAction !== null}
-                            className="h-12 rounded-2xl bg-indigo-600 px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                            className="h-12 rounded-2xl bg-primary-brand px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
                             Chia sẻ màn hình
@@ -1511,7 +1511,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <Button
                         onClick={() => void handleStartMeeting('screen')}
                         disabled={meetingAction !== null}
-                        className="h-12 rounded-2xl bg-indigo-600 px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest"
+                        className="h-12 rounded-2xl bg-primary-brand px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest"
                       >
                         {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
                         Mở phòng họp
@@ -1529,7 +1529,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 ) : (
                   <>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-indigo-100 transition-all">
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Trạng thái</div>
                         <div className="text-lg font-bold text-foreground flex items-center gap-2">
                           {activeMeeting ? (
@@ -1543,7 +1543,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           {activeMeeting ? `Bắt đầu lúc ${formatDateTime(activeMeeting.started_at || activeMeeting.created_at)}` : 'Sinh viên sẽ thấy thông báo khi bạn mở phòng.'}
                         </div>
                       </div>
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-indigo-100 transition-all">
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Kết nối thời gian thực</div>
                         <div className="flex items-center gap-3 text-lg font-bold text-foreground">
                           {rtcConnected ? <Wifi size={20} className="text-emerald-500" /> : <WifiOff size={20} className="text-muted-foreground/50" />}
@@ -1551,7 +1551,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         </div>
                         <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">Kênh tín hiệu bảo mật dùng mã lớp độc nhất.</div>
                       </div>
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-indigo-100 transition-all">
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Phòng gần nhất</div>
                         <div className="text-sm font-bold text-foreground truncate">
                           {latestMeeting?.title || 'Chưa có lịch sử'}
@@ -1562,7 +1562,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </div>
                     </div>
 
-                    <div className="rounded-[40px] border border-border bg-slate-950 p-6 shadow-2xl shadow-indigo-900/10">
+                    <div className="rounded-[40px] border border-border bg-slate-950 p-6 shadow-2xl shadow-primary-brand/10">
                       {localStream ? (
                         <div className="rounded-[24px] overflow-hidden border border-slate-800">
                           <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Camera đang phát' : 'Màn hình đang chia sẻ'} />
@@ -1597,7 +1597,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {canManageExams && (
                   <Button
                     onClick={() => router.push(`/space/classrooms/${uid}/exams/create`)}
-                    className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                    className="h-12 rounded-2xl bg-primary-brand px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                   >
                     <Plus size={20} />
                     Tạo bài kiểm tra
@@ -1613,7 +1613,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       onClick={() => setSelectedExamKind(kind.key)}
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
                         selectedExamKind === kind.key 
-                          ? 'bg-card text-indigo-600 shadow-sm border border-border' 
+                          ? 'bg-card text-primary-brand shadow-sm border border-border' 
                           : 'text-muted-foreground hover:text-muted-foreground'
                       }`}
                     >
@@ -1638,15 +1638,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {filteredExams.map(exam => (
-                        <div key={exam.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-indigo-200 transition-all hover:shadow-lg">
+                        <div key={exam.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-primary-brand-muted transition-all hover:shadow-lg">
                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm transition-all group-hover:scale-110 ${
-                            exam.status === 'published' ? 'bg-indigo-50 text-indigo-600' : 'bg-muted text-muted-foreground'
+                            exam.status === 'published' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'
                           }`}>
                             <FileText size={24} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-1">
-                              <h4 className="text-base font-bold text-foreground group-hover:text-indigo-600 transition-colors">{exam.title}</h4>
+                              <h4 className="text-base font-bold text-foreground group-hover:text-primary-brand transition-colors">{exam.title}</h4>
                               <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider border ${
                                 exam.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-muted text-muted-foreground border-border'
                               }`}>
@@ -1672,7 +1672,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             </Button>
                             <Button
                               onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)}
-                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-indigo-600 hover:text-white text-muted-foreground transition-all border border-border hover:border-indigo-600 uppercase tracking-widest"
+                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-primary-brand hover:text-white text-muted-foreground transition-all border border-border hover:border-primary-brand uppercase tracking-widest"
                             >
                               Chi tiết
                             </Button>
@@ -1684,7 +1684,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
-                                  <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
+                                  <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
                                     <Pencil size={16} className="mr-3 text-muted-foreground" />
                                     Chỉnh sửa
                                   </DropdownMenuItem>
@@ -1726,7 +1726,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     </div>
                     <Button
                       onClick={() => setShowOpenExamModal(true)}
-                      className="h-12 rounded-2xl bg-indigo-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 uppercase tracking-widest transition-all"
+                      className="h-12 rounded-2xl bg-primary-brand px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                     >
                       <Wifi size={20} />
                       Mở ca thi
@@ -1740,7 +1740,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       onClick={() => setExamSubTab('ongoing')}
                       className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
                         examSubTab === 'ongoing'
-                          ? 'border-indigo-600 text-indigo-600'
+                          ? 'border-primary-brand text-primary-brand'
                           : 'border-transparent text-muted-foreground hover:text-foreground'
                       }`}
                     >
@@ -1749,7 +1749,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         <span className={`relative inline-flex rounded-full h-2 w-2 ${activeExams.length > 0 ? 'bg-rose-500' : 'bg-muted-foreground/30'}`} />
                       </span>
                       Đang thi
-                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'ongoing' ? 'bg-indigo-100 text-indigo-600' : 'bg-muted text-muted-foreground'}`}>
+                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'ongoing' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'}`}>
                         {activeExams.length}
                       </span>
                     </button>
@@ -1758,12 +1758,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       onClick={() => setExamSubTab('closed')}
                       className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
                         examSubTab === 'closed'
-                          ? 'border-indigo-600 text-indigo-600'
+                          ? 'border-primary-brand text-primary-brand'
                           : 'border-transparent text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       Đã thi
-                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'closed' ? 'bg-indigo-100 text-indigo-600' : 'bg-muted text-muted-foreground'}`}>
+                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'closed' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'}`}>
                         {completedExams.length}
                       </span>
                     </button>
@@ -1785,7 +1785,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <p className="text-xs font-medium mt-1 mb-6 text-muted-foreground">Nhấn &ldquo;Mở ca thi&rdquo; để bắt đầu kì thi đầu tiên</p>
                       <Button
                         onClick={() => setShowOpenExamModal(true)}
-                        className="h-10 rounded-xl bg-indigo-600 px-6 gap-2 text-xs font-bold text-white hover:bg-indigo-700 uppercase tracking-widest"
+                        className="h-10 rounded-xl bg-primary-brand px-6 gap-2 text-xs font-bold text-white hover:bg-primary-brand-dark uppercase tracking-widest"
                       >
                         <Wifi size={15} />
                         Mở ca thi đầu tiên
@@ -1803,9 +1803,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       {examSubTab === 'ongoing' ? (
                         /* ── ĐANG THI cards ── */
                         tabExams.map(exam => (
-                          <div key={exam.uid} className="bg-card rounded-[20px] border-2 border-indigo-200 shadow-md shadow-indigo-50">
+                          <div key={exam.uid} className="bg-card rounded-[20px] border-2 border-primary-brand-muted shadow-md shadow-primary-brand-light">
                             <div className="flex items-center gap-5 p-5">
-                              <div className="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-200">
+                              <div className="w-12 h-12 rounded-xl bg-primary-brand text-white flex items-center justify-center shrink-0 shadow-lg shadow-primary-brand-muted">
                                 <FileText size={20} />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -1819,7 +1819,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   Bắt đầu: {exam.opened_at ? formatDateTime(exam.opened_at) : '--'}
                                 </p>
                                 <div className="mt-2 flex flex-wrap gap-1.5">
-                                  <span className="flex items-center gap-1 rounded-full bg-indigo-50 border border-indigo-100 px-2 py-0.5 text-[10px] font-black text-indigo-600">
+                                  <span className="flex items-center gap-1 rounded-full bg-primary-brand-light border border-primary-brand-muted px-2 py-0.5 text-[10px] font-black text-primary-brand">
                                     <Timer size={9} />
                                     {exam.duration_seconds ? `${Math.round(exam.duration_seconds / 60)} phút` : 'Không giới hạn'}
                                   </span>
@@ -1850,12 +1850,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       ) : (
                         /* ── ĐÃ THI cards ── */
                         tabExams.map(exam => (
-                          <div key={exam.uid} className="bg-muted/40 rounded-[20px] border border-border flex items-center gap-5 p-5 hover:bg-card hover:border-indigo-100 transition-all group">
-                            <div className="w-12 h-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors">
+                          <div key={exam.uid} className="bg-muted/40 rounded-[20px] border border-border flex items-center gap-5 p-5 hover:bg-card hover:border-primary-brand-muted transition-all group">
+                            <div className="w-12 h-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 group-hover:bg-primary-brand-light group-hover:text-primary-brand transition-colors">
                               <FileText size={20} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="text-sm font-black text-foreground truncate group-hover:text-indigo-600 transition-colors">{exam.title}</h4>
+                              <h4 className="text-sm font-black text-foreground truncate group-hover:text-primary-brand transition-colors">{exam.title}</h4>
                               <p className="text-[10px] font-bold text-muted-foreground mt-0.5">
                                 Đã thi: {exam.opened_at ? formatDateTime(exam.opened_at) : '--'}
                               </p>
@@ -1895,7 +1895,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   </Button>
                   <Button
                     onClick={() => setShowAssignModal(true)}
-                    className="h-12 rounded-2xl bg-violet-600 px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-violet-100 hover:bg-violet-700 uppercase tracking-widest transition-all"
+                    className="h-12 rounded-2xl bg-primary-brand px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-primary-brand/10 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                   >
                     <Plus size={20} />
                     Giao đề mới
@@ -1922,12 +1922,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       const assignment = quiz.assigned_classrooms?.[0];
                       const timeLimitMin = assignment?.time_limit_seconds ? Math.round(assignment.time_limit_seconds / 60) : 0;
                       return (
-                        <div key={quiz.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-violet-200 transition-all hover:shadow-lg">
-                          <div className="w-14 h-14 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center shadow-sm transition-all group-hover:scale-110">
+                        <div key={quiz.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-primary-brand-muted transition-all hover:shadow-lg">
+                          <div className="w-14 h-14 rounded-2xl bg-primary-brand-light text-primary-brand flex items-center justify-center shadow-sm transition-all group-hover:scale-110">
                             <Gamepad2 size={24} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-foreground group-hover:text-violet-600 transition-colors mb-1.5">{quiz.title}</h4>
+                            <h4 className="text-base font-bold text-foreground group-hover:text-primary-brand transition-colors mb-1.5">{quiz.title}</h4>
                             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                               <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{quiz.questions_count} câu hỏi</span>
                               <span className="flex items-center gap-1.5"><Clock size={12} /> {timeLimitMin > 0 ? `${timeLimitMin} phút` : 'Không giới hạn'}</span>
@@ -1998,7 +1998,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   // eslint-disable-next-line @next/next/no-img-element
                                   <img src={member.member_avatar} alt={member.member_name} className="w-10 h-10 rounded-2xl object-cover border border-border" />
                                 ) : (
-                                  <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 font-black text-sm">
+                                  <div className="w-10 h-10 rounded-2xl bg-primary-brand-light flex items-center justify-center text-primary-brand font-black text-sm">
                                     {member.member_name.charAt(0).toUpperCase()}
                                   </div>
                                 )}
@@ -2205,7 +2205,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="flex-1 overflow-y-auto px-8 py-6">
               {loadingPending ? (
                 <div className="flex h-48 items-center justify-center">
-                  <Loader2 size={32} className="animate-spin text-indigo-400" />
+                  <Loader2 size={32} className="animate-spin text-primary-brand" />
                 </div>
               ) : pendingMembers.length === 0 ? (
                 <div className="flex h-48 flex-col items-center justify-center gap-3 text-center">
@@ -2230,7 +2230,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           className="h-11 w-11 shrink-0 rounded-xl object-cover"
                         />
                       ) : (
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-sm font-black text-indigo-600">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-brand-light text-sm font-black text-primary-brand">
                           {member.member_name.charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -2361,12 +2361,12 @@ function AssignQuizModal({
               <div className="space-y-2.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
                 <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
               <div className="space-y-2.5">
                 <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
                 <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
             </div>
 
@@ -2378,10 +2378,10 @@ function AssignQuizModal({
               ].map(item => (
                 <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
                   <div className="flex items-center gap-3 text-sm font-bold text-foreground">
-                    <item.icon size={16} className="text-muted-foreground group-hover:text-indigo-500" /> {item.label}
+                    <item.icon size={16} className="text-muted-foreground group-hover:text-primary-brand" /> {item.label}
                   </div>
                   <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
-                    className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-border transition-all" />
+                    className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand border-border transition-all" />
                 </label>
               ))}
             </div>
@@ -2394,7 +2394,7 @@ function AssignQuizModal({
             <Button
               onClick={() => void handleConfirmAssign()}
               disabled={assigning}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-indigo-500/20 uppercase tracking-widest transition-all"
+              className="flex-1 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-primary-brand/20 uppercase tracking-widest transition-all"
             >
               {assigning ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
               Giao cho lớp
@@ -2421,7 +2421,7 @@ function AssignQuizModal({
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
-              <Loader2 size={40} className="animate-spin text-indigo-500" />
+              <Loader2 size={40} className="animate-spin text-primary-brand" />
             </div>
           ) : quizzes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
@@ -2441,14 +2441,14 @@ function AssignQuizModal({
                   className={`w-full text-left rounded-2xl border-2 p-5 transition-all flex items-center gap-5 ${
                     assigned
                       ? 'border-emerald-100 bg-emerald-50 cursor-default opacity-60'
-                      : 'border-slate-50 bg-card hover:border-indigo-300 hover:bg-indigo-50/30 cursor-pointer group shadow-sm'
+                      : 'border-slate-50 bg-card hover:border-primary-brand hover:bg-primary-brand-light/30 cursor-pointer group shadow-sm'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg'}`}>
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground group-hover:bg-primary-brand group-hover:text-white group-hover:shadow-lg'}`}>
                     {assigned ? <Check size={24} /> : <BookOpen size={24} />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-foreground group-hover:text-indigo-600 transition-colors">{quiz.title}</div>
+                    <div className="font-bold text-foreground group-hover:text-primary-brand transition-colors">{quiz.title}</div>
                     <div className="flex items-center gap-3 mt-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                       <span className="bg-muted px-2 py-0.5 rounded border border-border">{quiz.questions_count} câu hỏi</span>
                     </div>
@@ -2456,7 +2456,7 @@ function AssignQuizModal({
                   {assigned ? (
                     <span className="text-[10px] font-black text-emerald-600 uppercase bg-card border border-emerald-100 px-3 py-1 rounded-full shrink-0 tracking-widest">Đã giao</span>
                   ) : (
-                    <span className="text-[10px] font-black text-indigo-500 uppercase bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">Chọn</span>
+                    <span className="text-[10px] font-black text-primary-brand uppercase bg-primary-brand-light border border-primary-brand-light px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">Chọn</span>
                   )}
                 </button>
               );
@@ -2564,7 +2564,7 @@ function OpenOnlineExamModal({
             </div>
             {loading ? (
               <div className="flex h-32 items-center justify-center rounded-2xl border border-border bg-muted/40">
-                <Loader2 size={28} className="animate-spin text-indigo-500" />
+                <Loader2 size={28} className="animate-spin text-primary-brand" />
               </div>
             ) : exams.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center">
@@ -2584,12 +2584,12 @@ function OpenOnlineExamModal({
                       disabled={opening}
                       className={`rounded-2xl border-2 p-4 text-left transition-all ${
                         active
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-border bg-card hover:border-indigo-200 hover:bg-indigo-50/40'
+                          ? 'border-primary-brand bg-primary-brand-light'
+                          : 'border-border bg-card hover:border-primary-brand-muted hover:bg-primary-brand-light/40'
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground'}`}>
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                           {active ? <Check size={18} /> : <FileText size={18} />}
                         </div>
                         <div className="min-w-0">
@@ -2615,7 +2615,7 @@ function OpenOnlineExamModal({
                     value={durationMin}
                     onChange={event => setDurationMin(Math.max(1, Number(event.target.value)))}
                     disabled={opening}
-                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-indigo-100 disabled:opacity-60"
+                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
                   />
                 </label>
 
@@ -2627,16 +2627,16 @@ function OpenOnlineExamModal({
                     value={lateThresholdMin}
                     onChange={event => setLateThresholdMin(Number(event.target.value))}
                     disabled={opening}
-                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-indigo-100 disabled:opacity-60"
+                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
                     placeholder="0 = Không giới hạn"
                   />
                 </label>
               </div>
 
               {/* Camera toggle */}
-              <div className={`flex items-center justify-between rounded-2xl border-2 px-5 py-4 transition-colors ${cameraRequired ? 'border-indigo-300 bg-indigo-50' : 'border-border bg-muted/40'}`}>
+              <div className={`flex items-center justify-between rounded-2xl border-2 px-5 py-4 transition-colors ${cameraRequired ? 'border-primary-brand bg-primary-brand-light' : 'border-border bg-muted/40'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground'}`}>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                     <Camera size={20} />
                   </div>
                   <div>
@@ -2652,7 +2652,7 @@ function OpenOnlineExamModal({
                   type="button"
                   disabled={opening}
                   onClick={() => setCameraRequired(v => !v)}
-                  className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${cameraRequired ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                  className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${cameraRequired ? 'bg-primary-brand' : 'bg-slate-300'}`}
                   style={{ width: 52 }}
                 >
                   <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
@@ -2669,7 +2669,7 @@ function OpenOnlineExamModal({
           <Button
             onClick={() => void handleOpenExam()}
             disabled={opening || loading || !selectedExam}
-            className="rounded-[20px] bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-12 px-8 gap-3 shadow-lg shadow-indigo-500/20 uppercase tracking-widest transition-all"
+            className="rounded-[20px] bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs h-12 px-8 gap-3 shadow-lg shadow-primary-brand/20 uppercase tracking-widest transition-all"
           >
             {opening ? <Loader2 size={18} className="animate-spin" /> : <Wifi size={18} />}
             Bắt đầu ca thi
@@ -2739,12 +2739,12 @@ function EditSettingsModal({
             <div className="space-y-2.5">
               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
               <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
             <div className="space-y-2.5">
               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
               <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-100 transition-all" />
+                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
           </div>
 
@@ -2753,7 +2753,7 @@ function EditSettingsModal({
               <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Điểm đạt: {passingScore}%</label>
             </div>
             <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
-              className="w-full accent-indigo-600" />
+              className="w-full accent-primary-brand" />
           </div>
 
           <div className="space-y-4">
@@ -2764,10 +2764,10 @@ function EditSettingsModal({
             ].map(item => (
               <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
                 <div className="flex items-center gap-3 text-sm font-bold text-foreground">
-                  <item.icon size={16} className="text-muted-foreground group-hover:text-indigo-500" /> {item.label}
+                  <item.icon size={16} className="text-muted-foreground group-hover:text-primary-brand" /> {item.label}
                 </div>
                 <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
-                  className="w-5 h-5 rounded-lg text-indigo-600 focus:ring-indigo-500 border-border transition-all" />
+                  className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand border-border transition-all" />
               </label>
             ))}
           </div>
@@ -2780,7 +2780,7 @@ function EditSettingsModal({
           <Button
             onClick={() => void handleSave()}
             disabled={saving}
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-indigo-500/20 uppercase tracking-widest transition-all"
+            className="flex-1 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-primary-brand/20 uppercase tracking-widest transition-all"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
             Lưu cài đặt
@@ -2828,7 +2828,7 @@ function StudentDetailsModal({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={member.member_avatar} alt={member.member_name} className="w-14 h-14 rounded-2xl object-cover" />
             ) : (
-              <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xl">
+              <div className="w-14 h-14 rounded-2xl bg-primary-brand-light flex items-center justify-center text-primary-brand font-black text-xl">
                 {member.member_name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -2846,7 +2846,7 @@ function StudentDetailsModal({
         <div className="grid grid-cols-3 gap-4 px-8 py-5 border-b border-border shrink-0">
           {[
             { label: 'Tổng bài thi', value: records.length, color: 'text-foreground' },
-            { label: 'Đã nộp', value: submitted, color: 'text-indigo-600' },
+            { label: 'Đã nộp', value: submitted, color: 'text-primary-brand' },
             { label: 'Điểm TB', value: avgGrade != null ? avgGrade.toFixed(1) : '--', color: 'text-emerald-600' },
           ].map(s => (
             <div key={s.label} className="bg-muted rounded-2xl p-4 text-center">
@@ -2962,7 +2962,7 @@ function StudentAnalyzeModal({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={member.member_avatar} alt={member.member_name} className="w-12 h-12 rounded-2xl object-cover" />
             ) : (
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-lg">
+              <div className="w-12 h-12 rounded-2xl bg-primary-brand-light flex items-center justify-center text-primary-brand font-black text-lg">
                 {member.member_name.charAt(0).toUpperCase()}
               </div>
             )}
@@ -3266,7 +3266,7 @@ function ExamGradeTableModal({
         <div className="shrink-0 border-b border-border/70 bg-card px-5 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Bảng điểm</p>
+              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-brand">Bảng điểm</p>
               <h2 className="truncate text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">{exam.title}</h2>
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                 <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getExamStatusClass(exam.status)}`}>
@@ -3280,7 +3280,7 @@ function ExamGradeTableModal({
                   <Users size={13} />
                   {loading ? '--' : students.length} sinh viên
                 </span>
-                <span className="flex items-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50/70 px-2.5 py-1.5 text-indigo-700">
+                <span className="flex items-center gap-1.5 rounded-lg border border-primary-brand-light bg-primary-brand-light/70 px-2.5 py-1.5 text-primary-brand">
                   <ClipboardCheck size={13} />
                   {loading ? '--' : submitted} đã nộp
                 </span>
@@ -3293,14 +3293,14 @@ function ExamGradeTableModal({
         </div>
 
         <div className="grid shrink-0 gap-3 border-b border-border/70 bg-card px-5 py-4 md:grid-cols-4 sm:px-6">
-          <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 shadow-sm">
+          <div className="rounded-xl border border-primary-brand-light bg-primary-brand-light/60 p-3 shadow-sm">
             <div className="flex items-start justify-between">
               <p className="text-[11px] font-medium text-muted-foreground">Tỉ lệ nộp bài</p>
-              <span className="text-lg font-semibold tracking-tight text-indigo-700">{loading ? '--' : `${submissionRate}%`}</span>
+              <span className="text-lg font-semibold tracking-tight text-primary-brand">{loading ? '--' : `${submissionRate}%`}</span>
             </div>
             <p className="mt-1 text-[11px] text-muted-foreground">{loading ? 'Đang tải...' : `${submitted}/${students.length} sinh viên`}</p>
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-indigo-100">
-              <div className="h-full rounded-full bg-indigo-600 transition-all duration-500" style={{ width: `${submissionRate}%` }} />
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-primary-brand-light">
+              <div className="h-full rounded-full bg-primary-brand transition-all duration-500" style={{ width: `${submissionRate}%` }} />
             </div>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 shadow-sm">
@@ -3314,7 +3314,7 @@ function ExamGradeTableModal({
             </div>
           </div>
           {[
-            { label: 'Đang chờ chấm', value: Math.max(0, submitted - graded), detail: `${gradingRate}% hoàn tất`, color: 'text-indigo-700', surface: 'border-border bg-card' },
+            { label: 'Đang chờ chấm', value: Math.max(0, submitted - graded), detail: `${gradingRate}% hoàn tất`, color: 'text-primary-brand', surface: 'border-border bg-card' },
             { label: 'Chưa nộp', value: missing, detail: 'Cần theo dõi', color: 'text-rose-600', surface: 'border-rose-100 bg-rose-50/30' },
           ].map(metric => (
             <div key={metric.label} className={`rounded-xl border p-3 shadow-sm ${metric.surface}`}>
@@ -3333,7 +3333,7 @@ function ExamGradeTableModal({
                 value={query}
                 onChange={event => setQuery(event.target.value)}
                 placeholder="Tìm theo tên hoặc MSSV..."
-                className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-4 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-4 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
               />
             </label>
             <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -3344,8 +3344,8 @@ function ExamGradeTableModal({
                   onClick={() => setFilter(option.value)}
                   className={`flex h-9 shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-medium transition ${
                     filter === option.value
-                      ? 'border-indigo-600 bg-indigo-600 text-white'
-                      : 'border-border bg-card text-muted-foreground hover:border-indigo-200 hover:bg-indigo-50/40 hover:text-indigo-700'
+                      ? 'border-primary-brand bg-primary-brand text-white'
+                      : 'border-border bg-card text-muted-foreground hover:border-primary-brand-muted hover:bg-primary-brand-light/40 hover:text-primary-brand'
                   }`}
                 >
                   {option.label}
@@ -3359,7 +3359,7 @@ function ExamGradeTableModal({
               type="button"
               onClick={() => void handleAIGradeAll()}
               disabled={loading || aiGradingTarget !== null || submitted === 0}
-              className="h-9 shrink-0 rounded-lg bg-violet-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-violet-700 disabled:opacity-60"
+              className="h-9 shrink-0 rounded-lg bg-primary-brand px-3 text-xs font-medium text-white shadow-sm hover:bg-primary-brand-dark disabled:opacity-60"
             >
               {aiGradingTarget === 'all' ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
               AI chấm tất cả
@@ -3368,7 +3368,7 @@ function ExamGradeTableModal({
 
           {loading ? (
             <div className="flex min-h-56 flex-1 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground">
-              <Loader2 size={32} className="animate-spin text-indigo-500" />
+              <Loader2 size={32} className="animate-spin text-primary-brand" />
               <p className="ml-3 text-sm font-bold">Đang tải bảng điểm...</p>
             </div>
           ) : error ? (
@@ -3376,7 +3376,7 @@ function ExamGradeTableModal({
               <AlertCircle size={32} className="mb-3 text-rose-400" />
               <p className="text-sm font-black text-foreground">Không thể tải bảng điểm</p>
               <p className="mt-1 max-w-md text-xs font-medium text-muted-foreground">{error}</p>
-              <Button onClick={() => void loadGradeTable()} className="mt-4 rounded-xl bg-indigo-600 px-5 text-white">
+              <Button onClick={() => void loadGradeTable()} className="mt-4 rounded-xl bg-primary-brand px-5 text-white">
                 Tải lại
               </Button>
             </div>
@@ -3401,7 +3401,7 @@ function ExamGradeTableModal({
                   {visibleRows.map(row => {
                     const submission = row.submission;
                     return (
-                      <tr key={row.member.member_id} className="border-b border-border last:border-b-0 transition-colors hover:bg-indigo-50/30">
+                      <tr key={row.member.member_id} className="border-b border-border last:border-b-0 transition-colors hover:bg-primary-brand-light/30">
                         <td className="px-4 py-3">
                           <StudentIdentity member={row.member} />
                         </td>
@@ -3422,7 +3422,7 @@ function ExamGradeTableModal({
                           <div className="flex flex-wrap items-center gap-1.5">
                             <GradingBadge submission={submission} />
                             {submission?.grading_method === 'ai' && (
-                              <span className="rounded-full border border-violet-100 bg-violet-50 px-2.5 py-1 text-[10px] font-semibold text-violet-700">
+                              <span className="rounded-full border border-violet-100 bg-primary-brand-light px-2.5 py-1 text-[10px] font-semibold text-violet-700">
                                 AI chấm
                               </span>
                             )}
@@ -3436,13 +3436,13 @@ function ExamGradeTableModal({
                                   size="sm"
                                   variant="outline"
                                   disabled={aiGradingTarget !== null}
-                                  className="h-8 rounded-lg border-violet-200 px-3 text-xs font-medium text-violet-700 hover:bg-violet-50"
+                                  className="h-8 rounded-lg border-primary-brand-muted px-3 text-xs font-medium text-violet-700 hover:bg-primary-brand-light"
                                   onClick={() => void handleAIGradeSubmission(row)}
                                 >
                                   {aiGradingTarget === submission.uid ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
                                   AI chấm
                                 </Button>
-                                <Button size="sm" className="h-8 rounded-lg bg-indigo-600 px-3 text-xs font-medium text-white shadow-sm hover:bg-indigo-700" onClick={() => openSubmission(row)}>
+                                <Button size="sm" className="h-8 rounded-lg bg-primary-brand px-3 text-xs font-medium text-white shadow-sm hover:bg-primary-brand-dark" onClick={() => openSubmission(row)}>
                                   {submission.grade == null ? 'Chấm điểm' : 'Xem điểm'}
                                 </Button>
                                 <DropdownMenu>
@@ -3518,7 +3518,7 @@ function StudentIdentity({ member }: { member: ClassroomMember }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img src={member.member_avatar} alt={member.member_name} className="h-8 w-8 rounded-lg object-cover shadow-sm ring-1 ring-slate-100" />
       ) : (
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-50 to-violet-100 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-100">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-brand-light to-violet-100 text-xs font-semibold text-primary-brand ring-1 ring-primary-brand-light">
           {member.member_name.charAt(0).toUpperCase()}
         </div>
       )}
@@ -3534,7 +3534,7 @@ function SubmissionBadge({ submission }: { submission: import('@/lib/api/types')
   if (!submission) {
     return <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">Chưa nộp</span>;
   }
-  return <span className="rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold text-indigo-700">Đã nộp</span>;
+  return <span className="rounded-full border border-primary-brand-light bg-primary-brand-light px-2.5 py-1 text-[10px] font-semibold text-primary-brand">Đã nộp</span>;
 }
 
 function GradingBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
@@ -3577,7 +3577,7 @@ function SubmissionGradingDrawer({
       <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl animate-in slide-in-from-right duration-200">
         <div className="flex items-start justify-between gap-4 border-b border-border p-4 sm:p-5">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-500">Chi tiết bài nộp</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-brand">Chi tiết bài nộp</p>
             <div className="mt-3"><StudentIdentity member={member} /></div>
           </div>
           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-muted-foreground" onClick={onClose}>
@@ -3609,7 +3609,7 @@ function SubmissionGradingDrawer({
               </p>
             )}
             {resourceUrl && (
-              <a href={resourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-between rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-sm font-medium text-indigo-700 transition hover:border-indigo-200 hover:bg-indigo-50/70">
+              <a href={resourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-between rounded-lg border border-primary-brand-light bg-primary-brand-light p-3 text-sm font-medium text-primary-brand transition hover:border-primary-brand-muted hover:bg-primary-brand-light/70">
                 <span className="flex items-center gap-2"><FileText size={16} /> {submission.resource_name || 'File đính kèm'}</span>
                 <Download size={15} />
               </a>
@@ -3618,7 +3618,7 @@ function SubmissionGradingDrawer({
 
           <section className="space-y-3 border-t border-border pt-4">
             {submission.grading_method === 'ai' && (
-              <div className="rounded-xl border border-violet-100 bg-violet-50/70 p-3.5">
+              <div className="rounded-xl border border-violet-100 bg-primary-brand-light/70 p-3.5">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-100">
                     <Wand2 size={12} />
@@ -3671,7 +3671,7 @@ function SubmissionGradingDrawer({
                 max="10"
                 step="0.1"
                 placeholder="Nhập điểm"
-                className="h-11 w-full rounded-lg border border-border px-3.5 text-base font-semibold text-foreground outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                className="h-11 w-full rounded-lg border border-border px-3.5 text-base font-semibold text-foreground outline-none focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
               />
             </label>
             <label className="block">
@@ -3681,18 +3681,18 @@ function SubmissionGradingDrawer({
                 onChange={event => onFeedbackChange(event.target.value)}
                 rows={4}
                 placeholder="Nhập nhận xét cho sinh viên..."
-                className="w-full resize-none rounded-lg border border-border p-3.5 text-sm font-medium text-foreground outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full resize-none rounded-lg border border-border p-3.5 text-sm font-medium text-foreground outline-none focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
               />
             </label>
           </section>
         </div>
         <div className="border-t border-border bg-card p-4 sm:p-5">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Button onClick={onAIGrade} disabled={saving || aiGrading} variant="outline" className="h-11 rounded-lg border-violet-200 font-medium text-violet-700 hover:bg-violet-50">
+            <Button onClick={onAIGrade} disabled={saving || aiGrading} variant="outline" className="h-11 rounded-lg border-primary-brand-muted font-medium text-violet-700 hover:bg-primary-brand-light">
               {aiGrading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
               AI chấm
             </Button>
-            <Button onClick={onSave} disabled={saving || aiGrading} className="h-11 rounded-lg bg-indigo-600 font-medium text-white shadow-sm hover:bg-indigo-700">
+            <Button onClick={onSave} disabled={saving || aiGrading} className="h-11 rounded-lg bg-primary-brand font-medium text-white shadow-sm hover:bg-primary-brand-dark">
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               {submission.grade == null ? 'Lưu điểm' : 'Cập nhật điểm'}
             </Button>
@@ -3705,7 +3705,7 @@ function SubmissionGradingDrawer({
 
 function getSubmissionStatusClass(status: string) {
   if (status === 'graded') return 'bg-emerald-50 text-emerald-600';
-  if (status === 'submitted') return 'bg-indigo-50 text-indigo-600';
+  if (status === 'submitted') return 'bg-primary-brand-light text-primary-brand';
   if (status === 'late') return 'bg-amber-50 text-amber-600';
   return 'bg-muted text-muted-foreground';
 }

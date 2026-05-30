@@ -68,7 +68,7 @@ export default function StaffPage() {
             All students who have ever studied in your classrooms
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl px-4 py-2.5">
+        <div className="flex items-center gap-2 bg-primary-brand-light dark:bg-indigo-950/40 text-primary-brand dark:text-primary-brand rounded-xl px-4 py-2.5">
           <GraduationCap size={18} />
           <span className="text-sm font-bold">{totalContacts} students</span>
         </div>
@@ -82,7 +82,7 @@ export default function StaffPage() {
           value={query}
           onChange={handleQueryChange}
           placeholder="Search by name or email..."
-          className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:text-foreground dark:placeholder:text-muted-foreground"
+          className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary-brand/20 dark:text-foreground dark:placeholder:text-muted-foreground"
         />
       </div>
 
@@ -107,16 +107,16 @@ export default function StaffPage() {
               <Link
                 key={s.consumer_uid}
                 href={`/space/student/${s.consumer_uid}`}
-                className="group bg-card border border-border rounded-2xl p-5 flex items-start gap-4 hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700 transition-all"
+                className="group bg-card border border-border rounded-2xl p-5 flex items-start gap-4 hover:border-primary-brand hover:shadow-md dark:hover:border-indigo-700 transition-all"
               >
                 <Avatar className="h-12 w-12 border-2 border-muted flex-shrink-0">
                   <AvatarImage src={s.consumer_avatar} alt={s.consumer_name} />
-                  <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-sm">
+                  <AvatarFallback className="bg-primary-brand-light text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-sm">
                     {initials(s.consumer_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary-brand dark:group-hover:text-primary-brand transition-colors">
                     {s.consumer_name || '(No name)'}
                   </p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 truncate">
@@ -128,7 +128,7 @@ export default function StaffPage() {
                     First joined {formatDate(s.first_joined_at)}
                   </p>
                 </div>
-                <ChevronRight size={16} className="text-muted-foreground/40 group-hover:text-indigo-500 flex-shrink-0 mt-1 transition-colors" />
+                <ChevronRight size={16} className="text-muted-foreground/40 group-hover:text-primary-brand flex-shrink-0 mt-1 transition-colors" />
               </Link>
             ))}
           </div>
@@ -149,16 +149,16 @@ export default function StaffPage() {
               <Link
                 key={contact.consumer_uid}
                 href={`/space/student/${contact.consumer_uid}`}
-                className="group bg-card border border-border rounded-2xl p-5 flex items-start gap-4 hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700 transition-all"
+                className="group bg-card border border-border rounded-2xl p-5 flex items-start gap-4 hover:border-primary-brand hover:shadow-md dark:hover:border-indigo-700 transition-all"
               >
                 <Avatar className="h-12 w-12 border-2 border-muted flex-shrink-0">
                   <AvatarImage src={contact.consumer_avatar} alt={contact.consumer_name} />
-                  <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-sm">
+                  <AvatarFallback className="bg-primary-brand-light text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-sm">
                     {initials(contact.consumer_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-foreground truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary-brand dark:group-hover:text-primary-brand transition-colors">
                     {contact.consumer_name || '(No name)'}
                   </p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 truncate">
@@ -170,7 +170,7 @@ export default function StaffPage() {
                     First joined {formatDate(contact.first_joined_at)}
                   </p>
                 </div>
-                <ChevronRight size={16} className="text-muted-foreground/40 group-hover:text-indigo-500 flex-shrink-0 mt-1 transition-colors" />
+                <ChevronRight size={16} className="text-muted-foreground/40 group-hover:text-primary-brand flex-shrink-0 mt-1 transition-colors" />
               </Link>
             ))}
           </div>

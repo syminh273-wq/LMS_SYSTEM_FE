@@ -126,7 +126,7 @@ export default function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                className="flex items-center gap-1 text-xs text-primary-brand hover:text-primary-brand-dark font-medium"
               >
                 <CheckCheck size={13} />
                 Đọc tất cả
@@ -147,11 +147,11 @@ export default function NotificationBell() {
                     key={n.uid}
                     onClick={() => !isRead && handleMarkRead(n.uid)}
                     className={`flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer ${
-                      isRead ? 'hover:bg-muted/50' : 'bg-indigo-50/60 hover:bg-indigo-50'
+                      isRead ? 'hover:bg-muted/50' : 'bg-primary-brand-light/60 hover:bg-primary-brand-light'
                     }`}
                   >
                     <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      isRead ? 'bg-muted text-muted-foreground' : 'bg-indigo-100 text-indigo-600'
+                      isRead ? 'bg-muted text-muted-foreground' : 'bg-primary-brand-light text-primary-brand'
                     }`}>
                       {n.title?.[0]?.toUpperCase() ?? '🔔'}
                     </div>
@@ -165,7 +165,7 @@ export default function NotificationBell() {
                     </div>
 
                     {!isRead && (
-                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-indigo-500" />
+                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary-brand" />
                     )}
                   </li>
                 );

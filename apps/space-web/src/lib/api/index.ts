@@ -53,5 +53,7 @@ export const spaceApi = {
   quizzes: quizApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,
-  }
+  },
+  getSettings: spaceApiInstance.getSettings.bind(spaceApiInstance),
+  updateSettings: spaceApiInstance.updateSettings.bind(spaceApiInstance),
 };

@@ -135,17 +135,17 @@ function AttachmentView({
       target="_blank"
       rel="noopener noreferrer"
       className={`flex items-center gap-3 px-4 py-3 ${
-        isMe ? 'hover:bg-indigo-500' : 'hover:bg-muted'
+        isMe ? 'hover:bg-primary-brand' : 'hover:bg-muted'
       } transition-colors`}
     >
       <div
         className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-          isMe ? 'bg-indigo-500' : 'bg-muted'
+          isMe ? 'bg-primary-brand' : 'bg-muted'
         }`}
       >
         <FileText
           size={20}
-          className={isMe ? 'text-indigo-200' : 'text-muted-foreground'}
+          className={isMe ? 'text-primary-brand-muted' : 'text-muted-foreground'}
         />
       </div>
       <div className="min-w-0">
@@ -154,7 +154,7 @@ function AttachmentView({
         </div>
         <div
           className={`text-[10px] font-bold uppercase ${
-            isMe ? 'text-indigo-200' : 'text-muted-foreground'
+            isMe ? 'text-primary-brand-muted' : 'text-muted-foreground'
           }`}
         >
           {attachment.size ? formatFileSize(attachment.size) : ''}
@@ -162,7 +162,7 @@ function AttachmentView({
       </div>
       <Download
         size={16}
-        className={`shrink-0 ${isMe ? 'text-indigo-200' : 'text-muted-foreground'}`}
+        className={`shrink-0 ${isMe ? 'text-primary-brand-muted' : 'text-muted-foreground'}`}
       />
     </a>
   );
@@ -202,7 +202,7 @@ function MessageBubble({
       <div
         className={`max-w-[70%] rounded-2xl text-sm font-medium shadow-sm overflow-hidden ${
           isMe
-            ? 'bg-indigo-600 text-white rounded-br-none'
+            ? 'bg-primary-brand text-white rounded-br-none'
             : 'bg-card border border-border text-foreground rounded-bl-none'
         }`}
       >
@@ -469,7 +469,7 @@ export default function ClassroomChatPanel({
       {/* Header */}
       <div className="p-4 border-b border-border bg-card flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+          <div className="w-10 h-10 rounded-full bg-primary-brand-light flex items-center justify-center text-primary-brand">
             <Users size={20} />
           </div>
           <div>
@@ -546,7 +546,7 @@ export default function ClassroomChatPanel({
               />
             ) : (
               <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-                <FileText size={20} className="text-indigo-500" />
+                <FileText size={20} className="text-primary-brand" />
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -576,15 +576,15 @@ export default function ClassroomChatPanel({
           onChange={handleFileSelect}
         />
 
-        <div className="flex items-center gap-2 bg-muted p-2 rounded-2xl border border-border transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-500/5 focus-within:bg-card">
+        <div className="flex items-center gap-2 bg-muted p-2 rounded-2xl border border-border transition-all focus-within:border-primary-brand focus-within:ring-4 focus-within:ring-primary-brand/5 focus-within:bg-card">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => fileInputRef.current?.click()}
             className={`h-10 w-10 ${
               pendingFile
-                ? 'text-indigo-600 bg-indigo-50'
-                : 'text-muted-foreground hover:text-indigo-600'
+                ? 'text-primary-brand bg-primary-brand-light'
+                : 'text-muted-foreground hover:text-primary-brand'
             }`}
             title="Đính kèm file"
           >
@@ -603,7 +603,7 @@ export default function ClassroomChatPanel({
             onClick={handleSend}
             size="icon"
             disabled={(!newMessage.trim() && !pendingFile) || uploading}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-10 w-10 shrink-0 shadow-lg shadow-indigo-100 disabled:opacity-50 disabled:shadow-none"
+            className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl h-10 w-10 shrink-0 shadow-lg shadow-primary-brand-light disabled:opacity-50 disabled:shadow-none"
           >
             {uploading ? (
               <Loader2 size={18} className="animate-spin" />

@@ -74,7 +74,7 @@ export default function CreateClassroomPage() {
           <div className="h-2 bg-rose-500" />
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Info size={20} className="text-indigo-500" />
+              <Info size={20} className="text-primary-brand" />
               Thông tin cấu hình
             </CardTitle>
             <CardDescription className="font-medium text-muted-foreground">Vui lòng kiểm tra kỹ các thông tin trước khi khởi tạo</CardDescription>
@@ -92,12 +92,12 @@ export default function CreateClassroomPage() {
                 Tên phòng học <span className="text-rose-500">*</span>
               </label>
               <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-indigo-500 transition-colors">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
                   <BookOpen size={18} />
                 </div>
                 <input 
                   {...register('name', { required: 'Tên phòng học là bắt buộc' })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                   placeholder="Ví dụ: Toán học nâng cao lớp 12A1"
                 />
               </div>
@@ -109,7 +109,7 @@ export default function CreateClassroomPage() {
               <textarea 
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 rows={4}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                 placeholder="Mô tả tóm tắt về mục tiêu, kiến thức sẽ đạt được trong khóa học này..."
               />
               {errors.description && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.description.message}</p>}
@@ -120,7 +120,7 @@ export default function CreateClassroomPage() {
                 Giới hạn học sinh <span className="text-rose-500">*</span>
               </label>
               <div className="relative group max-w-[240px]">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-indigo-500 transition-colors">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
                   <Users size={18} />
                 </div>
                 <input 
@@ -129,7 +129,7 @@ export default function CreateClassroomPage() {
                     required: 'Vui lòng nhập số lượng',
                     min: { value: 1, message: 'Tối thiểu 1 học sinh' }
                   })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                 />
               </div>
               {errors.max_students && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.max_students.message}</p>}

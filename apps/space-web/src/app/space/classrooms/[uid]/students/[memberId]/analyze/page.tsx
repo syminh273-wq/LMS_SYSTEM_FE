@@ -112,7 +112,7 @@ const STATUS_MAP = {
   Stable:    { label: 'Ổn định',      color: 'text-blue-600 bg-blue-50 border-blue-200',          icon: Minus },
   Declining: { label: 'Đang giảm sút', color: 'text-rose-600 bg-rose-50 border-rose-200',        icon: TrendingDown },
   'At Risk': { label: 'Có nguy cơ',   color: 'text-amber-600 bg-amber-50 border-amber-200',      icon: AlertTriangle },
-  Excellent: { label: 'Xuất sắc',     color: 'text-violet-600 bg-violet-50 border-violet-200',   icon: Award },
+  Excellent: { label: 'Xuất sắc',     color: 'text-primary-brand bg-primary-brand-light border-primary-brand-muted',   icon: Award },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -137,7 +137,7 @@ export default function StudentAnalyzePage({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary-brand" />
       </div>
     );
   }
@@ -164,12 +164,12 @@ export default function StudentAnalyzePage({
               <img src={member.member_avatar} alt={member.member_name}
                 className="h-10 w-10 rounded-xl object-cover" />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-sm font-black text-indigo-600">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-brand-light text-sm font-black text-primary-brand">
                 {(member?.member_name ?? 'S').charAt(0).toUpperCase()}
               </div>
             )}
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Phân tích toàn diện</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-primary-brand">Phân tích toàn diện</p>
               <h1 className="text-xl font-black text-foreground">{member?.member_name ?? 'Sinh viên'}</h1>
             </div>
           </div>
@@ -189,17 +189,17 @@ export default function StudentAnalyzePage({
       {/* ── Composite score + breakdown ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Big score */}
-        <div className="rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-700 p-6 text-white shadow-lg shadow-indigo-500/20 flex flex-col justify-between">
+        <div className="rounded-2xl bg-gradient-to-br from-primary-brand to-violet-700 p-6 text-white shadow-lg shadow-primary-brand/20 flex flex-col justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200">Overall Score</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-primary-brand-muted">Overall Score</p>
             <div className="mt-2 flex items-end gap-2">
               <span className="text-6xl font-black leading-none">{MOCK.overall.score}</span>
-              <span className="text-2xl font-bold text-indigo-300 mb-1">/100</span>
+              <span className="text-2xl font-bold text-primary-brand mb-1">/100</span>
             </div>
           </div>
           <div className="mt-4">
-            <p className="text-xs font-bold text-indigo-200 mb-2 uppercase tracking-widest">Công thức tổng hợp</p>
-            <p className="text-[10px] text-indigo-300 leading-relaxed font-medium">
+            <p className="text-xs font-bold text-primary-brand-muted mb-2 uppercase tracking-widest">Công thức tổng hợp</p>
+            <p className="text-[10px] text-primary-brand leading-relaxed font-medium">
               35% Academic · 25% Assignment · 15% Attendance · 15% Engagement · 10% Discipline
             </p>
           </div>
@@ -210,8 +210,8 @@ export default function StudentAnalyzePage({
           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Breakdown by category</p>
           <div className="space-y-3">
             {[
-              { label: 'Academic Performance', value: MOCK.composite.academic, weight: '35%', color: 'bg-indigo-500' },
-              { label: 'Assignment Behavior',  value: MOCK.composite.assignment, weight: '25%', color: 'bg-violet-500' },
+              { label: 'Academic Performance', value: MOCK.composite.academic, weight: '35%', color: 'bg-primary-brand' },
+              { label: 'Assignment Behavior',  value: MOCK.composite.assignment, weight: '25%', color: 'bg-primary-brand-light0' },
               { label: 'Attendance',           value: MOCK.composite.attendance, weight: '15%', color: 'bg-emerald-500' },
               { label: 'Learning Engagement',  value: MOCK.composite.engagement, weight: '15%', color: 'bg-amber-500' },
               { label: 'Discipline',           value: MOCK.composite.discipline, weight: '10%', color: 'bg-rose-400' },
@@ -255,11 +255,11 @@ export default function StudentAnalyzePage({
       </div>
 
       {/* ── Academic Performance ── */}
-      <SectionCard icon={<BookOpen size={17} className="text-indigo-500" />}
+      <SectionCard icon={<BookOpen size={17} className="text-primary-brand" />}
         title="Academic Performance" sub="GPA & điểm số theo thời gian">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
-            { label: 'GPA hiện tại', value: MOCK.academic.currentGPA.toFixed(1), sub: `↑ từ ${MOCK.academic.previousGPA}`, color: 'text-indigo-600' },
+            { label: 'GPA hiện tại', value: MOCK.academic.currentGPA.toFixed(1), sub: `↑ từ ${MOCK.academic.previousGPA}`, color: 'text-primary-brand' },
             { label: 'GPA kỳ trước', value: MOCK.academic.previousGPA.toFixed(1), sub: 'Baseline', color: 'text-muted-foreground' },
             { label: 'Tỉ lệ pass', value: `${MOCK.academic.passRate}%`, sub: `Fail ${100 - MOCK.academic.passRate}%`, color: 'text-emerald-600' },
             { label: 'Tăng trưởng', value: `+${(MOCK.academic.currentGPA - MOCK.academic.previousGPA).toFixed(1)}`, sub: 'so kỳ trước', color: 'text-emerald-600' },
@@ -289,7 +289,7 @@ export default function StudentAnalyzePage({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
             { label: 'Tổng bài',   value: MOCK.assignment.total,        color: 'text-foreground' },
-            { label: 'Đã nộp',     value: MOCK.assignment.submitted,    color: 'text-indigo-600' },
+            { label: 'Đã nộp',     value: MOCK.assignment.submitted,    color: 'text-primary-brand' },
             { label: 'Đúng hạn',   value: MOCK.assignment.onTime,       color: 'text-emerald-600' },
             { label: 'Không nộp',  value: MOCK.assignment.missed,       color: 'text-rose-500' },
           ].map(s => (
@@ -303,7 +303,7 @@ export default function StudentAnalyzePage({
         {/* Rate bars */}
         <div className="space-y-3 mb-5">
           {[
-            { label: 'Tỉ lệ nộp bài',     value: MOCK.assignment.submitRate,  color: 'bg-indigo-500' },
+            { label: 'Tỉ lệ nộp bài',     value: MOCK.assignment.submitRate,  color: 'bg-primary-brand' },
             { label: 'Nộp đúng hạn',       value: MOCK.assignment.onTimeRate,  color: 'bg-emerald-500' },
             { label: 'Không nộp',          value: MOCK.assignment.missRate,    color: 'bg-rose-400' },
           ].map(r => (
@@ -350,8 +350,8 @@ export default function StudentAnalyzePage({
           title="Learning Engagement" sub="Mức độ tham gia học tập">
           <div className="grid grid-cols-2 gap-3 mb-4">
             {[
-              { label: 'Lần đăng nhập',  value: MOCK.engagement.loginCount,      color: 'text-indigo-600' },
-              { label: 'Giờ học',        value: `${MOCK.engagement.studyHours}h`, color: 'text-violet-600' },
+              { label: 'Lần đăng nhập',  value: MOCK.engagement.loginCount,      color: 'text-primary-brand' },
+              { label: 'Giờ học',        value: `${MOCK.engagement.studyHours}h`, color: 'text-primary-brand' },
               { label: 'Video đã xem',   value: `${MOCK.engagement.videoWatchPct}%`, color: 'text-amber-600' },
               { label: 'Bài tập TH',     value: MOCK.engagement.exercisesDone,   color: 'text-emerald-600' },
             ].map(s => (
@@ -374,7 +374,7 @@ export default function StudentAnalyzePage({
             <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 mt-1">Cải thiện tháng này</div>
           </div>
           <div className="rounded-xl border border-border bg-muted/30 p-4 text-center">
-            <div className="text-3xl font-black text-indigo-600">{MOCK.discipline.learningStreak}</div>
+            <div className="text-3xl font-black text-primary-brand">{MOCK.discipline.learningStreak}</div>
             <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1">Ngày học liên tiếp</div>
           </div>
           <div className="rounded-xl border border-border bg-muted/30 p-4 text-center">

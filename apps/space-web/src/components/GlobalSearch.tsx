@@ -29,8 +29,8 @@ const TYPE_META = {
   classroom: {
     label: 'Classrooms',
     icon: BookOpen,
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-50 dark:bg-indigo-950/40',
+    color: 'text-primary-brand',
+    bg: 'bg-primary-brand-light dark:bg-indigo-950/40',
     href: (item: SearchResultItem) => `/space/classrooms/${item.entity_id}/details`,
   },
   exam: {
@@ -100,7 +100,7 @@ function ResultItem({
       onMouseEnter={onMouseEnter}
       onClick={onClick}
       className={`w-full flex items-start gap-3 px-4 py-3 text-left rounded-lg transition-colors ${
-        active ? 'bg-indigo-50 dark:bg-indigo-900/30' : 'hover:bg-muted/60'
+        active ? 'bg-primary-brand-light dark:bg-indigo-900/30' : 'hover:bg-muted/60'
       }`}
     >
       <span className={`mt-0.5 flex-shrink-0 p-1.5 rounded-md ${meta.bg}`}>
@@ -283,7 +283,7 @@ export default function GlobalSearch() {
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">
           {loading ? (
-            <Loader2 size={18} className="text-indigo-500 animate-spin flex-shrink-0" />
+            <Loader2 size={18} className="text-primary-brand animate-spin flex-shrink-0" />
           ) : (
             <Search size={18} className="text-muted-foreground flex-shrink-0" />
           )}

@@ -238,7 +238,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
           <ArrowLeft size={18} className="text-muted-foreground" />
         </Button>
         <div>
-          <div className="mb-1 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-indigo-500">
+          <div className="mb-1 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider text-primary-brand">
             <ClipboardList size={14} />
             {classroom?.name || 'Lớp học'}
           </div>
@@ -249,10 +249,10 @@ export default function EditExamPage({ params }: EditExamPageProps) {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card className="overflow-hidden rounded-2xl border-border shadow-sm">
-          <div className="h-2 bg-indigo-600" />
+          <div className="h-2 bg-primary-brand" />
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-bold text-foreground">
-              <FileText size={20} className="text-indigo-500" />
+              <FileText size={20} className="text-primary-brand" />
               Thông tin bài kiểm tra
             </CardTitle>
           </CardHeader>
@@ -265,10 +265,10 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     <button
                       type="button"
                       disabled={form.exam_mode === 'online'}
-                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-70 disabled:cursor-not-allowed"
+                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                       <span className="flex min-w-0 items-center gap-2">
-                        <SelectedExamTypeIcon size={17} className="shrink-0 text-indigo-500" />
+                        <SelectedExamTypeIcon size={17} className="shrink-0 text-primary-brand" />
                         <span className="truncate">{selectedExamType.label}</span>
                       </span>
                       {form.exam_mode !== 'online' && <ChevronDown size={16} className="shrink-0 text-muted-foreground" />}
@@ -290,20 +290,20 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                               updateForm('content_type', 'markdown');
                             }
                           }}
-                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'}`}
+                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'}`}
                         >
                           <span className="flex min-w-0 items-center gap-2">
-                            <Icon size={16} className={active ? 'text-indigo-500' : 'text-muted-foreground'} />
+                            <Icon size={16} className={active ? 'text-primary-brand' : 'text-muted-foreground'} />
                             <span className="truncate">{option.label}</span>
                           </span>
-                          {active && <Check size={15} className="text-indigo-500" />}
+                          {active && <Check size={15} className="text-primary-brand" />}
                         </DropdownMenuItem>
                       );
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
                 {form.exam_mode === 'online' && (
-                  <p className="px-1 text-[10px] font-bold text-violet-600 italic">
+                  <p className="px-1 text-[10px] font-bold text-primary-brand italic">
                     * Chế độ trực tuyến bắt buộc thi trắc nghiệm
                   </p>
                 )}
@@ -315,10 +315,10 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                      className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                     >
                       <span className="flex min-w-0 items-center gap-2">
-                        <SelectedExamKindIcon size={17} className="shrink-0 text-indigo-500" />
+                        <SelectedExamKindIcon size={17} className="shrink-0 text-primary-brand" />
                         <span className="truncate">{selectedExamKind.label}</span>
                       </span>
                       <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
@@ -333,13 +333,13 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                         <DropdownMenuItem
                           key={kind.key}
                           onClick={() => updateForm('exam_kind', kind.key)}
-                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'}`}
+                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'}`}
                         >
                           <span className="flex min-w-0 items-center gap-2">
-                            <Icon size={16} className={active ? 'text-indigo-500' : 'text-muted-foreground'} />
+                            <Icon size={16} className={active ? 'text-primary-brand' : 'text-muted-foreground'} />
                             <span className="truncate">{kind.label}</span>
                           </span>
-                          {active && <Check size={15} className="text-indigo-500" />}
+                          {active && <Check size={15} className="text-primary-brand" />}
                         </DropdownMenuItem>
                       );
                     })}
@@ -353,7 +353,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
               <input
                 value={form.title}
                 onChange={event => updateForm('title', event.target.value)}
-                className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                 placeholder="Ví dụ: Kiểm tra giữa kỳ - Chương 1"
               />
             </label>
@@ -366,10 +366,10 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                        className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                       >
                         <span className="flex min-w-0 items-center gap-2">
-                          <ClipboardList size={17} className="shrink-0 text-indigo-500" />
+                          <ClipboardList size={17} className="shrink-0 text-primary-brand" />
                           <span className="truncate">{selectedQuiz?.title || 'Chọn bộ đề trắc nghiệm'}</span>
                         </span>
                         <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
@@ -383,13 +383,13 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                           <DropdownMenuItem
                             key={quiz.uid}
                             onClick={() => updateForm('ref_id', quiz.uid)}
-                            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${form.ref_id === quiz.uid ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'}`}
+                            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${form.ref_id === quiz.uid ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'}`}
                           >
                             <span className="flex min-w-0 flex-col">
                               <span className="truncate">{quiz.title}</span>
                               <span className="text-[10px] text-muted-foreground font-medium">{quiz.questions_count} câu hỏi</span>
                             </span>
-                            {form.ref_id === quiz.uid && <Check size={15} className="text-indigo-500" />}
+                            {form.ref_id === quiz.uid && <Check size={15} className="text-primary-brand" />}
                           </DropdownMenuItem>
                         ))
                       )}
@@ -406,7 +406,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     step={0.5}
                     value={form.max_grade}
                     onChange={event => updateForm('max_grade', parseFloat(event.target.value) || 0)}
-                    className="w-full h-12 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                    className="w-full h-12 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                   />
                 </label>
               </div>
@@ -418,7 +418,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                 value={form.description}
                 onChange={event => updateForm('description', event.target.value)}
                 rows={4}
-                className="w-full resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                 placeholder="Mô tả ngắn về yêu cầu bài thi"
               />
             </label>
@@ -426,7 +426,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
         </Card>
 
         <Card className="overflow-hidden rounded-2xl border-border shadow-sm">
-          <div className="h-2 bg-violet-600" />
+          <div className="h-2 bg-primary-brand" />
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-bold text-foreground">
               <Monitor size={20} className="text-violet-500" />
@@ -438,16 +438,16 @@ export default function EditExamPage({ params }: EditExamPageProps) {
               <button
                 type="button"
                 onClick={() => updateForm('exam_mode', 'offline')}
-                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'offline' ? 'border-indigo-500 bg-indigo-50' : 'border-border bg-muted/50 hover:border-border'}`}
+                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'offline' ? 'border-primary-brand bg-primary-brand-light' : 'border-border bg-muted/50 hover:border-border'}`}
               >
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${form.exam_mode === 'offline' ? 'bg-indigo-600 text-white' : 'bg-muted text-muted-foreground'}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${form.exam_mode === 'offline' ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                   <WifiOff size={18} />
                 </div>
                 <div>
                   <div className="text-sm font-black text-foreground">Ngoại tuyến</div>
                   <div className="text-[11px] font-bold text-muted-foreground">Học sinh nộp bài thông thường</div>
                 </div>
-                {form.exam_mode === 'offline' && <Check size={16} className="ml-auto text-indigo-500" />}
+                {form.exam_mode === 'offline' && <Check size={16} className="ml-auto text-primary-brand" />}
               </button>
 
               <button
@@ -457,9 +457,9 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   updateForm('exam_type', 'quiz');
                   updateForm('content_type', 'quiz');
                 }}
-                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'online' ? 'border-violet-500 bg-violet-50' : 'border-border bg-muted/50 hover:border-border'}`}
+                className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'online' ? 'border-violet-500 bg-primary-brand-light' : 'border-border bg-muted/50 hover:border-border'}`}
               >
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${form.exam_mode === 'online' ? 'bg-violet-600 text-white' : 'bg-muted text-muted-foreground'}`}>
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${form.exam_mode === 'online' ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                   <Wifi size={18} />
                 </div>
                 <div>
@@ -471,7 +471,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
             </div>
 
             {form.exam_mode === 'online' && (
-              <div className="space-y-4 rounded-2xl border border-violet-100 bg-violet-50/50 p-4">
+              <div className="space-y-4 rounded-2xl border border-violet-100 bg-primary-brand-light/50 p-4">
                 <label className="block space-y-2">
                   <span className="flex items-center gap-1.5 px-1 text-sm font-bold text-foreground">
                     <Timer size={15} className="text-violet-500" />
@@ -497,7 +497,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   <button
                     type="button"
                     onClick={() => updateForm('camera_required', !form.camera_required)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${form.camera_required ? 'bg-violet-600' : 'bg-muted'}`}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${form.camera_required ? 'bg-primary-brand' : 'bg-muted'}`}
                   >
                     <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-card shadow ring-0 transition duration-200 ease-in-out ${form.camera_required ? 'translate-x-5' : 'translate-x-0'}`} />
                   </button>
@@ -508,10 +508,10 @@ export default function EditExamPage({ params }: EditExamPageProps) {
         </Card>
 
         <Card className="overflow-hidden rounded-2xl border-border shadow-sm">
-          <div className="h-2 bg-indigo-600" />
+          <div className="h-2 bg-primary-brand" />
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-bold text-foreground">
-              <Calendar size={20} className="text-indigo-500" />
+              <Calendar size={20} className="text-primary-brand" />
               Thời hạn & Trạng thái
             </CardTitle>
           </CardHeader>
@@ -523,7 +523,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   type="datetime-local"
                   value={form.due_date}
                   onChange={event => updateForm('due_date', event.target.value)}
-                  className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                  className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                 />
               </label>
 
@@ -533,7 +533,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10"
+                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                     >
                       <span className="flex min-w-0 items-center gap-2">
                         <SelectedStatusIcon size={17} className={`shrink-0 ${selectedStatus.iconClassName}`} />
@@ -572,10 +572,10 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     <button
                       type="button"
                       disabled={form.exam_type === 'quiz'}
-                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-70"
+                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10 disabled:opacity-70"
                     >
                       <span className="flex min-w-0 items-center gap-2">
-                        <SelectedContentTypeIcon size={17} className="shrink-0 text-indigo-500" />
+                        <SelectedContentTypeIcon size={17} className="shrink-0 text-primary-brand" />
                         <span className="truncate">{selectedContentType.label}</span>
                       </span>
                       <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
@@ -594,13 +594,13 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                             setForm(prev => ({ ...prev, content_type: option.value as ExamContentType, content: '' }));
                           }}
                           disabled={option.value === 'quiz'}
-                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-indigo-50 text-indigo-600' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'} ${option.value === 'quiz' ? 'opacity-50' : ''}`}
+                          className={`flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-colors ${active ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted/50 focus:bg-muted/50'} ${option.value === 'quiz' ? 'opacity-50' : ''}`}
                         >
                           <span className="flex items-center gap-2">
-                            <Icon size={16} className={active ? 'text-indigo-500' : 'text-muted-foreground'} />
+                            <Icon size={16} className={active ? 'text-primary-brand' : 'text-muted-foreground'} />
                             {option.label}
                           </span>
-                          {active && <Check size={15} className="text-indigo-500" />}
+                          {active && <Check size={15} className="text-primary-brand" />}
                         </DropdownMenuItem>
                       );
                     })}
@@ -616,7 +616,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                 onChange={event => updateForm('body', event.target.value)}
                 rows={needsResource ? 2 : 6}
                 disabled={needsResource || form.exam_type === 'quiz'}
-                className="w-full resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-indigo-500 focus:bg-card focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-70"
+                className="w-full resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10 disabled:opacity-70"
                 placeholder={form.exam_type === 'quiz' ? 'Nội dung sẽ được lấy từ bộ đề trắc nghiệm' : needsResource ? 'File mới sẽ được upload khi lưu' : 'Nhập hướng dẫn làm bài cho học sinh'}
               />
             </label>
@@ -665,7 +665,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
           <Button
             type="submit"
             disabled={saving}
-            className="h-12 min-w-[180px] rounded-xl bg-indigo-600 px-6 text-xs font-bold text-white shadow-lg shadow-indigo-500/20 hover:bg-indigo-700"
+            className="h-12 min-w-[180px] rounded-xl bg-primary-brand px-6 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark"
           >
             {saving ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Save size={16} className="mr-2" />}
             LƯU THAY ĐỔI

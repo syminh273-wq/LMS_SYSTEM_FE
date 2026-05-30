@@ -57,6 +57,8 @@ export default function ClassroomsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState('');
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const fetchClassrooms = async (page: number) => {
     try {
       setLoading(true);
@@ -154,6 +156,11 @@ export default function ClassroomsPage() {
 
   const classrooms = data?.results || [];
 
+  const filteredClassrooms = classrooms.filter(classroom => 
+    classroom.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    classroom.pid.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const handleDelete = async (uid: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa phòng học này?')) {
       try {
@@ -174,8 +181,10 @@ export default function ClassroomsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
           <input 
             type="text"
-            className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:bg-card transition-all font-medium placeholder:text-muted-foreground"
+            className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-brand/10 hover:border-primary-brand transition-colors"
             placeholder="Tìm kiếm theo tên hoặc mã phòng..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
@@ -191,7 +200,14 @@ export default function ClassroomsPage() {
             Trạng thái
           </Button>
 
-          <Button variant="ghost" className="h-12 px-4 text-muted-foreground hover:text-foreground font-bold text-xs uppercase tracking-wider" onClick={() => fetchClassrooms(1)}>
+          <Button 
+            variant="ghost" 
+            className="h-12 px-4 text-muted-foreground hover:text-foreground font-bold text-xs uppercase tracking-wider" 
+            onClick={() => {
+              setSearchQuery('');
+              fetchClassrooms(1);
+            }}
+          >
             <RotateCcw size={16} />
             <span className="ml-2 hidden lg:inline">Đặt lại</span>
           </Button>
@@ -203,13 +219,13 @@ export default function ClassroomsPage() {
           <div className="flex bg-muted/80 p-1.5 rounded-xl border border-border">
             <button 
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-indigo-600 shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary-brand shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <List size={18} />
             </button>
             <button 
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-indigo-600 shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary-brand shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <LayoutGrid size={18} />
             </button>
@@ -217,7 +233,7 @@ export default function ClassroomsPage() {
           
           <Button 
             onClick={() => router.push('/space/classrooms/create')}
-            className="h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 gap-2.5 shadow-lg shadow-indigo-500/20 font-bold text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="h-12 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 gap-2.5 shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus size={20} />
             Tạo mới
@@ -235,7 +251,7 @@ export default function ClassroomsPage() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-40 text-muted-foreground/60">
-          <Loader2 size={48} className="animate-spin mb-4 text-indigo-500" />
+          <Loader2 size={48} className="animate-spin mb-4 text-primary-brand" />
           <p className="text-sm font-bold uppercase tracking-widest">Đang tải dữ liệu...</p>
         </div>
       ) : classrooms.length === 0 ? (
@@ -247,10 +263,26 @@ export default function ClassroomsPage() {
           <p className="text-muted-foreground mb-8 font-medium">Chưa có phòng học nào được tạo trong hệ thống của bạn.</p>
           <Button 
             onClick={() => router.push('/space/classrooms/create')}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-8 h-12 shadow-lg shadow-indigo-500/20 font-bold uppercase tracking-widest"
+            className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-8 h-12 shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark transition-all"
           >
             <Plus size={20} className="mr-2" />
             Tạo ngay
+          </Button>
+        </div>
+      ) : filteredClassrooms.length === 0 ? (
+        <div className="text-center py-32 bg-card border border-border rounded-3xl shadow-sm">
+          <div className="bg-muted/50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border border-border text-muted-foreground/60">
+            <Search size={40} />
+          </div>
+          <h3 className="text-xl font-bold text-foreground mb-2">Không tìm thấy kết quả</h3>
+          <p className="text-muted-foreground mb-8 font-medium">Không có phòng học nào khớp với từ khóa "{searchQuery}"</p>
+          <Button 
+            onClick={() => setSearchQuery('')}
+            variant="outline"
+            className="rounded-xl px-8 h-12 font-bold uppercase tracking-widest"
+          >
+            <RotateCcw size={20} className="mr-2" />
+            Xóa tìm kiếm
           </Button>
         </div>
       ) : viewMode === 'list' ? (
@@ -268,21 +300,21 @@ export default function ClassroomsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {classrooms.map((classroom) => (
+                {filteredClassrooms.map((classroom) => (
                   <tr key={classroom.uid} className="hover:bg-muted/50/50 transition-colors group cursor-pointer" onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs border-2 border-white shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all uppercase">
+                        <div className="w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs border-2 border-white shadow-sm group-hover:bg-primary-brand group-hover:text-white transition-all uppercase">
                           {classroom.name.substring(0, 2)}
                         </div>
                         <div className="space-y-0.5">
-                          <div className="font-bold text-foreground group-hover:text-indigo-600 transition-colors">{classroom.name}</div>
+                          <div className="font-bold text-foreground group-hover:text-primary-brand transition-colors">{classroom.name}</div>
                           <div className="text-[11px] text-muted-foreground font-semibold line-clamp-1 max-w-[300px]">{classroom.description}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-5 text-center">
-                      <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100 uppercase tracking-wider">
+                      <span className="text-[11px] font-bold text-primary-brand bg-primary-brand-light border-primary-brand-muted uppercase tracking-wider">
                         {classroom.pid}
                       </span>
                     </td>
@@ -302,7 +334,7 @@ export default function ClassroomsPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button 
                           onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
-                          className="text-muted-foreground/60 hover:text-indigo-600 p-2 transition-all rounded-xl hover:bg-indigo-50 border border-transparent hover:border-indigo-100"
+                          className="text-muted-foreground/60 hover:text-primary-brand p-2 transition-all rounded-xl hover:bg-primary-brand-light border-transparent hover:border-primary-brand-muted"
                           title="Xem chi tiết"
                         >
                           <ChevronRight size={20} />
@@ -314,11 +346,11 @@ export default function ClassroomsPage() {
                             </button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
-                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
+                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
                               <Pencil size={16} className="mr-3 text-muted-foreground" />
                               <span>Chỉnh sửa</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
+                            <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
                               <Download size={16} className="mr-3 text-muted-foreground" />
                               <span>Tải mã QR</span>
                             </DropdownMenuItem>
@@ -357,16 +389,16 @@ export default function ClassroomsPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-primary-brand border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(1)} disabled={currentPage === 1}>
                   <ChevronsLeft size={18} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-primary-brand border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                   <ChevronLeft size={18} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === data?.total_pages}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-primary-brand border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === data?.total_pages}>
                   <ChevronRight size={18} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-indigo-600 border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(data?.total_pages || 1)} disabled={currentPage === data?.total_pages}>
+                <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:bg-card hover:text-primary-brand border-2 border-transparent hover:border-border rounded-xl transition-all shadow-none" onClick={() => handlePageChange(data?.total_pages || 1)} disabled={currentPage === data?.total_pages}>
                   <ChevronsRight size={18} />
                 </Button>
               </div>
@@ -375,16 +407,16 @@ export default function ClassroomsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {classrooms.map((classroom) => (
-            <Card key={classroom.uid} className="group overflow-hidden border-border hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 rounded-2xl flex flex-col bg-card">
+          {filteredClassrooms.map((classroom) => (
+            <Card key={classroom.uid} className="group overflow-hidden border-border hover:border-primary-brand-muted shadow-primary-brand/5 transition-all duration-300 rounded-2xl flex flex-col bg-card">
               <div className="p-6 flex-1 flex flex-col relative">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground font-bold text-lg border border-border group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all uppercase shadow-sm">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground font-bold text-lg border border-border group-hover:bg-primary-brand group-hover:text-white group-hover:border-primary-brand transition-all uppercase shadow-sm">
                     {classroom.name ? classroom.name.substring(0, 2) : '??'}
                   </div>
                   
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-primary-brand bg-primary-brand-light border-primary-brand-muted uppercase tracking-wider">
                       {classroom.pid}
                     </span>
                     <DropdownMenu>
@@ -394,11 +426,11 @@ export default function ClassroomsPage() {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
-                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
+                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
                           <Pencil size={16} className="mr-3 text-muted-foreground" />
                           <span>Chỉnh sửa</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-indigo-600 cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
+                        <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
                           <Download size={16} className="mr-3 text-muted-foreground" />
                           <span>Tải mã QR</span>
                         </DropdownMenuItem>
@@ -416,7 +448,7 @@ export default function ClassroomsPage() {
                   </div>
                 </div>
                 
-                <h3 className="font-bold text-foreground group-hover:text-indigo-600 transition-colors text-lg mb-2 line-clamp-1 leading-tight">
+                <h3 className="font-bold text-foreground group-hover:text-primary-brand transition-colors text-lg mb-2 line-clamp-1 leading-tight">
                   {classroom.name}
                 </h3>
                 
@@ -444,7 +476,7 @@ export default function ClassroomsPage() {
                 <Button 
                   onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
                   variant="ghost" 
-                  className="w-full text-[11px] font-bold tracking-[0.2em] text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all h-10 rounded-xl"
+                  className="w-full text-[11px] font-bold tracking-[0.2em] text-primary-brand hover:bg-primary-brand hover:text-white transition-all h-10 rounded-xl"
                 >
                   CHI TIẾT PHÒNG HỌC
                 </Button>
@@ -458,7 +490,7 @@ export default function ClassroomsPage() {
       {!loading && classrooms.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
           {/* Total Classrooms Card */}
-          <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
+          <div className="bg-gradient-to-br from-primary-brand to-primary-brand-dark rounded-3xl p-8 text-white shadow-xl shadow-primary-brand/20 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform duration-500">
               <GraduationCap size={160} strokeWidth={1} />
             </div>
@@ -469,7 +501,7 @@ export default function ClassroomsPage() {
               
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-card/10 backdrop-blur-md rounded-full border border-white/10">
                 <TrendingUp size={16} className="text-emerald-400" />
-                <span className="text-xs font-bold">+12% <span className="text-indigo-200 font-medium">so với tháng trước</span></span>
+                <span className="text-xs font-bold">+12% <span className="text-primary-brand-muted font-medium">so với tháng trước</span></span>
               </div>
             </div>
 
@@ -487,18 +519,18 @@ export default function ClassroomsPage() {
                 <h3 className="text-lg font-bold text-foreground">Phân bổ nguồn lực</h3>
                 <p className="text-sm text-muted-foreground font-medium mt-1">Thống kê sĩ số trung bình theo khối</p>
               </div>
-              <button className="text-indigo-600 text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
+              <button className="text-primary-brand text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
                 Chi tiết
               </button>
             </div>
 
             <div className="flex-1 flex items-end justify-between gap-4 px-4 pb-2">
               {[
-                { label: 'K10', value: 35, color: 'bg-indigo-100' },
-                { label: 'K11', value: 85, color: 'bg-indigo-600' },
-                { label: 'K12', value: 45, color: 'bg-indigo-100' },
+                { label: 'K10', value: 35, color: 'bg-primary-brand-light' },
+                { label: 'K11', value: 85, color: 'bg-primary-brand' },
+                { label: 'K12', value: 45, color: 'bg-primary-brand-light' },
                 { label: 'NGHỀ', value: 95, color: 'bg-emerald-400' },
-                { label: 'IELTS', value: 25, color: 'bg-indigo-100' }
+                { label: 'IELTS', value: 25, color: 'bg-primary-brand-light' }
               ].map((item, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-4 group">
                   <div className="w-full relative h-48 bg-muted/50 rounded-xl overflow-hidden">

@@ -40,14 +40,14 @@ function ClassroomRow({ row, consumerUid }: { row: StudentClassroomStat; consume
   return (
     <Link
       href={`/space/classrooms/${row.classroom.uid}/students/${consumerUid}`}
-      className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-indigo-300 hover:shadow-sm dark:hover:border-indigo-700 transition-all"
+      className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary-brand hover:shadow-sm dark:hover:border-primary-brand-dark transition-all"
     >
-      <div className="flex-shrink-0 p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40">
-        <BookOpen size={18} className="text-indigo-500" />
+      <div className="flex-shrink-0 p-2.5 rounded-xl bg-primary-brand-light dark:bg-primary-brand-dark/40">
+        <BookOpen size={18} className="text-primary-brand" />
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm text-foreground truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary-brand dark:group-hover:text-primary-brand transition-colors">
           {row.classroom.name}
         </p>
         <div className="flex items-center gap-3 mt-1">
@@ -70,7 +70,7 @@ function ClassroomRow({ row, consumerUid }: { row: StudentClassroomStat; consume
           <BarChart2 size={12} />
           Chart
         </div>
-        <ChevronRight size={15} className="text-muted-foreground/40 group-hover:text-indigo-500 transition-colors" />
+        <ChevronRight size={15} className="text-muted-foreground/40 group-hover:text-primary-brand transition-colors" />
       </div>
     </Link>
   );
@@ -106,7 +106,7 @@ export default function StudentDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <p className="text-base font-semibold text-foreground">Student not found</p>
-        <button onClick={() => router.back()} className="mt-3 text-sm text-indigo-600 hover:underline">
+        <button onClick={() => router.back()} className="mt-3 text-sm text-primary-brand hover:underline">
           Go back
         </button>
       </div>
@@ -137,7 +137,7 @@ export default function StudentDetailPage() {
         <div className="flex items-start gap-5">
           <Avatar className="h-16 w-16 border-2 border-muted flex-shrink-0">
             <AvatarImage src={consumer.avatar_url} alt={consumer.full_name} />
-            <AvatarFallback className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-lg">
+            <AvatarFallback className="bg-primary-brand-light text-primary-brand-dark dark:bg-primary-brand-dark dark:text-primary-brand-muted font-bold text-lg">
               {initials(consumer.full_name)}
             </AvatarFallback>
           </Avatar>
@@ -175,7 +175,7 @@ export default function StudentDetailPage() {
       {/* Classrooms */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <GraduationCap size={16} className="text-indigo-500" />
+          <GraduationCap size={16} className="text-primary-brand" />
           <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">
             Classrooms ({classrooms.length})
           </h3>

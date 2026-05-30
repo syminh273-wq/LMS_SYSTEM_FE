@@ -54,37 +54,39 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen bg-[#f8faff] dark:bg-background">
       {/* Sidebar */}
-      <aside className={`bg-[#2D283E] text-white flex flex-col shadow-xl transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-72'}`}>
+      <aside className={`bg-card dark:bg-card border-r border-border flex flex-col shadow-sm transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-72'}`}>
         {sidebarCollapsed ? (
           <div className="flex flex-col items-center gap-3 pt-6 pb-2">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Sparkles size={22} className="text-white fill-white" />
-            </div>
+            <Link href="/space" className="hover:scale-105 transition-transform">
+              <div className="w-10 h-10 bg-primary-brand rounded-xl flex items-center justify-center shadow-lg shadow-primary-brand/20">
+                <Sparkles size={22} className="text-white fill-white" />
+              </div>
+            </Link>
             <button
               onClick={() => setSidebarCollapsed(false)}
               title="Mở rộng menu"
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-white hover:bg-card/10 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
             >
               <ChevronsRight size={16} />
             </button>
           </div>
         ) : (
           <div className="p-6 pb-4 flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <Link href="/space" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+              <div className="w-10 h-10 bg-primary-brand rounded-xl flex items-center justify-center shadow-lg shadow-primary-brand/20">
                 <Sparkles size={22} className="text-white fill-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-tight flex items-center gap-1.5">
-                  Space <span className="font-medium opacity-90 text-slate-100">Admin</span>
+                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-1.5 text-foreground">
+                  Space <span className="font-medium text-primary-brand">Admin</span>
                 </h1>
-                <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-[0.2em] mt-0.5">LMS Management</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-0.5">LMS Management</p>
               </div>
-            </div>
+            </Link>
             <button
               onClick={() => setSidebarCollapsed(true)}
               title="Thu nhỏ menu"
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-white hover:bg-card/10 transition-colors mt-1"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors mt-1"
             >
               <ChevronsLeft size={16} />
             </button>
@@ -99,31 +101,32 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.name}
                 href={item.href}
                 title={sidebarCollapsed ? item.name : undefined}
-                className={`flex items-center rounded-xl transition-all duration-200 group ${
+                className={`flex items-center rounded-xl transition-all duration-200 group relative ${
                   sidebarCollapsed ? 'justify-center py-3 px-2' : 'gap-3 px-4 py-3'
                 } ${
                   isActive
-                    ? 'bg-[#3b3254] text-white shadow-lg shadow-black/10'
-                    : 'text-muted-foreground hover:bg-[#3b3254]/50 hover:text-white'
+                    ? 'bg-primary-brand-light text-primary-brand shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >
-                <item.icon size={20} className={isActive ? 'text-indigo-400' : 'text-muted-foreground group-hover:text-muted-foreground/60'} />
-                {!sidebarCollapsed && <span className="text-sm font-semibold tracking-wide">{item.name}</span>}
+                {isActive && <div className="absolute left-0 w-1.5 h-6 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />}
+                <item.icon size={20} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-primary-brand/70'} />
+                {!sidebarCollapsed && <span className="text-sm font-bold tracking-wide">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
-        <div className={`mt-auto border-t border-slate-700/50 ${sidebarCollapsed ? 'p-3 flex justify-center' : 'p-6'}`}>
+        <div className={`mt-auto border-t border-border ${sidebarCollapsed ? 'p-3 flex justify-center' : 'p-6'}`}>
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className={`text-muted-foreground hover:text-white hover:bg-card/5 rounded-xl transition-all ${
-              sidebarCollapsed ? 'w-10 h-10 p-0 justify-center' : 'w-full justify-start gap-3'
+            className={`text-muted-foreground hover:text-destructive hover:bg-destructive/5 rounded-xl transition-all ${
+              sidebarCollapsed ? 'w-10 h-10 p-0 justify-center' : 'w-full justify-start gap-3 px-4'
             }`}
           >
             <LogOut size={20} />
-            {!sidebarCollapsed && <span className="text-sm font-semibold tracking-wide">Logout</span>}
+            {!sidebarCollapsed && <span className="text-sm font-bold tracking-wide">Logout</span>}
           </Button>
         </div>
       </aside>

@@ -13,7 +13,7 @@ import type { ClassroomMember, StudentExamRecord, StudentPublicProfile } from '@
 import { toast } from 'sonner';
 
 const THEME_GRADIENT: Record<string, string> = {
-  indigo:  'from-indigo-500 via-indigo-600 to-violet-600',
+  indigo:  'from-primary-brand via-primary-brand to-violet-600',
   rose:    'from-rose-400 via-pink-500 to-rose-600',
   emerald: 'from-emerald-400 via-teal-500 to-emerald-600',
   amber:   'from-amber-400 via-orange-500 to-amber-600',
@@ -85,7 +85,7 @@ export default function StudentDetailsPage({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary-brand" />
       </div>
     );
   }
@@ -95,7 +95,7 @@ export default function StudentDetailsPage({
       <div className="flex items-center justify-center py-32">
         <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
           <p className="font-black text-foreground">Không tìm thấy sinh viên</p>
-          <Button className="mt-5 w-full rounded-xl bg-indigo-600"
+          <Button className="mt-5 w-full rounded-xl bg-primary-brand"
             onClick={() => router.push(`/space/classrooms/${uid}/details?tab=students`)}>
             Quay lại
           </Button>
@@ -165,7 +165,7 @@ export default function StudentDetailsPage({
                   const Icon = SOCIAL_ICONS[link.platform] ?? Globe;
                   return (
                     <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-bold text-muted-foreground hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-bold text-muted-foreground hover:text-primary-brand hover:border-primary-brand transition-all">
                       <Icon size={12} /> {link.label}
                     </a>
                   );
@@ -194,7 +194,7 @@ export default function StudentDetailsPage({
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: 'Tổng bài thi',  value: records.length,    icon: ClipboardCheck, color: 'text-foreground',   bg: 'bg-muted/50' },
-          { label: 'Đã nộp',        value: submitted,          icon: CheckCircle2,   color: 'text-indigo-600',   bg: 'bg-indigo-50 dark:bg-indigo-950/30' },
+          { label: 'Đã nộp',        value: submitted,          icon: CheckCircle2,   color: 'text-primary-brand',   bg: 'bg-primary-brand-light dark:bg-primary-brand-dark/30' },
           { label: 'Nộp đúng hạn',  value: onTimeCount,        icon: Clock,          color: 'text-emerald-600',  bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
           {
             label: 'Điểm TB',
@@ -218,7 +218,7 @@ export default function StudentDetailsPage({
           <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-3">🎯 Sở thích</h3>
           <div className="flex flex-wrap gap-2">
             {meta.hobbies.map((h, i) => (
-              <span key={i} className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 text-xs font-bold border border-indigo-200/50">
+              <span key={i} className="px-3 py-1 rounded-full bg-primary-brand-light dark:bg-primary-brand-dark/30 text-primary-brand text-xs font-bold border border-primary-brand-muted/50">
                 {h}
               </span>
             ))}
@@ -238,7 +238,7 @@ export default function StudentDetailsPage({
                   <div className="text-xs text-muted-foreground">{c.issuer} · {c.issued_date}</div>
                 </div>
                 {c.url && (
-                  <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-600">
+                  <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-primary-brand hover:text-primary-brand">
                     <ExternalLink size={14} />
                   </a>
                 )}
@@ -251,7 +251,7 @@ export default function StudentDetailsPage({
       {/* ── Exam table ── */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="border-b border-border px-6 py-5 flex items-center gap-3">
-          <ClipboardCheck size={18} className="text-indigo-500" />
+          <ClipboardCheck size={18} className="text-primary-brand" />
           <div>
             <h2 className="text-sm font-black text-foreground">Lịch sử bài nộp</h2>
             <p className="text-xs font-medium text-muted-foreground mt-0.5">
@@ -291,7 +291,7 @@ export default function StudentDetailsPage({
                         <span className={`flex items-center gap-1 w-fit rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${
                           r.submission.status === 'graded'
                             ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600'
-                            : 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600'
+                            : 'bg-primary-brand-light dark:bg-primary-brand-dark/30 text-primary-brand'
                         }`}>
                           {r.submission.status === 'graded' ? <CheckCircle2 size={10} /> : <Clock size={10} />}
                           {r.submission.status === 'graded' ? 'Đã chấm' : 'Đã nộp'}

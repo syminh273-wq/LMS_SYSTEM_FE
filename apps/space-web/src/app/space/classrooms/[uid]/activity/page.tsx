@@ -39,7 +39,7 @@ function getActivityMeta(eventType: ActivityLogEventType): {
   label: string;
 } {
   const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; border: string; label: string }> = {
-    classroom_created: { icon: GraduationCap, color: 'text-indigo-600', bg: 'bg-indigo-50',  border: 'border-indigo-200', label: 'Lớp học được tạo' },
+    classroom_created: { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light',  border: 'border-primary-brand-muted', label: 'Lớp học được tạo' },
     document_uploaded: { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-50',    border: 'border-blue-200',   label: 'Tải lên tài liệu mới' },
     document_deleted:  { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-50',     border: 'border-red-200',    label: 'Xóa tài liệu' },
     exam_created:      { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-50',  border: 'border-orange-200', label: 'Tạo bài kiểm tra' },
@@ -165,7 +165,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
               </span>
             </div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-              <RotateCcw size={22} className="text-indigo-500" />
+              <RotateCcw size={22} className="text-primary-brand" />
               Lịch sử hoạt động
             </h1>
           </div>
@@ -193,7 +193,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
               onClick={() => setLevel(lvl)}
               className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
                 level === lvl
-                  ? 'bg-card text-indigo-600 shadow-sm'
+                  ? 'bg-card text-primary-brand shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -209,7 +209,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Tìm theo tên, sự kiện..."
-            className="w-full pl-10 pr-4 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            className="w-full pl-10 pr-4 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30"
           />
         </div>
 
@@ -221,8 +221,8 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
               onClick={() => setActiveGroup(i)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                 activeGroup === i
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-muted text-muted-foreground hover:bg-indigo-50 hover:text-indigo-600'
+                  ? 'bg-primary-brand text-white shadow-sm'
+                  : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'
               }`}
             >
               {g.label}
@@ -243,7 +243,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
       {/* Timeline */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-32 gap-4">
-          <Loader2 size={40} className="animate-spin text-indigo-500" />
+          <Loader2 size={40} className="animate-spin text-primary-brand" />
           <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Đang tải...</p>
         </div>
       ) : filtered.length === 0 ? (
@@ -283,14 +283,14 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
                             <p className="text-sm font-bold text-foreground leading-snug">
                               {label}
                               {log.target_name && (
-                                <span className="text-indigo-600"> — {log.target_name}</span>
+                                <span className="text-primary-brand"> — {log.target_name}</span>
                               )}
                             </p>
                             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                               {log.actor_name && (
                                 <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                                   log.actor_role === 'teacher'
-                                    ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                                    ? 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted'
                                     : 'bg-muted text-muted-foreground border border-border'
                                 }`}>
                                   {log.actor_role === 'teacher' ? '👩‍🏫' : '🎓'} {log.actor_name}

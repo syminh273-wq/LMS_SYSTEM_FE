@@ -185,7 +185,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black bg-indigo-500 text-white px-2 py-0.5 rounded uppercase tracking-wider">
+                <span className="text-[10px] font-black bg-primary-brand text-white px-2 py-0.5 rounded uppercase tracking-wider">
                   ID: {classroom.pid}
                 </span>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -203,19 +203,19 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
           <div className="flex gap-1 mt-6 bg-slate-800/50 p-1 rounded-xl w-fit">
             <button 
               onClick={() => setActiveTab('info')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'info' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-muted-foreground hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'info' ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20' : 'text-muted-foreground hover:text-white'}`}
             >
               Thông tin
             </button>
             <button 
               onClick={() => setActiveTab('docs')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'docs' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-muted-foreground hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'docs' ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20' : 'text-muted-foreground hover:text-white'}`}
             >
               Tài liệu
             </button>
             <button 
               onClick={() => setActiveTab('chat')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chat' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-muted-foreground hover:text-white'}`}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'chat' ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20' : 'text-muted-foreground hover:text-white'}`}
             >
               Tin nhắn
             </button>
@@ -250,7 +250,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
               {!showQr ? (
                 <Button 
                   onClick={handleShowQr}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white h-12 rounded-xl gap-2 font-bold shadow-lg shadow-indigo-500/20"
+                  className="w-full bg-primary-brand hover:bg-primary-brand-dark text-white h-12 rounded-xl gap-2 font-bold shadow-lg shadow-primary-brand/20"
                   disabled={loading}
                 >
                   {loading ? <Loader2 size={18} className="animate-spin" /> : <QrCode size={18} />}
@@ -286,11 +286,11 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
 
           {activeTab === 'docs' && (
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="bg-indigo-600 p-6 rounded-3xl text-white relative overflow-hidden mb-6">
+              <div className="bg-primary-brand p-6 rounded-3xl text-white relative overflow-hidden mb-6">
                 <div className="relative z-10">
                   <h4 className="font-bold mb-1">Tải lên tài liệu</h4>
-                  <p className="text-xs text-indigo-100 mb-4">Chia sẻ tài liệu học tập với tất cả học sinh trong lớp</p>
-                  <Button className="bg-card text-indigo-600 hover:bg-indigo-50 font-bold text-xs rounded-xl h-9 px-4">
+                  <p className="text-xs text-primary-brand-light mb-4">Chia sẻ tài liệu học tập với tất cả học sinh trong lớp</p>
+                  <Button className="bg-card text-primary-brand hover:bg-primary-brand-light font-bold text-xs rounded-xl h-9 px-4">
                     <UploadCloud size={16} className="mr-2" /> CHỌN TỆP
                   </Button>
                 </div>
@@ -302,8 +302,8 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1 mb-2">Tài liệu đã tải lên ({documents.length})</div>
               <div className="space-y-3">
                 {documents.map(doc => (
-                  <div key={doc.id} className="bg-card p-4 rounded-2xl border border-border shadow-sm flex items-center gap-4 group hover:border-indigo-200 transition-colors">
-                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                  <div key={doc.id} className="bg-card p-4 rounded-2xl border border-border shadow-sm flex items-center gap-4 group hover:border-primary-brand-muted transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-muted-foreground group-hover:bg-primary-brand-light group-hover:text-primary-brand transition-colors">
                       <File size={20} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -325,7 +325,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
                     {!msg.isMe && <div className="text-[10px] font-bold text-muted-foreground ml-3 mb-1">{msg.sender}</div>}
-                    <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium ${msg.isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-card border border-border text-foreground rounded-bl-none shadow-sm'}`}>
+                    <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm font-medium ${msg.isMe ? 'bg-primary-brand text-white rounded-br-none' : 'bg-card border border-border text-foreground rounded-bl-none shadow-sm'}`}>
                       {msg.text}
                     </div>
                     <div className="text-[9px] font-bold text-muted-foreground mt-1 px-1">{msg.time}</div>
@@ -335,7 +335,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
               
               <div className="sticky bottom-0 bg-muted/50/80 backdrop-blur-md pt-2">
                 <div className="flex items-center gap-2 bg-card p-2 rounded-2xl border border-border shadow-lg">
-                  <button className="p-2 text-muted-foreground hover:text-indigo-600">
+                  <button className="p-2 text-muted-foreground hover:text-primary-brand">
                     <Paperclip size={20} />
                   </button>
                   <input 
@@ -349,7 +349,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                   <Button 
                     onClick={handleSendMessage}
                     size="icon" 
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-10 w-10 shrink-0"
+                    className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl h-10 w-10 shrink-0"
                   >
                     <SendHorizontal size={18} />
                   </Button>

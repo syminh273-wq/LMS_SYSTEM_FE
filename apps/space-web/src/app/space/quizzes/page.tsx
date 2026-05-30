@@ -62,7 +62,7 @@ export default function QuizLibraryPage() {
         </div>
         <Button
           onClick={() => setShowGenerateModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl h-10 px-5 gap-2 shadow-lg shadow-indigo-500/20"
+          className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-xl h-10 px-5 gap-2 shadow-lg shadow-primary-brand/20"
         >
           <Wand2 size={16} />
           TẠO QUIZ MỚI
@@ -88,10 +88,10 @@ export default function QuizLibraryPage() {
           {quizzes.map(quiz => (
             <div
               key={quiz.uid}
-              className="bg-card border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400/50 transition-all group p-5 flex flex-col gap-4"
+              className="bg-card border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-primary-brand/50 transition-all group p-5 flex flex-col gap-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand shrink-0">
                   <BookOpen size={20} />
                 </div>
                 <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full border ${
@@ -113,7 +113,7 @@ export default function QuizLibraryPage() {
                 <div className="mt-3 flex items-center gap-3 text-[11px] font-bold text-muted-foreground uppercase">
                   <span>{quiz.questions_count} câu hỏi</span>
                   {quiz.assigned_classrooms && quiz.assigned_classrooms.length > 0 && (
-                    <span className="text-indigo-500">{quiz.assigned_classrooms.length} lớp</span>
+                    <span className="text-primary-brand">{quiz.assigned_classrooms.length} lớp</span>
                   )}
                 </div>
               </div>
@@ -282,7 +282,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                     <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="10" className="text-muted" />
                     <circle
                       cx="50" cy="50" r="40" fill="none"
-                      stroke="#6366f1" strokeWidth="10"
+                      stroke="var(--primary-brand)" strokeWidth="10"
                       strokeDasharray={`${2 * Math.PI * 40}`}
                       strokeDashoffset={`${2 * Math.PI * 40 * (1 - pct / 100)}`}
                       className="transition-all duration-500"
@@ -290,13 +290,13 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-lg font-black text-indigo-500">{progress}</span>
+                    <span className="text-lg font-black text-primary-brand">{progress}</span>
                     <span className="text-[10px] font-bold text-muted-foreground">/ {numQuestions}</span>
                   </div>
                 </div>
                 <div className="text-center space-y-1 w-full max-w-sm">
                   {streamTitle && <p className="font-black text-foreground text-sm truncate">{streamTitle}</p>}
-                  <p className="text-xs text-indigo-500 font-medium animate-pulse">AI đang tạo câu hỏi...</p>
+                  <p className="text-xs text-primary-brand font-medium animate-pulse">AI đang tạo câu hỏi...</p>
                   {lastQuestion && (
                     <p className="text-[11px] text-muted-foreground font-medium mt-3 line-clamp-2 leading-relaxed bg-muted rounded-xl px-4 py-2 border border-border">
                       {lastQuestion}
@@ -320,12 +320,12 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                     onClick={() => setQuizType(opt.value)}
                     className={`text-left rounded-2xl border-2 px-4 py-3 transition-all ${
                       quizType === opt.value
-                        ? 'border-indigo-500 bg-indigo-500/10'
-                        : 'border-border bg-muted/50 hover:border-indigo-400/50'
+                        ? 'border-primary-brand bg-primary-brand/10'
+                        : 'border-border bg-muted/50 hover:border-primary-brand/50'
                     }`}
                   >
                     <div className="text-lg mb-1">{opt.icon}</div>
-                    <div className={`text-xs font-black ${quizType === opt.value ? 'text-indigo-500' : 'text-foreground'}`}>
+                    <div className={`text-xs font-black ${quizType === opt.value ? 'text-primary-brand' : 'text-foreground'}`}>
                       {opt.label}
                     </div>
                     <div className="text-[10px] font-medium text-muted-foreground mt-0.5 leading-relaxed">{opt.desc}</div>
@@ -338,13 +338,13 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Số câu hỏi</div>
-                <span className="text-sm font-black text-indigo-500">{numQuestions} câu</span>
+                <span className="text-sm font-black text-primary-brand">{numQuestions} câu</span>
               </div>
               <input
                 type="range" min={5} max={30} step={5}
                 value={numQuestions}
                 onChange={e => setNumQuestions(Number(e.target.value))}
-                className="w-full accent-indigo-600"
+                className="w-full accent-primary-brand"
               />
               <div className="flex justify-between text-[10px] font-bold text-muted-foreground">
                 <span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>30</span>
@@ -362,7 +362,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                     onClick={() => setMode(key)}
                     className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
                       mode === key
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                        ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20'
                         : 'bg-muted text-muted-foreground hover:text-foreground'
                     }`}
                   >
@@ -377,19 +377,19 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                   onChange={e => setContent(e.target.value)}
                   placeholder="Dán nội dung tài liệu vào đây..."
                   rows={6}
-                  className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 resize-none transition"
+                  className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/20 resize-none transition"
                 />
               ) : (
                 <div
                   onClick={() => fileRef.current?.click()}
-                  className="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-border hover:border-indigo-400 bg-muted/30 hover:bg-indigo-500/5 transition cursor-pointer"
+                  className="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-border hover:border-primary-brand bg-muted/30 hover:bg-primary-brand/5 transition cursor-pointer"
                 >
                   <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
                   {selectedFile ? (
                     <>
-                      <FileText size={28} className="text-indigo-500 mb-2" />
+                      <FileText size={28} className="text-primary-brand mb-2" />
                       <p className="text-sm font-bold text-foreground">{selectedFile.name}</p>
-                      <p className="text-xs text-indigo-500 font-medium mt-1">Nhấn để đổi tệp</p>
+                      <p className="text-xs text-primary-brand font-medium mt-1">Nhấn để đổi tệp</p>
                     </>
                   ) : (
                     <>
@@ -412,7 +412,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
             </Button>
             <Button
               onClick={() => void handleGenerate()}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs h-11 gap-2 shadow-lg shadow-indigo-500/20"
+              className="flex-1 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl font-bold text-xs h-11 gap-2 shadow-lg shadow-primary-brand/20"
             >
               <Wand2 size={16} /> TẠO {numQuestions} CÂU HỎI
             </Button>

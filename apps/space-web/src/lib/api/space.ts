@@ -37,6 +37,14 @@ export class SpaceApiClient extends BaseRestApiClient {
   public async deactivate(uid: string): Promise<Space> {
     return this.patch<Space>(`/api/v1/space/account/spaces/${uid}/deactivate/`);
   }
+
+  public async getSettings(): Promise<Record<string, any>> {
+    return this.get<Record<string, any>>('/api/v1/space/account/settings/');
+  }
+
+  public async updateSettings(data: Record<string, any>): Promise<Record<string, any>> {
+    return this.patch<Record<string, any>>('/api/v1/space/account/settings/', data);
+  }
 }
 
 export const spaceApi = new SpaceApiClient();

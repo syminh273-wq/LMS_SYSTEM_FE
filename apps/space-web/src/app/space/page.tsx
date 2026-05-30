@@ -35,7 +35,7 @@ type DashboardStats = {
 
 function getActivityMeta(eventType: ActivityLogEventType) {
   const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; label: string }> = {
-    classroom_created: { icon: GraduationCap, color: 'text-indigo-600', bg: 'bg-indigo-50', label: 'Lớp học mới được tạo' },
+    classroom_created: { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light', label: 'Lớp học mới được tạo' },
     document_uploaded: { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-50',   label: 'Tải lên tài liệu' },
     document_deleted:  { icon: File,          color: 'text-red-500',    bg: 'bg-red-50',    label: 'Xóa tài liệu' },
     exam_created:      { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-50', label: 'Tạo bài kiểm tra' },
@@ -184,7 +184,7 @@ export default function SpaceDashboardPage() {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/50">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 size={40} className="animate-spin text-indigo-600" />
+          <Loader2 size={40} className="animate-spin text-primary-brand" />
           <p className="text-muted-foreground font-medium">Đang tải dữ liệu...</p>
         </div>
       </div>
@@ -323,11 +323,11 @@ export default function SpaceDashboardPage() {
         <Card className="lg:col-span-2 border-border shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-indigo-500" />
+              <BarChart3 size={18} className="text-primary-brand" />
               Hoạt động tuần này
             </CardTitle>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-indigo-500 inline-block" />Đăng ký</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-primary-brand inline-block" />Đăng ký</span>
               <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-400 inline-block" />Nộp bài</span>
             </div>
           </CardHeader>
@@ -337,7 +337,7 @@ export default function SpaceDashboardPage() {
                 <div key={d.day} className="flex-1 flex flex-col items-center gap-1.5">
                   <div className="w-full flex items-end justify-center gap-1 h-28">
                     <div
-                      className="flex-1 bg-indigo-500 rounded-t-md transition-all duration-700 hover:bg-indigo-600"
+                      className="flex-1 bg-primary-brand rounded-t-md transition-all duration-700 hover:bg-primary-brand"
                       style={{ height: `${(d.enrolled / MAX_WEEKLY) * 100}%` }}
                       title={`${d.enrolled} đăng ký`}
                     />
@@ -398,7 +398,7 @@ export default function SpaceDashboardPage() {
         <Card className="border-border shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <GraduationCap size={18} className="text-indigo-500" />
+              <GraduationCap size={18} className="text-primary-brand" />
               Lớp học nổi bật
             </CardTitle>
           </CardHeader>
@@ -412,7 +412,7 @@ export default function SpaceDashboardPage() {
                   </div>
                   <div className="w-full bg-muted rounded-full h-1.5">
                     <div
-                      className="h-1.5 rounded-full bg-indigo-500 transition-all duration-700"
+                      className="h-1.5 rounded-full bg-primary-brand transition-all duration-700"
                       style={{ width: `${cls.progress}%` }}
                     />
                   </div>
@@ -431,7 +431,7 @@ export default function SpaceDashboardPage() {
           <CardContent>
             <div className="space-y-5">
               {[
-                { label: 'Lớp học đang mở', value: stats?.activeClassrooms ?? 0, max: stats?.totalClassrooms ?? 1, color: 'bg-indigo-500' },
+                { label: 'Lớp học đang mở', value: stats?.activeClassrooms ?? 0, max: stats?.totalClassrooms ?? 1, color: 'bg-primary-brand' },
                 { label: 'Dung lượng lưu trữ', value: 45, max: 100, color: 'bg-amber-500', suffix: '%' },
                 { label: 'API Calls tháng này', value: 68, max: 100, color: 'bg-emerald-500', suffix: '%' },
               ].map((item) => (
@@ -452,8 +452,8 @@ export default function SpaceDashboardPage() {
               ))}
 
               <div className="pt-3 border-t border-border flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Gói hiện tại: <span className="font-bold text-indigo-600">Professional Plan</span></p>
-                <span className="text-[10px] font-bold bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full border border-indigo-100">Active</span>
+                <p className="text-xs text-muted-foreground">Gói hiện tại: <span className="font-bold text-primary-brand">Professional Plan</span></p>
+                <span className="text-[10px] font-bold bg-primary-brand-light text-primary-brand px-2 py-1 rounded-full border border-primary-brand-muted">Active</span>
               </div>
             </div>
           </CardContent>
