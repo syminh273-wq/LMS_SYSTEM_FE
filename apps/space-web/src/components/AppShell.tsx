@@ -3,8 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
+import type { RootState } from '@/lib/redux/store';
+import { getAvatarText } from '@/lib/avatar';
 import { Button } from '@shared/components/ui/button';
 import {
   LayoutDashboard,
@@ -16,9 +18,17 @@ import {
   Sparkles,
   ChevronsLeft,
   ChevronsRight,
+  UserCircle,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@shared/components/ui/dropdown-menu';
 import NotificationBell from '@/components/NotificationBell';
 import GlobalSearch from '@/components/GlobalSearch';
 
@@ -38,9 +48,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch();
+  const profile = useSelector((state: RootState) => state.user.profile);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const isAuthPage = pathname.includes('/space/login') || pathname.includes('/space/register');
+  const displayName = profile?.full_name || profile?.email || 'Space Admin';
+  const avatarText = getAvatarText(profile?.full_name || profile?.email, 'SA');
 
   const handleLogout = () => {
     dispatch(clearProfile());
@@ -151,13 +164,50 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
             <div className="flex items-center gap-3 pl-6 border-l border-border">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-foreground leading-none">Admin User</p>
+                <p className="text-sm font-bold text-foreground leading-none">{displayName}</p>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1 tracking-wider">System Admin</p>
               </div>
-              <Avatar className="h-10 w-10 border-2 border-muted shadow-sm">
-                <AvatarImage src="https://github.com/shadcn.png" alt="Admin" />
-                <AvatarFallback>AD</AvatarFallback>
-              </Avatar>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="rounded-full outline-none transition-transform hover:scale-105 focus-visible:ring-3 focus-visible:ring-primary-brand/25"
+                    aria-label="Open account menu"
+                  >
+                    <Avatar className="h-10 w-10 border-2 border-muted shadow-sm">
+                      {profile?.avatar_url ? <AvatarImage src={profile.avatar_url} alt={displayName} /> : null}
+                      <AvatarFallback className="bg-primary-brand text-sm font-extrabold text-white">
+                        {avatarText}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" sideOffset={10} className="w-52 p-2">
+                  <DropdownMenuItem
+                    onClick={() => router.push('/space/profile')}
+                    className="cursor-pointer gap-2 px-3 py-2 font-semibold"
+                  >
+                    <UserCircle size={16} />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push('/space/settings')}
+                    className="cursor-pointer gap-2 px-3 py-2 font-semibold"
+                  >
+                    <Settings size={16} />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    variant="destructive"
+                    className="cursor-pointer gap-2 px-3 py-2 font-semibold"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>

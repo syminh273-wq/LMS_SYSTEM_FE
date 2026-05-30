@@ -7,6 +7,8 @@ export type RegisterRequest = {
   email: string;
   password: string;
   full_name?: string;
+  avatar_url?: string;
+  avatar_text?: string;
 };
 
 export type AuthTokenResponse = {
