@@ -13,6 +13,12 @@ export type UpdateProfileResponse = ApiMessageResponse & {
   data: UserProfile;
 };
 
+export interface ChangePasswordData {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
 class AccountService extends BaseRestApiClient {
   constructor() {
     super();
@@ -36,6 +42,10 @@ class AccountService extends BaseRestApiClient {
 
   public async getPublicProfile(consumerUid: string): Promise<PublicStudentProfile> {
     return this.get(`/api/v1/consumer/account/profile/${consumerUid}/public/`);
+  }
+
+  public async changePassword(data: ChangePasswordData): Promise<ApiMessageResponse> {
+    return this.post('/api/v1/consumer/account/consumers/change-password/', data);
   }
 }
 

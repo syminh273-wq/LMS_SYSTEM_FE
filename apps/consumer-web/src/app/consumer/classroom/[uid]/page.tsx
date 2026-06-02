@@ -32,6 +32,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
@@ -363,8 +364,8 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Navbar */}
-      <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20">
-        <div className="flex items-center gap-4">
+      <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between gap-4 px-4 sm:px-6 sticky top-0 z-20">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <Button
             variant="ghost"
             size="icon"
@@ -373,25 +374,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
           >
             <ArrowLeft size={20} />
           </Button>
-          <div className="h-8 w-[1px] bg-slate-200 mx-1" />
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-bold uppercase">
+          <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1" />
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="w-8 h-8 shrink-0 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-bold uppercase">
               {classroom.name ? classroom.name.substring(0, 2) : '??'}
             </div>
-            <h1 className="text-lg font-bold text-slate-900 truncate max-w-[200px] md:max-w-md">
+            <h1 className="truncate text-base sm:text-lg font-bold text-slate-900 max-w-[140px] sm:max-w-[240px] md:max-w-md">
               {classroom.name || 'Phòng học'}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-wider">
             {classroom.status}
           </span>
-          <Button size="sm" variant="outline" className="gap-2 font-bold text-xs">
-            <Info size={14} />
-            THÔNG TIN
-          </Button>
+          <ConsumerProfileDropdown />
         </div>
       </header>
 

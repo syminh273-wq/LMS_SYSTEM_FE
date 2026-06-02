@@ -4,20 +4,6 @@ import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@shared/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@shared/components/ui/dropdown-menu";
 import { classroomApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
@@ -27,6 +13,7 @@ import { toast } from 'sonner';
 import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
 import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
 import { Loader2, QrCode, KeyRound, X, Camera } from 'lucide-react';
+import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
 
 
 type JoinTab = 'code' | 'qr';
@@ -208,9 +195,8 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
 
 export default function ClassroomPage() {
   const router = useRouter();
-  const { isAuthenticated, mounted, logout } = useRequireAuth();
+  const { isAuthenticated, mounted } = useRequireAuth();
   const userId = useSelector((state: RootState) => state.user.profile?.uid);
-  const [userName] = useState("Student");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -253,55 +239,27 @@ export default function ClassroomPage() {
       {showJoin && <JoinDialog onClose={() => setShowJoin(false)} onJoined={handleJoined} />}
 
       {/* Header */}
-      <nav className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
-        <div className="flex items-center gap-4">
+      <nav className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-200 sm:px-6">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <button className="p-2 hover:bg-gray-100 rounded-full">
             <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/consumer')}>
+          <div className="flex min-w-0 items-center gap-2 cursor-pointer" onClick={() => router.push('/consumer')}>
             <Image src="/logo.jpg" alt="LMS LOGO" width={100} height={35} className="h-8 w-auto object-contain" />
-            <span className="text-xl font-medium text-gray-700">Classroom</span>
+            <span className="truncate text-xl font-medium text-gray-700">Classroom</span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Button
             onClick={() => setShowJoin(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 rounded-xl font-semibold"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 rounded-xl font-semibold shrink-0"
           >
             <KeyRound size={16} />
-            Tham gia lớp
+            <span className="hidden min-[420px]:inline">Tham gia lớp</span>
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar className="cursor-pointer w-8 h-8">
-                <AvatarImage src="" alt="User" />
-                <AvatarFallback className="bg-indigo-500 text-white text-sm">
-                  {userName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => router.push('/consumer/profile')}>
-                  Cập nhật thông tin
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/consumer')}>
-                  Trang chủ
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/consumer/dashboard')}>
-                  Dashboard
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
-                Đăng xuất
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ConsumerProfileDropdown />
         </div>
       </nav>
 
