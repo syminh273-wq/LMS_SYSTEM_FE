@@ -16,6 +16,8 @@ import { Loader2, QrCode, KeyRound, X, Camera, Plus, ChevronRight, Video, BookOp
 import { cn } from '@shared/lib/utils';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Badge } from '@shared/components/ui/badge';
+import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
+
 
 type JoinTab = 'code' | 'qr';
 
@@ -267,7 +269,7 @@ export default function ClassroomPage() {
   return (
     <div className="p-6 animate-in fade-in duration-500">
       {showJoin && <JoinDialog onClose={() => setShowJoin(false)} onJoined={handleJoined} />}
-      
+
       <div className="max-w-5xl mx-auto space-y-6">
         <header className="flex items-center justify-between">
           <div>
@@ -279,13 +281,14 @@ export default function ClassroomPage() {
                 <BookOpen size={12} className="text-[#4F46E5]" />
                 Fall Semester 2024
              </div>
-             <button 
+             <button
                 onClick={() => setShowJoin(true)}
                 className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-3.5 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-lg shadow-[#4F46E5]/15 active:scale-[0.98] cursor-pointer"
               >
                 <Plus size={12} />
                 Join Class
               </button>
+             <ConsumerProfileDropdown />
           </div>
         </header>
 

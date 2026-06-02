@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
@@ -567,30 +568,52 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F8FAFF] dark:bg-background">
-      {/* Banner Section */}
-      <div className="bg-gradient-to-r from-[#4F46E5] to-[#6366F1] text-white p-8 md:p-12 relative overflow-hidden mx-6 mt-6 rounded-[32px] shadow-xl shadow-indigo-100/50">
-        <div className="absolute top-0 right-0 w-1/4 h-full bg-white/5 skew-x-[-15deg] translate-x-1/4" />
-        <div className="relative z-10 space-y-4">
-          <div className="flex items-center gap-2.5">
-             <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[9px] font-black uppercase tracking-widest border border-white/20">
-                Mã lớp: {classroom.pid}
-             </div>
-             <div className="px-3 py-1 bg-emerald-400 rounded-full text-[9px] font-black uppercase tracking-widest text-[#064E3B] flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-[#064E3B] animate-pulse" />
-                Active
-             </div>
-          </div>
-          
-          <div className="space-y-1.5">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">
-              {classroom.name}
-            </h1>
-            <div className="flex flex-wrap items-center gap-3 text-indigo-50 text-sm font-semibold opacity-90">
-              <span className="flex items-center gap-1.5"><BookOpen size={16} /> Advanced Scientific Research</span>
-              <span className="hidden md:block w-1 h-1 rounded-full bg-white/30" />
-              <span className="flex items-center gap-1.5"><Users size={16} /> 123 Students enrolled</span>
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      {/* Navbar */}
+      <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between gap-4 px-4 sm:px-6 sticky top-0 z-20">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/consumer/classroom')}
+            className="rounded-full hover:bg-slate-100"
+          >
+            <ArrowLeft size={20} />
+          </Button>
+          <div className="hidden sm:block h-8 w-[1px] bg-slate-200 mx-1" />
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="w-8 h-8 shrink-0 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xs font-bold uppercase">
+              {classroom.name ? classroom.name.substring(0, 2) : '??'}
             </div>
+            <h1 className="truncate text-base sm:text-lg font-bold text-slate-900 max-w-[140px] sm:max-w-[240px] md:max-w-md">
+              {classroom.name || 'Phòng học'}
+            </h1>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-wider">
+            {classroom.status}
+          </span>
+          <ConsumerProfileDropdown />
+        </div>
+      </header>
+
+      {/* Hero Banner Section */}
+      <div className="bg-indigo-600 h-48 md:h-64 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white" />
+          <div className="absolute bottom-[-20px] right-20 w-48 h-48 rounded-full bg-white" />
+          <div className="absolute top-1/2 left-1/3 w-16 h-16 rounded-lg bg-white rotate-12" />
+        </div>
+        <div className="max-w-6xl mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
+          <div className="space-y-2">
+            <div className="inline-flex items-center px-2 py-1 rounded bg-black/20 backdrop-blur-sm text-white text-[10px] font-black tracking-widest uppercase mb-2">
+              MÃ LỚP: {classroom.pid}
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-sm">
+              {classroom.name}
+            </h2>
           </div>
         </div>
       </div>

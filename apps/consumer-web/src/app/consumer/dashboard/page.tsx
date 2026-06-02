@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookOpen } from 'lucide-react';
+import Image from 'next/image';
 import { accountService } from '@/lib/api/account';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
 
 const MOCK_GRADES = [
   { course: 'Web Development 101', assignment: 'Final Project', score: 95, total: 100, date: '2024-05-10', color: 'bg-[#4F46E5]' },
@@ -55,13 +57,16 @@ export default function DashboardPage() {
               You have <span className="text-[#4F46E5] font-bold">2 assignments</span> due this week. Stay focused!
             </p>
           </div>
-          <button 
-            onClick={() => router.push('/consumer/classroom')}
-            className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-[#4F46E5]/20 active:scale-[0.98]"
-          >
-            <BookOpen size={18} />
-            Enter Classroom
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push('/consumer/classroom')}
+              className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-[#4F46E5]/20 active:scale-[0.98]"
+            >
+              <BookOpen size={18} />
+              Enter Classroom
+            </button>
+            <ConsumerProfileDropdown />
+          </div>
         </header>
 
         {/* Stats Grid */}
