@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Lock, Mail, User, Building, Globe } from 'lucide-react';
+import { Lock, Mail, GraduationCap, ArrowRight, ShieldCheck, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import { MasterLayout, MasterHeader, MasterBody } from '@shared/components/layout/MasterLayout';
 
 type RegisterFormValues = {
   email: string;
@@ -36,7 +37,6 @@ export default function SpaceRegisterPage() {
     setGlobalError('');
     setLoading(true);
     try {
-      // Tự động tạo name và slug từ email nếu API yêu cầu
       const name = data.email.split('@')[0];
       const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
       
@@ -53,77 +53,119 @@ export default function SpaceRegisterPage() {
   };
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-muted px-4 py-12'>
-      <div className='max-w-md w-full'>
-        <div className='bg-card rounded-2xl shadow-xl overflow-hidden'>
-          <div className='bg-slate-900 py-8 px-10 text-center'>
-            <div className="flex justify-center mb-4">
-              <Image src="/logo.jpg" alt="LMS LOGO" width={150} height={50} className="h-12 w-auto object-contain brightness-0 invert" />
+    <MasterLayout
+      header={
+        <MasterHeader className="px-12 py-8 h-auto bg-transparent border-none">
+          <div className="flex items-center gap-3">
+            <div className="bg-[#1A1F2C] p-2 rounded-xl shadow-lg">
+               <Image src="/logo.jpg" alt="EduSphere" width={28} height={28} className="brightness-0 invert" />
             </div>
-            <h2 className='text-white text-2xl font-bold'>Đăng ký Space</h2>
-            <p className='text-muted-foreground text-sm mt-1'>Bắt đầu quản lý tổ chức của bạn</p>
+            <span className="text-2xl font-black text-[#1A1F2C] tracking-tight">EduSphere</span>
           </div>
+          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+            Professional Academy Network
+          </div>
+        </MasterHeader>
+      }
+    >
+      <MasterBody className="items-center justify-center p-6 relative z-10">
+        {/* Floating Stat Card */}
+        <div className='absolute bottom-12 left-12 bg-white/80 backdrop-blur-xl p-5 rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/50 animate-bounce' style={{ animationDuration: '4s' }}>
+          <div className='flex items-center gap-3 mb-3'>
+             <div className='p-2 bg-indigo-50 rounded-lg'>
+                <TrendingUp size={16} className='text-[#4F46E5]' />
+             </div>
+             <span className='text-[10px] font-black text-[#1A1F2C] uppercase tracking-wider'>Hiệu suất học tập</span>
+          </div>
+          <div className='w-40 h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2'>
+             <div className='w-2/3 h-full bg-[#4F46E5] rounded-full' />
+          </div>
+          <span className='text-[10px] font-bold text-green-500'>+24% tương tác trong tháng qua</span>
+        </div>
 
-          <div className='p-10'>
+        {/* Main Card */}
+        <div className='w-full max-w-lg bg-white rounded-[40px] shadow-[0_40px_100px_rgba(0,0,0,0.08)] overflow-hidden relative group'>
+          {/* Top Gradient Border */}
+          <div className='h-1.5 w-full bg-gradient-to-r from-transparent via-[#4F46E5] to-transparent opacity-80' />
+          
+          <div className='p-12 md:p-16'>
+            <div className='flex flex-col items-center text-center mb-10'>
+              <div className='w-20 h-20 bg-[#EEF2FF] rounded-[28px] flex items-center justify-center mb-6 shadow-inner'>
+                <GraduationCap size={40} className='text-[#4F46E5]' />
+              </div>
+              <h1 className='text-3xl font-black text-[#1A1F2C] mb-4 tracking-tight'>
+                Khởi tạo Space của bạn
+              </h1>
+              <p className='text-gray-500 text-sm leading-relaxed max-w-[280px]'>
+                Thiết lập không gian đào tạo chuyên nghiệp cho đội ngũ và học viên của bạn chỉ trong vài bước.
+              </p>
+            </div>
+
             {globalError && (
-              <div className='bg-red-50 border-l-4 border-red-500 p-4 mb-6 text-red-700 text-sm'>
+              <div className='bg-red-50 text-red-600 p-4 rounded-2xl text-xs font-bold mb-6 border border-red-100'>
                 {globalError}
               </div>
             )}
 
-            <form onSubmit={handleSubmit(onRegister)} className='space-y-5'>
-              <div>
-                <label className='block text-sm font-semibold text-foreground mb-2'>Email quản trị</label>
+            <form onSubmit={handleSubmit(onRegister)} className='space-y-6'>
+              <div className='space-y-2'>
+                <label className='text-[11px] font-black text-[#1A1F2C] uppercase tracking-widest ml-1'>Admin Email</label>
                 <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
-                    <Mail size={18} />
-                  </div>
+                  <Mail className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' size={18} />
                   <input 
-                    type='email' 
-                    {...register('email', { required: 'Vui lòng nhập email' })} 
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-border'}`} 
-                    placeholder='admin@your-space.com' 
+                    {...register('email', { required: 'Bắt buộc' })}
+                    placeholder='name@organization.com'
+                    className='w-full bg-[#F3F4F9] border-none h-14 rounded-2xl pl-12 pr-4 text-sm font-medium focus:ring-2 focus:ring-[#4F46E5]/20 focus:bg-white transition-all outline-none'
                   />
                 </div>
-                {errors.email && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.email.message}</p>}
+                {errors.email && <p className='text-red-500 text-[10px] font-bold ml-1'>{errors.email.message}</p>}
               </div>
 
-              <div>
-                <label className='block text-sm font-semibold text-foreground mb-2'>Mật khẩu hệ thống</label>
+              <div className='space-y-2'>
+                <label className='text-[11px] font-black text-[#1A1F2C] uppercase tracking-widest ml-1'>Mật khẩu hệ thống</label>
                 <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
-                    <Lock size={18} />
-                  </div>
+                  <Lock className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' size={18} />
                   <input 
-                    type='password' 
-                    {...register('password', { required: 'Vui lòng nhập mật khẩu' })} 
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-border'}`} 
-                    placeholder='••••••••' 
+                    type='password'
+                    {...register('password', { required: 'Bắt buộc' })}
+                    placeholder='••••••••••••'
+                    className='w-full bg-[#F3F4F9] border-none h-14 rounded-2xl pl-12 pr-12 text-sm font-medium focus:ring-2 focus:ring-[#4F46E5]/20 focus:bg-white transition-all outline-none'
                   />
+                  <button type='button' className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500'>
+                    <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>
+                  </button>
                 </div>
-                {errors.password && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.password.message}</p>}
+                {errors.password && <p className='text-red-500 text-[10px] font-bold ml-1'>{errors.password.message}</p>}
+                <p className='text-[10px] text-gray-400 font-medium ml-1'>Mật khẩu cần ít nhất 8 ký tự bao gồm chữ cái và số.</p>
               </div>
 
               <button 
                 type='submit' 
-                disabled={loading} 
-                className='w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98] mt-4'
+                disabled={loading}
+                className='w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white h-16 rounded-2xl font-black text-sm flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#4F46E5]/20 active:scale-[0.98] disabled:opacity-50 mt-4'
               >
-                {loading ? 'Đang khởi tạo...' : 'Khởi tạo Space của tôi'}
+                {loading ? 'Đang khởi tạo...' : 'Bắt đầu quản lý ngay'}
+                {!loading && <ArrowRight size={20} />}
               </button>
             </form>
 
-            <div className='mt-8 pt-6 border-t border-border text-center'>
-              <p className='text-muted-foreground text-sm'>
-                Đã có Space? {' '}
-                <Link href='/space/login' className='text-foreground font-bold hover:underline'>
-                  Đăng nhập quản trị
-                </Link>
-              </p>
+            <div className='mt-12 pt-8 border-t border-gray-50 flex items-center justify-between'>
+              <div className='flex items-center gap-2'>
+                 <ShieldCheck className='text-indigo-600' size={16} />
+                 <span className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>Bảo mật cấp doanh nghiệp</span>
+              </div>
+              <div className='flex -space-x-2'>
+                 {[1,2,3].map(i => (
+                   <div key={i} className='w-7 h-7 rounded-full border-2 border-white bg-gray-100 overflow-hidden relative'>
+                      <Image src={`https://i.pravatar.cc/100?u=${i}`} alt='user' fill className='object-cover' />
+                   </div>
+                 ))}
+                 <div className='w-7 h-7 rounded-full border-2 border-white bg-gray-50 flex items-center justify-center text-[8px] font-bold text-gray-400'>+2k</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </MasterBody>
+    </MasterLayout>
   );
 }

@@ -86,6 +86,7 @@ export type Classroom = {
   description: string;
   max_students: number;
   status: string;
+  membership_status?: 'approved' | 'pending';
   teacher_id: string;
   resolve_link?: SharingLink;
   created_at: string;
@@ -190,37 +191,53 @@ export type JoinSessionResponse = {
   session: ExamSessionInfo;
 };
 
+export type ExamSubmissionType = 'multiple_choice' | 'online_quiz' | 'file' | 'essay';
+
 export type ExamSubmission = {
   uid: string;
   exam_id: string;
   classroom_id: string;
   student_id: string;
-  content_type: ExamContentType;
+  submission_type: ExamSubmissionType;
+  ref_id?: string | null;
   content: string;
-  resource_uid?: string | null;
+  meta: Record<string, unknown>;
+  // convenience fields populated by backend serializer from meta
   resource_url?: string | null;
   resource_name?: string;
+  quiz_result?: {
+    correct_count: number;
+    total: number;
+    score_pct: number;
+    results?: Array<{
+      question_uid: string;
+      question_text: string;
+      chosen: string | null;
+      correct_answer: string;
+      is_correct: boolean;
+      explanation: string;
+    }>;
+  } | null;
   status: string;
   submitted_at: string | null;
   grade?: number | null;
+  max_grade?: number | null;
+  passed?: boolean | null;
   feedback?: string;
   graded_by?: string | null;
   graded_at?: string | null;
-  quiz_result?: {
-    grade: number;
-    correct_count: number;
-    total: number;
-    feedback: string;
-  } | null;
+  grading_method?: 'auto' | 'manual' | 'ai';
+  returned_at?: string | null;
   created_at?: string;
   updated_at?: string;
 };
 
 export type SubmitExamRequest = {
-  content_type: ExamContentType;
-  content?: string;
-  resource_uid?: string | null;
+  submission_type?: ExamSubmissionType;
+  ref_id?: string | null;
   answers?: Record<string, string>;
+  content?: string;
+  time_taken_seconds?: number;
 };
 
 export type UploadedResource = {
@@ -254,7 +271,7 @@ export type QuizSummary = {
   updated_at?: string;
 };
 
-export type QuizAttemptRecord = {
+export type QuizPlayRecord = {
   uid: string;
   quiz_id: string;
   student_id: string;
@@ -266,6 +283,9 @@ export type QuizAttemptRecord = {
   time_taken_seconds: number;
   submitted_at: string;
 };
+
+/** @deprecated use QuizPlayRecord */
+export type QuizAttemptRecord = QuizPlayRecord;
 
 export type QuizPublicDetail = QuizSummary & {
   questions: QuizQuestionPublic[];

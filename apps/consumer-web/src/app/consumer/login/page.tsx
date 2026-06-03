@@ -8,32 +8,36 @@ import { consumerApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
+import { Input } from '@shared/components/ui/input';
+import Link from 'next/link';
+import { toast } from 'sonner';
+import { MasterLayout, MasterHeader, MasterBody } from '@shared/components/layout/MasterLayout';
 
-type AuthFormValues = {
+type LoginFormValues = {
   email: string;
   password: string;
-  confirm_password?: string;
-  first_name?: string;
-  last_name?: string;
-  root?: {
-    server?: string;
-  };
 };
 
+function GoogleIcon() {
+  return (
+    <svg width='20' height='20' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
+      <path d='M6.306 14.691l6.571 4.819C14.655 15.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z' fill='#FF3D00'/>
+      <path d='M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.316 0-9.829-3.562-11.448-8.47l-6.522 5.025C9.505 39.556 16.227 44 24 44z' fill='#4CAF50'/>
+      <path d='M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z' fill='#1976D2'/>
+    </svg>
+  );
+}
+
 export default function LoginPage() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit, formState: { errors }, reset, setError: setFormError, setValue } = useForm<AuthFormValues>({
-    defaultValues: { email: '', password: '', confirm_password: '' }
-  });
+  const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<LoginFormValues>();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -49,197 +53,182 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleApiError = (err: any, prefix: string) => {
-    if (err instanceof ValidationException) {
-      let hasFieldErrors = false;
-      Object.entries(err.errors).forEach(([field, message]) => {
-        // Map 'username' from backend to 'email' in frontend
-        const formField = field === 'username' ? 'email' : field;
-
-        if (formField === 'email' || formField === 'password' || formField === 'confirm_password') {
-          setFormError(formField as any, { type: 'server', message });
-          hasFieldErrors = true;
-        }
-      });
-      if (!hasFieldErrors) {
-        setGlobalError(prefix + ': Lỗi dữ liệu không xác định');
-      }
-    } else {
-      setGlobalError(err.message || prefix + ' thất bại');
-    }
-  };
-
-  const onLogin = async (data: AuthFormValues) => {
-    setSuccess('');
-    setGlobalError('');
-    setLoading(true);
+  const onLogin = async (data: LoginFormValues) => {
+    setGlobalError(''); setLoading(true);
     try {
-      const response = await consumerApi.auth.login({ email: data.email, password: data.password });
+      const response = await consumerApi.auth.login(data);
       localStorage.setItem('accessToken', response.access);
       localStorage.setItem('refreshToken', response.refresh);
-
-      // Fetch user profile after successful login
       try {
         const userProfile = await accountService.getProfile();
         dispatch(setProfile(userProfile));
-      } catch (profileErr) {
-        console.error("Failed to fetch profile after login:", profileErr);
-      }
-
+      } catch {}
       router.push('/consumer/dashboard');
     } catch (err: any) {
-      handleApiError(err, 'Đăng nhập');
+      if (err instanceof ValidationException) {
+        Object.entries(err.errors).forEach(([field, message]) => {
+          const formField = field === 'username' ? 'email' : field;
+          setFormError(formField as any, { type: 'server', message });
+        });
+        toast.error('Vui lòng kiểm tra lại thông tin đăng nhập.');
+      } else {
+        const msg = err.message || 'Đăng nhập thất bại';
+        setGlobalError(msg);
+        toast.error(msg);
+      }
     } finally { setLoading(false); }
   };
-
-  const onRegister = async (data: AuthFormValues) => {
-    setSuccess('');
-    setGlobalError('');
-    setLoading(true);
-    try {
-      const response = await consumerApi.auth.register({
-        email: data.email,
-        password: data.password,
-        first_name: data.first_name || '',
-        last_name: data.last_name || '',
-      });
-      setSuccess(response.message || 'Đăng ký thành công. Vui lòng đăng nhập.');
-      setIsLogin(true);
-      reset({ email: data.email, password: '', confirm_password: '', first_name: '', last_name: '' });
-    } catch (err: any) {
-      handleApiError(err, 'Đăng ký');
-    } finally { setLoading(false); }
-  };
-
-  const inputClass = (fieldName: keyof AuthFormValues) => {
-    return `w-full px-4 py-2 border rounded-lg outline-none transition-all focus:ring-2 ${
-      errors[fieldName] ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-500'
-    }`;
-  };
-  const labelClass = (fieldName: keyof AuthFormValues) => `block text-sm font-medium mb-1 ${errors[fieldName] ? "text-red-500" : "text-gray-700"}`;
-  const errorClass = "text-red-500 text-xs mt-1 font-medium";
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-gray-50 px-4'>
-      <div className='max-w-md w-full bg-white rounded-xl shadow-lg p-8'>
-        <div className="flex justify-center mb-6">
-          <Image src="/logo.jpg" alt="LMS LOGO" width={180} height={60} className="h-16 w-auto object-contain" />
-        </div>
-        <p className='text-center text-gray-500 mb-8'>{isLogin ? 'Đăng nhập để tiếp tục' : 'Tạo tài khoản mới'}</p>
+    <MasterLayout footer={null}>
+      <MasterBody className="min-h-screen">
+        <div className="flex flex-col lg:flex-row min-h-screen bg-white">
+          
+          {/* Left Side - Hero */}
+          <div className='hidden lg:flex lg:w-1/2 relative bg-[#0F172A] text-white p-16 flex-col justify-between overflow-hidden'>
+            <div className='absolute inset-0 opacity-40'>
+              <Image 
+                src='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80' 
+                alt='Library' 
+                fill 
+                className='object-cover grayscale transition-transform duration-1000 hover:scale-105'
+                priority
+              />
+              <div className='absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#0F172A]/90 to-[#4F46E5]/30' />
+            </div>
 
-        {success && <div className='bg-green-50 border-l-4 border-green-400 p-4 mb-6 text-green-700 text-sm animate-in fade-in slide-in-from-top-2'>{success}</div>}
-        {globalError && <div className='bg-red-50 border-l-4 border-red-400 p-4 mb-6 text-red-700 text-sm animate-in fade-in slide-in-from-top-2'>{globalError}</div>}
+            <div className='relative z-10'>
+              <div className="flex items-center gap-3 mb-16">
+                <div className="bg-white p-2 rounded-xl">
+                   <Image src="/logo.jpg" alt="EduSphere" width={28} height={28} />
+                </div>
+                <span className="text-2xl font-black tracking-tight">EduSphere</span>
+              </div>
 
-        <form onSubmit={handleSubmit(isLogin ? onLogin : onRegister)} className='space-y-4'>
+              <div className='inline-flex items-center gap-2 bg-[#4F46E5] px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase mb-8'>
+                <span className='w-2 h-2 bg-white rounded-full animate-pulse' />
+                ELITE ENROLLMENT 2026
+              </div>
+              <h1 className='text-6xl font-black leading-tight mb-8 tracking-tighter'>
+                Nâng tầm<br />tri thức Việt.
+              </h1>
+              <p className='text-gray-300 text-xl max-w-lg leading-relaxed font-medium opacity-90'>
+                Hệ thống quản lý học tập thông minh, kiến tạo tương lai số cho thế hệ trẻ.
+              </p>
+            </div>
 
-          <div>
-            <label className={labelClass('email')}>Email</label>
-            <input type='text' {...register('email', { required: 'Thông tin bắt buộc' })} className={inputClass('email')} placeholder='name@example.com' />
-            {errors.email && <p className={errorClass}>{errors.email.message}</p>}
+            <div className='relative z-10 grid grid-cols-2 gap-6'>
+              <div className='bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-md'>
+                <div className='bg-[#4F46E5]/20 w-12 h-12 flex items-center justify-center rounded-xl mb-4'>
+                  <ShieldCheck className='text-[#4F46E5]' size={28} />
+                </div>
+                <h3 className='font-bold text-lg mb-1'>Bảo mật</h3>
+                <p className='text-gray-400 text-sm'>Dữ liệu mã hóa chuẩn quốc tế.</p>
+              </div>
+              <div className='bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-md'>
+                <div className='bg-[#4F46E5]/20 w-12 h-12 flex items-center justify-center rounded-xl mb-4'>
+                  <Zap className='text-[#4F46E5]' size={28} />
+                </div>
+                <h3 className='font-bold text-lg mb-1'>Tối ưu</h3>
+                <p className='text-gray-400 text-sm'>Trải nghiệm học tập mượt mà.</p>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <label className={labelClass('password')}>Mật khẩu</label>
-            <div className='relative'>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                {...register('password', { required: 'Thông tin bắt buộc' })}
-                className={inputClass('password')}
-                placeholder='••••••••'
-              />
+          {/* Right Side - Form */}
+          <div className='flex-1 flex flex-col items-center justify-center p-8 md:p-16 bg-white relative'>
+            <div className="absolute top-8 right-8 text-sm text-gray-500 font-medium">
+              Chưa có tài khoản?{' '}
+              <Link href="/consumer/register" className="text-[#4F46E5] font-bold hover:underline ml-1">
+                Đăng ký ngay
+              </Link>
+            </div>
+
+            <div className='max-w-[440px] w-full'>
+              <div className='mb-12'>
+                <h2 className='text-5xl font-black text-[#1A1F2C] mb-4 tracking-tighter'>
+                  Đăng nhập
+                </h2>
+                <p className='text-gray-500 text-lg font-medium'>
+                  Chào mừng bạn quay trở lại với EduSphere.
+                </p>
+              </div>
+
+              {globalError && (
+                <div className='bg-red-50 text-red-600 p-5 rounded-2xl text-xs font-bold mb-8 border border-red-100 flex items-center gap-3'>
+                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full" />
+                  {globalError}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit(onLogin)} className='space-y-6'>
+                <div className='space-y-2'>
+                  <label className='text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1'>Địa chỉ Email</label>
+                  <Input
+                    {...register('email', { required: 'Vui lòng nhập email' })}
+                    placeholder='name@company.com'
+                    className='bg-[#F8F9FB] border-2 border-transparent focus:border-[#4F46E5]/20 focus:bg-white h-14 rounded-2xl transition-all text-base font-medium px-6'
+                  />
+                  {errors.email && <p className='text-red-500 text-xs font-bold ml-1'>{errors.email.message}</p>}
+                </div>
+
+                <div className='space-y-2'>
+                  <div className="flex justify-between items-end px-1">
+                    <label className='text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]'>Mật khẩu</label>
+                    <Link href='#' className='text-[10px] font-black text-[#4F46E5] hover:underline uppercase tracking-widest'>
+                      Quên mật khẩu?
+                    </Link>
+                  </div>
+                  <div className='relative'>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
+                      placeholder='••••••••'
+                      className='bg-[#F8F9FB] border-2 border-transparent focus:border-[#4F46E5]/20 focus:bg-white h-14 rounded-2xl pr-14 transition-all text-base font-medium px-6'
+                    />
+                    <button 
+                      type='button' 
+                      onClick={() => setShowPassword(!showPassword)}
+                      className='absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#4F46E5] transition-colors'
+                    >
+                      {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                    </button>
+                  </div>
+                  {errors.password && <p className='text-red-500 text-xs font-bold ml-1'>{errors.password.message}</p>}
+                </div>
+
+                <div className='pt-4'>
+                  <button
+                    type='submit'
+                    disabled={loading}
+                    className='w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white h-15 rounded-2xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-2xl shadow-[#4F46E5]/30 active:scale-[0.98] disabled:opacity-50'
+                  >
+                    {loading ? 'Đang xác thực...' : 'Đăng nhập ngay'}
+                    {!loading && <ArrowRight size={20} />}
+                  </button>
+                </div>
+              </form>
+
+              <div className='relative my-10'>
+                <div className='absolute inset-0 flex items-center'><div className='w-full border-t border-gray-100'></div></div>
+                <div className='relative flex justify-center text-[10px] uppercase font-black tracking-[0.4em]'><span className='bg-white px-6 text-gray-400'>Hoặc</span></div>
+              </div>
+
               <button
                 type='button'
-                onClick={() => setShowPassword(!showPassword)}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'
+                onClick={() => {
+                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                   window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
+                }}
+                className='w-full flex items-center justify-center gap-4 border-2 border-gray-100 h-15 rounded-2xl text-sm font-black text-[#1A1F2C] bg-white hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] uppercase tracking-wider'
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                <GoogleIcon />
+                Tiếp tục với Google
               </button>
             </div>
-            {errors.password && <p className={errorClass}>{errors.password.message}</p>}
           </div>
-
-          {!isLogin && (
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Họ</label>
-                <input
-                  type="text"
-                  {...register('last_name', { required: !isLogin ? 'Thông tin bắt buộc' : false })}
-                  className={`w-full px-4 py-2 border rounded-lg outline-none transition-all focus:ring-2 ${errors.last_name ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-500'}`}
-                  placeholder="Nguyễn"
-                />
-                {errors.last_name && <p className={errorClass}>{errors.last_name.message}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Tên</label>
-                <input
-                  type="text"
-                  {...register('first_name', { required: !isLogin ? 'Thông tin bắt buộc' : false })}
-                  className={`w-full px-4 py-2 border rounded-lg outline-none transition-all focus:ring-2 ${errors.first_name ? 'border-red-500 focus:ring-red-200' : 'border-gray-300 focus:ring-indigo-500'}`}
-                  placeholder="Văn A"
-                />
-                {errors.first_name && <p className={errorClass}>{errors.first_name.message}</p>}
-              </div>
-            </div>
-          )}
-
-          {!isLogin && (
-            <div>
-              <label className={labelClass('confirm_password')}>Xác nhận mật khẩu</label>
-              <div className='relative'>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  {...register('confirm_password', { required: 'Thông tin bắt buộc' })}
-                  className={inputClass('confirm_password')}
-                  placeholder='••••••••'
-                />
-                <button
-                  type='button'
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none'
-                >
-                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-              {errors.confirm_password && <p className={errorClass}>{errors.confirm_password.message}</p>}
-            </div>
-          )}
-
-          <button type='submit' disabled={loading} className='w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 transition-colors mt-4 shadow-md active:scale-[0.98] transform'>
-            {loading ? 'Đang xử lý...' : (isLogin ? 'Đăng nhập' : 'Đăng ký tài khoản')}
-          </button>
-        </form>
-
-        <div className='mt-6 flex items-center gap-3'>
-          <div className='h-px flex-1 bg-gray-200' />
-          <span className='text-xs text-gray-400 font-medium'>hoặc</span>
-          <div className='h-px flex-1 bg-gray-200' />
         </div>
-
-        <button
-          type='button'
-          onClick={() => {
-            const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-            window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
-          }}
-          className='mt-4 w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 active:scale-[0.98] transform transition-all shadow-sm'
-        >
-          <svg width='20' height='20' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
-            <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
-            <path d='M6.306 14.691l6.571 4.819C14.655 15.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z' fill='#FF3D00'/>
-            <path d='M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.316 0-9.829-3.562-11.448-8.47l-6.522 5.025C9.505 39.556 16.227 44 24 44z' fill='#4CAF50'/>
-            <path d='M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z' fill='#1976D2'/>
-          </svg>
-          Đăng nhập với Google
-        </button>
-
-        <div className='mt-6 text-center text-sm text-gray-600'>
-          {isLogin ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'} {' '}
-          <button onClick={() => { setIsLogin(!isLogin); setGlobalError(''); setSuccess(''); reset(); }} className='text-indigo-600 font-medium hover:underline'>
-            {isLogin ? 'Đăng ký ngay' : 'Đăng nhập'}
-          </button>
-        </div>
-      </div>
-    </div>
+      </MasterBody>
+    </MasterLayout>
   );
 }

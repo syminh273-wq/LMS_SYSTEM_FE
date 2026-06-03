@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { useState, useEffect, use, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { consumerQuizApi } from '@/lib/api/quiz';
+import { classroomApi } from '@/lib/api/classroom';
 import type { QuizPublicDetail, QuizQuestionPublic, QuizResult, QuizAttemptRecord } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, CheckCircle2, XCircle, Trophy,
@@ -27,6 +28,8 @@ function fmtSeconds(s: number): string {
 export default function QuizGamePage({ params }: Props) {
   const { uid: classroomUid, quizUid } = use(params);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const examUid = searchParams.get('examUid');
 
   const [phase, setPhase] = useState<GamePhase>('loading');
   const [quiz, setQuiz] = useState<QuizPublicDetail | null>(null);
@@ -104,22 +107,51 @@ export default function QuizGamePage({ params }: Props) {
       const timeTaken = startedAtRef.current
         ? Math.floor((Date.now() - startedAtRef.current.getTime()) / 1000)
         : 0;
-      const res = await consumerQuizApi.submit(quizUid, {
-        answers: finalAnswers,
-        classroom_id: classroomUid,
-        time_taken_seconds: timeTaken,
-      });
-      setResult(res);
-      // refresh attempts list
-      const updated = await consumerQuizApi.listAttempts(quizUid, classroomUid);
-      setPastAttempts(updated);
+
+      if (examUid) {
+        // Quiz is part of an exam — submit to exam endpoint so ExamSubmission is created
+        await classroomApi.submitExam(examUid, {
+          submission_type: 'online_quiz',
+          answers: finalAnswers,
+          time_taken_seconds: timeTaken,
+        });
+        // Build a minimal QuizResult-like object from the exam submission response
+        // so the result screen still works
+        const updated = await consumerQuizApi.listAttempts(quizUid, classroomUid);
+        setPastAttempts(updated);
+        const lastAttempt = updated[updated.length - 1];
+        if (lastAttempt) {
+          setResult({
+            total: quiz?.questions.length ?? 0,
+            correct: Math.round((lastAttempt.score_pct / 100) * (quiz?.questions.length ?? 0)),
+            score: lastAttempt.score_pct,
+            is_passed: lastAttempt.score_pct >= 50,
+            passing_score: 50,
+            attempt_number: lastAttempt.attempt_number,
+            attempts_used: lastAttempt.attempt_number,
+            attempts_remaining: null,
+            results: [],
+            show_explanation: false,
+          });
+        }
+      } else {
+        const res = await consumerQuizApi.submit(quizUid, {
+          answers: finalAnswers,
+          classroom_id: classroomUid,
+          time_taken_seconds: timeTaken,
+        });
+        setResult(res);
+        const updated = await consumerQuizApi.listAttempts(quizUid, classroomUid);
+        setPastAttempts(updated);
+      }
+
       setPhase('result');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Gửi câu trả lời thất bại');
     } finally {
       setSubmitting(false);
     }
-  }, [quizUid, classroomUid]);
+  }, [quizUid, classroomUid, examUid, quiz]);
 
   const handleAutoSubmit = useCallback(async () => {
     await doSubmit({ ...answers });
@@ -380,6 +412,7 @@ export default function QuizGamePage({ params }: Props) {
   if (phase === 'result' && result) {
     const scoreColor = result.score >= 80 ? 'text-emerald-600' : result.score >= 50 ? 'text-amber-600' : 'text-rose-600';
     const scoreBg = result.score >= 80 ? 'from-emerald-500 to-teal-600' : result.score >= 50 ? 'from-amber-500 to-orange-600' : 'from-rose-500 to-pink-600';
+    void scoreColor;
     const timeTaken = startedAtRef.current
       ? Math.floor((Date.now() - startedAtRef.current.getTime()) / 1000)
       : 0;
@@ -414,9 +447,17 @@ export default function QuizGamePage({ params }: Props) {
             )}
           </div>
 
+          {/* Exam linkage notice */}
+          {examUid && (
+            <div className="flex items-center gap-2 rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-700">
+              <CheckCircle2 size={16} className="shrink-0 text-indigo-500" />
+              Kết quả đã được ghi nhận vào bài kiểm tra
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex gap-3">
-            {(result.attempts_remaining === null || result.attempts_remaining > 0) && (
+            {!examUid && (result.attempts_remaining === null || result.attempts_remaining > 0) && (
               <Button
                 onClick={handleRestart}
                 variant="outline"

@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
-import { classroomApi, Classroom, Exam, ExamContentType, ExamSubmission } from '@/lib/api';
+import { classroomApi, Classroom, Exam, ExamContentType, ExamSubmission, ExamSubmissionType } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { FaceMonitorWidget } from '@/components/face/face-monitor-widget';
 
@@ -48,6 +48,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
   const [selectedPreviewFile, setSelectedPreviewFile] = useState<PreviewFile | null>(null);
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const quizStartedAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || !uid || !examUid) return;
@@ -73,6 +74,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
           try {
             const questions = await classroomApi.examQuestions(examUid);
             setQuizData(questions);
+            quizStartedAtRef.current = Date.now();
           } catch (err) {
             console.error('Failed to load exam questions', err);
           }
@@ -133,7 +135,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
     ? {
         url: submission.resource_url,
         name: submission.resource_name || 'File đã nộp',
-        type: submission.content_type || 'file',
+        type: 'file',
       }
     : null;
 
@@ -161,20 +163,22 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
       setSubmitMessage('');
 
       if (exam.exam_type === 'quiz') {
+        const timeTaken = quizStartedAtRef.current
+          ? Math.floor((Date.now() - quizStartedAtRef.current) / 1000)
+          : 0;
         const savedSubmission = await classroomApi.submitExam(examUid, {
-          content_type: 'quiz',
+          submission_type: 'multiple_choice',
           answers: quizAnswers,
+          time_taken_seconds: timeTaken,
         });
         setSubmission(savedSubmission);
         setSubmitMessage('Bài thi trắc nghiệm đã được nộp và tự động chấm điểm.');
       } else {
         const selectedFile = answerFile!;
-        const uploadedResource = await saveSubmissionResource(selectedFile, examUid, submission?.resource_uid || null);
-        const contentType = getSubmissionContentType(selectedFile);
+        const uploadedResource = await saveSubmissionResource(selectedFile, examUid, submission?.ref_id || null);
         const savedSubmission = await classroomApi.submitExam(examUid, {
-          content_type: contentType,
-          content: '',
-          resource_uid: uploadedResource.uid,
+          submission_type: 'file',
+          ref_id: uploadedResource.uid,
         });
         setSubmission(savedSubmission);
         setAnswerFile(null);
@@ -204,9 +208,9 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
       setSubmitError('');
       setSubmitMessage('');
       const savedSubmission = await classroomApi.submitExam(examUid, {
-        content_type: 'markdown',
+        submission_type: 'essay',
         content: '',
-        resource_uid: null,
+        ref_id: null,
       });
       setSubmission(savedSubmission);
       setSubmitMessage('Đã xóa file khỏi bài nộp.');
@@ -281,27 +285,91 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                       <div>
                         <h2 className="text-xl font-black text-emerald-900">Kết quả thi trắc nghiệm</h2>
                         <p className="text-sm font-medium text-emerald-700">Hệ thống đã tự động chấm điểm bài làm của bạn</p>
+                        {submission.passed != null && (
+                          <span className={`mt-2 inline-block rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider ${submission.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                            {submission.passed ? 'Đạt' : 'Không đạt'}
+                          </span>
+                        )}
                       </div>
                       <div className="text-center">
                         <div className="text-3xl font-black text-emerald-600">{submission.grade ?? '--'}</div>
-                        <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Điểm số</div>
+                        <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500">/ {submission.max_grade ?? maxGrade} điểm</div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+
+                    {submission.quiz_result && (
+                      <div className="px-5 pt-4">
+                        <div className="mb-1 flex items-center justify-between text-xs font-bold text-slate-500">
+                          <span>Số câu đúng: <strong className="text-slate-800">{submission.quiz_result.correct_count}/{submission.quiz_result.total}</strong></span>
+                          <span className="text-emerald-600 font-black">{submission.quiz_result.score_pct}%</span>
+                        </div>
+                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full bg-emerald-500 transition-all duration-700"
+                            style={{ width: `${submission.quiz_result.score_pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 divide-y divide-slate-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0 mt-2">
                       <div className="p-5">
                         <div className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Thông tin nộp bài</div>
                         <p className="text-sm font-bold text-slate-700">Nộp lúc: {formatDateTime(submission.submitted_at)}</p>
                         <p className="text-xs font-medium text-slate-500">{isLate ? 'Nộp trễ hạn' : 'Nộp đúng hạn'}</p>
                       </div>
                       <div className="p-5">
-                        <div className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Chi tiết</div>
-                        <p className="text-sm font-bold text-slate-700">{submission.quiz_result?.feedback || 'Chưa có thông tin chi tiết'}</p>
-                        {submission.quiz_result && (
-                          <p className="text-xs font-medium text-slate-500">Số câu đúng: {submission.quiz_result.correct_count}/{submission.quiz_result.total}</p>
+                        <div className="mb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Chấm điểm</div>
+                        <p className="text-sm font-bold text-slate-700">
+                          {submission.grading_method === 'auto' ? 'Tự động chấm điểm' : submission.grading_method === 'ai' ? 'AI chấm điểm' : 'Giáo viên chấm'}
+                        </p>
+                        {submission.feedback && (
+                          <p className="text-xs font-medium text-slate-500 mt-1">{submission.feedback}</p>
                         )}
                       </div>
                     </div>
                   </section>
+
+                  {/* Per-question breakdown */}
+                  {submission.quiz_result?.results && submission.quiz_result.results.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Chi tiết từng câu</div>
+                      {submission.quiz_result.results.map((item, idx) => (
+                        <div
+                          key={item.question_uid}
+                          className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${item.is_correct ? 'border-emerald-100' : 'border-rose-100'}`}
+                        >
+                          <div className="flex items-start gap-3 p-4">
+                            {item.is_correct
+                              ? <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-500" />
+                              : <AlertCircle size={18} className="mt-0.5 shrink-0 text-rose-500" />
+                            }
+                            <p className="text-sm font-bold leading-relaxed text-slate-900">
+                              <span className="mr-1 font-black text-slate-400">{idx + 1}.</span>
+                              {item.question_text}
+                            </p>
+                          </div>
+                          <div className="flex flex-wrap gap-2 border-t border-slate-100 bg-slate-50 px-4 py-3">
+                            {item.chosen && (
+                              <span className={`rounded-lg px-3 py-1 text-xs font-black uppercase ${item.is_correct ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                Bạn chọn: {item.chosen}
+                              </span>
+                            )}
+                            {!item.is_correct && (
+                              <span className="rounded-lg bg-emerald-100 px-3 py-1 text-xs font-black uppercase text-emerald-700">
+                                Đáp án: {item.correct_answer}
+                              </span>
+                            )}
+                          </div>
+                          {item.explanation && (
+                            <div className="border-t border-amber-100 bg-amber-50 px-4 py-2 text-xs font-medium leading-5 text-slate-600">
+                              <span className="font-black text-amber-600">Giải thích: </span>{item.explanation}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 ) : !quizData ? (
                   <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white">
                     <Loader2 className="mb-4 animate-spin text-indigo-500" size={32} />
@@ -504,6 +572,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                 <SidebarRow label="Trạng thái" value={<span className={`rounded-full border px-2.5 py-1 text-[10px] font-black uppercase ${resultStatus.className}`}>{resultStatus.label}</span>} />
                 <SidebarRow label="Hạn chót" value={exam.due_date ? formatDateTime(exam.due_date) : 'Không có'} />
                 {submission?.submitted_at && <SidebarRow label="Ngày nộp" value={formatDateTime(submission.submitted_at)} />}
+                {submission?.returned_at && <SidebarRow label="Trả bài lúc" value={formatDateTime(submission.returned_at)} />}
               </div>
             </section>
 
@@ -694,7 +763,7 @@ function getSubmissionContentType(file: File): ExamContentType {
   return 'file';
 }
 
-async function saveSubmissionResource(file: File, examUid: string, existingUid: string | null) {
+async function saveSubmissionResource(file: File, examUid: string, existingRefId: string | null | undefined) {
   const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   const formData = new FormData();
   formData.append('file', file);

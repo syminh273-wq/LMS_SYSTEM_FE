@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     "*.ngrok.app",
     "*.ngrok.io",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

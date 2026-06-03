@@ -50,7 +50,7 @@ export const spaceApi = {
 
 // Sharing logic
 export const sharingApi = {
-  resolve: (code: string) => consumerApiInstance.post<SharingLink>('/api/v1/sharing/links/resolve/', { code }),
+  resolve: (code: string) => consumerApiInstance.get<SharingLink>(`/api/v1/sharing/links/resolve/?code=${code}`),
 };
 
 export const consumerApi = {

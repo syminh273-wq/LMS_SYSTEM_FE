@@ -201,11 +201,22 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const docInputRef = useRef<HTMLInputElement>(null);
 
   // AI Bot state
-  type AiMessage = { role: 'user' | 'assistant'; text: string; loading?: boolean; sources?: Array<{ document: string; metadata: Record<string, string>; score: number }> };
+  type AiMode = 'doc' | 'manage' | 'free';
+  type AiToolCall = { tool: string; args: Record<string, unknown>; result: string };
+  type AiMessage = { role: 'user' | 'assistant'; text: string; loading?: boolean; sources?: Array<{ document: string; metadata: Record<string, string>; score: number }>; tool_calls?: AiToolCall[] };
   const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
   const [aiQuestion, setAiQuestion] = useState('');
+  const [aiMode, setAiMode] = useState<AiMode>('doc');
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiSessionId, setAiSessionId] = useState<string | null>(null);
+  const [aiSessions, setAiSessions] = useState<any[]>([]);
   const aiScrollRef = useRef<HTMLDivElement>(null);
+
+  const AI_MODES: { key: AiMode; label: string; icon: React.ElementType; placeholder: string; description: string }[] = [
+    { key: 'doc',    label: 'Hỏi tài liệu',  icon: BookOpen,    placeholder: 'Hỏi về nội dung tài liệu, bài giảng...', description: 'Tìm kiếm và trả lời từ tài liệu đã tải lên' },
+    { key: 'manage', label: 'Quản lý lớp',   icon: Users,       placeholder: 'Hỏi về học sinh, thống kê, bài thi...', description: 'Truy vấn dữ liệu lớp học qua công cụ' },
+    { key: 'free',   label: 'Hỏi tự do',     icon: Sparkles,    placeholder: 'Đặt câu hỏi bất kỳ...', description: 'AI trả lời từ kiến thức của mình' },
+  ];
 
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');
@@ -523,12 +534,112 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     }
   }, [activeTab, fetchDocs, filterSection]);
 
+  const fetchAiSessions = useCallback(async () => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ai-sessions/`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setAiSessions(data);
+        if (!aiSessionId && data.length > 0) {
+          setAiSessionId(data[0].session_id);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch AI sessions', err);
+    }
+  }, [uid, aiSessionId]);
+
+  const fetchAiHistory = useCallback(async (sid: string) => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ai-session/history/?session_id=${sid}`, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setAiMessages(data.messages.map((m: any) => ({
+          role: m.role,
+          text: m.content,
+          loading: false
+        })));
+      }
+    } catch (err) {
+      console.error('Failed to fetch AI history', err);
+    }
+  }, [uid]);
+
+  const createNewAiSession = async () => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ai-session/`, {
+        method: 'POST',
+        headers,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAiSessionId(data.session_id);
+        void fetchAiSessions();
+      }
+    } catch (err) {
+      toast.error('Không thể tạo hội thoại mới');
+    }
+  };
+
+  const clearAiSession = async () => {
+    if (!aiSessionId) return;
+    if (!window.confirm('Bạn có chắc muốn xóa lịch sử hội thoại này?')) return;
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ai-session/`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ session_id: aiSessionId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAiSessionId(data.session_id);
+        void fetchAiSessions();
+      }
+    } catch (err) {
+      toast.error('Không thể xóa hội thoại');
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'ai') {
+      void fetchAiSessions();
+    }
+  }, [activeTab, fetchAiSessions]);
+
+  useEffect(() => {
+    if (aiSessionId) {
+      void fetchAiHistory(aiSessionId);
+    } else {
+      setAiMessages([]);
+    }
+  }, [aiSessionId, fetchAiHistory]);
+
+
+
+
   // Auto-scroll AI chat to bottom on new messages
   useEffect(() => {
     if (aiScrollRef.current) {
       aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
     }
   }, [aiMessages]);
+
 
   const handleAiAsk = async () => {
     if (!aiQuestion.trim() || aiLoading) return;
@@ -550,7 +661,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ask-stream/`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, session_id: aiSessionId, mode: aiMode }),
       });
 
       if (!res.ok || !res.body) throw new Error('Không thể kết nối AI');
@@ -571,17 +682,27 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           const raw = line.slice(6).trim();
           if (raw === '[DONE]') break;
           try {
-            const event = JSON.parse(raw) as { type: string; text?: string; data?: AiMessage['sources']; message?: string };
-            if (event.type === 'chunk' && event.text) {
+            const event = JSON.parse(raw) as { type: string; text?: string; data?: AiMessage['sources'] | AiToolCall[]; message?: string };
+            if (event.type === 'session_id') {
+              if (!aiSessionId || aiSessionId !== event.session_id) {
+                setAiSessionId(event.session_id as string);
+                void fetchAiSessions();
+              }
+            } else if (event.type === 'chunk' && event.text) {
               setAiMessages(prev => {
                 const last = prev[prev.length - 1];
                 const next = (last.text + event.text!).replace(/\n{3,}/g, '\n\n');
-                return [...prev.slice(0, -1), { ...last, text: next }];
+                return [...prev.slice(0, -1), { ...last, loading: false, text: next }];
+              });
+            } else if (event.type === 'tool_calls') {
+              setAiMessages(prev => {
+                const last = prev[prev.length - 1];
+                return [...prev.slice(0, -1), { ...last, tool_calls: event.data as AiToolCall[] }];
               });
             } else if (event.type === 'sources') {
               setAiMessages(prev => {
                 const last = prev[prev.length - 1];
-                return [...prev.slice(0, -1), { ...last, loading: false, sources: event.data }];
+                return [...prev.slice(0, -1), { ...last, loading: false, sources: event.data as AiMessage['sources'] }];
               });
             } else if (event.type === 'error') {
               setAiMessages(prev => {
@@ -875,7 +996,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 { id: 'meeting',  label: 'Phòng họp',          icon: Video },
                 { id: 'exams',    label: 'Bài tập',       icon: ClipboardList },
                 { id: 'final_exams', label: 'Kì Thi',           icon: BarChart2 },
-                { id: 'quiz',     label: 'Thi trắc nghiệm',     icon: Gamepad2 },
+                { id: 'quiz',     label: 'Quizz Game',     icon: Gamepad2 },
                 { id: 'students', label: 'Danh sách sinh viên', icon: Users },
               ] as const).map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === id;
@@ -965,7 +1086,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   {[
                     { id: 'final_exams', label: 'Kì Thi', icon: BarChart2 },
                     { id: 'exams', label: 'Bài tập', icon: ClipboardList },
-                    { id: 'quiz',  label: 'Thi trắc nghiệm',    icon: Gamepad2 },
+                    { id: 'quiz',  label: 'Quizz Game',    icon: Gamepad2 },
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
@@ -1310,21 +1431,66 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'ai' && (
-            <div className="flex flex-col h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              {/* Header */}
-              <div className="p-8 border-b border-border bg-gradient-to-r from-primary-brand-light/80 to-violet-50/80 flex items-center gap-4">
+            <div className="flex h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              {/* AI Sidebar */}
+              <div className="w-72 border-r border-border bg-muted/20 flex flex-col hidden md:flex">
+                <div className="p-6 border-b border-border flex items-center justify-between bg-card">
+                  <h4 className="font-bold text-sm text-foreground">Lịch sử hội thoại</h4>
+                  <Button variant="ghost" size="icon" onClick={createNewAiSession} className="h-8 w-8 rounded-lg hover:bg-primary-brand-light hover:text-primary-brand">
+                    <Plus size={16} />
+                  </Button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                  {aiSessions.length === 0 ? (
+                    <div className="text-center py-10 px-4">
+                      <p className="text-xs text-muted-foreground">Chưa có hội thoại nào</p>
+                    </div>
+                  ) : (
+                    aiSessions.map((s) => (
+                      <button
+                        key={s.session_id}
+                        onClick={() => setAiSessionId(s.session_id)}
+                        className={`w-full text-left p-3 rounded-xl transition-all duration-200 group ${
+                          aiSessionId === s.session_id 
+                            ? 'bg-primary-brand text-white shadow-md shadow-primary-brand/20' 
+                            : 'hover:bg-primary-brand-light/50 text-muted-foreground hover:text-primary-brand'
+                        }`}
+                      >
+                        <p className={`text-xs font-bold truncate ${aiSessionId === s.session_id ? 'text-white' : 'text-foreground group-hover:text-primary-brand'}`}>
+                          {s.title || 'Hội thoại mới'}
+                        </p>
+                        <div className="flex items-center justify-between mt-1.5">
+                          <span className={`text-[10px] ${aiSessionId === s.session_id ? 'text-white/70' : 'text-muted-foreground'}`}>
+                            {s.msg_count} tin nhắn
+                          </span>
+                          <span className={`text-[10px] ${aiSessionId === s.session_id ? 'text-white/70' : 'text-muted-foreground'}`}>
+                            {new Date(s.updated_at).toLocaleDateString('vi-VN')}
+                          </span>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Chat Area */}
+              <div className="flex-1 flex flex-col min-w-0 bg-card">
+                {/* Header */}
+                <div className="px-8 py-5 border-b border-border bg-card flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-primary-brand flex items-center justify-center shadow-lg shadow-primary-brand-muted shrink-0">
                   <Bot size={24} className="text-white" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-foreground">AI Trợ giảng</h3>
-                  <p className="text-sm text-muted-foreground font-medium mt-0.5">Đặt câu hỏi về tài liệu đã tải lên trong lớp học</p>
+                  <p className="text-sm text-muted-foreground font-medium mt-0.5">
+                    {AI_MODES.find(m => m.key === aiMode)?.description}
+                  </p>
                 </div>
                 {aiMessages.length > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setAiMessages([])}
+                    onClick={clearAiSession}
                     className="ml-auto text-xs text-muted-foreground hover:text-foreground rounded-xl"
                   >
                     Xoá lịch sử
@@ -1381,6 +1547,22 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             )
                         }
                       </div>
+                      {msg.tool_calls && msg.tool_calls.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">AI đã thực hiện</p>
+                          {msg.tool_calls.map((tc, j) => (
+                            <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center gap-2">
+                              <span className="shrink-0 text-primary-brand">⚙</span>
+                              <span className="font-mono font-semibold text-foreground">{tc.tool}</span>
+                              {tc.args && Object.keys(tc.args).length > 0 && (
+                                <span className="truncate text-muted-foreground">
+                                  ({Object.entries(tc.args).map(([k, v]) => `${k}: ${String(v).slice(0, 20)}`).join(', ')})
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {msg.sources && msg.sources.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
                           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nguồn tham khảo</p>
@@ -1404,13 +1586,30 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               {/* Input */}
               <div className="p-6 border-t border-border bg-muted/30">
+                {/* Mode selector */}
+                <div className="flex gap-2 mb-3">
+                  {AI_MODES.map(({ key, label, icon: Icon }) => (
+                    <button
+                      key={key}
+                      onClick={() => setAiMode(key)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                        aiMode === key
+                          ? 'bg-primary-brand text-white shadow-md shadow-primary-brand/20'
+                          : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'
+                      }`}
+                    >
+                      <Icon size={13} />
+                      {label}
+                    </button>
+                  ))}
+                </div>
                 <div className="flex gap-3">
                   <input
                     type="text"
                     value={aiQuestion}
                     onChange={e => setAiQuestion(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
-                    placeholder="Đặt câu hỏi về tài liệu của lớp..."
+                    placeholder={AI_MODES.find(m => m.key === aiMode)?.placeholder ?? 'Đặt câu hỏi...'}
                     disabled={aiLoading}
                     className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
                   />
@@ -1422,12 +1621,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     {aiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                   </Button>
                 </div>
-                <p className="text-[11px] text-muted-foreground/70 mt-2 text-center">
-                  AI trả lời dựa trên tài liệu đã tải lên trong lớp học
-                </p>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
           {activeTab === 'chat' && (
             <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm h-[calc(100vh-260px)] flex flex-col">
@@ -2181,7 +2378,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {pendingMembers.length > 1 && (
+                {pendingMembers.length >= 1 && (
                   <Button
                     size="sm"
                     className="h-9 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 gap-1.5"
@@ -2189,7 +2386,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     onClick={() => void handleApproveAll()}
                   >
                     <Check size={13} />
-                    Duyệt tất cả
+                    Chấp nhận hết
                   </Button>
                 )}
                 <button

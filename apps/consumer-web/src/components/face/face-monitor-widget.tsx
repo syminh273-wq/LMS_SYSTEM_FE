@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Eye, EyeOff, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 
 export type MonitorResult = {
@@ -27,8 +27,6 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
   const sendingRef = useRef(false);
   const destroyedRef = useRef(false);
   const [result, setResult] = useState<MonitorResult | null>(null);
-  const [minimized, setMinimized] = useState(false);
-
   useEffect(() => {
     destroyedRef.current = false;
 
@@ -115,46 +113,36 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
       )}
 
       <div className="fixed bottom-24 right-4 z-40 sm:bottom-8">
-        <div
-          className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl transition-all duration-200 ${
-            minimized ? 'w-12' : 'w-44'
-          }`}
-        >
-          {!minimized && (
-            <div className="relative">
-              <video
-                ref={videoRef}
-                className="h-32 w-full object-cover bg-slate-800"
-                autoPlay
-                muted
-                playsInline
-              />
-              <div
-                className={`absolute bottom-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full ${
-                  recognized === null
-                    ? 'bg-slate-400'
-                    : recognized
-                      ? 'bg-emerald-500'
-                      : 'bg-rose-500'
-                }`}
-              >
-                {recognized ? (
-                  <ShieldCheck size={11} className="text-white" />
-                ) : (
-                  <ShieldAlert size={11} className="text-white" />
-                )}
-              </div>
+        <div className="w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+          <div className="relative">
+            <video
+              ref={videoRef}
+              className="h-32 w-full object-cover bg-slate-800"
+              autoPlay
+              muted
+              playsInline
+            />
+            <div
+              className={`absolute bottom-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full ${
+                recognized === null
+                  ? 'bg-slate-400'
+                  : recognized
+                    ? 'bg-emerald-500'
+                    : 'bg-rose-500'
+              }`}
+            >
+              {recognized ? (
+                <ShieldCheck size={11} className="text-white" />
+              ) : (
+                <ShieldAlert size={11} className="text-white" />
+              )}
             </div>
-          )}
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setMinimized(m => !m)}
-            className="flex h-9 w-full items-center justify-center gap-1.5 bg-slate-50 text-xs font-bold text-slate-600 hover:bg-slate-100"
-          >
-            {minimized ? <Eye size={14} /> : <EyeOff size={14} />}
-            {!minimized && <span>Camera</span>}
-          </button>
+          <div className="flex h-9 w-full items-center justify-center gap-1.5 bg-slate-50 text-xs font-bold text-slate-600">
+            <ShieldCheck size={14} className="text-slate-400" />
+            <span>Camera</span>
+          </div>
         </div>
       </div>
     </>

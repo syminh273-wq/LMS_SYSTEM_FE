@@ -433,14 +433,16 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                     <th className="px-4 py-3">Học sinh</th>
                     <th className="px-4 py-3">Trạng thái</th>
                     <th className="px-4 py-3">Nộp lúc</th>
+                    <th className="px-4 py-3">Kết quả</th>
                     <th className="px-4 py-3">Điểm</th>
+                    <th className="px-4 py-3">Đạt/Không</th>
                     <th className="px-4 py-3 text-right">File</th>
                   </tr>
                 </thead>
                 <tbody>
                   {visibleRows.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-12 text-center text-sm font-bold text-muted-foreground">
+                      <td colSpan={7} className="px-4 py-12 text-center text-sm font-bold text-muted-foreground">
                         Không có dữ liệu phù hợp
                       </td>
                     </tr>
@@ -463,8 +465,37 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                         <td className="px-4 py-3 text-xs font-bold text-muted-foreground">
                           {row.kind === 'submitted' ? formatDateTime(row.submission.submitted_at) : '--'}
                         </td>
+                        <td className="px-4 py-3">
+                          {row.kind === 'submitted' && row.submission.quiz_result ? (
+                            <div className="min-w-[90px]">
+                              <div className="text-xs font-black text-slate-800">
+                                {row.submission.quiz_result.correct_count}/{row.submission.quiz_result.total} câu
+                              </div>
+                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                                <div
+                                  className="h-full rounded-full bg-emerald-500"
+                                  style={{ width: `${row.submission.quiz_result.score_pct}%` }}
+                                />
+                              </div>
+                              <div className="mt-0.5 text-[10px] font-bold text-emerald-600">
+                                {row.submission.quiz_result.score_pct}%
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-xs font-bold text-muted-foreground/60">--</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-sm font-black text-foreground">
                           {row.kind === 'submitted' && typeof row.submission.grade === 'number' ? row.submission.grade : '--'}
+                        </td>
+                        <td className="px-4 py-3">
+                          {row.kind === 'submitted' && row.submission.passed != null ? (
+                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${row.submission.passed ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+                              {row.submission.passed ? 'Đạt' : 'Không đạt'}
+                            </span>
+                          ) : (
+                            <span className="text-xs font-bold text-muted-foreground/60">--</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right">
                           {row.kind === 'submitted' && row.submission.resource_url ? (
@@ -500,6 +531,8 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
               <Metric label="Chưa nộp" value={String(analytics.missing)} />
               <Metric label="Điểm TB" value={analytics.averageLabel} />
               <Metric label="Đã chấm" value={String(analytics.graded)} />
+              <Metric label="Đạt" value={String(analytics.passed)} />
+              <Metric label="Không đạt" value={String(analytics.failed)} />
             </div>
 
             <div className="mt-5">
@@ -586,11 +619,16 @@ function buildAnalytics(members: ClassroomMember[], submissions: ExamSubmission[
     { label: '8 - 10', min: 8, max: 10 },
   ];
 
+  const passed = submissions.filter(s => s.passed === true).length;
+  const failed = submissions.filter(s => s.passed === false).length;
+
   return {
     totalStudents,
     submitted,
     missing,
     graded: grades.length,
+    passed,
+    failed,
     submitRate: totalStudents > 0 ? Math.round((submitted / totalStudents) * 100) : 0,
     averageLabel: average === null ? '--' : average.toFixed(1),
     scoreBuckets: buckets.map(bucket => {
@@ -634,15 +672,17 @@ function getExamStatusClass(status: string) {
 
 function getSubmissionStatusClass(status: string) {
   const normalized = status.toLowerCase();
-  if (normalized === 'graded' || normalized === 'returned') {
-    return 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted';
-  }
+  if (normalized === 'returned') return 'bg-violet-50 text-violet-600 border border-violet-100';
+  if (normalized === 'graded') return 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted';
+  if (normalized === 'late') return 'bg-amber-50 text-amber-600 border border-amber-100';
   return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
 }
 
 function getSubmissionStatusLabel(status: string) {
   const normalized = status.toLowerCase();
-  if (normalized === 'graded' || normalized === 'returned') return 'Đã chấm';
+  if (normalized === 'returned') return 'Đã trả bài';
+  if (normalized === 'graded') return 'Đã chấm';
+  if (normalized === 'late') return 'Nộp trễ';
   return 'Đã nộp';
 }
 

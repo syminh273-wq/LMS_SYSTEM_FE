@@ -4,6 +4,7 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export default class BaseRestApiClient {
   protected baseURL: string;
+  public static onUnauthorized?: () => void;
 
   constructor(baseURL?: string) {
     this.baseURL = baseURL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -66,7 +67,10 @@ export default class BaseRestApiClient {
     if (!response.ok) {
       if (response.status === 401) {
         if (typeof window !== 'undefined') {
+          BaseRestApiClient.onUnauthorized?.();
           localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('userProfile');
           window.location.href = '/login';
         }
         throw new UnauthorizedException();

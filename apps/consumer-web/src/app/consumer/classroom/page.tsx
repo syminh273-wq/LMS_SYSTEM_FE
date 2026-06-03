@@ -4,21 +4,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@shared/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@shared/components/ui/dropdown-menu";
-import { classroomApi, type Classroom } from '@/lib/api';
+import { classroomApi, consumerApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useSelector } from 'react-redux';
@@ -26,8 +12,10 @@ import type { RootState } from '@/lib/redux/store';
 import { toast } from 'sonner';
 import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
 import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
-import { Loader2, QrCode, KeyRound, X, Camera } from 'lucide-react';
-
+import { Loader2, QrCode, KeyRound, X, Camera, Plus, ChevronRight, Video, BookOpen, Clock } from 'lucide-react';
+import { cn } from '@shared/lib/utils';
+import { Card, CardContent } from '@shared/components/ui/card';
+import { Badge } from '@shared/components/ui/badge';
 
 type JoinTab = 'code' | 'qr';
 
@@ -105,11 +93,43 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
     setError('');
     setLoading(true);
     try {
-      const classroom = await classroomApi.joinByCode(trimmed);
-      void sendJoinClassroomNotification({ classroomId: classroom.uid, classroomName: classroom.name, code: trimmed });
-      toast.success(`Đã tham gia lớp "${classroom.name}" thành công!`);
-      onJoined(classroom);
-      onClose();
+      // 1. Resolve code first to get classroom details
+      const link = await consumerApi.sharing.resolve(trimmed);
+      if (link.resource_type !== 'classroom') {
+        throw new Error('Mã này không phải mã lớp học.');
+      }
+
+      // 2. Perform join
+      const res = await classroomApi.joinByCode(trimmed);
+      
+      const classroomObj: Classroom = {
+        uid: link.resource_id,
+        pid: trimmed,
+        name: link.metadata.name || 'Phòng học mới',
+        description: link.metadata.description || '',
+        max_students: 0, // Fallback
+        status: 'active',
+        membership_status: res.membership_status as 'approved' | 'pending',
+        teacher_id: '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      void sendJoinClassroomNotification({ 
+        classroomId: classroomObj.uid, 
+        classroomName: classroomObj.name, 
+        code: trimmed 
+      });
+
+      if (res.membership_status === 'pending') {
+        toast.info('Đã gửi lời tham gia! Chờ giáo viên phê duyệt.');
+        onJoined(classroomObj); // Add to list even if pending
+        onClose();
+      } else {
+        toast.success(`Đã tham gia lớp "${classroomObj.name}" thành công!`);
+        onJoined(classroomObj);
+        onClose();
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Mã lớp không hợp lệ.');
     } finally {
@@ -131,13 +151,13 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
         {/* Tabs */}
         <div className="flex border-b border-gray-100">
           <button
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors ${tab === 'code' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors cursor-pointer ${tab === 'code' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
             onClick={() => setTab('code')}
           >
             <KeyRound size={16} /> Nhập mã
           </button>
           <button
-            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors ${tab === 'qr' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors cursor-pointer ${tab === 'qr' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
             onClick={() => setTab('qr')}
           >
             <QrCode size={16} /> Quét QR
@@ -159,7 +179,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
                 />
               </div>
               {error && <p className="text-sm text-red-600">{error}</p>}
-              <Button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 h-11 rounded-xl font-bold">
+              <Button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-700 h-11 rounded-xl font-bold cursor-pointer">
                 {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
                 Tham gia
               </Button>
@@ -204,13 +224,10 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
-
 export default function ClassroomPage() {
   const router = useRouter();
-  const { isAuthenticated, mounted, logout } = useRequireAuth();
+  const { isAuthenticated, mounted } = useRequireAuth();
   const userId = useSelector((state: RootState) => state.user.profile?.uid);
-  const [userName] = useState("Student");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -233,7 +250,6 @@ export default function ClassroomPage() {
     }
   }, [fetchClassrooms, isAuthenticated]);
 
-  // Realtime Firebase: khi giáo viên approve → tự động refresh danh sách lớp
   useMembershipRealtime({
     userId,
     onApproved: useCallback(() => { void fetchClassrooms(); }, [fetchClassrooms]),
@@ -249,113 +265,151 @@ export default function ClassroomPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="p-6 animate-in fade-in duration-500">
       {showJoin && <JoinDialog onClose={() => setShowJoin(false)} onJoined={handleJoined} />}
-
-      {/* Header */}
-      <nav className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
-        <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-gray-100 rounded-full">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push('/consumer')}>
-            <Image src="/logo.jpg" alt="LMS LOGO" width={100} height={35} className="h-8 w-auto object-contain" />
-            <span className="text-xl font-medium text-gray-700">Classroom</span>
+      
+      <div className="max-w-5xl mx-auto space-y-6">
+        <header className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">My Classrooms</h1>
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">You are currently enrolled in <span className="text-[#4F46E5] font-bold">{classrooms.filter(c => c.membership_status !== 'pending').length} active courses</span>.</p>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={() => setShowJoin(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2 rounded-xl font-semibold"
-          >
-            <KeyRound size={16} />
-            Tham gia lớp
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar className="cursor-pointer w-8 h-8">
-                <AvatarImage src="" alt="User" />
-                <AvatarFallback className="bg-indigo-500 text-white text-sm">
-                  {userName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => router.push('/consumer/profile')}>
-                  Cập nhật thông tin
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/consumer')}>
-                  Trang chủ
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/consumer/dashboard')}>
-                  Dashboard
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
-                Đăng xuất
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </nav>
+          <div className="flex items-center gap-2.5">
+             <div className="bg-white dark:bg-card border border-gray-100 dark:border-border px-2.5 py-1 rounded-lg flex items-center gap-1.5 text-[10px] font-bold text-gray-500 dark:text-gray-300 shadow-sm">
+                <BookOpen size={12} className="text-[#4F46E5]" />
+                Fall Semester 2024
+             </div>
+             <button 
+                onClick={() => setShowJoin(true)}
+                className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-3.5 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-lg shadow-[#4F46E5]/15 active:scale-[0.98] cursor-pointer"
+              >
+                <Plus size={12} />
+                Join Class
+              </button>
+          </div>
+        </header>
 
-      <main className="p-8">
         {error && (
-          <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-2.5 text-[10px] text-red-700 font-medium">
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Loader2 size={16} className="animate-spin" />
-            Đang tải classroom...
+          <div className="flex items-center gap-2.5 text-gray-500 font-bold py-12 justify-center bg-white dark:bg-card rounded-[20px] border border-gray-100 dark:border-border shadow-sm">
+            <Loader2 size={18} className="animate-spin text-[#4F46E5]" />
+            <span className="text-xs">Loading academic space...</span>
           </div>
         ) : classrooms.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
-            <div className="text-5xl mb-4">🏫</div>
-            <p className="font-semibold text-gray-900 text-lg">Bạn chưa tham gia lớp học nào.</p>
-            <p className="mt-1 text-sm text-gray-500">Nhấn &ldquo;Tham gia lớp&rdquo; và nhập mã từ giáo viên hoặc quét QR code.</p>
-            <Button className="mt-6 bg-indigo-600 hover:bg-indigo-700 gap-2" onClick={() => setShowJoin(true)}>
-              <KeyRound size={16} />
-              Tham gia lớp học
-            </Button>
+          <div className="rounded-[24px] border-2 border-dashed border-gray-200 dark:border-border bg-white dark:bg-card p-10 text-center space-y-4">
+            <div className="w-12 h-12 bg-gray-50 dark:bg-muted rounded-full flex items-center justify-center mx-auto text-xl">🏫</div>
+            <div className="space-y-0.5">
+              <p className="font-bold text-gray-900 dark:text-white text-base">Your classroom is empty</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Join a class using a code from your teacher.</p>
+            </div>
+            <button 
+              className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest inline-flex items-center gap-1.5 transition-all shadow-lg shadow-[#4F46E5]/15 cursor-pointer" 
+              onClick={() => setShowJoin(true)}
+            >
+              <Plus size={14} />
+              Join First Class
+            </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {classrooms.map((classroom, index) => (
-              <div key={classroom.uid} className="flex flex-col overflow-hidden rounded-lg border border-gray-200 transition-shadow hover:shadow-md">
-                <div className={`${getSpaceColor(index)} relative h-24 p-4`}>
-                  <h3 className="truncate pr-8 text-xl font-bold text-white">{classroom.name}</h3>
-                  <p className="text-sm text-white opacity-90">ID: {classroom.pid}</p>
+              <Card 
+                key={classroom.uid} 
+                onClick={() => {
+                  if (classroom.membership_status === 'pending') {
+                    toast.info('Yêu cầu đang chờ phê duyệt.');
+                    return;
+                  }
+                  router.push(`/consumer/classroom/${classroom.uid}`);
+                }}
+                className="group overflow-hidden rounded-[16px] border-gray-100 dark:border-border shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer"
+              >
+                <div className={cn(
+                  getSpaceColor(index), 
+                  "h-16 p-3 flex flex-col justify-between relative transition-opacity",
+                  classroom.membership_status === 'pending' && "opacity-60 grayscale-[0.5]"
+                )}>
+                   <div className="flex justify-between items-start">
+                      <div className="space-y-0.5">
+                        <h3 className="text-[12px] font-bold text-white leading-tight pr-4 line-clamp-1">{classroom.name}</h3>
+                        <p className="text-[7px] font-bold text-white/70 uppercase tracking-widest">ID: {classroom.pid}</p>
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white font-bold text-[9px] border border-white/30 shrink-0">
+                         {classroom.name ? classroom.name[0] : '?'}
+                      </div>
+                   </div>
                 </div>
-                <div className="min-h-[100px] flex-1 bg-white p-4">
-                  <div className="relative -top-10 flex justify-end pr-2">
-                    <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-gray-300 text-2xl font-bold uppercase text-gray-600">
-                      {classroom.name ? classroom.name[0] : '?'}
+                <CardContent className="p-3 bg-white dark:bg-card">
+                  <p className="text-[10px] text-gray-500 font-medium leading-relaxed line-clamp-2 min-h-[2rem]">
+                    {classroom.description || 'No description provided for this classroom yet.'}
+                  </p>
+                  
+                  <div className="flex items-center gap-1.5 mt-2.5">
+                    <Badge variant="secondary" className={cn(
+                      "border-none px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-widest flex items-center gap-1",
+                      classroom.membership_status === 'pending' 
+                        ? "bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400" 
+                        : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+                    )}>
+                       <span className={cn(
+                         "w-1 h-1 rounded-full",
+                         classroom.membership_status === 'pending' ? "bg-amber-500" : "bg-emerald-500"
+                       )} />
+                       {classroom.membership_status === 'pending' ? 'Pending' : 'Active'}
+                    </Badge>
+                    <Badge variant="secondary" className="bg-gray-50 dark:bg-muted text-gray-500 dark:text-gray-400 border-none px-1.5 py-0.5 text-[7px] font-bold uppercase tracking-widest">
+                       123 Students
+                    </Badge>
+                  </div>
+
+                  <div className="h-px bg-gray-50 dark:bg-border/50 my-2.5" />
+
+                  <div className="flex items-center justify-between">
+                    <div className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">
+                       <p>{classroom.membership_status === 'pending' ? 'Awaiting Approval' : 'Next: Tomorrow, 9 AM'}</p>
+                    </div>
+                    <div className={cn(
+                      "font-bold text-[8px] uppercase tracking-widest flex items-center gap-1 transition-all",
+                      classroom.membership_status === 'pending' ? "text-amber-500" : "text-[#4F46E5] group-hover:gap-1.5"
+                    )}>
+                      {classroom.membership_status === 'pending' ? 'View Status' : 'Enter'}
+                      <ChevronRight size={8} />
                     </div>
                   </div>
-                  <p className="-mt-8 line-clamp-2 text-sm text-gray-600">{classroom.description || 'Không có mô tả.'}</p>
-                </div>
-                <div className="flex justify-between gap-2 border-t border-gray-200 p-3">
-                  <span className={`rounded-full px-2 py-1 text-xs ${classroom.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                    {classroom.status}
-                  </span>
-                  <Button size="sm" variant="outline" onClick={() => router.push(`/consumer/classroom/${classroom.uid}`)}>
-                    Vào lớp
-                  </Button>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
-      </main>
+
+        {/* Missed a Class Banner */}
+        <div className="bg-[#EBF2FF] dark:bg-muted/30 rounded-[40px] p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 overflow-hidden relative">
+           <div className="flex-1 space-y-6 relative z-10">
+              <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Missed a class?</h2>
+              <p className="text-gray-600 dark:text-gray-400 font-medium max-w-md">
+                Catch up with the latest recorded sessions and downloadable resources available in the Archive section.
+              </p>
+              <button className="bg-white text-gray-900 px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2">
+                 <Video size={16} className="text-[#4F46E5]" />
+                 View Recordings
+              </button>
+           </div>
+           <div className="w-full md:w-[400px] h-[240px] rounded-3xl overflow-hidden shadow-2xl relative">
+              <Image 
+                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80" 
+                alt="Workspace" 
+                fill 
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-indigo-500/10 mix-blend-multiply" />
+           </div>
+        </div>
+      </div>
     </div>
   );
 }

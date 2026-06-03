@@ -71,7 +71,7 @@ export default function CreateClassroomPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-rose-500" />
+          <div className="h-2 bg-primary-brand" />
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Info size={20} className="text-primary-brand" />
@@ -97,7 +97,7 @@ export default function CreateClassroomPage() {
                 </div>
                 <input 
                   {...register('name', { required: 'Tên phòng học là bắt buộc' })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                   placeholder="Ví dụ: Toán học nâng cao lớp 12A1"
                 />
               </div>
@@ -109,7 +109,7 @@ export default function CreateClassroomPage() {
               <textarea 
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 rows={4}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                 placeholder="Mô tả tóm tắt về mục tiêu, kiến thức sẽ đạt được trong khóa học này..."
               />
               {errors.description && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.description.message}</p>}
@@ -129,7 +129,7 @@ export default function CreateClassroomPage() {
                     required: 'Vui lòng nhập số lượng',
                     min: { value: 1, message: 'Tối thiểu 1 học sinh' }
                   })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                 />
               </div>
               {errors.max_students && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.max_students.message}</p>}
@@ -151,7 +151,7 @@ export default function CreateClassroomPage() {
           <Button 
             type="submit" 
             disabled={loading}
-            className="bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-rose-100 transition-all active:scale-95"
+            className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-primary-brand/20 transition-all active:scale-95"
           >
             {loading ? (
               <>

@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
     "*.ngrok.app",
     "*.ngrok.io",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

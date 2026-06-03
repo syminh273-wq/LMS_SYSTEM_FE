@@ -155,12 +155,19 @@ export default function ExamSessionPage({ params }: Props) {
       }
 
       headers['Content-Type'] = 'application/json';
+      const sessionDuration = session?.time_remaining_seconds != null && timeLeft !== null
+        ? session.time_remaining_seconds - timeLeft
+        : 0;
       body = exam.content_type === 'quiz'
-        ? JSON.stringify({ content_type: 'quiz', answers: quizAnswers })
+        ? JSON.stringify({
+            submission_type: 'online_quiz',
+            answers: quizAnswers,
+            time_taken_seconds: Math.max(0, sessionDuration),
+          })
         : JSON.stringify({
-            content_type: exam.content_type,
+            submission_type: exam.content_type === 'markdown' ? 'essay' : 'file',
             content: exam.content_type === 'markdown' ? answerContent.trim() : '',
-            resource_uid: resourceUid,
+            ref_id: resourceUid,
           });
 
       const res = await fetch(`${apiBase}/api/v1/consumer/course/exams/${exam.uid}/submissions/`, {

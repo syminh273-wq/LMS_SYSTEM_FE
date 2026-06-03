@@ -161,23 +161,35 @@ export type OpenOnlineResponse = {
   expires_in_minutes: number;
 };
 
+export type ExamSubmissionType = 'multiple_choice' | 'online_quiz' | 'file' | 'essay';
+
 export type ExamSubmission = {
   uid: string;
   exam_id: string;
   classroom_id: string;
   student_id: string;
-  content_type: ExamContentType;
+  submission_type: ExamSubmissionType;
+  ref_id?: string | null;
   content: string;
-  resource_uid?: string | null;
+  meta: Record<string, unknown>;
+  // convenience fields from meta
   resource_url?: string | null;
   resource_name?: string;
+  quiz_result?: {
+    correct_count: number;
+    total: number;
+    score_pct: number;
+  } | null;
   status: string;
   submitted_at: string | null;
   grade?: number | null;
+  max_grade?: number | null;
+  passed?: boolean | null;
   feedback?: string;
   graded_by?: string | null;
   graded_at?: string | null;
-  grading_method?: 'manual' | 'ai' | string;
+  grading_method?: 'auto' | 'manual' | 'ai';
+  returned_at?: string | null;
   ai_model?: string;
   ai_rubric?: string;
   ai_reason?: string;
