@@ -6,6 +6,7 @@ import { consumerQuizApi } from './quiz';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
+import { voiceSettingsApi } from './voice-settings';
 import { examSessionApi } from './exam-session';
 import { SharingLink } from './types';
 
@@ -25,7 +26,7 @@ export const api = {
 };
 
 // Re-export specific instances
-export { authApi, classroomApi, meetingRoomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService };
+export { authApi, classroomApi, meetingRoomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService, voiceSettingsApi };
 
 // Backward compatibility exports for the previous structure
 export const consumerApiCompat = {

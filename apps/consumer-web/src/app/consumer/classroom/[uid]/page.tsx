@@ -3,11 +3,12 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, meetingRoomApi, examSessionApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
+import { classroomApi, meetingRoomApi, examSessionApi, Classroom, Exam, consumerQuizApi, voiceSettingsApi } from '@/lib/api';
 import type { Message as ChatMessage, ExamSessionInfo, QuizSummary } from '@/lib/api/types';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/lib/redux/store';
 import { toast } from 'sonner';
+import { VoiceSettingsDialog } from '@shared/components/VoiceSettingsDialog';
 import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
 import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
 import { 
@@ -35,6 +36,8 @@ import {
   ChevronRight,
   Bot,
   Sparkles,
+  Mic,
+  Square,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -187,6 +190,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [aiSessionId, setAiSessionId] = useState<string | null>(null);
   const [aiSessionLoading, setAiSessionLoading] = useState(false);
 
+  // Audio recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
   const {
     messages, hasMore, loadingMore, connected, loading: chatLoading,
     sendMessage, scrollContainerRef, topSentinelRef,
@@ -335,20 +343,69 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     await fetchSessionList();
   };
 
-  const handleAiAsk = async () => {
-    if (!aiQuestion.trim() || aiLoading || !aiSessionId) return;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        void handleAiAsk(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      toast.error('Không thể truy cập microphone');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+    }
+  };
+
+  const handleAiAsk = async (audioBlob?: Blob) => {
+    if ((!aiQuestion.trim() && !audioBlob) || aiLoading || !aiSessionId) return;
+    
     const question = aiQuestion.trim();
     setAiQuestion('');
     setAiLoading(true);
-    setAiMessages(prev => [...prev, { role: 'user', text: question }, { role: 'assistant', text: '', loading: true }]);
+
+    if (question) {
+      setAiMessages(prev => [...prev, { role: 'user', text: question }, { role: 'assistant', text: '', loading: true }]);
+    } else {
+      setAiMessages(prev => [...prev, { role: 'user', text: '🎤 [Tin nhắn thoại]' }, { role: 'assistant', text: '', loading: true }]);
+    }
+
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      
+      const body = new FormData();
+      if (audioBlob) {
+        body.append('audio', audioBlob, 'voice.webm');
+      } else {
+        body.append('question', question);
+      }
+      body.append('session_id', aiSessionId);
+      body.append('mode', 'doc');
+
       const res = await fetch(`${apiBase}/api/v1/consumer/course/classrooms/${uid}/ask-stream/`, {
-        method: 'POST', headers, body: JSON.stringify({ question, session_id: aiSessionId, mode: 'doc' }),
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        body: body,
       });
+
       if (!res.ok || !res.body) throw new Error('Không thể kết nối AI');
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -364,11 +421,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
           const raw = line.slice(6).trim();
           if (raw === '[DONE]') break;
           try {
-            const ev = JSON.parse(raw) as { type: string; text?: string; data?: AiMsg['sources']; message?: string };
-            if (ev.type === 'chunk' && ev.text) {
+            const ev = JSON.parse(raw) as { type: string; text?: string; data?: AiMsg['sources']; message?: string; transcript?: string; audio?: string };
+            if (ev.type === 'session_id' && ev.transcript) {
+              setAiMessages(prev => {
+                const lastUser = prev[prev.length - 2];
+                if (lastUser && lastUser.text === '🎤 [Tin nhắn thoại]') {
+                  return [...prev.slice(0, -2), { ...lastUser, text: `🎤 ${ev.transcript}` }, prev[prev.length - 1]];
+                }
+                return prev;
+              });
+            } else if (ev.type === 'chunk' && ev.text) {
               setAiMessages(prev => { const last = prev[prev.length - 1]; const next = (last.text + ev.text!).replace(/\n{3,}/g, '\n\n'); return [...prev.slice(0, -1), { ...last, text: next }]; });
             } else if (ev.type === 'sources') {
               setAiMessages(prev => { const last = prev[prev.length - 1]; return [...prev.slice(0, -1), { ...last, loading: false, sources: ev.data }]; });
+            } else if (ev.type === 'audio' && ev.audio) {
+              const audio = new Audio(`data:audio/mpeg;base64,${ev.audio}`);
+              void audio.play().catch(e => console.error('Audio play failed', e));
             } else if (ev.type === 'error') {
               setAiMessages(prev => { const last = prev[prev.length - 1]; return [...prev.slice(0, -1), { ...last, loading: false, text: ev.message ?? 'Có lỗi' }]; });
             }
@@ -843,14 +911,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">Chọn hoặc bắt đầu hội thoại</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => void handleNewSession()}
-                    disabled={aiSessionLoading}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide bg-[#4F46E5] text-white hover:bg-[#4338CA] transition-all disabled:opacity-50 shadow-lg shadow-[#4F46E5]/20"
-                  >
-                    {aiSessionLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                    Hội thoại mới
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <VoiceSettingsDialog
+                      getSettings={() => voiceSettingsApi.getSettings()}
+                      updateSettings={(data) => voiceSettingsApi.updateSettings(data)}
+                      getAvailableVoices={() => voiceSettingsApi.getAvailableVoices()}
+                      previewVoice={(voiceId, text) => voiceSettingsApi.previewVoice(voiceId, text)}
+                    />
+                    <button
+                      onClick={() => void handleNewSession()}
+                      disabled={aiSessionLoading}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide bg-[#4F46E5] text-white hover:bg-[#4338CA] transition-all disabled:opacity-50 shadow-lg shadow-[#4F46E5]/20"
+                    >
+                      {aiSessionLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                      Hội thoại mới
+                    </button>
+                  </div>
                 </div>
 
                 {/* Session List */}
@@ -918,14 +994,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     </div>
                     <h2 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">AI Trợ giảng</h2>
                   </div>
-                  <button
-                    onClick={() => void handleClearSession()}
-                    disabled={aiLoading || aiSessionLoading}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide text-gray-500 hover:text-[#4F46E5] hover:bg-indigo-50 transition-all disabled:opacity-40"
-                  >
-                    {aiSessionLoading ? <Loader2 size={14} className="animate-spin" /> : <Bot size={14} />}
-                    Hội thoại mới
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <VoiceSettingsDialog
+                      getSettings={() => voiceSettingsApi.getSettings()}
+                      updateSettings={(data) => voiceSettingsApi.updateSettings(data)}
+                      getAvailableVoices={() => voiceSettingsApi.getAvailableVoices()}
+                      previewVoice={(voiceId, text) => voiceSettingsApi.previewVoice(voiceId, text)}
+                    />
+                    <button
+                      onClick={() => void handleClearSession()}
+                      disabled={aiLoading || aiSessionLoading}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wide text-gray-500 hover:text-[#4F46E5] hover:bg-indigo-50 transition-all disabled:opacity-40"
+                    >
+                      {aiSessionLoading ? <Loader2 size={14} className="animate-spin" /> : <Bot size={14} />}
+                      Hội thoại mới
+                    </button>
+                  </div>
                 </div>
 
                 {/* Chat Messages */}
@@ -1002,9 +1086,29 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                       disabled={aiLoading || !aiSessionId}
                       onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
                     />
-                    <div className="flex items-center justify-end border-t border-gray-50 dark:border-border/50 pt-2 px-1">
+                    <div className="flex items-center justify-between border-t border-gray-50 dark:border-border/50 pt-2 px-1">
+                      <div className="flex items-center gap-2">
+                        {isRecording ? (
+                          <button
+                            onClick={stopRecording}
+                            className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-xl text-[11px] font-black uppercase tracking-wide animate-pulse"
+                          >
+                            <Square size={14} fill="white" />
+                            Đang ghi...
+                          </button>
+                        ) : (
+                          <button
+                            disabled={aiLoading || !aiSessionId}
+                            onClick={() => void startRecording()}
+                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-[#4F46E5] rounded-xl text-[11px] font-black uppercase tracking-wide hover:bg-indigo-100 disabled:opacity-50 transition-all"
+                          >
+                            <Mic size={14} />
+                            Nói
+                          </button>
+                        )}
+                      </div>
                       <button
-                        disabled={!aiQuestion.trim() || aiLoading || !aiSessionId}
+                        disabled={!aiQuestion.trim() || aiLoading || !aiSessionId || isRecording}
                         onClick={() => void handleAiAsk()}
                         className="bg-[#4F46E5] text-white p-2.5 rounded-xl hover:bg-[#4338CA] disabled:opacity-50 transition-all shadow-lg shadow-[#4F46E5]/20 active:scale-95 flex items-center gap-2 px-4 text-[11px] font-black uppercase tracking-wide"
                       >

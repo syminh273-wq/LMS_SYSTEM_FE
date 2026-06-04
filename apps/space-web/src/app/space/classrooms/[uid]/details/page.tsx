@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState, useEffect, useCallback, use, useRef } from 'react';
 import { usePendingRealtime } from '@/lib/hooks/use-pending-realtime';
 import { useRouter } from 'next/navigation';
-import { spaceApi, SharingLink, Classroom, Exam } from '@/lib/api';
+import { spaceApi, SharingLink, Classroom, Exam, voiceSettingsApi } from '@/lib/api';
 import type { ClassroomMember, StudentExamRecord, ActivityLog } from '@/lib/api/types';
 import {
   QrCode,
@@ -22,6 +22,8 @@ import {
   Bot,
   Sparkles,
   Send,
+  Mic,
+  Square,
   ArrowLeft,
   Settings,
   ClipboardList,
@@ -70,6 +72,7 @@ import type { Quiz } from '@/lib/api/types';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import { Button } from '@shared/components/ui/button';
 import { Card } from '@shared/components/ui/card';
+import { VoiceSettingsDialog } from '@shared/components/VoiceSettingsDialog';
 import {
   Dialog,
   DialogContent,
@@ -212,6 +215,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [aiSessions, setAiSessions] = useState<any[]>([]);
   const aiScrollRef = useRef<HTMLDivElement>(null);
 
+  // Audio recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const AI_MODES: { key: AiMode; label: string; icon: React.ElementType; placeholder: string; description: string }[] = [
     { key: 'doc',    label: 'Hỏi tài liệu',  icon: BookOpen,    placeholder: 'Hỏi về nội dung tài liệu, bài giảng...', description: 'Tìm kiếm và trả lời từ tài liệu đã tải lên' },
     { key: 'manage', label: 'Quản lý lớp',   icon: Users,       placeholder: 'Hỏi về học sinh, thống kê, bài thi...', description: 'Truy vấn dữ liệu lớp học qua công cụ' },
@@ -641,27 +648,66 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   }, [aiMessages]);
 
 
-  const handleAiAsk = async () => {
-    if (!aiQuestion.trim() || aiLoading) return;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        void handleAiAsk(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      toast.error('Không thể truy cập microphone');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+    }
+  };
+
+  const handleAiAsk = async (audioBlob?: Blob) => {
+    if ((!aiQuestion.trim() && !audioBlob) || aiLoading) return;
     const question = aiQuestion.trim();
     setAiQuestion('');
     setAiLoading(true);
-    setAiMessages(prev => [
-      ...prev,
-      { role: 'user', text: question },
-      { role: 'assistant', text: '', loading: true },
-    ]);
+    
+    if (question) {
+      setAiMessages(prev => [...prev, { role: 'user', text: question }, { role: 'assistant', text: '', loading: true }]);
+    } else {
+      setAiMessages(prev => [...prev, { role: 'user', text: '🎤 [Tin nhắn thoại]' }, { role: 'assistant', text: '', loading: true }]);
+    }
 
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const body = new FormData();
+      if (audioBlob) {
+        body.append('audio', audioBlob, 'voice.webm');
+      } else {
+        body.append('question', question);
+      }
+      body.append('session_id', aiSessionId || '');
+      body.append('mode', aiMode);
 
       const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/ask-stream/`, {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ question, session_id: aiSessionId, mode: aiMode }),
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        body: body,
       });
 
       if (!res.ok || !res.body) throw new Error('Không thể kết nối AI');
@@ -682,8 +728,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           const raw = line.slice(6).trim();
           if (raw === '[DONE]') break;
           try {
-            const event = JSON.parse(raw) as { type: string; text?: string; data?: AiMessage['sources'] | AiToolCall[]; message?: string };
+            const event = JSON.parse(raw) as { type: string; text?: string; data?: AiMessage['sources'] | AiToolCall[]; message?: string; session_id?: string; transcript?: string; audio?: string };
             if (event.type === 'session_id') {
+              if (event.transcript) {
+                setAiMessages(prev => {
+                  const lastUser = prev[prev.length - 2];
+                  if (lastUser && lastUser.text === '🎤 [Tin nhắn thoại]') {
+                    return [...prev.slice(0, -2), { ...lastUser, text: `🎤 ${event.transcript}` }, prev[prev.length - 1]];
+                  }
+                  return prev;
+                });
+              }
               if (!aiSessionId || aiSessionId !== event.session_id) {
                 setAiSessionId(event.session_id as string);
                 void fetchAiSessions();
@@ -704,6 +759,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 const last = prev[prev.length - 1];
                 return [...prev.slice(0, -1), { ...last, loading: false, sources: event.data as AiMessage['sources'] }];
               });
+            } else if (event.type === 'audio' && event.audio) {
+              const audio = new Audio(`data:audio/mpeg;base64,${event.audio}`);
+              void audio.play().catch(e => console.error('Audio play failed', e));
             } else if (event.type === 'error') {
               setAiMessages(prev => {
                 const last = prev[prev.length - 1];
@@ -721,11 +779,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     } catch (err: unknown) {
       setAiMessages(prev => {
         const last = prev[prev.length - 1];
-        return [...prev.slice(0, -1), {
+        return last ? [...prev.slice(0, -1), {
           ...last,
           loading: false,
           text: err instanceof Error ? err.message : 'Có lỗi xảy ra',
-        }];
+        }] : prev;
       });
     } finally {
       setAiLoading(false);
@@ -1486,16 +1544,24 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     {AI_MODES.find(m => m.key === aiMode)?.description}
                   </p>
                 </div>
-                {aiMessages.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearAiSession}
-                    className="ml-auto text-xs text-muted-foreground hover:text-foreground rounded-xl"
-                  >
-                    Xoá lịch sử
-                  </Button>
-                )}
+                <div className="ml-auto flex items-center gap-2">
+                  <VoiceSettingsDialog
+                    getSettings={() => voiceSettingsApi.getSettings()}
+                    updateSettings={(data) => voiceSettingsApi.updateSettings(data)}
+                    getAvailableVoices={() => voiceSettingsApi.getAvailableVoices()}
+                    previewVoice={(voiceId, text) => voiceSettingsApi.previewVoice(voiceId, text)}
+                  />
+                  {aiMessages.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearAiSession}
+                      className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
+                    >
+                      Xoá lịch sử
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {/* Messages */}
@@ -1604,18 +1670,40 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ))}
                 </div>
                 <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={aiQuestion}
-                    onChange={e => setAiQuestion(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
-                    placeholder={AI_MODES.find(m => m.key === aiMode)?.placeholder ?? 'Đặt câu hỏi...'}
-                    disabled={aiLoading}
-                    className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
-                  />
+                  <div className="flex-1 flex gap-2">
+                    {isRecording ? (
+                      <button
+                        onClick={stopRecording}
+                        className="flex-1 h-12 flex items-center justify-center gap-2 bg-rose-500 text-white rounded-2xl text-xs font-black uppercase tracking-wide animate-pulse"
+                      >
+                        <Square size={14} fill="white" />
+                        Đang ghi âm...
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          disabled={aiLoading}
+                          onClick={() => void startRecording()}
+                          className="h-12 w-12 flex items-center justify-center bg-muted text-muted-foreground rounded-2xl hover:bg-primary-brand-light hover:text-primary-brand disabled:opacity-50 transition-all shrink-0"
+                          title="Nói với AI"
+                        >
+                          <Mic size={18} />
+                        </button>
+                        <input
+                          type="text"
+                          value={aiQuestion}
+                          onChange={e => setAiQuestion(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
+                          placeholder={AI_MODES.find(m => m.key === aiMode)?.placeholder ?? 'Đặt câu hỏi...'}
+                          disabled={aiLoading}
+                          className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
+                        />
+                      </>
+                    )}
+                  </div>
                   <Button
                     onClick={() => void handleAiAsk()}
-                    disabled={!aiQuestion.trim() || aiLoading}
+                    disabled={!aiQuestion.trim() || aiLoading || isRecording}
                     className="h-12 w-12 rounded-2xl bg-primary-brand hover:bg-primary-brand-dark text-white p-0 shadow-lg shadow-primary-brand/20 disabled:opacity-50 shrink-0"
                   >
                     {aiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
