@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '@/lib/redux/store';
 import { clearProfile } from '@/lib/redux/userSlice';
+import { setBrandColors } from '@shared/lib/redux/themeSlice';
 import { Button } from '@shared/components/ui/button';
 import {
   LayoutDashboard,
@@ -13,11 +15,11 @@ import {
   LogOut,
   BookOpen,
   Gamepad2,
-  Sparkles,
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
+import { LmsLogo } from '@shared/components/LmsLogo';
 import NotificationBell from '@/components/NotificationBell';
 import GlobalSearch from '@/components/GlobalSearch';
 import { SpaceProfileDropdown } from '@/components/layout/space-profile-dropdown';
@@ -40,6 +42,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  const brandColors = useSelector((state: RootState) => state.theme.brand);
+  const spaceThemeColor = useSelector((state: RootState) => state.space.themeColor);
+
+  // Sync space theme color → brand colors whenever it changes
+  useEffect(() => {
+    if (spaceThemeColor) {
+      dispatch(setBrandColors({ primaryColor: spaceThemeColor }));
+    }
+  }, [spaceThemeColor, dispatch]);
+
   const isAuthPage = pathname.includes('/space/login') || pathname.includes('/space/register');
 
   const handleLogout = () => {
@@ -56,11 +68,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside className={`bg-card dark:bg-card border-r border-border flex flex-col shadow-sm transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-72'}`}>
         {sidebarCollapsed ? (
-          <div className="flex flex-col items-center gap-3 pt-6 pb-2">
-            <Link href="/space" className="hover:scale-105 transition-transform">
-              <div className="w-10 h-10 bg-primary-brand rounded-xl flex items-center justify-center shadow-lg shadow-primary-brand/20">
-                <Sparkles size={22} className="text-white fill-white" />
-              </div>
+          <div className="flex flex-col items-center gap-3 pt-5 pb-2 px-2">
+            <Link href="/space" className="hover:opacity-80 transition-opacity" title="LMS System">
+              <LmsLogo
+                width={40}
+                height={40}
+                primaryColor={brandColors.primaryColor}
+                accentColor={brandColors.accentColor}
+                goldColor={brandColors.goldColor}
+              />
             </Link>
             <button
               onClick={() => setSidebarCollapsed(false)}
@@ -71,22 +87,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </button>
           </div>
         ) : (
-          <div className="p-6 pb-4 flex items-start justify-between">
-            <Link href="/space" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <div className="w-10 h-10 bg-primary-brand rounded-xl flex items-center justify-center shadow-lg shadow-primary-brand/20">
-                <Sparkles size={22} className="text-white fill-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-extrabold tracking-tight flex items-center gap-1.5 text-foreground">
-                  Space <span className="font-medium text-primary-brand">Admin</span>
-                </h1>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-0.5">LMS Management</p>
-              </div>
+          <div className="p-5 pb-4 flex items-center justify-between">
+            <Link href="/space" className="hover:opacity-80 transition-opacity flex-1 min-w-0">
+              <LmsLogo
+                height={38}
+                width="auto"
+                primaryColor={brandColors.primaryColor}
+                accentColor={brandColors.accentColor}
+                goldColor={brandColors.goldColor}
+                className="h-[38px] w-auto"
+              />
             </Link>
             <button
               onClick={() => setSidebarCollapsed(true)}
               title="Thu nhỏ menu"
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors mt-1"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors ml-2 shrink-0"
             >
               <ChevronsLeft size={16} />
             </button>

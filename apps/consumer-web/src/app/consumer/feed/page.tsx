@@ -92,7 +92,7 @@ export default function FeedPage() {
       {/* Top nav */}
       <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
         <div className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14">
-          <Image src="/logo.jpg" alt="LMS" width={80} height={28} className="h-7 w-auto object-contain cursor-pointer" onClick={() => router.push('/consumer/dashboard')} />
+          <Image src="/logo.svg" alt="LMS" width={80} height={28} className="h-7 w-auto object-contain cursor-pointer" onClick={() => router.push('/consumer/dashboard')} />
           <nav className="flex items-center gap-1">
             <button onClick={() => router.push('/consumer/dashboard')}
               className="flex flex-col items-center px-5 py-1 text-gray-400 hover:text-indigo-600 transition-colors">

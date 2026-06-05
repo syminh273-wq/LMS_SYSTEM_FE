@@ -100,7 +100,7 @@ export default function LoginPage() {
             <div className='relative z-10'>
               <div className="flex items-center gap-3 mb-16">
                 <div className="bg-white p-2 rounded-xl">
-                   <Image src="/logo.jpg" alt="EduSphere" width={28} height={28} />
+                   <Image src="/logo.svg" alt="EduSphere" width={28} height={28} />
                 </div>
                 <span className="text-2xl font-black tracking-tight">EduSphere</span>
               </div>

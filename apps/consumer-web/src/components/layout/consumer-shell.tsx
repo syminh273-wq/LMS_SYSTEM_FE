@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
 import type { RootState } from '@/lib/redux/store';
+import { setBrandColors } from '@shared/lib/redux/themeSlice';
 import { 
   Bell, 
   Search, 
@@ -29,6 +30,7 @@ import {
 } from "@shared/components/ui/dropdown-menu";
 import { ThemeToggle } from "@shared/components/ThemeToggle";
 import { MasterLayout, MasterHeader, MasterBody } from "@shared/components/layout/MasterLayout";
+import { LmsLogo } from "@shared/components/LmsLogo";
 
 interface ConsumerShellProps {
   children: React.ReactNode;
@@ -47,6 +49,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
   const dispatch = useDispatch();
   const [mounted, setMounted] = React.useState(false);
   const userProfile = useSelector((state: RootState) => state.user.profile);
+  const brandColors = useSelector((state: RootState) => state.theme.brand);
 
   React.useEffect(() => {
     setMounted(true);
@@ -78,12 +81,21 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
     <MasterLayout
       header={
         <MasterHeader>
-          <div className="flex items-center gap-10">
-            <Link href="/consumer/dashboard" className="flex items-center gap-2">
-              <span className="text-xl font-bold text-[#4F46E5] dark:text-white">EduFocus <span className="text-gray-900 dark:text-gray-300 font-medium">LMS</span></span>
+          <div className="flex items-center gap-8">
+            <Link href="/consumer/dashboard" className="flex items-center shrink-0">
+              <LmsLogo
+                height={36}
+                width="auto"
+                primaryColor={brandColors.primaryColor}
+                accentColor={brandColors.accentColor}
+                goldColor={brandColors.goldColor}
+                className="h-9 w-auto object-contain"
+              />
             </Link>
 
-            <nav className="hidden md:flex items-center gap-8">
+            <div className="h-6 w-px bg-gray-200 dark:bg-border" />
+
+            <nav className="hidden md:flex items-center gap-6">
               {navItems.map((item) => {
                 const isActive = pathname.startsWith(item.href);
                 return (
@@ -91,8 +103,8 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     key={item.href}
                     href={item.href}
                     className={`text-sm font-semibold transition-colors relative py-5 ${
-                      isActive 
-                        ? 'text-[#4F46E5] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#4F46E5]' 
+                      isActive
+                        ? 'text-[#1a3a7a] dark:text-[#93c5fd] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#1a3a7a] dark:after:bg-[#93c5fd]'
                         : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
                     }`}
                   >

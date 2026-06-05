@@ -250,7 +250,7 @@ export default function ClassroomPage() {
             </svg>
           </button>
           <div className="flex min-w-0 items-center gap-2 cursor-pointer" onClick={() => router.push('/consumer')}>
-            <Image src="/logo.jpg" alt="LMS LOGO" width={100} height={35} className="h-8 w-auto object-contain" />
+            <Image src="/logo.svg" alt="LMS LOGO" width={100} height={35} className="h-8 w-auto object-contain" />
             <span className="truncate text-xl font-medium text-gray-700">Classroom</span>
           </div>
         </div>
