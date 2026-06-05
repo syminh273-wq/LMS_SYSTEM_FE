@@ -2,28 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BookOpen } from 'lucide-react';
 import Image from 'next/image';
 import { accountService } from '@/lib/api/account';
-import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
 import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
 
 const MOCK_GRADES = [
-  { course: 'Web Development 101', assignment: 'Final Project', score: 95, total: 100, date: '2024-05-10', color: 'bg-[#4F46E5]' },
-  { course: 'Advanced React Patterns', assignment: 'Midterm Exam', score: 88, total: 100, date: '2024-05-08', color: 'bg-[#4F46E5]' },
-  { course: 'Data Structures & Algorithms', assignment: 'Homework #4', score: 42, total: 50, date: '2024-05-05', color: 'bg-red-500' },
-  { course: 'UI/UX Design Systems', assignment: 'Design Audit', score: 10, total: 10, date: '2024-05-01', color: 'bg-[#4F46E5]' },
+  { course: 'Web Development 101', assignment: 'Final Project', score: 95, total: 100, date: '2024-05-10' },
+  { course: 'Advanced React Patterns', assignment: 'Midterm Exam', score: 88, total: 100, date: '2024-05-08' },
+  { course: 'Data Structures & Algorithms', assignment: 'Homework #4', score: 42, total: 50, date: '2024-05-05' },
+  { course: 'UI/UX Design Systems', assignment: 'Design Audit', score: 10, total: 10, date: '2024-05-01' },
 ];
 
 const MOCK_STATS = [
-  { label: 'GPA', value: '3.8', icon: '🎓', color: 'bg-indigo-50 text-indigo-600', subLabel: 'Academic Performance' },
-  { label: 'Courses', value: '4', icon: '📚', color: 'bg-emerald-50 text-emerald-600', subLabel: 'Active Enrolled' },
-  { label: 'Assignments', value: '12', icon: '📝', color: 'bg-violet-50 text-violet-600', subLabel: 'Tasks to Complete' },
-  { label: 'Attendance', value: '98%', icon: '⏰', color: 'bg-rose-50 text-rose-600', subLabel: 'Session Presence' },
+  { label: 'GPA', value: '3.8', icon: '🎓', color: 'text-blue-600' },
+  { label: 'Courses', value: '4', icon: '📚', color: 'text-green-600' },
+  { label: 'Assignments', value: '12', icon: '📝', color: 'text-purple-600' },
+  { label: 'Attendance', value: '98%', icon: '⏰', color: 'text-orange-600' },
 ];
 
 export default function DashboardPage() {
   const router = useRouter();
+  // Use null = loading, false = not auth, true = auth
+  // Start null to avoid SSR/client mismatch
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userProfile, setUserProfile] = useState<{ full_name: string; email: string; avatar_url: string; username: string } | null>(null);
@@ -43,133 +43,105 @@ export default function DashboardPage() {
 
   const displayName = userProfile?.full_name || userProfile?.username || 'User';
 
+  // Wait for client mount to avoid hydration mismatch
   if (!mounted || !isAuthenticated) return null;
 
   return (
-    <div className="p-10 animate-in fade-in duration-500">
-      <div className="max-w-7xl mx-auto space-y-10">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">
-              Welcome back, {displayName.split(' ')[0]}! 👋
-            </h1>
-            <p className="text-gray-500 dark:text-gray-400 font-medium mt-2">
-              You have <span className="text-[#4F46E5] font-bold">2 assignments</span> due this week. Stay focused!
-            </p>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <header className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="cursor-pointer" onClick={() => router.push('/consumer/dashboard')}>
+              <Image src="/logo.jpg" alt="LMS LOGO" width={120} height={40} className="h-12 w-auto object-contain" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight">Dashboard</h1>
+              <p className="text-gray-600 text-sm">Xin chào, {displayName}! 👋</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/consumer/classroom')}
-              className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 transition-all shadow-xl shadow-[#4F46E5]/20 active:scale-[0.98]"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
             >
-              <BookOpen size={18} />
-              Enter Classroom
+              Vào lớp học
             </button>
-            <ConsumerProfileDropdown />
+
+            <ConsumerProfileDropdown profile={userProfile} />
           </div>
         </header>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {MOCK_STATS.map((stat) => (
-            <div key={stat.label} className="bg-white dark:bg-card p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-border flex items-center gap-5 transition-transform hover:scale-[1.02]">
-              <div className={`w-14 h-14 rounded-2xl ${stat.color} flex items-center justify-center text-2xl shadow-sm`}>
-                {stat.icon}
-              </div>
+            <div key={stat.label} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+              <div className="text-4xl">{stat.icon}</div>
               <div>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{stat.label}</p>
-                </div>
-                <p className="text-3xl font-black text-gray-900 dark:text-white mt-1 leading-none">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Grades Table */}
-        <Card className="rounded-[32px] border-gray-100 dark:border-border shadow-sm overflow-hidden bg-white dark:bg-card">
-          <CardHeader className="p-8 pb-4 flex flex-row items-center justify-between border-b border-gray-50 dark:border-border/50 mb-4">
-            <CardTitle className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Recent Grades</CardTitle>
-            <button className="text-[10px] font-black text-[#4F46E5] uppercase tracking-widest hover:underline">View All Report</button>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                  <tr>
-                    <th className="px-8 py-4">Course</th>
-                    <th className="px-8 py-4">Assignment</th>
-                    <th className="px-8 py-4">Score</th>
-                    <th className="px-8 py-4">Date</th>
-                    <th className="px-8 py-4 text-right">Progress</th>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="text-xl font-bold text-gray-900">Recent Grades</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-gray-50 text-gray-600 text-sm uppercase font-semibold">
+                <tr>
+                  <th className="px-6 py-4">Course</th>
+                  <th className="px-6 py-4">Assignment</th>
+                  <th className="px-6 py-4">Score</th>
+                  <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4 text-right">Progress</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {MOCK_GRADES.map((grade, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-gray-900">{grade.course}</td>
+                    <td className="px-6 py-4 text-gray-600">{grade.assignment}</td>
+                    <td className="px-6 py-4">
+                      <span className="font-bold text-indigo-600">{grade.score}</span>
+                      <span className="text-gray-400"> / {grade.total}</span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 text-sm">{grade.date}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="w-24 bg-gray-200 rounded-full h-2 inline-block">
+                        <div
+                          className="bg-indigo-600 h-2 rounded-full"
+                          style={{ width: `${(grade.score / grade.total) * 100}%` }}
+                        ></div>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50 dark:divide-border/50">
-                  {MOCK_GRADES.map((grade, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50/50 dark:hover:bg-muted/50 transition-colors group">
-                      <td className="px-8 py-6">
-                        <p className="font-bold text-gray-900 dark:text-white">{grade.course}</p>
-                      </td>
-                      <td className="px-8 py-6">
-                        <p className="text-sm text-gray-500 font-medium">{grade.assignment}</p>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-baseline">
-                          <span className={`text-lg font-black ${grade.score < 50 ? 'text-red-500' : 'text-[#4F46E5]'}`}>{grade.score}</span>
-                          <span className="text-gray-300 dark:text-gray-600 font-bold text-xs ml-1">/ {grade.total}</span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <p className="text-sm text-gray-400 font-bold">{grade.date}</p>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="flex justify-end">
-                          <div className="w-32 bg-gray-100 dark:bg-muted rounded-full h-1.5 overflow-hidden">
-                            <div
-                              className={`${grade.color} h-full rounded-full transition-all duration-1000`}
-                              style={{ width: `${(grade.score / grade.total) * 100}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Charts Mockup Placeholder */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card className="rounded-[32px] border-gray-100 dark:border-border p-8 bg-white dark:bg-card">
-            <h3 className="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-1">Performance Over Time</h3>
-            <p className="text-xs text-gray-400 font-medium mb-8 uppercase tracking-widest">Semester cumulative grade average</p>
-            <div className="h-64 flex flex-col items-center justify-center text-gray-300 gap-4">
-              <div className="flex items-end gap-2 h-32">
-                {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
-                  <div key={i} className="w-8 bg-[#4F46E5]/10 group relative">
-                    <div 
-                      className="absolute bottom-0 left-0 right-0 bg-[#4F46E5] opacity-80 group-hover:opacity-100 transition-all rounded-t-sm" 
-                      style={{ height: `${h}%` }}
-                    />
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs font-bold uppercase tracking-widest">Performance visualization would go here</p>
-            </div>
-          </Card>
-          
-          <Card className="rounded-[32px] border-gray-100 dark:border-border p-8 bg-white dark:bg-card">
-            <h3 className="text-lg font-black text-gray-900 dark:text-white tracking-tight mb-1">Course Distribution</h3>
-            <p className="text-xs text-gray-400 font-medium mb-8 uppercase tracking-widest">Time allocation per subject</p>
-            <div className="h-64 flex flex-col items-center justify-center text-gray-300 gap-4">
-               <div className="w-32 h-32 rounded-full border-[12px] border-gray-100 relative">
-                  <div className="absolute inset-0 border-[12px] border-[#4F46E5] border-t-transparent border-r-transparent rounded-full rotate-45" />
-               </div>
-               <p className="text-xs font-bold uppercase tracking-widest">Course distribution would go here</p>
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64 flex flex-col items-center justify-center text-gray-400">
+            <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <p className="font-medium">Performance Over Time</p>
+            <p className="text-sm">Chart visualization would go here</p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-64 flex flex-col items-center justify-center text-gray-400">
+            <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+            </svg>
+            <p className="font-medium">Course Distribution</p>
+            <p className="text-sm">Chart visualization would go here</p>
+          </div>
         </div>
       </div>
     </div>

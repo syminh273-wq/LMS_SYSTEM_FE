@@ -18,9 +18,9 @@ import {
   ChevronsRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
-import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import NotificationBell from '@/components/NotificationBell';
 import GlobalSearch from '@/components/GlobalSearch';
+import { SpaceProfileDropdown } from '@/components/layout/space-profile-dropdown';
 
 const navItems = [
   { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
@@ -149,15 +149,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
             <NotificationBell />
 
-            <div className="flex items-center gap-3 pl-6 border-l border-border">
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-foreground leading-none">Admin User</p>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase mt-1 tracking-wider">System Admin</p>
-              </div>
-              <Avatar className="h-10 w-10 border-2 border-muted shadow-sm">
-                <AvatarImage src="https://github.com/shadcn.png" alt="Admin" />
-                <AvatarFallback>AD</AvatarFallback>
-              </Avatar>
+            <div className="pl-6 border-l border-border">
+              <SpaceProfileDropdown />
             </div>
           </div>
         </header>

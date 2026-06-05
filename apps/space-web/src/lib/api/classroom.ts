@@ -9,6 +9,7 @@ import type {
   SharingLink,
   ActivityLog,
   StudentPublicProfile,
+  BlacklistEntry,
 } from './types';
 
 export class ClassroomApiClient extends BaseRestApiClient {
@@ -66,6 +67,32 @@ export class ClassroomApiClient extends BaseRestApiClient {
 
   public async getStudentPublicProfile(consumerUid: string): Promise<StudentPublicProfile> {
     return this.get(`/api/v1/consumer/account/profile/${consumerUid}/public/`);
+  }
+
+  // ── Classroom blacklist ────────────────────────────────────────────────────
+  public async listClassroomBlacklist(uid: string): Promise<BlacklistEntry[]> {
+    return this.get<BlacklistEntry[]>(`/api/v1/space/course/classrooms/${uid}/blacklist/`);
+  }
+
+  public async addClassroomBlacklist(uid: string, consumer_uid: string, reason = ''): Promise<BlacklistEntry> {
+    return this.post<BlacklistEntry>(`/api/v1/space/course/classrooms/${uid}/blacklist/`, { consumer_uid, reason });
+  }
+
+  public async removeClassroomBlacklist(uid: string, consumer_uid: string): Promise<void> {
+    return super.delete(`/api/v1/space/course/classrooms/${uid}/blacklist/${consumer_uid}/`);
+  }
+
+  // ── Global blacklist (all classrooms by this teacher) ─────────────────────
+  public async listGlobalBlacklist(): Promise<BlacklistEntry[]> {
+    return this.get<BlacklistEntry[]>('/api/v1/space/course/blacklist/');
+  }
+
+  public async addGlobalBlacklist(consumer_uid: string, reason = ''): Promise<BlacklistEntry> {
+    return this.post<BlacklistEntry>('/api/v1/space/course/blacklist/', { consumer_uid, reason });
+  }
+
+  public async removeGlobalBlacklist(consumer_uid: string): Promise<void> {
+    return super.delete(`/api/v1/space/course/blacklist/${consumer_uid}/`);
   }
 
   // Consumer side

@@ -2,19 +2,23 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { 
-  Building2, 
-  ShieldCheck, 
-  Settings2, 
-  Bell, 
-  Save, 
-  Upload, 
-  Globe, 
+import {
+  Building2,
+  ShieldCheck,
+  Settings2,
+  Bell,
+  Save,
+  Upload,
+  Globe,
   Palette,
   Camera,
   Lock,
   Users,
-  Check
+  Check,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Loader2,
 } from 'lucide-react';
 import { 
   Card, 
@@ -28,11 +32,15 @@ import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
 import { spaceApi } from '@/lib/api';
+import { accountService } from '@/lib/api/account';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSettings as setGlobalSettings, setThemeColor as setGlobalThemeColor } from '@/lib/redux/spaceSlice';
 
 type SettingSection = 'profile' | 'security' | 'classrooms' | 'notifications';
+
+type PasswordForm = { current_password: string; new_password: string; confirm_password: string };
+const EMPTY_PASSWORD: PasswordForm = { current_password: '', new_password: '', confirm_password: '' };
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
@@ -40,6 +48,12 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [themeColor, setThemeColor] = useState('#4f46e5');
+
+  const [passwordForm, setPasswordForm] = useState<PasswordForm>(EMPTY_PASSWORD);
+  const [pwVisible, setPwVisible] = useState({ current_password: false, new_password: false, confirm_password: false });
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwSuccess, setPwSuccess] = useState('');
+  const [pwError, setPwError] = useState('');
   
   const [settings, setSettings] = useState<Record<string, any>>({
     space_profile: {},
@@ -103,6 +117,26 @@ export default function SettingsPage() {
         [key]: value
       }
     }));
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError('');
+    setPwSuccess('');
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      setPwError('Mật khẩu xác nhận không khớp.');
+      return;
+    }
+    setPwLoading(true);
+    try {
+      await accountService.changePassword(passwordForm);
+      setPwSuccess('Đổi mật khẩu thành công!');
+      setPasswordForm(EMPTY_PASSWORD);
+    } catch (err: unknown) {
+      setPwError(err instanceof Error ? err.message : 'Không thể đổi mật khẩu. Vui lòng kiểm tra lại.');
+    } finally {
+      setPwLoading(false);
+    }
   };
 
   const menuItems = [
@@ -310,13 +344,13 @@ export default function SettingsPage() {
                   <div className="space-y-4 pt-4">
                     <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block">Mã tham gia mặc định (Join Code)</Label>
                     <div className="flex gap-4">
-                      <Input 
-                        value={settings.security_config?.join_code || ''} 
+                      <Input
+                        value={settings.security_config?.join_code || ''}
                         onChange={(e) => updateSetting('security_config', 'join_code', e.target.value)}
-                        className="h-12 rounded-xl bg-muted/30 font-mono font-bold tracking-widest text-center" 
+                        className="h-12 rounded-xl bg-muted/30 font-mono font-bold tracking-widest text-center"
                       />
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => updateSetting('security_config', 'join_code', 'SPACE-' + Math.floor(100 + Math.random() * 900))}
                         className="h-12 px-6 rounded-xl font-bold uppercase text-xs tracking-widest border-border"
                       >
@@ -326,8 +360,8 @@ export default function SettingsPage() {
                   </div>
                 </CardContent>
                 <div className="p-6 bg-muted/20 border-t border-border flex justify-end">
-                  <Button 
-                    onClick={handleSave} 
+                  <Button
+                    onClick={handleSave}
                     disabled={isSaving}
                     className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
                   >
@@ -335,6 +369,82 @@ export default function SettingsPage() {
                     Lưu bảo mật
                   </Button>
                 </div>
+              </Card>
+
+              {/* Change Password Card */}
+              <Card className="border-border rounded-3xl shadow-sm">
+                <CardHeader className="bg-muted/30 pb-6 border-b border-border/50">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary-brand-light flex items-center justify-center text-primary-brand">
+                      <KeyRound size={24} />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl font-bold">Đổi mật khẩu</CardTitle>
+                      <CardDescription className="font-medium">Cập nhật mật khẩu đăng nhập của bạn</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <form onSubmit={handleChangePassword} className="space-y-5">
+                    {(['current_password', 'new_password', 'confirm_password'] as const).map((field) => {
+                      const labels = {
+                        current_password: 'Mật khẩu hiện tại',
+                        new_password: 'Mật khẩu mới',
+                        confirm_password: 'Xác nhận mật khẩu mới',
+                      };
+                      return (
+                        <div key={field} className="space-y-2">
+                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                            {labels[field]}
+                          </Label>
+                          <div className="relative">
+                            <input
+                              type={pwVisible[field] ? 'text' : 'password'}
+                              value={passwordForm[field]}
+                              onChange={(e) => {
+                                setPasswordForm(prev => ({ ...prev, [field]: e.target.value }));
+                                setPwError('');
+                                setPwSuccess('');
+                              }}
+                              required
+                              className="w-full h-12 rounded-xl bg-muted/30 border border-border px-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-primary-brand/20 focus:bg-card transition-all"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setPwVisible(prev => ({ ...prev, [field]: !prev[field] }))}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                              {pwVisible[field] ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {pwError && (
+                      <p className="text-sm text-destructive font-medium bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
+                        {pwError}
+                      </p>
+                    )}
+                    {pwSuccess && (
+                      <p className="text-sm text-emerald-600 font-medium bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                        <Check size={16} />
+                        {pwSuccess}
+                      </p>
+                    )}
+
+                    <div className="flex justify-end pt-2">
+                      <Button
+                        type="submit"
+                        disabled={pwLoading}
+                        className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
+                      >
+                        {pwLoading ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={16} />}
+                        Đổi mật khẩu
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
               </Card>
             </div>
           )}

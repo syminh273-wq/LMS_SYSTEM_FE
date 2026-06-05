@@ -6,6 +6,7 @@ import {
   ArrowLeft, BarChart2, ClipboardCheck, Loader2,
   MapPin, Globe, Github, Facebook, Linkedin, Twitter, Instagram,
   ExternalLink, UserX, TrendingUp, CheckCircle2, Clock, AlertCircle,
+  ShieldBan, ChevronDown,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
@@ -33,10 +34,12 @@ export default function StudentDetailsPage({
   const { uid, memberId } = use(params);
   const router = useRouter();
 
-  const [member, setMember]   = useState<ClassroomMember | null>(null);
-  const [records, setRecords] = useState<StudentExamRecord[]>([]);
-  const [profile, setProfile] = useState<StudentPublicProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [member, setMember]     = useState<ClassroomMember | null>(null);
+  const [records, setRecords]   = useState<StudentExamRecord[]>([]);
+  const [profile, setProfile]   = useState<StudentPublicProfile | null>(null);
+  const [loading, setLoading]   = useState(true);
+  const [blockMenu, setBlockMenu] = useState(false);
+  const [blocking, setBlocking] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -73,6 +76,35 @@ export default function StudentDetailsPage({
     if (!r.submission?.submitted_at || !r.exam.due_date) return false;
     return new Date(r.submission.submitted_at) <= new Date(r.exam.due_date);
   }).length;
+
+  const handleKick = async () => {
+    try {
+      await spaceApi.classrooms.kickMember(uid, memberId);
+      toast.success('Đã kick sinh viên khỏi lớp.');
+      router.push(`/space/classrooms/${uid}/details?tab=students`);
+    } catch {
+      toast.error('Không thể kick sinh viên.');
+    }
+  };
+
+  const handleBlock = async (scope: 'classroom' | 'global') => {
+    setBlocking(true);
+    setBlockMenu(false);
+    try {
+      if (scope === 'classroom') {
+        await spaceApi.classrooms.addClassroomBlacklist(uid, memberId);
+        toast.success('Đã chặn sinh viên khỏi lớp này.');
+      } else {
+        await spaceApi.classrooms.addGlobalBlacklist(memberId);
+        toast.success('Đã chặn sinh viên trên toàn bộ lớp học.');
+      }
+      router.push(`/space/classrooms/${uid}/details?tab=students`);
+    } catch {
+      toast.error('Không thể chặn sinh viên.');
+    } finally {
+      setBlocking(false);
+    }
+  };
 
   const gradient = THEME_GRADIENT[profile?.theme_color ?? 'indigo'] ?? THEME_GRADIENT.indigo;
   const meta      = profile?.metadata ?? {};
@@ -133,9 +165,32 @@ export default function StudentDetailsPage({
                 onClick={() => router.push(`/space/classrooms/${uid}/students/${memberId}/analyze`)}>
                 <BarChart2 size={14} /> Phân tích
               </Button>
-              <Button variant="outline" size="sm" className="rounded-xl gap-2 text-xs font-bold text-rose-500 hover:text-rose-600 hover:border-rose-300">
+              <Button variant="outline" size="sm"
+                className="rounded-xl gap-2 text-xs font-bold text-rose-500 hover:text-rose-600 hover:border-rose-300"
+                onClick={handleKick}>
                 <UserX size={14} /> Kick
               </Button>
+              <div className="relative">
+                <Button variant="outline" size="sm" disabled={blocking}
+                  className="rounded-xl gap-1 text-xs font-bold text-orange-500 hover:text-orange-600 hover:border-orange-300"
+                  onClick={() => setBlockMenu(v => !v)}>
+                  <ShieldBan size={14} /> Chặn <ChevronDown size={12} />
+                </Button>
+                {blockMenu && (
+                  <div className="absolute right-0 top-full mt-1 z-50 min-w-[180px] rounded-xl border border-border bg-card shadow-lg overflow-hidden">
+                    <button
+                      className="w-full px-4 py-2.5 text-left text-xs font-bold hover:bg-muted transition-colors"
+                      onClick={() => handleBlock('classroom')}>
+                      Chặn khỏi lớp này
+                    </button>
+                    <button
+                      className="w-full px-4 py-2.5 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                      onClick={() => handleBlock('global')}>
+                      Chặn toàn bộ lớp học
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

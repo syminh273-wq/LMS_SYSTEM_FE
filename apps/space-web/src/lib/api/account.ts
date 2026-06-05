@@ -7,6 +7,12 @@ export interface UpdateProfileData {
   avatar_url?: string;
 }
 
+export interface ChangePasswordData {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
 export type UserProfile = Consumer;
 
 export type UpdateProfileResponse = ApiMessageResponse & {
@@ -23,8 +29,11 @@ class AccountService extends BaseRestApiClient {
   }
 
   public async updateProfile(data: UpdateProfileData | FormData): Promise<UpdateProfileResponse> {
-    // Note: Space update might need different logic if we use a different endpoint
     return this.put('/api/v1/space/account/spaces/mine/', data);
+  }
+
+  public async changePassword(data: ChangePasswordData): Promise<ApiMessageResponse> {
+    return this.post('/api/v1/space/account/spaces/change-password/', data);
   }
 }
 

@@ -4,8 +4,8 @@ import * as React from 'react';
 import { useState, useEffect, useCallback, use, useRef } from 'react';
 import { usePendingRealtime } from '@/lib/hooks/use-pending-realtime';
 import { useRouter } from 'next/navigation';
-import { spaceApi, SharingLink, Classroom, Exam, voiceSettingsApi } from '@/lib/api';
-import type { ClassroomMember, StudentExamRecord, ActivityLog } from '@/lib/api/types';
+import { spaceApi, SharingLink, Classroom, Exam, userSettingsApi } from '@/lib/api';
+import type { ClassroomMember, StudentExamRecord, ActivityLog, BlacklistEntry } from '@/lib/api/types';
 import {
   QrCode,
   Download,
@@ -66,6 +66,8 @@ import {
   GraduationCap,
   CheckCircle2,
   Clock as ClockIcon,
+  ShieldBan,
+  ShieldOff,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
@@ -169,12 +171,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
+  const [blacklist, setBlacklist] = useState<BlacklistEntry[]>([]);
+  const [loadingBlacklist, setLoadingBlacklist] = useState(false);
+  const [unblockingId, setUnblockingId] = useState<string | null>(null);
   const [pendingMembers, setPendingMembers] = useState<ClassroomMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [loadingPending, setLoadingPending] = useState(false);
   const [kickingId, setKickingId] = useState<string | null>(null);
+  const [blockingMemberId, setBlockingMemberId] = useState<string | null>(null);
+  const [memberToBlock, setMemberToBlock] = useState<{ member: ClassroomMember; scope: 'classroom' | 'global' } | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [memberToKick, setMemberToKick] = useState<ClassroomMember | null>(null);
@@ -274,7 +281,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai' || tab === 'blacklist') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
       setActiveTab(tab);
     }
@@ -379,6 +386,25 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       .finally(() => setLoadingMembers(false));
   }, [activeTab, uid]);
 
+  useEffect(() => {
+    if (activeTab !== 'blacklist') return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
+    setLoadingBlacklist(true);
+    Promise.all([
+      spaceApi.classrooms.listClassroomBlacklist(uid),
+      spaceApi.classrooms.listGlobalBlacklist(),
+    ])
+      .then(([classroomEntries, globalEntries]) => {
+        // Merge: nếu cùng consumer_uid xuất hiện ở cả 2, global ưu tiên
+        const map = new Map<string, typeof classroomEntries[0]>();
+        for (const e of classroomEntries) map.set(e.consumer_uid, e);
+        for (const e of globalEntries)    map.set(e.consumer_uid, e); // global ghi đè
+        setBlacklist(Array.from(map.values()));
+      })
+      .catch(() => toast.error('Không thể tải danh sách chặn'))
+      .finally(() => setLoadingBlacklist(false));
+  }, [activeTab, uid]);
+
   const loadPendingMembers = useCallback(() => {
     setLoadingPending(true);
     spaceApi.classrooms.pendingMembers(uid)
@@ -439,6 +465,28 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       toast.error(err instanceof Error ? err.message : 'Không thể kick sinh viên');
     } finally {
       setKickingId(null);
+    }
+  };
+
+  const handleBlockConfirm = async () => {
+    if (!memberToBlock) return;
+    const { member, scope } = memberToBlock;
+    setBlockingMemberId(member.member_id);
+    try {
+      if (scope === 'global') {
+        await spaceApi.classrooms.addGlobalBlacklist(member.member_id);
+        toast.success(`Đã chặn toàn cục "${member.member_name}"`);
+      } else {
+        await spaceApi.classrooms.addClassroomBlacklist(uid, member.member_id);
+        toast.success(`Đã chặn "${member.member_name}" khỏi lớp này`);
+      }
+      try { await spaceApi.classrooms.kickMember(uid, member.member_id); } catch { /* already kicked */ }
+      setMembers(prev => prev.filter(m => m.member_id !== member.member_id));
+      setMemberToBlock(null);
+    } catch {
+      toast.error('Không thể chặn sinh viên.');
+    } finally {
+      setBlockingMemberId(null);
     }
   };
 
@@ -1055,7 +1103,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 { id: 'exams',    label: 'Bài tập',       icon: ClipboardList },
                 { id: 'final_exams', label: 'Kì Thi',           icon: BarChart2 },
                 { id: 'quiz',     label: 'Quizz Game',     icon: Gamepad2 },
-                { id: 'students', label: 'Danh sách sinh viên', icon: Users },
+                { id: 'students',  label: 'Danh sách sinh viên', icon: Users },
+                { id: 'blacklist', label: 'Danh sách chặn',      icon: ShieldBan },
               ] as const).map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === id;
                 return (
@@ -1191,6 +1240,26 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         {members.filter(m => m.role === 'student').length > 0 && (
                           <span className="ml-auto text-[10px] font-black bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
                             {members.filter(m => m.role === 'student').length}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })()}
+                  {(() => {
+                    const isActive = activeTab === 'blacklist';
+                    return (
+                      <button
+                        onClick={() => setActiveTab('blacklist')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
+                        <ShieldBan size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        Danh sách chặn
+                        {blacklist.length > 0 && (
+                          <span className="ml-auto text-[10px] font-black bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">
+                            {blacklist.length}
                           </span>
                         )}
                       </button>
@@ -1546,10 +1615,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <VoiceSettingsDialog
-                    getSettings={() => voiceSettingsApi.getSettings()}
-                    updateSettings={(data) => voiceSettingsApi.updateSettings(data)}
-                    getAvailableVoices={() => voiceSettingsApi.getAvailableVoices()}
-                    previewVoice={(voiceId, text) => voiceSettingsApi.previewVoice(voiceId, text)}
+                    getSettings={() => userSettingsApi.getSettings()}
+                    updateSettings={(data) => userSettingsApi.updateSettings(data)}
+                    getAvailableVoices={() => userSettingsApi.getAvailableVoices()}
+                    previewVoice={(voiceId, text) => userSettingsApi.previewVoice(voiceId, text)}
                   />
                   {aiMessages.length > 0 && (
                     <Button
@@ -2239,6 +2308,113 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             </div>
           )}
 
+          {activeTab === 'blacklist' && (
+            <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+              <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+                <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">Danh sách chặn</h3>
+                    <p className="text-sm text-muted-foreground font-medium mt-1">
+                      {loadingBlacklist ? 'Đang tải...' : (
+                        <>
+                          {blacklist.filter(e => e.scope === 'classroom').length} chặn lớp này
+                          {' · '}
+                          {blacklist.filter(e => e.scope === 'global').length} chặn toàn cục
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-10">
+                  {loadingBlacklist ? (
+                    <div className="flex items-center justify-center h-40 text-muted-foreground">
+                      <Loader2 size={32} className="animate-spin" />
+                    </div>
+                  ) : blacklist.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                      <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
+                        <ShieldBan size={24} className="opacity-40" />
+                      </div>
+                      <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có ai bị chặn</p>
+                      <p className="text-xs font-medium mt-1">Dùng nút Chặn trong trang chi tiết sinh viên để thêm</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-sm">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-border text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                            <th className="px-6 py-4">Người dùng</th>
+                            <th className="px-6 py-4">Lý do</th>
+                            <th className="px-6 py-4">Ngày chặn</th>
+                            <th className="px-6 py-4 text-right">Hành động</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {blacklist.map(entry => (
+                            <tr key={entry.consumer_uid} className="border-b border-border last:border-0 hover:bg-rose-50/20 transition-colors">
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${entry.scope === 'global' ? 'bg-rose-100' : 'bg-orange-100'}`}>
+                                    <ShieldBan size={16} className={entry.scope === 'global' ? 'text-rose-500' : 'text-orange-500'} />
+                                  </div>
+                                  <div>
+                                    <div className="text-xs font-black text-foreground font-mono">{entry.consumer_uid.slice(0, 8)}…</div>
+                                    <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${
+                                      entry.scope === 'global'
+                                        ? 'bg-rose-100 text-rose-600'
+                                        : 'bg-orange-100 text-orange-600'
+                                    }`}>
+                                      {entry.scope === 'global' ? '🌐 Toàn cục' : '🏫 Lớp này'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-xs text-muted-foreground max-w-xs">
+                                {entry.reason || <span className="italic opacity-50">Không có lý do</span>}
+                              </td>
+                              <td className="px-6 py-4 text-xs font-bold text-muted-foreground">
+                                {entry.created_at ? new Date(entry.created_at).toLocaleDateString('vi-VN') : '—'}
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={unblockingId === entry.consumer_uid}
+                                  className="rounded-xl gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:border-emerald-300"
+                                  onClick={async () => {
+                                    setUnblockingId(entry.consumer_uid);
+                                    try {
+                                      if (entry.scope === 'global') {
+                                        await spaceApi.classrooms.removeGlobalBlacklist(entry.consumer_uid);
+                                      } else {
+                                        await spaceApi.classrooms.removeClassroomBlacklist(uid, entry.consumer_uid);
+                                      }
+                                      setBlacklist(prev => prev.filter(e => e.consumer_uid !== entry.consumer_uid));
+                                      toast.success('Đã hủy chặn thành công.');
+                                    } catch {
+                                      toast.error('Không thể hủy chặn.');
+                                    } finally {
+                                      setUnblockingId(null);
+                                    }
+                                  }}
+                                >
+                                  {unblockingId === entry.consumer_uid
+                                    ? <Loader2 size={13} className="animate-spin" />
+                                    : <ShieldOff size={13} />}
+                                  Hủy chặn
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'students' && (
             <div className="flex flex-col gap-6 animate-in fade-in duration-300">
               <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
@@ -2305,7 +2481,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                       : <MoreVertical size={16} />}
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-44">
+                                <DropdownMenuContent align="end" className="w-52">
                                   <DropdownMenuItem onClick={() => router.push(`/space/classrooms/${uid}/students/${member.member_id}`)}>
                                     <ClipboardCheck size={14} className="mr-2" />
                                     Chi tiết
@@ -2318,6 +2494,20 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   <DropdownMenuItem variant="destructive" onClick={() => setMemberToKick(member)}>
                                     <UserX size={14} className="mr-2" />
                                     Kick
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() => setMemberToBlock({ member, scope: 'classroom' })}
+                                  >
+                                    <ShieldBan size={14} className="mr-2" />
+                                    Chặn lớp này
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() => setMemberToBlock({ member, scope: 'global' })}
+                                  >
+                                    <ShieldBan size={14} className="mr-2" />
+                                    Chặn toàn cục
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -2374,52 +2564,136 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         />
       )}
 
+      {/* ── Kick dialog ── */}
       <Dialog open={!!memberToKick} onOpenChange={(open) => { if (!open) setMemberToKick(null); }}>
-        <DialogContent showCloseButton={false} className="max-w-sm rounded-[24px] p-0 overflow-hidden">
-          <DialogHeader className="p-8 pb-4">
-            <div className="flex items-center gap-4 mb-4">
-              {memberToKick?.member_avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={memberToKick.member_avatar}
-                  alt={memberToKick.member_name}
-                  className="w-14 h-14 rounded-2xl object-cover border border-border"
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 font-black text-xl">
-                  {memberToKick?.member_name.charAt(0).toUpperCase()}
+        <DialogContent showCloseButton={false} className="max-w-sm rounded-[28px] p-0 overflow-hidden border-0 shadow-2xl">
+          {/* Header strip */}
+          <div className="relative bg-gradient-to-br from-rose-500 to-rose-700 px-8 pt-8 pb-12">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
+            <div className="relative flex flex-col items-center gap-3 text-center">
+              <div className="relative">
+                {memberToKick?.member_avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={memberToKick.member_avatar} alt={memberToKick.member_name}
+                    className="w-20 h-20 rounded-2xl object-cover border-4 border-white/30 shadow-xl" />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-white/20 border-4 border-white/30 flex items-center justify-center text-white font-black text-3xl shadow-xl">
+                    {memberToKick?.member_name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute -bottom-3 -right-3 w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-lg">
+                  <UserX size={16} className="text-rose-600" />
                 </div>
-              )}
-              <div>
-                <DialogTitle className="text-base font-black text-foreground">
-                  {memberToKick?.member_name}
-                </DialogTitle>
-                <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Sinh viên</p>
+              </div>
+              <div className="text-white mt-1">
+                <DialogTitle className="text-lg font-black text-white">{memberToKick?.member_name}</DialogTitle>
+                <p className="text-xs font-bold text-white/60 uppercase tracking-widest mt-0.5">Sinh viên</p>
               </div>
             </div>
-            <DialogDescription className="text-sm text-muted-foreground font-medium leading-relaxed">
-              Bạn có chắc muốn <span className="font-black text-rose-600">kick</span> sinh viên này ra khỏi lớp?
-              Sinh viên vẫn có thể tham gia lại qua link mời.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="px-8 pb-8 pt-2 border-0 bg-transparent flex-row gap-3">
-            <Button
-              variant="outline"
-              className="flex-1 h-11 rounded-xl font-bold text-xs"
-              onClick={() => setMemberToKick(null)}
-              disabled={!!kickingId}
-            >
-              Huỷ
-            </Button>
-            <Button
-              className="flex-1 h-11 rounded-xl font-bold text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-100 gap-2"
-              onClick={() => void handleKickConfirm()}
-              disabled={!!kickingId}
-            >
-              {kickingId ? <Loader2 size={14} className="animate-spin" /> : <UserX size={14} />}
-              Kick ngay
-            </Button>
-          </DialogFooter>
+          </div>
+          {/* Body */}
+          <div className="px-8 pt-6 pb-8 bg-card">
+            <div className="text-center space-y-3 mb-6">
+              <DialogDescription className="text-sm font-bold text-foreground">
+                Kick sinh viên này ra khỏi lớp?
+              </DialogDescription>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Sinh viên sẽ bị xóa khỏi lớp ngay lập tức.<br/>
+                Họ vẫn có thể tham gia lại qua link mời.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm border-border"
+                onClick={() => setMemberToKick(null)} disabled={!!kickingId}>
+                Huỷ bỏ
+              </Button>
+              <Button className="flex-1 h-11 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-700 text-white gap-2"
+                onClick={() => void handleKickConfirm()} disabled={!!kickingId}>
+                {kickingId ? <Loader2 size={15} className="animate-spin" /> : <UserX size={15} />}
+                Kick ngay
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Block dialog ── */}
+      <Dialog open={!!memberToBlock} onOpenChange={(open) => { if (!open) setMemberToBlock(null); }}>
+        <DialogContent showCloseButton={false} className="max-w-sm rounded-[28px] p-0 overflow-hidden border-0 shadow-2xl">
+          {/* Header strip — orange for classroom, rose for global */}
+          <div className={`relative px-8 pt-8 pb-12 bg-gradient-to-br ${
+            memberToBlock?.scope === 'global'
+              ? 'from-rose-600 to-rose-800'
+              : 'from-orange-400 to-orange-600'
+          }`}>
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
+            <div className="relative flex flex-col items-center gap-3 text-center">
+              <div className="relative">
+                {memberToBlock?.member.member_avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={memberToBlock.member.member_avatar} alt={memberToBlock.member.member_name}
+                    className="w-20 h-20 rounded-2xl object-cover border-4 border-white/30 shadow-xl" />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-white/20 border-4 border-white/30 flex items-center justify-center text-white font-black text-3xl shadow-xl">
+                    {memberToBlock?.member.member_name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="absolute -bottom-3 -right-3 w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-lg">
+                  <ShieldBan size={16} className={memberToBlock?.scope === 'global' ? 'text-rose-600' : 'text-orange-500'} />
+                </div>
+              </div>
+              <div className="text-white mt-1">
+                <DialogTitle className="text-lg font-black text-white">{memberToBlock?.member.member_name}</DialogTitle>
+                <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-white/20 text-white px-2.5 py-0.5 rounded-full mt-1">
+                  {memberToBlock?.scope === 'global' ? '🌐 Chặn toàn cục' : '🏫 Chặn lớp này'}
+                </span>
+              </div>
+            </div>
+          </div>
+          {/* Body */}
+          <div className="px-8 pt-6 pb-8 bg-card">
+            <div className="text-center space-y-3 mb-6">
+              {memberToBlock?.scope === 'global' ? (
+                <>
+                  <DialogDescription className="text-sm font-bold text-foreground">
+                    Chặn toàn cục sinh viên này?
+                  </DialogDescription>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Sinh viên sẽ <span className="font-black text-rose-600">không thể vào bất kỳ lớp nào</span> của bạn.<br/>
+                    Bạn có thể hủy chặn bất cứ lúc nào trong tab Danh sách chặn.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <DialogDescription className="text-sm font-bold text-foreground">
+                    Chặn sinh viên khỏi lớp này?
+                  </DialogDescription>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Sinh viên sẽ bị xóa và <span className="font-black text-orange-600">không thể vào lớp này</span>.<br/>
+                    Họ vẫn có thể tham gia các lớp khác của bạn.
+                  </p>
+                </>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm border-border"
+                onClick={() => setMemberToBlock(null)} disabled={!!blockingMemberId}>
+                Huỷ bỏ
+              </Button>
+              <Button
+                className={`flex-1 h-11 rounded-xl font-bold text-sm text-white gap-2 ${
+                  memberToBlock?.scope === 'global'
+                    ? 'bg-rose-600 hover:bg-rose-700'
+                    : 'bg-orange-500 hover:bg-orange-600'
+                }`}
+                onClick={() => void handleBlockConfirm()}
+                disabled={!!blockingMemberId}
+              >
+                {blockingMemberId ? <Loader2 size={15} className="animate-spin" /> : <ShieldBan size={15} />}
+                {memberToBlock?.scope === 'global' ? 'Chặn toàn cục' : 'Chặn lớp này'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

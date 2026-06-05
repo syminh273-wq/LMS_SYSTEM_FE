@@ -433,6 +433,15 @@ export type ClassroomMember = {
   joined_at: string;
 };
 
+export type BlacklistEntry = {
+  scope_id: string;
+  consumer_uid: string;
+  scope: 'global' | 'classroom';
+  reason: string;
+  added_by: string;
+  created_at: string;
+};
+
 export type StudentExamRecord = {
   exam: {
     uid: string;

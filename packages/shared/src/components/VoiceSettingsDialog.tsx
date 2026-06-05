@@ -16,7 +16,7 @@ export interface VoiceSetting {
   user_id: string;
   user_type: string;
   voice_name: string;
-  is_voice_enabled: boolean;
+  is_voice_enabled: boolean | string;
   language: string;
   updated_at: string;
 }
@@ -28,7 +28,7 @@ export interface AvailableVoice {
 
 interface VoiceSettingsDialogProps {
   getSettings: () => Promise<VoiceSetting>;
-  updateSettings: (data: Partial<VoiceSetting>) => Promise<VoiceSetting>;
+  updateSettings: (data: Record<string, any>) => Promise<VoiceSetting>;
   getAvailableVoices: () => Promise<AvailableVoice[]>;
   previewVoice?: (voiceId: string, text?: string) => Promise<{ url: string }>;
   trigger?: React.ReactNode;
@@ -48,12 +48,29 @@ export function VoiceSettingsDialog({
   const [saving, setSaving] = React.useState(false);
   const [previewingId, setPreviewingId] = React.useState<string | null>(null);
 
+  const isVoiceEnabled = React.useMemo(() => {
+    if (!settings) return false;
+    return settings.is_voice_enabled === true || settings.is_voice_enabled === 'true' || settings.is_voice_enabled === '1';
+  }, [settings]);
+
   const fetchData = async () => {
     setLoading(true);
     try {
       const [s, v] = await Promise.all([getSettings(), getAvailableVoices()]);
       setSettings(s);
-      setVoices(v);
+      
+      // Chỉ hiển thị các giọng nói tiếng Việt
+      const vietnameseVoices = v.filter(voice => {
+        const lowerId = voice.id.toLowerCase();
+        const lowerName = voice.name.toLowerCase();
+        return lowerId.includes('vi-vn') || 
+               lowerId.includes('vi_vn') ||
+               lowerId === 'vi' ||
+               lowerName.includes('vietnam') ||
+               lowerName.includes('tiếng việt');
+      });
+      
+      setVoices(vietnameseVoices.length > 0 ? vietnameseVoices : v);
     } catch (error) {
       toast.error('Không thể tải cấu hình giọng nói');
     } finally {
@@ -71,9 +88,13 @@ export function VoiceSettingsDialog({
     if (!settings) return;
     setSaving(true);
     try {
-      const updated = await updateSettings({ is_voice_enabled: !settings.is_voice_enabled });
+      const nextValue = !isVoiceEnabled;
+      // Convert to string to ensure compatibility with backend that uses generic settings table
+      const updated = await updateSettings({ is_voice_enabled: nextValue.toString() });
       setSettings(updated);
-      toast.success(updated.is_voice_enabled ? 'Đã bật giọng nói' : 'Đã tắt giọng nói');
+      
+      const newIsEnabled = updated.is_voice_enabled === true || updated.is_voice_enabled === 'true' || updated.is_voice_enabled === '1';
+      toast.success(newIsEnabled ? 'Đã bật giọng nói' : 'Đã tắt giọng nói');
     } catch (error) {
       toast.error('Không thể cập nhật cấu hình');
     } finally {
@@ -136,8 +157,8 @@ export function VoiceSettingsDialog({
           <div className="space-y-6 py-4">
             <div className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${settings.is_voice_enabled ? 'bg-indigo-50 text-[#4F46E5]' : 'bg-gray-100 text-gray-400'}`}>
-                  {settings.is_voice_enabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isVoiceEnabled ? 'bg-indigo-50 text-[#4F46E5]' : 'bg-gray-100 text-gray-400'}`}>
+                  {isVoiceEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
                 </div>
                 <div>
                   <p className="text-sm font-black text-gray-900 uppercase tracking-wide">Phản hồi bằng giọng nói</p>
@@ -145,14 +166,14 @@ export function VoiceSettingsDialog({
                 </div>
               </div>
               <Button
-                variant={settings.is_voice_enabled ? "default" : "outline"}
+                variant={isVoiceEnabled ? "default" : "outline"}
                 size="sm"
                 onClick={() => void handleToggleVoice()}
                 disabled={saving}
-                className={`rounded-xl px-4 font-black text-[10px] uppercase tracking-widest h-9 ${settings.is_voice_enabled ? 'bg-[#4F46E5] hover:bg-[#4338CA]' : ''}`}
+                className={`rounded-xl px-4 font-black text-[10px] uppercase tracking-widest h-9 ${isVoiceEnabled ? 'bg-[#4F46E5] hover:bg-[#4338CA]' : ''}`}
               >
                 {saving ? <Loader2 className="animate-spin mr-2" size={12} /> : null}
-                {settings.is_voice_enabled ? 'Đang bật' : 'Đang tắt'}
+                {isVoiceEnabled ? 'Đang bật' : 'Đang tắt'}
               </Button>
             </div>
 
