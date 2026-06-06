@@ -205,25 +205,34 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
 
     try {
       let finalUid = '';
+      let finalTitle = '';
       let finalTotal = 0;
 
       for await (const event of quizApi.generateStream(payload, mode === 'file' ? selectedFile! : undefined)) {
         if (event.type === 'error') { setErrorMsg(event.detail); setPhase('error'); return; }
-        if (event.type === 'meta') { setStreamTitle(event.title); finalUid = event.quiz_uid; }
+        if (event.type === 'meta') { finalTitle = event.title; setStreamTitle(event.title); finalUid = event.quiz_uid || ''; }
         if (event.type === 'question') { setProgress(event.index + 1); setLastQuestion(event.question); finalTotal = event.index + 1; }
         if (event.type === 'done') {
-          finalUid = event.quiz_uid ?? finalUid;
+          finalUid = event.quiz_uid || finalUid;
           finalTotal = event.total;
           setPhase('done');
+          if (!finalUid) {
+            setErrorMsg('Không nhận được ID quiz từ server. Quiz có thể đã được tạo — vui lòng tải lại trang.');
+            setPhase('error');
+            return;
+          }
           try {
             const quiz = await quizApi.retrieve(finalUid);
             onSuccess(quiz);
           } catch {
-            onSuccess({ uid: finalUid, created_by: '', title: streamTitle, description: '', questions_count: finalTotal, status: 'published' });
+            onSuccess({ uid: finalUid, created_by: '', title: finalTitle, description: '', questions_count: finalTotal, status: 'published' });
           }
           return;
         }
       }
+      // Stream ended without a done event
+      setErrorMsg('Kết nối stream bị ngắt. Quiz có thể đã được tạo — vui lòng tải lại trang.');
+      setPhase('error');
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Tạo quiz thất bại');
       setPhase('error');

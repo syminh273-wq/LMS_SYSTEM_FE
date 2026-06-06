@@ -120,6 +120,12 @@ export default function SpaceLoginPage() {
                 {errors.password && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.password.message}</p>}
               </div>
 
+              <div className='flex justify-end'>
+                <Link href='/space/forgot-password' className='text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors'>
+                  Quên mật khẩu?
+                </Link>
+              </div>
+
               <button
                 type='submit'
                 disabled={loading}

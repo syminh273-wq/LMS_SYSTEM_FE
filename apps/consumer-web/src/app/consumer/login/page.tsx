@@ -175,7 +175,7 @@ export default function LoginPage() {
                 <div className='space-y-2'>
                   <div className="flex justify-between items-end px-1">
                     <label className='text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]'>Mật khẩu</label>
-                    <Link href='#' className='text-[10px] font-black text-[#4F46E5] hover:underline uppercase tracking-widest'>
+                    <Link href='/consumer/forgot-password' className='text-[10px] font-black text-[#4F46E5] hover:underline uppercase tracking-widest'>
                       Quên mật khẩu?
                     </Link>
                   </div>

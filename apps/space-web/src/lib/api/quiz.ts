@@ -58,15 +58,15 @@ export class QuizApiClient extends BaseRestApiClient {
 
     while (true) {
       const { done, value } = await reader.read();
-      if (done) break;
-      buf += decoder.decode(value, { stream: true });
+      if (!done) buf += decoder.decode(value, { stream: true });
       const lines = buf.split('\n');
-      buf = lines.pop() ?? '';
+      buf = done ? '' : (lines.pop() ?? '');
       for (const line of lines) {
         if (line.startsWith('data: ')) {
           try { yield JSON.parse(line.slice(6)) as QuizStreamEvent; } catch { /* skip */ }
         }
       }
+      if (done) break;
     }
   }
 

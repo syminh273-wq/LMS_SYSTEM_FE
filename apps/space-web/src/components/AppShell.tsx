@@ -52,7 +52,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [spaceThemeColor, dispatch]);
 
-  const isAuthPage = pathname.includes('/space/login') || pathname.includes('/space/register');
+  const isAuthPage =
+    pathname.includes('/space/login') ||
+    pathname.includes('/space/register') ||
+    pathname.includes('/space/forgot-password') ||
+    pathname.includes('/space/verify-otp') ||
+    pathname.includes('/space/reset-password');
 
   const handleLogout = () => {
     dispatch(clearProfile());

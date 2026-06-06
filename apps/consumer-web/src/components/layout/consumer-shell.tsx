@@ -65,7 +65,14 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
   const displayName = mounted ? (userProfile?.full_name || userProfile?.username || 'User') : 'User';
   const initials = displayName.slice(0, 2).toUpperCase();
 
-  const isLoginPage = pathname === '/consumer/login' || pathname === '/login' || pathname === '/consumer/register' || pathname === '/register';
+  const isLoginPage =
+    pathname === '/consumer/login' ||
+    pathname === '/login' ||
+    pathname === '/consumer/register' ||
+    pathname === '/register' ||
+    pathname.startsWith('/consumer/forgot-password') ||
+    pathname.startsWith('/consumer/verify-otp') ||
+    pathname.startsWith('/consumer/reset-password');
 
   if (isLoginPage) {
     return (
