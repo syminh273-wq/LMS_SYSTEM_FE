@@ -1,0 +1,77 @@
+{
+  "title": "Quản trị LMS",
+  "subtitle": "Quản lý Consumers và Spaces từ Backend.",
+  "reload": "Tải lại",
+  "dashboard_btn": "Dashboard",
+  "load_error": "Không thể tải dữ liệu quản trị.",
+  "action_error": "Thao tác thất bại.",
+  "consumers": {
+    "section_title": "Consumers",
+    "empty": "Chưa có consumer nào được tạo.",
+    "loading": "Đang tải danh sách consumers...",
+    "form": {
+      "username": "Username",
+      "username_placeholder": "johndoe",
+      "email": "Email",
+      "email_placeholder": "john@example.com",
+      "full_name": "Họ tên",
+      "full_name_placeholder": "John Doe",
+      "phone": "Số điện thoại",
+      "phone_placeholder": "0987654321",
+      "avatar": "Avatar URL",
+      "avatar_placeholder": "https://example.com/avatar.jpg"
+    },
+    "actions": {
+      "create": "Tạo mới",
+      "update_selected": "Cập nhật đã chọn",
+      "deselect": "Bỏ chọn",
+      "created": "Đã tạo consumer.",
+      "updated": "Đã cập nhật consumer.",
+      "deactivated": "Đã vô hiệu hóa consumer.",
+      "deleted": "Đã xóa consumer.",
+      "detail": "Chi tiết",
+      "deactivate": "Vô hiệu hóa",
+      "delete": "Xóa"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "no_name": "No Name",
+      "no_username": "no-username"
+    }
+  },
+  "spaces": {
+    "section_title": "Spaces",
+    "empty": "Chưa có space nào được tạo.",
+    "loading": "Đang tải danh sách spaces...",
+    "form": {
+      "name": "Tên Space",
+      "name_placeholder": "Học viện Công nghệ",
+      "slug": "Slug",
+      "slug_placeholder": "hoc-vien",
+      "description": "Mô tả",
+      "description_placeholder": "Nền tảng học tập trực tuyến...",
+      "logo": "Logo URL",
+      "logo_placeholder": "https://...",
+      "cover": "Cover URL",
+      "cover_placeholder": "https://..."
+    },
+    "actions": {
+      "create": "Tạo mới",
+      "update_selected": "Cập nhật đã chọn",
+      "deselect": "Bỏ chọn",
+      "created": "Đã tạo space.",
+      "updated": "Đã cập nhật space.",
+      "deactivated": "Đã vô hiệu hóa space.",
+      "deleted": "Đã xóa space.",
+      "detail": "Chi tiết",
+      "deactivate": "Vô hiệu hóa",
+      "delete": "Xóa"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "no_description": "Không có mô tả cho không gian này."
+    }
+  }
+}

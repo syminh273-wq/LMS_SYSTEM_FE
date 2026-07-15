@@ -1,0 +1,22 @@
+{
+  "labels": {
+    "title": "Academic Calendar",
+    "subtitle": "Manage your schedule and upcoming deadlines.",
+    "new_event": "New Event",
+    "month_label": "June 2026",
+    "view_day": "Day",
+    "view_week": "Week",
+    "view_month": "Month",
+    "days_sun": "Sun",
+    "days_mon": "Mon",
+    "days_tue": "Tue",
+    "days_wed": "Wed",
+    "days_thu": "Thu",
+    "days_fri": "Fri",
+    "days_sat": "Sat",
+    "upcoming": "Upcoming",
+    "sync_google_title": "Sync with Google",
+    "sync_google_desc": "Connect your academic calendar with your personal devices.",
+    "connect_now": "Connect Now"
+  }
+}

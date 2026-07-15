@@ -1,0 +1,32 @@
+{
+  "labels": {
+    "search_placeholder": "Search resources...",
+    "student_account": "Student account",
+    "user": "User",
+    "logout": "Logout",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close",
+    "download": "Download",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "actions": {
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "remove": "Remove"
+  },
+  "messages": {
+    "success": "Success",
+    "error": "Error",
+    "something_went_wrong": "Something went wrong. Please try again."
+  }
+}

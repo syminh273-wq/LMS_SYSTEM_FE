@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "classroom": "Classroom",
+    "classrooms": "Classrooms",
+    "calendar": "Calendar",
+    "grades": "Grades",
+    "quiz_library": "Quiz Library",
+    "students": "Students",
+    "settings": "Settings",
+    "space_admin": "Space Admin"
+  },
+  "menu": {
+    "my_profile": "My Profile",
+    "my_classrooms": "My Classrooms",
+    "language": "Language",
+    "switch_language": "Switch language",
+    "expand_menu": "Expand menu",
+    "collapse_menu": "Collapse menu"
+  },
+  "header": {
+    "language": {
+      "en": "English",
+      "vi": "Vietnamese"
+    }
+  },
+  "app_shell": {
+    "logout": "Logout"
+  },
+  "profile_dropdown": {
+    "default_name": "Admin",
+    "default_email": "Space Admin"
+  }
+}

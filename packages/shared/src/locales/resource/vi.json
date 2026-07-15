@@ -1,0 +1,33 @@
+{
+  "labels": {
+    "records_count": "{{count}} bản ghi"
+  },
+  "sharing_modal": {
+    "tab_info": "Thông tin",
+    "tab_docs": "Tài liệu",
+    "tab_chat": "Tin nhắn",
+    "badge_classroom": "Phòng học",
+    "label_description": "Mô tả",
+    "label_max_students": "Sĩ số tối đa",
+    "value_max_students_suffix": " học sinh",
+    "label_created_at": "Ngày tạo",
+    "qr_button": "XEM MÃ QR THAM GIA",
+    "qr_button_loading": "Đang khởi tạo...",
+    "qr_download": "TẢI QR",
+    "qr_copy": "COPY LINK",
+    "docs_upload_title": "Tải lên tài liệu",
+    "docs_upload_subtitle": "Chia sẻ tài liệu học tập với tất cả học sinh trong lớp",
+    "docs_upload_button": "CHỌN TỆP",
+    "docs_list_label": "Tài liệu đã tải lên ({{count}})",
+    "chat_placeholder": "Nhập tin nhắn...",
+    "chat_seed_teacher": "Giảng viên",
+    "chat_seed_teacher_text": "Chào mừng các em đến với lớp học!",
+    "chat_seed_me": "Bạn",
+    "chat_seed_me_text": "Em chào thầy ạ.",
+    "toast_link_failed": "Không thể lấy thông tin link chia sẻ",
+    "toast_qr_not_found": "Không tìm thấy mã QR để tải",
+    "toast_link_copied": "Đã copy link tham gia",
+    "toast_qr_downloaded": "Đã tải ảnh QR về máy",
+    "qr_filename_prefix": "QR_Lop_"
+  }
+}

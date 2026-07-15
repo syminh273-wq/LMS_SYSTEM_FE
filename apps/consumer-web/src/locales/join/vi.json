@@ -1,0 +1,25 @@
+{
+  "labels": {
+    "processing_code": "Đang xử lý mã tham gia...",
+    "processing_help": "Vui lòng đợi trong giây lát khi chúng tôi xác nhận quyền truy cập của bạn.",
+    "request_sent_title": "Yêu cầu đã được gửi!",
+    "request_sent_classroom": "Yêu cầu tham gia lớp học đang chờ giáo viên phê duyệt:",
+    "request_sent_resource": "Yêu cầu tham gia tài nguyên đang chờ giáo viên phê duyệt:",
+    "default_room_name": "Phòng học mới",
+    "pending_notice": "Bạn sẽ có thể vào lớp sau khi giáo viên chấp thuận yêu cầu.",
+    "back_to_classes": "Về danh sách lớp học",
+    "error_title": "Rất tiếc, đã có lỗi xảy ra",
+    "retry": "Thử lại",
+    "back_home": "Về trang chủ"
+  },
+  "messages": {
+    "join_request_sent": "Yêu cầu tham gia đã được gửi, chờ giáo viên phê duyệt!",
+    "join_failed": "Tham gia thất bại",
+    "invalid_code": "Mã tham gia không hợp lệ hoặc đã hết hạn"
+  },
+  "buttons": {
+    "retry": "Thử lại",
+    "back_home": "Về trang chủ",
+    "back_to_classes": "Về danh sách lớp học"
+  }
+}

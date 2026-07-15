@@ -48,9 +48,11 @@ import {
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 export default function ClassroomsPage() {
   const router = useRouter();
+  const { t, formatDate: localeFormatDate } = useTranslation();
   const [data, setData] = useState<PaginatedResponse<Classroom> | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -66,7 +68,7 @@ export default function ClassroomsPage() {
       setData(res);
       setCurrentPage(res.current_page);
     } catch (err: any) {
-      setError(err.message || 'Không thể tải danh sách phòng học');
+      setError(err.message || t('classroom.ui.list_message_load_error'));
     } finally {
       setLoading(false);
     }
@@ -75,33 +77,33 @@ export default function ClassroomsPage() {
   const handleDownloadQr = async (classroom: Classroom) => {
     try {
       let linkData = classroom.resolve_link;
-      
+
       if (!linkData) {
-        toast.info('Đang khởi tạo mã QR...');
+        toast.info(t('classroom.ui.list_message_qr_initializing'));
         linkData = await spaceApi.classrooms.getSharingLink(classroom.uid);
       }
-      
+
       if (linkData) {
-        toast.info('Đang tạo ảnh QR...');
-        
+        toast.info(t('classroom.ui.list_message_qr_creating'));
+
         // 1. Tạo joining URL
         const joinUrl = `${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`;
-        
+
         // 2. Tạo chuỗi SVG từ QRCodeSVG component
         let svgString = renderToStaticMarkup(
-          <QRCodeSVG 
+          <QRCodeSVG
             value={joinUrl}
             size={400}
             level="H"
             includeMargin={true}
           />
         );
-        
+
         // Ensure SVG namespace is present for Blob rendering
         if (!svgString.includes('xmlns=')) {
           svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
         }
-        
+
         // 3. Chuyển SVG sang Canvas để tải về dạng PNG
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -115,8 +117,8 @@ export default function ClassroomsPage() {
           if (ctx) {
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 50, 50, 400, 400); 
-            
+            ctx.drawImage(img, 50, 50, 400, 400);
+
             const pngUrl = canvas.toDataURL("image/png");
             const downloadLink = document.createElement("a");
             downloadLink.href = pngUrl;
@@ -124,15 +126,15 @@ export default function ClassroomsPage() {
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
-            
-            toast.success('Đã tải mã QR xuống');
+
+            toast.success(t('classroom.ui.list_message_qr_downloaded'));
           }
           URL.revokeObjectURL(url);
         };
-        
+
         img.onerror = () => {
           console.error('Failed to load SVG into Image');
-          toast.error('Có lỗi xảy ra khi tạo ảnh QR');
+          toast.error(t('classroom.ui.list_message_qr_error'));
           URL.revokeObjectURL(url);
         };
 
@@ -140,7 +142,7 @@ export default function ClassroomsPage() {
       }
     } catch (err) {
       console.error('Failed to download QR:', err);
-      toast.error('Không thể tải mã QR');
+      toast.error(t('classroom.ui.list_message_qr_download_error'));
     }
   };
 
@@ -156,19 +158,19 @@ export default function ClassroomsPage() {
 
   const classrooms = data?.results || [];
 
-  const filteredClassrooms = classrooms.filter(classroom => 
+  const filteredClassrooms = classrooms.filter(classroom =>
     classroom.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     classroom.pid.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = async (uid: string) => {
-    if (confirm('Bạn có chắc chắn muốn xóa phòng học này?')) {
+    if (confirm(t('classroom.ui.list_confirm_delete'))) {
       try {
         await spaceApi.classrooms.delete(uid);
-        toast.success('Đã xóa phòng học');
+        toast.success(t('classroom.ui.list_delete_success'));
         fetchClassrooms(currentPage);
       } catch (err: any) {
-        toast.error(err.message || 'Không thể xóa phòng học');
+        toast.error(err.message || t('classroom.ui.list_delete_error'));
       }
     }
   };
@@ -179,10 +181,10 @@ export default function ClassroomsPage() {
       <div className="bg-card p-4 rounded-2xl border border-border shadow-sm flex flex-col md:flex-row items-center gap-4">
         <div className="relative flex-1 w-full md:w-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-          <input 
+          <input
             type="text"
             className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-brand/10 hover:border-primary-brand transition-colors"
-            placeholder="Tìm kiếm theo tên hoặc mã phòng..."
+            placeholder={t('classroom.ui.list_search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -191,25 +193,25 @@ export default function ClassroomsPage() {
         <div className="flex items-center gap-3 w-full md:w-auto">
           <Button variant="outline" className="h-12 px-5 gap-2.5 rounded-xl border-border text-muted-foreground hover:bg-muted/50 font-bold text-xs uppercase tracking-wider">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-            Tất cả
+            {t('classroom.ui.list_filter_all')}
             <Plus size={16} className="text-muted-foreground ml-1" />
           </Button>
-          
+
           <Button variant="outline" className="h-12 px-5 gap-2.5 rounded-xl border-border text-muted-foreground hover:bg-muted/50 font-bold text-xs uppercase tracking-wider">
             <Filter size={16} />
-            Trạng thái
+            {t('classroom.ui.list_filter_status')}
           </Button>
 
-          <Button 
-            variant="ghost" 
-            className="h-12 px-4 text-muted-foreground hover:text-foreground font-bold text-xs uppercase tracking-wider" 
+          <Button
+            variant="ghost"
+            className="h-12 px-4 text-muted-foreground hover:text-foreground font-bold text-xs uppercase tracking-wider"
             onClick={() => {
               setSearchQuery('');
               fetchClassrooms(1);
             }}
           >
             <RotateCcw size={16} />
-            <span className="ml-2 hidden lg:inline">Đặt lại</span>
+            <span className="ml-2 hidden lg:inline">{t('classroom.ui.list_reset')}</span>
           </Button>
         </div>
 
@@ -217,26 +219,26 @@ export default function ClassroomsPage() {
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
           <div className="flex bg-muted/80 p-1.5 rounded-xl border border-border">
-            <button 
+            <button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary-brand shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <List size={18} />
             </button>
-            <button 
+            <button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary-brand shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <LayoutGrid size={18} />
             </button>
           </div>
-          
-          <Button 
+
+          <Button
             onClick={() => router.push('/space/classrooms/create')}
             className="h-12 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 gap-2.5 shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus size={20} />
-            Tạo mới
+            {t('classroom.ui.list_create_btn')}
           </Button>
         </div>
       </div>
@@ -252,21 +254,21 @@ export default function ClassroomsPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-40 text-muted-foreground/60">
           <Loader2 size={48} className="animate-spin mb-4 text-primary-brand" />
-          <p className="text-sm font-bold uppercase tracking-widest">Đang tải dữ liệu...</p>
+          <p className="text-sm font-bold uppercase tracking-widest">{t('classroom.ui.list_loading')}</p>
         </div>
       ) : classrooms.length === 0 ? (
         <div className="text-center py-32 bg-card border border-border rounded-3xl shadow-sm">
           <div className="bg-muted/50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border border-border text-muted-foreground/60">
             <List size={40} />
           </div>
-          <h3 className="text-xl font-bold text-foreground mb-2">Không có dữ liệu</h3>
-          <p className="text-muted-foreground mb-8 font-medium">Chưa có phòng học nào được tạo trong hệ thống của bạn.</p>
-          <Button 
+          <h3 className="text-xl font-bold text-foreground mb-2">{t('classroom.ui.list_no_data_title')}</h3>
+          <p className="text-muted-foreground mb-8 font-medium">{t('classroom.ui.list_no_data_desc')}</p>
+          <Button
             onClick={() => router.push('/space/classrooms/create')}
             className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-8 h-12 shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark transition-all"
           >
             <Plus size={20} className="mr-2" />
-            Tạo ngay
+            {t('classroom.ui.list_message_create_first')}
           </Button>
         </div>
       ) : filteredClassrooms.length === 0 ? (
@@ -274,15 +276,15 @@ export default function ClassroomsPage() {
           <div className="bg-muted/50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border border-border text-muted-foreground/60">
             <Search size={40} />
           </div>
-          <h3 className="text-xl font-bold text-foreground mb-2">Không tìm thấy kết quả</h3>
-          <p className="text-muted-foreground mb-8 font-medium">Không có phòng học nào khớp với từ khóa "{searchQuery}"</p>
-          <Button 
+          <h3 className="text-xl font-bold text-foreground mb-2">{t('classroom.ui.list_no_match_title')}</h3>
+          <p className="text-muted-foreground mb-8 font-medium">{t('classroom.ui.list_no_match_desc', undefined, { query: searchQuery })}</p>
+          <Button
             onClick={() => setSearchQuery('')}
             variant="outline"
             className="rounded-xl px-8 h-12 font-bold uppercase tracking-widest"
           >
             <RotateCcw size={20} className="mr-2" />
-            Xóa tìm kiếm
+            {t('classroom.ui.list_clear_search')}
           </Button>
         </div>
       ) : viewMode === 'list' ? (
@@ -291,12 +293,12 @@ export default function ClassroomsPage() {
             <table className="w-full text-left border-collapse min-w-[1000px]">
               <thead>
                 <tr className="bg-muted/30 text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
-                  <th className="px-8 py-5 border-b border-border">Thông tin phòng</th>
-                  <th className="px-6 py-5 border-b border-border text-center">Mã phòng</th>
-                  <th className="px-6 py-5 border-b border-border text-center">Sĩ số tối đa</th>
-                  <th className="px-6 py-5 border-b border-border text-center">Ngày tạo</th>
-                  <th className="px-6 py-5 border-b border-border text-center">Trạng thái</th>
-                  <th className="px-8 py-5 border-b border-border text-right">Thao tác</th>
+                  <th className="px-8 py-5 border-b border-border">{t('classroom.ui.list_th_info')}</th>
+                  <th className="px-6 py-5 border-b border-border text-center">{t('classroom.ui.list_th_code')}</th>
+                  <th className="px-6 py-5 border-b border-border text-center">{t('classroom.ui.list_th_max_students')}</th>
+                  <th className="px-6 py-5 border-b border-border text-center">{t('classroom.ui.list_th_created_at')}</th>
+                  <th className="px-6 py-5 border-b border-border text-center">{t('classroom.ui.list_th_status')}</th>
+                  <th className="px-8 py-5 border-b border-border text-right">{t('classroom.ui.list_th_actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -322,20 +324,20 @@ export default function ClassroomsPage() {
                       <div className="text-sm font-bold text-foreground">{classroom.max_students}</div>
                     </td>
                     <td className="px-6 py-5 text-center text-xs text-muted-foreground font-bold">
-                      {new Date(classroom.created_at).toLocaleDateString('vi-VN')}
+                      {localeFormatDate(classroom.created_at)}
                     </td>
                     <td className="px-6 py-5 text-center">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 gap-1.5">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        Hoạt động
+                        {t('classroom.ui.list_status_active')}
                       </span>
                     </td>
                     <td className="px-8 py-5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
-                        <button 
+                        <button
                           onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
                           className="text-muted-foreground/60 hover:text-primary-brand p-2 transition-all rounded-xl hover:bg-primary-brand-light border-transparent hover:border-primary-brand-muted"
-                          title="Xem chi tiết"
+                          title={t('classroom.ui.list_view_detail')}
                         >
                           <ChevronRight size={20} />
                         </button>
@@ -348,20 +350,20 @@ export default function ClassroomsPage() {
                           <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
                             <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
                               <Pencil size={16} className="mr-3 text-muted-foreground" />
-                              <span>Chỉnh sửa</span>
+                              <span>{t('classroom.ui.list_action_edit')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
                               <Download size={16} className="mr-3 text-muted-foreground" />
-                              <span>Tải mã QR</span>
+                              <span>{t('classroom.ui.list_action_download_qr')}</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-2 bg-muted/50" />
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               variant="destructive"
                               className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase cursor-pointer"
                               onClick={() => handleDelete(classroom.uid)}
                             >
                               <Trash2 size={16} className="mr-3" />
-                              <span>Xóa phòng</span>
+                              <span>{t('classroom.ui.list_action_delete')}</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -376,7 +378,7 @@ export default function ClassroomsPage() {
           {/* Footer with Pagination */}
           <div className="px-8 py-5 bg-muted/30 border-t border-border flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Số hàng mỗi trang</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('classroom.labels.rows_per_page')}</span>
               <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-1.5 text-xs font-bold text-foreground cursor-pointer hover:border-indigo-500 transition-colors">
                 20
                 <ChevronLeft size={16} className="-rotate-90 text-muted-foreground" />
@@ -385,7 +387,7 @@ export default function ClassroomsPage() {
 
             <div className="flex items-center gap-8">
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                Trang <span className="text-foreground text-xs mx-1">{data?.current_page}</span> trên {data?.total_pages}
+                {t('classroom.labels.page_of', undefined, { current: data?.current_page ?? 1, total: data?.total_pages ?? 1 })}
               </div>
 
               <div className="flex items-center gap-2">
@@ -414,7 +416,7 @@ export default function ClassroomsPage() {
                   <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center text-muted-foreground font-bold text-lg border border-border group-hover:bg-primary-brand group-hover:text-white group-hover:border-primary-brand transition-all uppercase shadow-sm">
                     {classroom.name ? classroom.name.substring(0, 2) : '??'}
                   </div>
-                  
+
                   <div className="flex items-center gap-1.5">
                     <span className="text-[10px] font-bold text-primary-brand bg-primary-brand-light border-primary-brand-muted uppercase tracking-wider">
                       {classroom.pid}
@@ -428,30 +430,30 @@ export default function ClassroomsPage() {
                       <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
                         <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
                           <Pencil size={16} className="mr-3 text-muted-foreground" />
-                          <span>Chỉnh sửa</span>
+                          <span>{t('classroom.ui.list_action_edit')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => handleDownloadQr(classroom)}>
                           <Download size={16} className="mr-3 text-muted-foreground" />
-                          <span>Tải mã QR</span>
+                          <span>{t('classroom.ui.list_action_download_qr')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="my-2 bg-muted/50" />
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           variant="destructive"
                           className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase cursor-pointer"
                           onClick={() => handleDelete(classroom.uid)}
                         >
                           <Trash2 size={16} className="mr-3" />
-                          <span>Xóa phòng</span>
+                          <span>{t('classroom.ui.list_action_delete')}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
-                
+
                 <h3 className="font-bold text-foreground group-hover:text-primary-brand transition-colors text-lg mb-2 line-clamp-1 leading-tight">
                   {classroom.name}
                 </h3>
-                
+
                 <p className="text-xs text-muted-foreground line-clamp-2 mb-8 font-medium leading-relaxed">
                   {classroom.description}
                 </p>
@@ -462,23 +464,23 @@ export default function ClassroomsPage() {
                       <Users size={14} className="text-muted-foreground" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter leading-none mb-1">Học sinh</span>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter leading-none mb-1">{t('classroom.ui.list_card_students')}</span>
                       <span className="text-xs font-bold text-foreground leading-none">0 / {classroom.max_students}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter leading-none block mb-1">Ngày tạo</span>
-                    <span className="text-[10px] font-bold text-muted-foreground leading-none">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter leading-none block mb-1">{t('classroom.ui.list_card_created')}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground leading-none">{localeFormatDate(classroom.created_at)}</span>
                   </div>
                 </div>
               </div>
               <div className="p-4 bg-muted/30 border-t border-border">
-                <Button 
+                <Button
                   onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
-                  variant="ghost" 
+                  variant="ghost"
                   className="w-full text-[11px] font-bold tracking-[0.2em] text-primary-brand hover:bg-primary-brand hover:text-white transition-all h-10 rounded-xl"
                 >
-                  CHI TIẾT PHÒNG HỌC
+                  {t('classroom.ui.list_card_detail_btn')}
                 </Button>
               </div>
             </Card>
@@ -494,14 +496,14 @@ export default function ClassroomsPage() {
             <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform duration-500">
               <GraduationCap size={160} strokeWidth={1} />
             </div>
-            
+
             <div className="relative">
-              <p className="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2 opacity-80">Tổng số lớp học</p>
+              <p className="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2 opacity-80">{t('classroom.ui.list_stats_title')}</p>
               <h2 className="text-6xl font-bold mb-8">{data?.count ?? classrooms.length}</h2>
-              
+
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-card/10 backdrop-blur-md rounded-full border border-white/10">
                 <TrendingUp size={16} className="text-emerald-400" />
-                <span className="text-xs font-bold">+12% <span className="text-primary-brand-muted font-medium">so với tháng trước</span></span>
+                <span className="text-xs font-bold">+12% <span className="text-primary-brand-muted font-medium">{t('classroom.ui.list_stats_growth_label')}</span></span>
               </div>
             </div>
 
@@ -516,25 +518,25 @@ export default function ClassroomsPage() {
           <div className="lg:col-span-2 bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col">
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h3 className="text-lg font-bold text-foreground">Phân bổ nguồn lực</h3>
-                <p className="text-sm text-muted-foreground font-medium mt-1">Thống kê sĩ số trung bình theo khối</p>
+                <h3 className="text-lg font-bold text-foreground">{t('classroom.ui.list_resource_title')}</h3>
+                <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.list_resource_desc')}</p>
               </div>
               <button className="text-primary-brand text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
-                Chi tiết
+                {t('classroom.ui.list_resource_detail')}
               </button>
             </div>
 
             <div className="flex-1 flex items-end justify-between gap-4 px-4 pb-2">
               {[
-                { label: 'K10', value: 35, color: 'bg-primary-brand-light' },
-                { label: 'K11', value: 85, color: 'bg-primary-brand' },
-                { label: 'K12', value: 45, color: 'bg-primary-brand-light' },
-                { label: 'NGHỀ', value: 95, color: 'bg-emerald-400' },
-                { label: 'IELTS', value: 25, color: 'bg-primary-brand-light' }
+                { label: t('classroom.ui.list_grade_K10'), value: 35, color: 'bg-primary-brand-light' },
+                { label: t('classroom.ui.list_grade_K11'), value: 85, color: 'bg-primary-brand' },
+                { label: t('classroom.ui.list_grade_K12'), value: 45, color: 'bg-primary-brand-light' },
+                { label: t('classroom.ui.list_grade_VOC'), value: 95, color: 'bg-emerald-400' },
+                { label: t('classroom.ui.list_grade_IELTS'), value: 25, color: 'bg-primary-brand-light' }
               ].map((item, idx) => (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-4 group">
                   <div className="w-full relative h-48 bg-muted/50 rounded-xl overflow-hidden">
-                    <div 
+                    <div
                       className={`absolute bottom-0 left-0 w-full transition-all duration-700 ease-out group-hover:brightness-110 shadow-lg ${item.color}`}
                       style={{ height: `${item.value}%` }}
                     />

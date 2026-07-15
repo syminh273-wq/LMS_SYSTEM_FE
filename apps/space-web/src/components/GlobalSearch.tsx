@@ -13,6 +13,7 @@ import {
   File,
 } from 'lucide-react';
 import { searchApi, SearchResultItem, SearchResponse } from '@/lib/api/search';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -25,39 +26,37 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced;
 }
 
+const TYPE_ICONS = {
+  classroom: BookOpen,
+  exam: FileText,
+  quiz: Gamepad2,
+  consumer: User,
+  resource: File,
+} as const;
+
 const TYPE_META = {
   classroom: {
-    label: 'Classrooms',
-    icon: BookOpen,
     color: 'text-primary-brand',
     bg: 'bg-primary-brand-light dark:bg-indigo-950/40',
     href: (item: SearchResultItem) => `/space/classrooms/${item.entity_id}/details`,
   },
   exam: {
-    label: 'Exams',
-    icon: FileText,
     color: 'text-amber-500',
     bg: 'bg-amber-50 dark:bg-amber-950/40',
     href: (item: SearchResultItem) =>
       `/space/classrooms/${item.classroom_id}/exams/${item.entity_id}`,
   },
   quiz: {
-    label: 'Quizzes',
-    icon: Gamepad2,
     color: 'text-emerald-500',
     bg: 'bg-emerald-50 dark:bg-emerald-950/40',
     href: (item: SearchResultItem) => `/space/quizzes/${item.entity_id}`,
   },
   consumer: {
-    label: 'Students',
-    icon: User,
     color: 'text-sky-500',
     bg: 'bg-sky-50 dark:bg-sky-950/40',
     href: (item: SearchResultItem) => `/space/student/${item.entity_id}`,
   },
   resource: {
-    label: 'Resources',
-    icon: File,
     color: 'text-rose-500',
     bg: 'bg-rose-50 dark:bg-rose-950/40',
     href: (_item: SearchResultItem) => `/space/classrooms`,
@@ -86,14 +85,18 @@ function ResultItem({
   active,
   onClick,
   onMouseEnter,
+  labelKey,
+  t,
 }: {
   item: FlatResult;
   active: boolean;
   onClick: () => void;
   onMouseEnter: () => void;
+  labelKey: string;
+  t: (key: string, fallback?: string) => string;
 }) {
   const meta = TYPE_META[item.type];
-  const Icon = meta.icon;
+  const Icon = TYPE_ICONS[item.type];
   return (
     <button
       type="button"
@@ -108,7 +111,7 @@ function ResultItem({
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-sm font-semibold text-foreground truncate">
-          {item.title || '(Untitled)'}
+          {item.title || t('layout.search.untitled')}
         </span>
         {item.snippet && (
           <span
@@ -118,7 +121,7 @@ function ResultItem({
         )}
       </span>
       <span className={`flex-shrink-0 text-[10px] font-bold uppercase tracking-wider mt-1 ${meta.color}`}>
-        {meta.label}
+        {t(labelKey)}
       </span>
     </button>
   );
@@ -136,6 +139,7 @@ function GroupLabel({ label }: { label: string }) {
 
 export default function GlobalSearch() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -256,7 +260,7 @@ export default function GlobalSearch() {
         className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-muted/60 border border-border hover:bg-muted transition-colors text-sm text-muted-foreground group"
       >
         <Search size={15} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-        <span className="hidden sm:block">Search everything...</span>
+        <span className="hidden sm:block">{t('layout.search.trigger_label')}</span>
         <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
           ⌘K
         </kbd>
@@ -277,7 +281,7 @@ export default function GlobalSearch() {
       <div
         role="dialog"
         aria-modal
-        aria-label="Global search"
+        aria-label={t('layout.search.dialog_aria_label')}
         className="fixed left-1/2 top-[15vh] z-50 w-full max-w-xl -translate-x-1/2 rounded-2xl bg-popover shadow-2xl ring-1 ring-border overflow-hidden"
       >
         {/* Search input */}
@@ -292,7 +296,7 @@ export default function GlobalSearch() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search classrooms, exams, quizzes, students..."
+            placeholder={t('layout.search.placeholder')}
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
           />
           {query && (
@@ -317,22 +321,23 @@ export default function GlobalSearch() {
         <div ref={listRef} className="max-h-[60vh] overflow-y-auto py-2">
           {!query.trim() && (
             <p className="text-center text-sm text-muted-foreground py-10 select-none">
-              Type to search across your LMS
+              {t('layout.search.empty_prompt')}
             </p>
           )}
 
           {query.trim() && !loading && totalHits === 0 && (
             <p className="text-center text-sm text-muted-foreground py-10 select-none">
-              No results for &ldquo;{query}&rdquo;
+              {t('layout.search.no_results_for', undefined, { query })}
             </p>
           )}
 
           {(Object.keys(TYPE_META) as ResultType[]).map((type) => {
             const items = grouped[type];
             if (!items?.length) return null;
+            const labelKey = `layout.search.type_${type}`;
             return (
               <div key={type}>
-                <GroupLabel label={TYPE_META[type].label} />
+                <GroupLabel label={t(labelKey)} />
                 {items.map((item) => {
                   const idx = runningIdx++;
                   return (
@@ -342,6 +347,8 @@ export default function GlobalSearch() {
                       active={activeIdx === idx}
                       onMouseEnter={() => setActiveIdx(idx)}
                       onClick={() => navigate(item)}
+                      labelKey={labelKey}
+                      t={t}
                     />
                   );
                 })}
@@ -354,14 +361,14 @@ export default function GlobalSearch() {
         {totalHits > 0 && (
           <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-muted/30">
             <span className="text-[11px] text-muted-foreground">
-              {totalHits} result{totalHits !== 1 ? 's' : ''} found
+              {t('layout.search.results_count_other', undefined, { count: totalHits })}
             </span>
             <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
               <span className="flex items-center gap-1">
-                <kbd className="border border-border rounded px-1">↑↓</kbd> navigate
+                <kbd className="border border-border rounded px-1">↑↓</kbd> {t('layout.search.navigate')}
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="border border-border rounded px-1">↵</kbd> open
+                <kbd className="border border-border rounded px-1">↵</kbd> {t('layout.search.open')}
               </span>
             </div>
           </div>

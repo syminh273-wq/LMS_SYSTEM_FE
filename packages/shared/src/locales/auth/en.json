@@ -1,0 +1,211 @@
+{
+  "login": {
+    "labels": {
+      "brand": "EduSphere",
+      "tagline": "ELITE ENROLLMENT 2026",
+      "hero_title": "Elevate your knowledge.",
+      "hero_subtitle": "A smart learning management system building a digital future for the next generation.",
+      "feature_security_title": "Secure",
+      "feature_security_desc": "Data encrypted to international standards.",
+      "feature_optimization_title": "Optimized",
+      "feature_optimization_desc": "Seamless learning experience.",
+      "title": "Space Administrator",
+      "subtitle": "Sign in to manage your organization",
+      "welcome_back": "Welcome back to EduSphere.",
+      "no_account": "Don't have an account?",
+      "register_link": "Sign up now",
+      "email_label": "Admin email",
+      "password_label": "Password",
+      "forgot_link": "Forgot password?",
+      "submit": "Sign in to the system",
+      "submit_now": "Sign in now",
+      "submit_loading": "Authenticating...",
+      "divider": "or",
+      "google_login": "Continue with Google",
+      "google_note": "Only for registered Spaces",
+      "no_space": "Don't have a Space?",
+      "create_space": "Create a new Space",
+      "back_user": "Back to user site"
+    },
+    "placeholders": {
+      "email": "admin@your-space.com",
+      "password": "••••••••"
+    },
+    "messages": {
+      "validation_check": "Please check your login information.",
+      "login_failed_fallback": "Sign in failed",
+      "session_expired": "Your session has expired. Please sign in again."
+    },
+    "errors": {
+      "google_auth_failed": "Google sign in failed. Please try again.",
+      "google_token_failed": "Could not authenticate with Google.",
+      "google_token_invalid": "Invalid Google token.",
+      "account_disabled": "This account has been disabled.",
+      "login_failed_fallback": "Sign in failed.",
+      "default": "Sign in failed"
+    },
+    "validation": {
+      "email_required": "Please enter your email",
+      "password_required": "Please enter your password"
+    }
+  },
+  "register": {
+    "labels": {
+      "brand": "EduSphere",
+      "tagline": "Professional Academy Network",
+      "stat_label": "Learning performance",
+      "stat_growth": "+24% interaction this month",
+      "card_title": "Launch your Space",
+      "card_subtitle": "Set up a professional training space for your team and learners in just a few steps.",
+      "hero_title": "Start your journey to excellence.",
+      "hero_subtitle": "Join a community of elite learners and experience a world-class education platform.",
+      "feature_security_title": "Secure",
+      "feature_security_desc": "Data encrypted to international standards.",
+      "feature_optimization_title": "Optimized",
+      "feature_optimization_desc": "Seamless learning experience.",
+      "title": "Sign up",
+      "subtitle": "Become an EduSphere learner today.",
+      "have_account": "Already have an account?",
+      "login_link": "Sign in now",
+      "last_name_label": "Last name",
+      "first_name_label": "First name",
+      "email_label": "Admin Email",
+      "consumer_email_label": "Email address",
+      "consumer_password_label": "Password",
+      "password_label": "System password",
+      "confirm_password_label": "Confirm password",
+      "terms_prefix": "I agree to the",
+      "terms_link": "Terms of Service",
+      "terms_and": "and",
+      "privacy_link": "Privacy Policy",
+      "terms_suffix": "of EduSphere.",
+      "submit": "Start managing now",
+      "submit_now": "Create account now",
+      "submit_loading": "Launching...",
+      "divider": "Or",
+      "google_login": "Continue with Google",
+      "security_badge": "Enterprise-grade security",
+      "password_hint": "Password must be at least 8 characters and include letters and numbers."
+    },
+    "placeholders": {
+      "last_name": "Nguyen",
+      "first_name": "An",
+      "email": "name@organization.com",
+      "password": "••••••••••••"
+    },
+    "messages": {
+      "success_title": "Congratulations! Your account has been created.",
+      "success_description": "You will be redirected to the sign in page shortly.",
+      "success_fallback": "Sign up successful. Please sign in.",
+      "validation_check": "Please check your registration information.",
+      "register_failed_fallback": "Sign up failed"
+    },
+    "errors": {
+      "register_failed_fallback": "Sign up failed",
+      "default": "Sign up failed"
+    },
+    "validation": {
+      "email_required": "Required",
+      "password_required": "Required",
+      "required": "Required",
+      "password_min": "Minimum 8 characters",
+      "password_mismatch": "Passwords do not match"
+    }
+  },
+  "forgot": {
+    "labels": {
+      "back": "Back to sign in",
+      "title": "Forgot password",
+      "subtitle": "Enter your email to receive an OTP code",
+      "consumer_subtitle": "Enter your account email and we will send an OTP code to verify.",
+      "email_label": "Admin email",
+      "consumer_email_label": "Email address",
+      "submit": "Send OTP code",
+      "submit_loading": "Sending..."
+    },
+    "placeholders": {
+      "email": "admin@your-space.com",
+      "consumer_email": "name@company.com"
+    },
+    "messages": {
+      "otp_sent": "OTP code has been sent to your email."
+    },
+    "errors": {
+      "default": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "email_required": "Please enter your email"
+    }
+  },
+  "reset": {
+    "labels": {
+      "back": "Back to sign in",
+      "title": "Set a new password",
+      "subtitle": "Password must be at least 8 characters",
+      "new_password_label": "New password",
+      "confirm_password_label": "Confirm password",
+      "submit": "Reset password",
+      "submit_loading": "Updating...",
+      "success_title": "Success!",
+      "success_subtitle": "Password updated. Redirecting to sign in..."
+    },
+    "placeholders": {
+      "password": "••••••••"
+    },
+    "messages": {
+      "password_updated": "Password updated successfully!"
+    },
+    "errors": {
+      "default": "Could not reset password. Please try again."
+    },
+    "validation": {
+      "new_password_required": "Please enter a new password",
+      "new_password_min": "Password must be at least 8 characters",
+      "confirm_password_required": "Please confirm your password",
+      "confirm_password_mismatch": "Password confirmation does not match"
+    }
+  },
+  "otp": {
+    "labels": {
+      "back": "Back to sign in",
+      "title": "Enter OTP code",
+      "subtitle": "6-digit code sent to {{email}}",
+      "consumer_subtitle": "A 6-digit code has been sent to {{email}}. The code is valid for 5 minutes.",
+      "code_label": "OTP code (6 digits)",
+      "code_hint": "Code is valid for 5 minutes.",
+      "submit": "Verify",
+      "submit_loading": "Verifying...",
+      "resend": "Resend OTP code",
+      "resend_countdown": "Resend in {{seconds}}s"
+    },
+    "placeholders": {
+      "code": "000000"
+    },
+    "messages": {
+      "verified": "Verification successful!",
+      "resend_success": "A new OTP code has been sent."
+    },
+    "errors": {
+      "invalid_code": "OTP code is incorrect or has expired.",
+      "resend_error": "Could not resend the code. Please try again."
+    },
+    "validation": {
+      "code_required": "Please enter the OTP code",
+      "code_pattern": "OTP must be 6 digits"
+    }
+  },
+  "callback": {
+    "labels": {
+      "processing": "Processing sign in..."
+    },
+    "errors": {
+      "space_not_found": "This Space account does not exist yet. Please register first.",
+      "account_disabled": "This account has been disabled.",
+      "google_auth_failed": "Google sign in failed.",
+      "google_token_failed": "Could not verify the Google token.",
+      "google_token_invalid": "The Google token is invalid.",
+      "fallback": "Sign in failed.",
+      "invalid_session": "Your session is invalid. Please try again."
+    }
+  }
+}

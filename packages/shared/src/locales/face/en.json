@@ -1,0 +1,37 @@
+{
+  "labels": {
+    "camera_not_found": "Camera not found",
+    "camera_not_found_desc": "Your device has no camera or the camera is not connected.",
+    "retry": "Retry",
+    "address_bar_hint": "Click here",
+    "step1": "Click the 🔒 icon in the browser address bar",
+    "step2": "Find \"Camera\" and select \"Allow\"",
+    "step3": "Click \"Retry\" below",
+    "not_enrolled_title": "Face not registered",
+    "not_enrolled_classroom_desc": "You need to register your face before entering the classroom.",
+    "not_enrolled_exam_desc": "You need to register your face before taking the exam.",
+    "enroll_now": "Register now",
+    "verify_classroom_title": "Verify to enter classroom",
+    "verify_classroom_desc": "Look straight at the camera then press verify — the session is valid for 8 hours",
+    "verify_exam_title": "Identity verification",
+    "verify_exam_desc": "Look straight at the camera then press verify to start the exam",
+    "verifying": "Verifying...",
+    "verify_classroom_button": "Verify and enter classroom",
+    "verify_exam_button": "Verify and start exam",
+    "enroll_title": "Register your face",
+    "enroll_subtitle": "Look straight at the camera then press capture",
+    "enroll_success": "Registration successful!",
+    "capturing": "Processing...",
+    "capture_button": "Capture and register",
+    "capture_hint": "Make sure your face is within the frame and well-lit",
+    "monitor_label": "Camera",
+    "multiple_faces_warning": "Multiple faces detected!",
+    "no_face_warning": "Face not recognized!"
+  },
+  "messages": {
+    "enroll_fallback_error": "Failed to register. Please try again.",
+    "verify_no_face": "No face detected. Make sure there is enough light and look straight at the camera.",
+    "verify_mismatch": "Face does not match ({{similarity}}% similarity). Please try again.",
+    "verify_error": "Verification failed. Please try again."
+  }
+}

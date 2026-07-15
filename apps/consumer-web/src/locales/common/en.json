@@ -1,0 +1,11 @@
+{
+  "labels": {
+    "welcome": "Welcome",
+    "get_started": "Get started",
+    "learn_more": "Learn more",
+    "read_more": "Read more"
+  },
+  "messages": {
+    "coming_soon": "Coming soon"
+  }
+}

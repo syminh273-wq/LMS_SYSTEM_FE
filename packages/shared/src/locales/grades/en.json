@@ -1,0 +1,14 @@
+{
+  "labels": {
+    "title": "Grades & Performance",
+    "subtitle": "Track your academic progress and achievements.",
+    "export_transcript": "Export Transcript",
+    "stat_gpa": "Overall GPA",
+    "stat_credits": "Credits Earned",
+    "stat_rank": "Rank",
+    "recent_results": "Recent Results",
+    "achievements_unlocked": "You've unlocked 12 achievements",
+    "achievements_desc": "Keep up the great work to earn more badges!",
+    "view_all_badges": "View All Badges"
+  }
+}

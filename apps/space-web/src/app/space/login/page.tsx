@@ -10,6 +10,7 @@ import { setProfile } from '@/lib/redux/userSlice';
 import Image from 'next/image';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 type LoginFormValues = {
   email: string;
@@ -22,6 +23,7 @@ export default function SpaceLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<LoginFormValues>({
     defaultValues: { email: '', password: '' }
@@ -38,8 +40,8 @@ export default function SpaceLoginPage() {
       Object.entries(err.errors).forEach(([field, message]) => {
         setFormError(field as any, { type: 'server', message });
       });
-    } else {
-      setGlobalError(err.message || 'Đăng nhập thất bại');
+      } else {
+      setGlobalError(err.message || t('auth.login.login_failed'));
     }
   };
 
@@ -69,8 +71,8 @@ export default function SpaceLoginPage() {
             <div className="flex justify-center mb-4">
               <Image src="/logo.jpg" alt="LMS LOGO" width={150} height={50} className="h-12 w-auto object-contain brightness-0 invert" />
             </div>
-            <h2 className='text-white text-2xl font-bold'>Space Administrator</h2>
-            <p className='text-muted-foreground text-sm mt-1'>Đăng nhập để quản lý tổ chức của bạn</p>
+            <h2 className='text-white text-2xl font-bold'>{t('auth.login.title')}</h2>
+            <p className='text-muted-foreground text-sm mt-1'>{t('auth.login.subtitle')}</p>
           </div>
 
           <div className='p-10'>
@@ -82,32 +84,32 @@ export default function SpaceLoginPage() {
 
             <form onSubmit={handleSubmit(onLogin)} className='space-y-6'>
               <div>
-                <label className='block text-sm font-semibold text-foreground mb-2'>Email quản trị</label>
+                <label className='block text-sm font-semibold text-foreground mb-2'>{t('auth.login.email_label')}</label>
                 <div className='relative'>
                   <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
                     <Mail size={18} />
                   </div>
-                  <input 
-                    type='email' 
-                    {...register('email', { required: 'Vui lòng nhập email' })} 
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-border'}`} 
-                    placeholder='admin@your-space.com' 
+                  <input
+                    type='email'
+                    {...register('email', { required: t('auth.login.email_required') })}
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-border'}`}
+                    placeholder={t('auth.login.email_placeholder')}
                   />
                 </div>
                 {errors.email && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.email.message}</p>}
               </div>
 
               <div>
-                <label className='block text-sm font-semibold text-foreground mb-2'>Mật khẩu</label>
+                <label className='block text-sm font-semibold text-foreground mb-2'>{t('auth.login.password_label')}</label>
                 <div className='relative'>
                   <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
                     <Lock size={18} />
                   </div>
-                  <input 
-                    type={showPassword ? 'text' : 'password'} 
-                    {...register('password', { required: 'Vui lòng nhập mật khẩu' })} 
-                    className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-border'}`} 
-                    placeholder='••••••••' 
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password', { required: t('auth.login.password_required') })}
+                    className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-border'}`}
+                    placeholder='••••••••'
                   />
                   <button
                     type='button'
@@ -122,7 +124,7 @@ export default function SpaceLoginPage() {
 
               <div className='flex justify-end'>
                 <Link href='/space/forgot-password' className='text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors'>
-                  Quên mật khẩu?
+                  {t('auth.login.forgot_password')}
                 </Link>
               </div>
 
@@ -131,13 +133,13 @@ export default function SpaceLoginPage() {
                 disabled={loading}
                 className='w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98] flex justify-center items-center gap-2'
               >
-                {loading ? 'Đang xác thực...' : 'Đăng nhập hệ thống'}
+                {loading ? t('auth.login.submit_loading') : t('auth.login.submit')}
               </button>
             </form>
 
             <div className='mt-6 flex items-center gap-3'>
               <div className='h-px flex-1 bg-muted' />
-              <span className='text-xs text-muted-foreground font-medium'>hoặc</span>
+              <span className='text-xs text-muted-foreground font-medium'>{t('auth.common.or')}</span>
               <div className='h-px flex-1 bg-muted' />
             </div>
 

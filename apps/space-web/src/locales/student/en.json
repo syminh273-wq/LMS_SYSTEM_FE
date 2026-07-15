@@ -1,0 +1,13 @@
+{
+  "title": "Student Management",
+  "subtitle": "All students who have ever studied in your classrooms",
+  "total_badge": "{{count}} students",
+  "search_placeholder": "Search by name or email...",
+  "search_empty_title": "No students match your search",
+  "search_empty_desc": "Try a different name or email",
+  "list_empty_title": "No students yet",
+  "list_empty_desc": "Students appear here once they are approved in one of your classrooms",
+  "no_name": "(No name)",
+  "no_email": "—",
+  "first_joined": "First joined {{date}}"
+}

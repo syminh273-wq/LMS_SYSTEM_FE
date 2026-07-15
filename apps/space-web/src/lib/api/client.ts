@@ -15,6 +15,30 @@ export default class BaseRestApiClient {
     return localStorage.getItem('accessToken');
   }
 
+  protected async tryRefreshToken(): Promise<boolean> {
+    if (typeof window === 'undefined') return false;
+    const refresh = localStorage.getItem('refreshToken');
+    if (!refresh) return false;
+    const userType = localStorage.getItem('userType') || 'space';
+    const path = userType === 'space'
+      ? '/api/v1/space/account/token/refresh/'
+      : '/api/v1/consumer/account/token/refresh/';
+    try {
+      const res = await fetch(`${this.baseURL}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh }),
+      });
+      if (!res.ok) return false;
+      const data = (await res.json().catch(() => null)) as { access?: string } | null;
+      if (!data?.access) return false;
+      localStorage.setItem('accessToken', data.access);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   protected async request<TResponse = unknown>(
     method: HttpMethod,
     path: string,
@@ -38,6 +62,10 @@ export default class BaseRestApiClient {
     const token = this.getAccessToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[api]', method, url, token ? `with-token(${token.slice(0, 12)}...)` : 'NO-TOKEN');
     }
 
     const config: RequestInit = {
@@ -64,17 +92,35 @@ export default class BaseRestApiClient {
 
     const data = await response.json().catch(() => null);
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        if (typeof window !== 'undefined') {
-          BaseRestApiClient.onUnauthorized?.();
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('userProfile');
-          window.location.href = '/space/login';
+      if (!response.ok) {
+        if (response.status === 401) {
+          if (typeof window !== 'undefined') {
+            const sentToken = this.getAccessToken();
+            console.warn('[api 401]', url, sentToken ? `had-token(${sentToken.slice(0, 12)}...)` : 'no-token', 'data=', data);
+            if (sentToken) {
+              const refreshed = await this.tryRefreshToken();
+              if (refreshed) {
+                const retryResponse = await fetch(url, {
+                  ...config,
+                  headers: {
+                    ...headers,
+                    'Authorization': `Bearer ${this.getAccessToken()}`,
+                  },
+                });
+                if (retryResponse.ok) {
+                  const retryData = await retryResponse.json().catch(() => null);
+                  return retryData as TResponse;
+                }
+              }
+              BaseRestApiClient.onUnauthorized?.();
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('refreshToken');
+              localStorage.removeItem('userProfile');
+              window.location.href = '/space/login';
+            }
+          }
+          throw new UnauthorizedException();
         }
-        throw new UnauthorizedException();
-      }
 
       if (response.status === 400 || response.status === 422) {
         throw new ValidationException(getValidationPayload(data), response.status);

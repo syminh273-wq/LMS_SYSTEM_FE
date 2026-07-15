@@ -19,18 +19,12 @@ import {
   ChevronsRight,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
+import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { LmsLogo } from '@shared/components/LmsLogo';
+import { useTranslation } from '@shared/components/LocaleProvider';
 import NotificationBell from '@/components/NotificationBell';
 import GlobalSearch from '@/components/GlobalSearch';
 import { SpaceProfileDropdown } from '@/components/layout/space-profile-dropdown';
-
-const navItems = [
-  { name: 'Dashboard', href: '/space', icon: LayoutDashboard },
-  { name: 'Classrooms', href: '/space/classrooms', icon: BookOpen },
-  { name: 'Quiz Library', href: '/space/quizzes', icon: Gamepad2 },
-  { name: 'Students', href: '/space/student', icon: Users },
-  { name: 'Settings', href: '/space/settings', icon: Settings },
-];
 
 function matchesNavPath(pathname: string, href: string) {
   return href === '/space' ? pathname === href : pathname.startsWith(href);
@@ -40,6 +34,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const brandColors = useSelector((state: RootState) => state.theme.brand);
@@ -58,6 +53,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     pathname.includes('/space/forgot-password') ||
     pathname.includes('/space/verify-otp') ||
     pathname.includes('/space/reset-password');
+
+  const navItems = React.useMemo(
+    () => [
+      { key: 'dashboard',  label: t('layout.nav.dashboard'),  href: '/space',              icon: LayoutDashboard },
+      { key: 'classrooms', label: t('layout.nav.classrooms'), href: '/space/classrooms',   icon: BookOpen },
+      { key: 'quizzes',    label: t('layout.nav.quizzes'),    href: '/space/quizzes',      icon: Gamepad2 },
+      { key: 'students',   label: t('layout.nav.students'),   href: '/space/student',      icon: Users },
+      { key: 'settings',   label: t('layout.nav.settings'),   href: '/space/settings',     icon: Settings },
+    ],
+    [t]
+  );
 
   const handleLogout = () => {
     dispatch(clearProfile());
@@ -85,7 +91,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <button
               onClick={() => setSidebarCollapsed(false)}
-              title="Mở rộng menu"
+              title={t('layout.actions.expand_menu')}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
             >
               <ChevronsRight size={16} />
@@ -105,7 +111,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
             <button
               onClick={() => setSidebarCollapsed(true)}
-              title="Thu nhỏ menu"
+              title={t('layout.actions.collapse_menu')}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors ml-2 shrink-0"
             >
               <ChevronsLeft size={16} />
@@ -118,9 +124,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             const isActive = matchesNavPath(pathname, item.href);
             return (
               <Link
-                key={item.name}
+                key={item.key}
                 href={item.href}
-                title={sidebarCollapsed ? item.name : undefined}
+                title={sidebarCollapsed ? item.label : undefined}
                 className={`flex items-center rounded-xl transition-all duration-200 group relative ${
                   sidebarCollapsed ? 'justify-center py-3 px-2' : 'gap-3 px-4 py-3'
                 } ${
@@ -131,7 +137,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               >
                 {isActive && <div className="absolute left-0 w-1.5 h-6 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />}
                 <item.icon size={20} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-primary-brand/70'} />
-                {!sidebarCollapsed && <span className="text-sm font-bold tracking-wide">{item.name}</span>}
+                {!sidebarCollapsed && <span className="text-sm font-bold tracking-wide">{item.label}</span>}
               </Link>
             );
           })}
@@ -146,7 +152,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             }`}
           >
             <LogOut size={20} />
-            {!sidebarCollapsed && <span className="text-sm font-bold tracking-wide">Logout</span>}
+            {!sidebarCollapsed && <span className="text-sm font-bold tracking-wide">{t('layout.actions.logout')}</span>}
           </Button>
         </div>
       </aside>
@@ -156,7 +162,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <header className="h-20 bg-card dark:bg-card border-b border-border dark:border-border flex items-center justify-between px-10">
           <div className="flex items-center gap-6 flex-1">
             <h2 className="text-lg font-bold text-foreground uppercase tracking-widest">
-              {navItems.find(i => matchesNavPath(pathname, i.href))?.name || 'Space Admin'}
+              {navItems.find(i => matchesNavPath(pathname, i.href))?.label || t('layout.page_title.space_admin')}
             </h2>
           </div>
 
@@ -166,6 +172,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-8">
             <ThemeToggle />
+
+            <LanguageSwitcher variant="compact" />
 
             <NotificationBell />
 

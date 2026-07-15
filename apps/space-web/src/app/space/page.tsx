@@ -26,6 +26,7 @@ import {
 import { accountService } from '@/lib/api/account';
 import { spaceApi } from '@/lib/api';
 import type { ActivityLog, ActivityLogEventType } from '@/lib/api/types';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 type DashboardStats = {
   totalClassrooms: number;
@@ -33,37 +34,57 @@ type DashboardStats = {
   activeClassrooms: number;
 };
 
-function getActivityMeta(eventType: ActivityLogEventType) {
+const ACTIVITY_KEY_MAP: Record<ActivityLogEventType, string> = {
+  classroom_created: 'dashboard.activity.classroom_created',
+  document_uploaded: 'dashboard.activity.document_uploaded',
+  document_deleted: 'dashboard.activity.document_deleted',
+  exam_created: 'dashboard.activity.exam_created',
+  exam_published: 'dashboard.activity.exam_published',
+  exam_opened: 'dashboard.activity.exam_opened',
+  exam_closed: 'dashboard.activity.exam_closed',
+  exam_deleted: 'dashboard.activity.exam_deleted',
+  quiz_assigned: 'dashboard.activity.quiz_assigned',
+  meeting_started: 'dashboard.activity.meeting_started',
+  meeting_ended: 'dashboard.activity.meeting_ended',
+  member_joined: 'dashboard.activity.member_joined',
+  member_approved: 'dashboard.activity.member_approved',
+  member_rejected: 'dashboard.activity.member_rejected',
+  member_kicked: 'dashboard.activity.member_kicked',
+  member_left: 'dashboard.activity.member_left',
+  exam_submitted: 'dashboard.activity.exam_submitted',
+};
+
+function getActivityMeta(eventType: ActivityLogEventType, t: (key: string) => string) {
   const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; label: string }> = {
-    classroom_created: { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light', label: 'Lớp học mới được tạo' },
-    document_uploaded: { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-50',   label: 'Tải lên tài liệu' },
-    document_deleted:  { icon: File,          color: 'text-red-500',    bg: 'bg-red-50',    label: 'Xóa tài liệu' },
-    exam_created:      { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-50', label: 'Tạo bài kiểm tra' },
-    exam_published:    { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: 'Phát hành bài kiểm tra' },
-    exam_opened:       { icon: Timer,         color: 'text-emerald-600',bg: 'bg-emerald-50',label: 'Mở ca thi trực tuyến' },
-    exam_closed:       { icon: Clock,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: 'Đóng ca thi' },
-    exam_deleted:      { icon: ClipboardList, color: 'text-red-500',    bg: 'bg-red-50',    label: 'Xóa bài kiểm tra' },
-    quiz_assigned:     { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-50', label: 'Giao đề trắc nghiệm' },
-    meeting_started:   { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-50',    label: 'Mở buổi học trực tuyến' },
-    meeting_ended:     { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: 'Kết thúc buổi học' },
-    member_joined:     { icon: UserPlus,      color: 'text-blue-500',   bg: 'bg-blue-50',   label: 'Học sinh đăng ký' },
-    member_approved:   { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: 'Duyệt học sinh vào lớp' },
-    member_rejected:   { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: 'Từ chối yêu cầu' },
-    member_kicked:     { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: 'Kick học sinh' },
-    member_left:       { icon: Users,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: 'Học sinh rời lớp' },
-    exam_submitted:    { icon: FileCheck,     color: 'text-teal-600',   bg: 'bg-teal-50',   label: 'Học sinh nộp bài' },
+    classroom_created: { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light', label: t(ACTIVITY_KEY_MAP.classroom_created) },
+    document_uploaded: { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-50',   label: t(ACTIVITY_KEY_MAP.document_uploaded) },
+    document_deleted:  { icon: File,          color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.document_deleted) },
+    exam_created:      { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-50', label: t(ACTIVITY_KEY_MAP.exam_created) },
+    exam_published:    { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: t(ACTIVITY_KEY_MAP.exam_published) },
+    exam_opened:       { icon: Timer,         color: 'text-emerald-600',bg: 'bg-emerald-50',label: t(ACTIVITY_KEY_MAP.exam_opened) },
+    exam_closed:       { icon: Clock,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.exam_closed) },
+    exam_deleted:      { icon: ClipboardList, color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.exam_deleted) },
+    quiz_assigned:     { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-50', label: t(ACTIVITY_KEY_MAP.quiz_assigned) },
+    meeting_started:   { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-50',    label: t(ACTIVITY_KEY_MAP.meeting_started) },
+    meeting_ended:     { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.meeting_ended) },
+    member_joined:     { icon: UserPlus,      color: 'text-blue-500',   bg: 'bg-blue-50',   label: t(ACTIVITY_KEY_MAP.member_joined) },
+    member_approved:   { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: t(ACTIVITY_KEY_MAP.member_approved) },
+    member_rejected:   { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.member_rejected) },
+    member_kicked:     { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.member_kicked) },
+    member_left:       { icon: Users,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.member_left) },
+    exam_submitted:    { icon: FileCheck,     color: 'text-teal-600',   bg: 'bg-teal-50',   label: t(ACTIVITY_KEY_MAP.exam_submitted) },
   };
   return map[eventType] ?? { icon: ClipboardList, color: 'text-muted-foreground', bg: 'bg-muted/50', label: eventType };
 }
 
-function timeAgo(isoString: string): string {
+function timeAgo(isoString: string, t: (key: string, fb?: string, values?: Record<string, string | number>) => string): string {
   const diff = Date.now() - new Date(isoString).getTime();
   const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return 'Vừa xong';
-  if (minutes < 60) return `${minutes} phút trước`;
+  if (minutes < 1) return t('dashboard.time_ago.just_now');
+  if (minutes < 60) return t('dashboard.time_ago.minutes_ago', undefined, { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} giờ trước`;
-  return `${Math.floor(hours / 24)} ngày trước`;
+  if (hours < 24) return t('dashboard.time_ago.hours_ago', undefined, { count: hours });
+  return t('dashboard.time_ago.days_ago', undefined, { count: Math.floor(hours / 24) });
 }
 
 const MOCK_WEEKLY = [
@@ -102,17 +123,18 @@ function getDailyQuote() {
   return QUOTES[day % QUOTES.length];
 }
 
-function getGreeting(hour: number): { text: string; emoji: string; gradient: string } {
-  if (hour < 6)  return { text: 'Chào đêm khuya',  emoji: '🌙', gradient: 'from-slate-800 via-indigo-900 to-slate-900' };
-  if (hour < 12) return { text: 'Chào buổi sáng',  emoji: '☀️', gradient: 'from-orange-400 via-amber-500 to-yellow-400' };
-  if (hour < 18) return { text: 'Chào buổi chiều', emoji: '⛅', gradient: 'from-sky-500 via-indigo-500 to-violet-500' };
-  return          { text: 'Chào buổi tối',  emoji: '🌆', gradient: 'from-indigo-600 via-purple-600 to-slate-700' };
+function getGreeting(hour: number, t: (key: string) => string): { text: string; emoji: string; gradient: string } {
+  if (hour < 6)  return { text: t('dashboard.greeting.night'),    emoji: '🌙', gradient: 'from-slate-800 via-indigo-900 to-slate-900' };
+  if (hour < 12) return { text: t('dashboard.greeting.morning'),  emoji: '☀️', gradient: 'from-orange-400 via-amber-500 to-yellow-400' };
+  if (hour < 18) return { text: t('dashboard.greeting.afternoon'), emoji: '⛅', gradient: 'from-sky-500 via-indigo-500 to-violet-500' };
+  return          { text: t('dashboard.greeting.evening'),   emoji: '🌆', gradient: 'from-indigo-600 via-purple-600 to-slate-700' };
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 
 export default function SpaceDashboardPage() {
   const router = useRouter();
+  const { t, formatDate: localeFormatDate, formatTime: localeFormatTime } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
@@ -185,7 +207,7 @@ export default function SpaceDashboardPage() {
       <div className="flex h-screen items-center justify-center bg-muted/50">
         <div className="flex flex-col items-center gap-4">
           <Loader2 size={40} className="animate-spin text-primary-brand" />
-          <p className="text-muted-foreground font-medium">Đang tải dữ liệu...</p>
+          <p className="text-muted-foreground font-medium">{t('dashboard.loading')}</p>
         </div>
       </div>
     );
@@ -193,36 +215,36 @@ export default function SpaceDashboardPage() {
 
   const statCards = [
     {
-      name: 'Tổng lớp học',
+      name: t('dashboard.stats.total_classrooms'),
       value: stats?.totalClassrooms ?? 0,
-      sub: '+3 tháng này',
+      sub: t('dashboard.stats.total_classrooms_sub'),
       icon: BookOpen,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       trend: true,
     },
     {
-      name: 'Học sinh đang học',
+      name: t('dashboard.stats.active_students'),
       value: stats?.totalStudents ?? 0,
-      sub: 'Từ các lớp đang mở',
+      sub: t('dashboard.stats.active_students_sub'),
       icon: Users,
       color: 'text-green-600',
       bg: 'bg-green-50',
       trend: true,
     },
     {
-      name: 'Tỉ lệ hoàn thành',
+      name: t('dashboard.stats.completion_rate'),
       value: '74%',
-      sub: '+6% so với kỳ trước',
+      sub: t('dashboard.stats.completion_rate_sub'),
       icon: TrendingUp,
       color: 'text-orange-600',
       bg: 'bg-orange-50',
       trend: true,
     },
     {
-      name: 'Chứng chỉ đã cấp',
+      name: t('dashboard.stats.certificates_issued'),
       value: 47,
-      sub: '12 tuần qua',
+      sub: t('dashboard.stats.certificates_issued_sub'),
       icon: Award,
       color: 'text-purple-600',
       bg: 'bg-purple-50',
@@ -230,10 +252,10 @@ export default function SpaceDashboardPage() {
     },
   ];
 
-  const greeting = getGreeting(now.getHours());
+  const greeting = getGreeting(now.getHours(), t);
   const quote = getDailyQuote();
-  const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const dateStr = now.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const timeStr = localeFormatTime(now);
+  const dateStr = localeFormatDate(now, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const firstName = teacherName.split(' ').pop() ?? teacherName;
 
   return (
@@ -258,7 +280,7 @@ export default function SpaceDashboardPage() {
                   {dateStr}
                 </p>
                 <h1 className="text-2xl md:text-3xl font-black tracking-tight mt-0.5">
-                  {greeting.text}{firstName ? `, ${firstName}` : ''}!
+                  {t('dashboard.greeting.with_name', undefined, { greeting: greeting.text, name: firstName })}
                 </h1>
               </div>
             </div>
@@ -278,18 +300,18 @@ export default function SpaceDashboardPage() {
               {timeStr}
             </div>
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mt-1">
-              Giờ hiện tại
+              {t('dashboard.current_time')}
             </p>
             {/* Mini stats row */}
             <div className="flex items-center gap-4 mt-4 justify-end">
               <div className="text-center">
                 <div className="text-xl font-black">{stats?.totalClassrooms ?? '—'}</div>
-                <div className="text-[10px] text-white/60 uppercase font-bold">Lớp học</div>
+                <div className="text-[10px] text-white/60 uppercase font-bold">{t('dashboard.mini_stats.classrooms')}</div>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div className="text-center">
                 <div className="text-xl font-black">{stats?.totalStudents ?? '—'}</div>
-                <div className="text-[10px] text-white/60 uppercase font-bold">Học sinh</div>
+                <div className="text-[10px] text-white/60 uppercase font-bold">{t('dashboard.mini_stats.students')}</div>
               </div>
             </div>
           </div>
@@ -324,11 +346,11 @@ export default function SpaceDashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <BarChart3 size={18} className="text-primary-brand" />
-              Hoạt động tuần này
+              {t('dashboard.chart.title')}
             </CardTitle>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-primary-brand inline-block" />Đăng ký</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-400 inline-block" />Nộp bài</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-primary-brand inline-block" />{t('dashboard.chart.enrolled_label')}</span>
+              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-400 inline-block" />{t('dashboard.chart.submitted_label')}</span>
             </div>
           </CardHeader>
           <CardContent>
@@ -339,12 +361,12 @@ export default function SpaceDashboardPage() {
                     <div
                       className="flex-1 bg-primary-brand rounded-t-md transition-all duration-700 hover:bg-primary-brand"
                       style={{ height: `${(d.enrolled / MAX_WEEKLY) * 100}%` }}
-                      title={`${d.enrolled} đăng ký`}
+                      title={t('dashboard.chart.enrolled_tooltip', undefined, { count: d.enrolled })}
                     />
                     <div
                       className="flex-1 bg-emerald-400 rounded-t-md transition-all duration-700 hover:bg-emerald-500"
                       style={{ height: `${(d.submitted / MAX_WEEKLY) * 100}%` }}
-                      title={`${d.submitted} nộp bài`}
+                      title={t('dashboard.chart.submitted_tooltip', undefined, { count: d.submitted })}
                     />
                   </div>
                   <span className="text-[10px] font-bold text-muted-foreground uppercase">{d.day}</span>
@@ -359,16 +381,16 @@ export default function SpaceDashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Clock size={18} className="text-muted-foreground" />
-              Hoạt động gần đây
+              {t('dashboard.recent_activity.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recentActivity.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic text-center py-4">Chưa có hoạt động nào.</p>
+              <p className="text-sm text-muted-foreground italic text-center py-4">{t('dashboard.recent_activity.empty')}</p>
             ) : (
               <div className="space-y-4">
                 {recentActivity.map((log) => {
-                  const { icon: Icon, color, bg, label } = getActivityMeta(log.event_type);
+                  const { icon: Icon, color, bg, label } = getActivityMeta(log.event_type, t);
                   return (
                     <div key={log.uid} className="flex items-start gap-3">
                       <div className={`w-7 h-7 rounded-lg ${bg} flex items-center justify-center shrink-0 mt-0.5`}>
@@ -381,7 +403,7 @@ export default function SpaceDashboardPage() {
                         {log.actor_name && (
                           <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{log.actor_name}</p>
                         )}
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{timeAgo(log.created_at)}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{timeAgo(log.created_at, t)}</p>
                       </div>
                     </div>
                   );
@@ -399,7 +421,7 @@ export default function SpaceDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap size={18} className="text-primary-brand" />
-              Lớp học nổi bật
+              {t('dashboard.top_classes.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -408,7 +430,7 @@ export default function SpaceDashboardPage() {
                 <div key={cls.name} className="space-y-1.5">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-foreground truncate">{cls.name}</span>
-                    <span className="text-xs text-muted-foreground shrink-0 ml-2">{cls.students}/{cls.max} hs</span>
+                    <span className="text-xs text-muted-foreground shrink-0 ml-2">{t('dashboard.top_classes.students_count', undefined, { current: cls.students, max: cls.max })}</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-1.5">
                     <div
@@ -416,7 +438,7 @@ export default function SpaceDashboardPage() {
                       style={{ width: `${cls.progress}%` }}
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground">Tiến độ: {cls.progress}%</p>
+                  <p className="text-[10px] text-muted-foreground">{t('dashboard.top_classes.progress', undefined, { percent: cls.progress })}</p>
                 </div>
               ))}
             </div>
@@ -426,14 +448,14 @@ export default function SpaceDashboardPage() {
         {/* Organization Status */}
         <Card className="border-border shadow-sm">
           <CardHeader>
-            <CardTitle>Trạng thái tổ chức</CardTitle>
+            <CardTitle>{t('dashboard.organization_status.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-5">
               {[
-                { label: 'Lớp học đang mở', value: stats?.activeClassrooms ?? 0, max: stats?.totalClassrooms ?? 1, color: 'bg-primary-brand' },
-                { label: 'Dung lượng lưu trữ', value: 45, max: 100, color: 'bg-amber-500', suffix: '%' },
-                { label: 'API Calls tháng này', value: 68, max: 100, color: 'bg-emerald-500', suffix: '%' },
+                { label: t('dashboard.organization_status.open_classrooms'), value: stats?.activeClassrooms ?? 0, max: stats?.totalClassrooms ?? 1, color: 'bg-primary-brand' },
+                { label: t('dashboard.organization_status.storage_capacity'), value: 45, max: 100, color: 'bg-amber-500', suffix: '%' },
+                { label: t('dashboard.organization_status.api_calls_month'), value: 68, max: 100, color: 'bg-emerald-500', suffix: '%' },
               ].map((item) => (
                 <div key={item.label} className="space-y-1.5">
                   <div className="flex justify-between text-sm">
@@ -452,8 +474,8 @@ export default function SpaceDashboardPage() {
               ))}
 
               <div className="pt-3 border-t border-border flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Gói hiện tại: <span className="font-bold text-primary-brand">Professional Plan</span></p>
-                <span className="text-[10px] font-bold bg-primary-brand-light text-primary-brand px-2 py-1 rounded-full border border-primary-brand-muted">Active</span>
+                <p className="text-xs text-muted-foreground">{t('dashboard.organization_status.current_plan')} <span className="font-bold text-primary-brand">{t('dashboard.organization_status.plan_name')}</span></p>
+                <span className="text-[10px] font-bold bg-primary-brand-light text-primary-brand px-2 py-1 rounded-full border border-primary-brand-muted">{t('dashboard.organization_status.active_badge')}</span>
               </div>
             </div>
           </CardContent>

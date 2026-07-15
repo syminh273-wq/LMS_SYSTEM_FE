@@ -1,0 +1,83 @@
+{
+  "title": "Dashboard",
+  "loading": "Loading data...",
+  "greeting": {
+    "night": "Good night",
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening",
+    "with_name": "{{greeting}}, {{name}}!"
+  },
+  "current_time": "Current time",
+  "stats": {
+    "total_classrooms": "Total classrooms",
+    "total_classrooms_sub": "+3 this month",
+    "active_students": "Active students",
+    "active_students_sub": "From open classrooms",
+    "completion_rate": "Completion rate",
+    "completion_rate_sub": "+6% vs last term",
+    "certificates_issued": "Certificates issued",
+    "certificates_issued_sub": "Last 12 weeks"
+  },
+  "chart": {
+    "title": "Weekly activity",
+    "enrolled_label": "Enrolled",
+    "submitted_label": "Submitted",
+    "enrolled_tooltip": "{{count}} enrolled",
+    "submitted_tooltip": "{{count}} submitted",
+    "day_mon": "Mon",
+    "day_tue": "Tue",
+    "day_wed": "Wed",
+    "day_thu": "Thu",
+    "day_fri": "Fri",
+    "day_sat": "Sat",
+    "day_sun": "Sun"
+  },
+  "recent_activity": {
+    "title": "Recent activity",
+    "empty": "No recent activity yet."
+  },
+  "top_classes": {
+    "title": "Top classes",
+    "students_count": "{{current}}/{{max}} students",
+    "progress": "Progress: {{percent}}%"
+  },
+  "organization_status": {
+    "title": "Organization status",
+    "open_classrooms": "Open classrooms",
+    "storage_capacity": "Storage capacity",
+    "api_calls_month": "API calls this month",
+    "current_plan": "Current plan:",
+    "plan_name": "Professional Plan",
+    "active_badge": "Active"
+  },
+  "time_ago": {
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minutes ago",
+    "hours_ago": "{{count}} hours ago",
+    "days_ago": "{{count}} days ago"
+  },
+  "mini_stats": {
+    "classrooms": "Classrooms",
+    "students": "Students"
+  },
+  "activity": {
+    "classroom_created": "New classroom created",
+    "document_uploaded": "Document uploaded",
+    "document_deleted": "Document deleted",
+    "exam_created": "Exam created",
+    "exam_published": "Exam published",
+    "exam_opened": "Online exam session opened",
+    "exam_closed": "Exam session closed",
+    "exam_deleted": "Exam deleted",
+    "quiz_assigned": "Quiz assigned",
+    "meeting_started": "Online class started",
+    "meeting_ended": "Online class ended",
+    "member_joined": "Student registered",
+    "member_approved": "Student approved",
+    "member_rejected": "Request rejected",
+    "member_kicked": "Student kicked",
+    "member_left": "Student left class",
+    "exam_submitted": "Student submitted"
+  }
+}

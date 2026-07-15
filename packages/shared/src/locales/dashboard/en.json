@@ -1,0 +1,121 @@
+{
+  "labels": {
+    "recent_grades": "Recent Grades",
+    "course": "Course",
+    "assignment": "Assignment",
+    "score": "Score",
+    "date": "Date",
+    "progress": "Progress",
+    "performance_over_time": "Performance Over Time",
+    "chart_placeholder": "Chart visualization would go here",
+    "course_distribution": "Course Distribution",
+    "gpa": "GPA",
+    "courses": "Courses",
+    "assignments": "Assignments",
+    "attendance": "Attendance"
+  },
+  "space": {
+    "loading": "Loading data...",
+    "greeting": {
+      "night": "Good night",
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "with_name": "{{greeting}}, {{name}}!"
+    },
+    "current_time": "Current time",
+    "stat": {
+      "classrooms": "Classrooms",
+      "students": "Students"
+    },
+    "stats": {
+      "total_classrooms": "Total classrooms",
+      "total_classrooms_sub": "+3 this month",
+      "active_students": "Active students",
+      "active_students_sub": "From open classrooms",
+      "completion_rate": "Completion rate",
+      "completion_rate_sub": "+6% vs last term",
+      "certificates": "Certificates issued",
+      "certificates_sub": "Last 12 weeks"
+    },
+    "weekly_chart": {
+      "title": "This week's activity",
+      "enrolled": "Enrolled",
+      "submitted": "Submitted",
+      "enrolled_title": "{{count}} enrolled",
+      "submitted_title": "{{count}} submitted"
+    },
+    "activity": {
+      "title": "Recent activity",
+      "empty": "No activity yet.",
+      "event": {
+        "classroom_created": "New classroom created",
+        "document_uploaded": "Document uploaded",
+        "document_deleted": "Document deleted",
+        "exam_created": "Exam created",
+        "exam_published": "Exam published",
+        "exam_opened": "Exam session opened",
+        "exam_closed": "Exam session closed",
+        "exam_deleted": "Exam deleted",
+        "quiz_assigned": "Quiz assigned",
+        "meeting_started": "Live class started",
+        "meeting_ended": "Live class ended",
+        "member_joined": "Student enrolled",
+        "member_approved": "Student approved into classroom",
+        "member_rejected": "Request rejected",
+        "member_kicked": "Student kicked",
+        "member_left": "Student left the classroom",
+        "exam_submitted": "Student submitted exam"
+      },
+      "time": {
+        "just_now": "Just now",
+        "minutes_ago": "{{count}} minutes ago",
+        "hours_ago": "{{count}} hours ago",
+        "days_ago": "{{count}} days ago"
+      }
+    },
+    "top_classes": {
+      "title": "Top classrooms",
+      "students_count": "{{current}}/{{max}} students",
+      "progress": "Progress: {{percent}}%"
+    },
+    "org_status": {
+      "title": "Organization status",
+      "active_classrooms": "Active classrooms",
+      "storage": "Storage capacity",
+      "api_calls": "API calls this month",
+      "current_plan": "Current plan: ",
+      "active_badge": "Active"
+    }
+  },
+  "quotes": [
+    {
+      "text": "Education is the most powerful weapon which you can use to change the world.",
+      "author": "Nelson Mandela"
+    },
+    {
+      "text": "A teacher affects eternity; he can never tell where his influence stops.",
+      "author": "Henry Adams"
+    },
+    {
+      "text": "The purpose of education is to turn mirrors into windows.",
+      "author": "Sydney J. Harris"
+    },
+    {
+      "text": "Teaching is not about filling a bucket, but lighting a fire.",
+      "author": "W. B. Yeats"
+    },
+    {
+      "text": "Everybody is a genius. But if you judge a fish by its ability to climb a tree...",
+      "author": "Albert Einstein"
+    },
+    {
+      "text": "Learning never exhausts the mind. Boredom comes from repetition, not from learning.",
+      "author": "Leonardo da Vinci"
+    },
+    {
+      "text": "The best teacher is the one who teaches students to find answers, not gives them the answer.",
+      "author": "Lao Tzu"
+    }
+  ]
+}

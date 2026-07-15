@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Building2,
   ShieldCheck,
@@ -20,20 +20,21 @@ import {
   KeyRound,
   Loader2,
 } from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
 } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
+import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
+import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { spaceApi } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
-import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSettings as setGlobalSettings, setThemeColor as setGlobalThemeColor } from '@/lib/redux/spaceSlice';
 
@@ -44,6 +45,7 @@ const EMPTY_PASSWORD: PasswordForm = { current_password: '', new_password: '', c
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [activeSection, setActiveSection] = useState<SettingSection>('profile');
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -54,7 +56,7 @@ export default function SettingsPage() {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwSuccess, setPwSuccess] = useState('');
   const [pwError, setPwError] = useState('');
-  
+
   const [settings, setSettings] = useState<Record<string, any>>({
     space_profile: {},
     security_config: {},
@@ -97,13 +99,12 @@ export default function SettingsPage() {
         }
       };
       const updatedData = await spaceApi.updateSettings(payload);
-      
-      // Update Global Redux State immediately
+
       dispatch(setGlobalSettings(updatedData));
-      
-      toast.success('Đã lưu cài đặt thành công!');
+
+      toast.success(t('settings.space.profile.saved_toast'));
     } catch (err) {
-      toast.error('Không thể lưu cài đặt');
+      toast.error(t('settings.space.profile.save_error'));
     } finally {
       setIsSaving(false);
     }
@@ -124,27 +125,27 @@ export default function SettingsPage() {
     setPwError('');
     setPwSuccess('');
     if (passwordForm.new_password !== passwordForm.confirm_password) {
-      setPwError('Mật khẩu xác nhận không khớp.');
+      setPwError(t('settings.space.password.mismatch_error'));
       return;
     }
     setPwLoading(true);
     try {
       await accountService.changePassword(passwordForm);
-      setPwSuccess('Đổi mật khẩu thành công!');
+      setPwSuccess(t('settings.space.password.success'));
       setPasswordForm(EMPTY_PASSWORD);
     } catch (err: unknown) {
-      setPwError(err instanceof Error ? err.message : 'Không thể đổi mật khẩu. Vui lòng kiểm tra lại.');
+      setPwError(err instanceof Error ? err.message : t('settings.space.password.error_fallback'));
     } finally {
       setPwLoading(false);
     }
   };
 
   const menuItems = [
-    { id: 'profile', label: 'Thông tin tổ chức', icon: Building2 },
-    { id: 'security', label: 'Bảo mật & Xác thực', icon: ShieldCheck },
-    { id: 'classrooms', label: 'Cấu hình lớp học', icon: Settings2 },
-    { id: 'notifications', label: 'Thông báo', icon: Bell },
-  ];
+    { id: 'profile', label: t('settings.space.nav.profile'), icon: Building2 },
+    { id: 'security', label: t('settings.space.nav.security'), icon: ShieldCheck },
+    { id: 'classrooms', label: t('settings.space.nav.classrooms'), icon: Settings2 },
+    { id: 'notifications', label: t('settings.space.nav.notifications'), icon: Bell },
+  ] as const;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10 relative">
@@ -152,27 +153,26 @@ export default function SettingsPage() {
         <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-3xl">
           <div className="flex flex-col items-center gap-3">
             <div className="w-10 h-10 border-4 border-primary-brand border-t-transparent rounded-full animate-spin" />
-            <p className="text-xs font-bold uppercase tracking-widest text-primary-brand">Đang tải cấu hình...</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-primary-brand">{t('settings.space.loading')}</p>
           </div>
         </div>
       )}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">Cài đặt hệ thống</h2>
-          <p className="text-muted-foreground font-medium mt-1">Quản lý và tùy chỉnh không gian làm việc của bạn</p>
+          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">{t('settings.space.title')}</h2>
+          <p className="text-muted-foreground font-medium mt-1">{t('settings.space.subtitle')}</p>
         </div>
       </div>
 
       <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
-        {/* Sidebar Navigation */}
         <aside className="lg:col-span-3 space-y-2">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id as SettingSection)}
               className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all font-bold text-sm uppercase tracking-wider ${
-                activeSection === item.id 
-                  ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20' 
+                activeSection === item.id
+                  ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20'
                   : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
               }`}
             >
@@ -182,7 +182,6 @@ export default function SettingsPage() {
           ))}
         </aside>
 
-        {/* Main Content Area */}
         <main className="lg:col-span-9 space-y-6">
           {activeSection === 'profile' && (
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
@@ -193,8 +192,8 @@ export default function SettingsPage() {
                       <Building2 size={24} />
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-bold">Hồ sơ Space</CardTitle>
-                      <CardDescription className="font-medium">Thông tin hiển thị cho học sinh và giáo viên</CardDescription>
+                      <CardTitle className="text-xl font-bold">{t('settings.space.profile.title')}</CardTitle>
+                      <CardDescription className="font-medium">{t('settings.space.profile.subtitle')}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -203,37 +202,37 @@ export default function SettingsPage() {
                     <div className="space-y-4 flex flex-col items-center">
                       <div className="w-32 h-32 rounded-3xl bg-muted border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground gap-2 group hover:border-primary-brand hover:bg-primary-brand-light/50 transition-all cursor-pointer">
                         <Upload size={24} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Tải Logo</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">{t('settings.space.profile.upload_logo')}</span>
                       </div>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase text-center tracking-tighter">PNG, JPG tối đa 2MB</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase text-center tracking-tighter">{t('settings.space.profile.upload_hint')}</p>
                     </div>
-                    
+
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                       <div className="space-y-2.5">
-                        <Label htmlFor="spaceName" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Tên Space</Label>
-                        <Input 
-                          id="spaceName" 
-                          value={settings.space_profile?.name || ''} 
+                        <Label htmlFor="spaceName" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.name_label')}</Label>
+                        <Input
+                          id="spaceName"
+                          value={settings.space_profile?.name || ''}
                           onChange={(e) => updateSetting('space_profile', 'name', e.target.value)}
-                          className="h-12 rounded-xl bg-muted/30 border-border focus:bg-card" 
+                          className="h-12 rounded-xl bg-muted/30 border-border focus:bg-card"
                         />
                       </div>
                       <div className="space-y-2.5">
-                        <Label htmlFor="slug" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Slug (Đường dẫn)</Label>
+                        <Label htmlFor="slug" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.slug_label')}</Label>
                         <div className="relative">
                           <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                          <Input 
-                            id="slug" 
-                            value={settings.space_profile?.slug || ''} 
+                          <Input
+                            id="slug"
+                            value={settings.space_profile?.slug || ''}
                             onChange={(e) => updateSetting('space_profile', 'slug', e.target.value)}
-                            className="h-12 pl-12 rounded-xl bg-muted/30 border-border focus:bg-card" 
+                            className="h-12 pl-12 rounded-xl bg-muted/30 border-border focus:bg-card"
                           />
                         </div>
                       </div>
                       <div className="md:col-span-2 space-y-2.5">
-                        <Label htmlFor="desc" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Mô tả</Label>
-                        <textarea 
-                          id="desc" 
+                        <Label htmlFor="desc" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.desc_label')}</Label>
+                        <textarea
+                          id="desc"
                           rows={3}
                           className="w-full p-4 rounded-xl bg-muted/30 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary-brand/10 focus:bg-card transition-all font-medium"
                           value={settings.space_profile?.description || ''}
@@ -245,12 +244,12 @@ export default function SettingsPage() {
 
                   <div className="pt-6 border-t border-border/50">
                     <div className="flex items-center justify-between mb-4">
-                      <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Màu sắc thương hiệu</Label>
+                      <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.theme_color_label')}</Label>
                       <span className="text-xs font-mono font-bold text-primary-brand bg-primary-brand-light px-2 py-1 rounded-md border border-primary-brand-muted uppercase">{themeColor}</span>
                     </div>
                     <div className="flex flex-wrap gap-4 items-center">
                       {['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'].map((color) => (
-                        <button 
+                        <button
                           key={color}
                           onClick={() => setThemeColor(color)}
                           className={`w-12 h-12 rounded-2xl border-2 shadow-sm transition-all hover:scale-110 active:scale-95 ${themeColor === color ? 'border-primary-brand ring-2 ring-primary-brand/20' : 'border-white ring-1 ring-border'}`}
@@ -259,10 +258,10 @@ export default function SettingsPage() {
                           {themeColor === color && <Check size={18} className="text-white mx-auto" />}
                         </button>
                       ))}
-                      
+
                       <div className="relative group">
-                        <input 
-                          type="color" 
+                        <input
+                          type="color"
                           value={themeColor}
                           onChange={(e) => setThemeColor(e.target.value)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
@@ -271,19 +270,29 @@ export default function SettingsPage() {
                           <Palette size={20} />
                         </button>
                       </div>
-                      
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight ml-2">Chọn màu tùy chỉnh</p>
+
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight ml-2">{t('settings.space.profile.custom_color_hint')}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-border/50">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div className="space-y-1">
+                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.language_label')}</Label>
+                        <p className="text-xs text-muted-foreground font-medium">{t('settings.space.profile.language_hint')}</p>
+                      </div>
+                      <LanguageSwitcher />
                     </div>
                   </div>
                 </CardContent>
                 <div className="p-6 bg-muted/20 border-t border-border flex justify-end">
-                  <Button 
-                    onClick={handleSave} 
+                  <Button
+                    onClick={handleSave}
                     disabled={isSaving}
                     className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
-                    Lưu hồ sơ
+                    {t('settings.space.profile.save')}
                   </Button>
                 </div>
               </Card>
@@ -299,8 +308,8 @@ export default function SettingsPage() {
                       <ShieldCheck size={24} />
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-bold">Bảo mật & Truy cập</CardTitle>
-                      <CardDescription className="font-medium">Quản lý các lớp bảo vệ và quy tắc tham gia</CardDescription>
+                      <CardTitle className="text-xl font-bold">{t('settings.space.security.title')}</CardTitle>
+                      <CardDescription className="font-medium">{t('settings.space.security.subtitle')}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -311,11 +320,11 @@ export default function SettingsPage() {
                         <Camera size={20} />
                       </div>
                       <div>
-                        <p className="font-bold text-sm">Xác thực khuôn mặt (FaceID)</p>
-                        <p className="text-xs text-muted-foreground font-medium">Yêu cầu xác thực khi vào phòng học</p>
+                        <p className="font-bold text-sm">{t('settings.space.security.face_id_title')}</p>
+                        <p className="text-xs text-muted-foreground font-medium">{t('settings.space.security.face_id_desc')}</p>
                       </div>
                     </div>
-                    <div 
+                    <div
                       onClick={() => updateSetting('security_config', 'face_verify', !settings.security_config?.face_verify)}
                       className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors ${settings.security_config?.face_verify ? 'bg-primary-brand' : 'bg-muted'}`}
                     >
@@ -329,11 +338,11 @@ export default function SettingsPage() {
                         <Lock size={20} />
                       </div>
                       <div>
-                        <p className="font-bold text-sm">Giới hạn Domain Email</p>
-                        <p className="text-xs text-muted-foreground font-medium">Chỉ cho phép email từ tổ chức (@school.edu.vn)</p>
+                        <p className="font-bold text-sm">{t('settings.space.security.domain_title')}</p>
+                        <p className="text-xs text-muted-foreground font-medium">{t('settings.space.security.domain_desc')}</p>
                       </div>
                     </div>
-                    <div 
+                    <div
                       onClick={() => updateSetting('security_config', 'domain_restriction', !settings.security_config?.domain_restriction)}
                       className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors ${settings.security_config?.domain_restriction ? 'bg-primary-brand' : 'bg-muted'}`}
                     >
@@ -342,7 +351,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-4 pt-4">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block">Mã tham gia mặc định (Join Code)</Label>
+                    <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block">{t('settings.space.security.join_code_label')}</Label>
                     <div className="flex gap-4">
                       <Input
                         value={settings.security_config?.join_code || ''}
@@ -354,7 +363,7 @@ export default function SettingsPage() {
                         onClick={() => updateSetting('security_config', 'join_code', 'SPACE-' + Math.floor(100 + Math.random() * 900))}
                         className="h-12 px-6 rounded-xl font-bold uppercase text-xs tracking-widest border-border"
                       >
-                        Tạo mới
+                        {t('settings.space.security.generate')}
                       </Button>
                     </div>
                   </div>
@@ -366,12 +375,11 @@ export default function SettingsPage() {
                     className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
-                    Lưu bảo mật
+                    {t('settings.space.security.save')}
                   </Button>
                 </div>
               </Card>
 
-              {/* Change Password Card */}
               <Card className="border-border rounded-3xl shadow-sm">
                 <CardHeader className="bg-muted/30 pb-6 border-b border-border/50">
                   <div className="flex items-center gap-4">
@@ -379,18 +387,18 @@ export default function SettingsPage() {
                       <KeyRound size={24} />
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-bold">Đổi mật khẩu</CardTitle>
-                      <CardDescription className="font-medium">Cập nhật mật khẩu đăng nhập của bạn</CardDescription>
+                      <CardTitle className="text-xl font-bold">{t('settings.space.security.change_password_title')}</CardTitle>
+                      <CardDescription className="font-medium">{t('settings.space.security.change_password_desc')}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="p-8">
                   <form onSubmit={handleChangePassword} className="space-y-5">
                     {(['current_password', 'new_password', 'confirm_password'] as const).map((field) => {
-                      const labels = {
-                        current_password: 'Mật khẩu hiện tại',
-                        new_password: 'Mật khẩu mới',
-                        confirm_password: 'Xác nhận mật khẩu mới',
+                      const labels: Record<typeof field, string> = {
+                        current_password: t('settings.space.security.current_password_label'),
+                        new_password: t('settings.space.security.new_password_label'),
+                        confirm_password: t('settings.space.security.confirm_password_label'),
                       };
                       return (
                         <div key={field} className="space-y-2">
@@ -440,7 +448,7 @@ export default function SettingsPage() {
                         className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
                       >
                         {pwLoading ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={16} />}
-                        Đổi mật khẩu
+                        {t('settings.space.security.change_password_submit')}
                       </Button>
                     </div>
                   </form>
@@ -458,8 +466,8 @@ export default function SettingsPage() {
                       <Settings2 size={24} />
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-bold">Cấu hình lớp học</CardTitle>
-                      <CardDescription className="font-medium">Cài đặt mặc định cho các phòng học mới</CardDescription>
+                      <CardTitle className="text-xl font-bold">{t('settings.space.classrooms.title')}</CardTitle>
+                      <CardDescription className="font-medium">{t('settings.space.classrooms.subtitle')}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -468,58 +476,58 @@ export default function SettingsPage() {
                     <div className="space-y-2.5">
                       <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Users size={14} />
-                        Sĩ số tối đa mặc định
+                        {t('settings.space.classrooms.max_students_label')}
                       </Label>
-                      <Input 
-                        type="number" 
-                        value={settings.classroom_defaults?.max_students || 40} 
+                      <Input
+                        type="number"
+                        value={settings.classroom_defaults?.max_students || 40}
                         onChange={(e) => updateSetting('classroom_defaults', 'max_students', parseInt(e.target.value))}
-                        className="h-12 rounded-xl bg-muted/30 border-border" 
+                        className="h-12 rounded-xl bg-muted/30 border-border"
                       />
                     </div>
-                    
+
                     <div className="space-y-2.5">
                       <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Palette size={14} />
-                        Giao diện mặc định
+                        {t('settings.space.classrooms.view_mode_label')}
                       </Label>
                       <div className="flex h-12 bg-muted/30 rounded-xl border border-border p-1">
-                        <button 
+                        <button
                           onClick={() => updateSetting('classroom_defaults', 'view_mode', 'grid')}
                           className={`flex-1 rounded-lg transition-all text-xs font-bold ${settings.classroom_defaults?.view_mode === 'grid' ? 'bg-card shadow-sm text-primary-brand border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                          Lưới (Grid)
+                          {t('settings.space.classrooms.view_grid')}
                         </button>
-                        <button 
+                        <button
                           onClick={() => updateSetting('classroom_defaults', 'view_mode', 'list')}
                           className={`flex-1 rounded-lg transition-all text-xs font-bold ${settings.classroom_defaults?.view_mode === 'list' ? 'bg-card shadow-sm text-primary-brand border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                          Danh sách (List)
+                          {t('settings.space.classrooms.view_list')}
                         </button>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4 pt-4 border-t border-border/50">
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Tính năng được bật mặc định</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.classrooms.features_label')}</p>
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        'Trò chuyện công khai',
-                        'Chia sẻ màn hình',
-                        'Ghi lại buổi học',
-                        'Phòng thảo luận nhóm',
-                        'Bảng trắng tương tác',
-                        'Phản hồi bằng Emoji'
-                      ].map((feature, i) => {
-                        const isEnabled = settings.classroom_defaults?.features?.includes(feature);
+                        { key: 'feature_chat', label: t('settings.space.classrooms.feature_chat') },
+                        { key: 'feature_screen_share', label: t('settings.space.classrooms.feature_screen_share') },
+                        { key: 'feature_record', label: t('settings.space.classrooms.feature_record') },
+                        { key: 'feature_breakout', label: t('settings.space.classrooms.feature_breakout') },
+                        { key: 'feature_whiteboard', label: t('settings.space.classrooms.feature_whiteboard') },
+                        { key: 'feature_emoji', label: t('settings.space.classrooms.feature_emoji') },
+                      ].map((feature) => {
+                        const isEnabled = settings.classroom_defaults?.features?.includes(feature.label);
                         return (
-                          <div 
-                            key={i} 
+                          <div
+                            key={feature.key}
                             onClick={() => {
                               const currentFeatures = settings.classroom_defaults?.features || [];
-                              const newFeatures = isEnabled 
-                                ? currentFeatures.filter((f: string) => f !== feature)
-                                : [...currentFeatures, feature];
+                              const newFeatures = isEnabled
+                                ? currentFeatures.filter((f: string) => f !== feature.label)
+                                : [...currentFeatures, feature.label];
                               updateSetting('classroom_defaults', 'features', newFeatures);
                             }}
                             className="flex items-center gap-3 p-3 rounded-xl border border-border bg-muted/10 hover:bg-muted/30 transition-all cursor-pointer"
@@ -527,7 +535,7 @@ export default function SettingsPage() {
                             <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${isEnabled ? 'bg-primary-brand border-primary-brand text-white' : 'border-border'}`}>
                               {isEnabled && <Check size={12} />}
                             </div>
-                            <span className="text-sm font-medium">{feature}</span>
+                            <span className="text-sm font-medium">{feature.label}</span>
                           </div>
                         );
                       })}
@@ -535,13 +543,13 @@ export default function SettingsPage() {
                   </div>
                 </CardContent>
                 <div className="p-6 bg-muted/20 border-t border-border flex justify-end">
-                  <Button 
-                    onClick={handleSave} 
+                  <Button
+                    onClick={handleSave}
                     disabled={isSaving}
                     className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
-                    Lưu lớp học
+                    {t('settings.space.classrooms.save')}
                   </Button>
                 </div>
               </Card>
@@ -557,27 +565,27 @@ export default function SettingsPage() {
                       <Bell size={24} />
                     </div>
                     <div>
-                      <CardTitle className="text-xl font-bold">Tùy chỉnh thông báo</CardTitle>
-                      <CardDescription className="font-medium">Kiểm soát các cảnh báo và cập nhật quan trọng</CardDescription>
+                      <CardTitle className="text-xl font-bold">{t('settings.space.notifications.title')}</CardTitle>
+                      <CardDescription className="font-medium">{t('settings.space.notifications.subtitle')}</CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="p-8 space-y-10">
                   <div className="space-y-4">
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Thông báo qua Web</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">{t('settings.space.notifications.web_section')}</p>
                     {[
-                      { id: 'new_student', title: 'Học sinh mới tham gia', desc: 'Nhận thông báo khi có học sinh yêu cầu vào Space' },
-                      { id: 'submission', title: 'Bài nộp bài tập mới', desc: 'Thông báo khi học sinh nộp bài tập về nhà' },
-                      { id: 'support', title: 'Tin nhắn hỗ trợ', desc: 'Thông báo tin nhắn mới từ hệ thống hỗ trợ' }
-                    ].map((item, i) => {
+                      { id: 'new_student', title: t('settings.space.notifications.new_student_title'), desc: t('settings.space.notifications.new_student_desc') },
+                      { id: 'submission', title: t('settings.space.notifications.submission_title'), desc: t('settings.space.notifications.submission_desc') },
+                      { id: 'support', title: t('settings.space.notifications.support_title'), desc: t('settings.space.notifications.support_desc') }
+                    ].map((item) => {
                       const isEnabled = settings.notification_prefs?.web?.[item.id];
                       return (
-                        <div key={i} className="flex items-center justify-between py-2">
+                        <div key={item.id} className="flex items-center justify-between py-2">
                           <div>
                             <p className="font-bold text-sm">{item.title}</p>
                             <p className="text-xs text-muted-foreground font-medium">{item.desc}</p>
                           </div>
-                          <div 
+                          <div
                             onClick={() => {
                               const web = { ...(settings.notification_prefs?.web || {}), [item.id]: !isEnabled };
                               updateSetting('notification_prefs', 'web', web);
@@ -592,19 +600,19 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="space-y-4 pt-6 border-t border-border/50">
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Thông báo qua Email</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">{t('settings.space.notifications.email_section')}</p>
                     {[
-                      { id: 'weekly_report', title: 'Báo cáo hàng tuần', desc: 'Tóm tắt hoạt động của Space trong tuần' },
-                      { id: 'security_alert', title: 'Cảnh báo bảo mật', desc: 'Email khi có đăng nhập từ thiết bị lạ' }
-                    ].map((item, i) => {
+                      { id: 'weekly_report', title: t('settings.space.notifications.weekly_report_title'), desc: t('settings.space.notifications.weekly_report_desc') },
+                      { id: 'security_alert', title: t('settings.space.notifications.security_alert_title'), desc: t('settings.space.notifications.security_alert_desc') }
+                    ].map((item) => {
                       const isEnabled = settings.notification_prefs?.email?.[item.id];
                       return (
-                        <div key={i} className="flex items-center justify-between py-2">
+                        <div key={item.id} className="flex items-center justify-between py-2">
                           <div>
                             <p className="font-bold text-sm">{item.title}</p>
                             <p className="text-xs text-muted-foreground font-medium">{item.desc}</p>
                           </div>
-                          <div 
+                          <div
                             onClick={() => {
                               const email = { ...(settings.notification_prefs?.email || {}), [item.id]: !isEnabled };
                               updateSetting('notification_prefs', 'email', email);
@@ -619,13 +627,13 @@ export default function SettingsPage() {
                   </div>
                 </CardContent>
                 <div className="p-6 bg-muted/20 border-t border-border flex justify-end">
-                  <Button 
-                    onClick={handleSave} 
+                  <Button
+                    onClick={handleSave}
                     disabled={isSaving}
                     className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
-                    Lưu thông báo
+                    {t('settings.space.notifications.save')}
                   </Button>
                 </div>
               </Card>

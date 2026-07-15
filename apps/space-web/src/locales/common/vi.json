@@ -1,0 +1,46 @@
+{
+  "labels": {
+    "welcome": "Chào mừng",
+    "overview": "Tổng quan",
+    "untitled": "Chưa có tiêu đề"
+  },
+  "messages": {
+    "coming_soon": "Sắp ra mắt"
+  },
+  "chat": {
+    "title": "Thảo luận lớp học",
+    "empty_state": "Chưa có tin nhắn nào. Hãy là người đầu tiên bắt đầu cuộc trò chuyện!",
+    "input_placeholder": "Nhập tin nhắn...",
+    "attach_file": "Đính kèm tệp",
+    "status_online": "Trực tuyến",
+    "status_connecting": "Đang kết nối",
+    "status_disconnected": "Mất kết nối",
+    "reconnecting": "Đang kết nối lại...",
+    "not_connected": "Chưa kết nối chat",
+    "history_load_failed": "Không thể tải lịch sử tin nhắn",
+    "load_more_failed": "Không thể tải thêm tin nhắn",
+    "typing": "đang nhập...",
+    "upload_failed_prefix": "Tải lên thất bại:",
+    "upload_failed_default": "Không thể tải tệp lên",
+    "upload_unknown_error": "Lỗi không xác định"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "aria_label": "Thông báo",
+    "mark_all_read": "Đánh dấu đã đọc tất cả",
+    "empty": "Không có thông báo nào",
+    "just_now": "Vừa xong",
+    "minutes_ago": "{{count}} phút trước",
+    "hours_ago": "{{count}} giờ trước"
+  },
+  "search": {
+    "trigger_label": "Tìm kiếm",
+    "dialog_aria_label": "Hộp thoại tìm kiếm",
+    "placeholder": "Tìm kiếm...",
+    "empty_prompt": "Nhập để tìm kiếm...",
+    "no_results": "Không tìm thấy kết quả",
+    "navigate": "Điều hướng",
+    "open": "Mở",
+    "results_count_other": "{{count}} kết quả"
+  }
+}

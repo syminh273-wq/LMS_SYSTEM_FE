@@ -5,6 +5,8 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import { usePathname } from 'next/navigation';
 import { store } from '@/lib/redux/store';
 import { ThemeProvider } from '@shared/components/ThemeProvider';
+import { LocaleProvider } from '@shared/components/LocaleProvider';
+import { consumerWebBundles } from '@/lib/i18n/bundles';
 import { FaceEnrollModal } from '@/components/face/face-enroll-modal';
 import { setFaceEnrolled } from '@/lib/redux/userSlice';
 import type { RootState } from '@/lib/redux/store';
@@ -34,12 +36,14 @@ function FaceEnrollmentGuard({ children }: { children: React.ReactNode }) {
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider>
-      <Provider store={store}>
-        <FaceEnrollmentGuard>
-          {children}
-        </FaceEnrollmentGuard>
-      </Provider>
-    </ThemeProvider>
+    <LocaleProvider bundles={consumerWebBundles}>
+      <ThemeProvider>
+        <Provider store={store}>
+          <FaceEnrollmentGuard>
+            {children}
+          </FaceEnrollmentGuard>
+        </Provider>
+      </ThemeProvider>
+    </LocaleProvider>
   );
 }

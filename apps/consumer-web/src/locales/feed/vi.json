@@ -1,0 +1,57 @@
+{
+  "labels": {
+    "tab_all": "Tất cả",
+    "tab_following": "Đang theo dõi",
+    "no_posts_title": "Chưa có bài đăng nào",
+    "no_posts_desc": "Hãy là người đầu tiên chia sẻ điều gì đó!",
+    "load_more": "Xem thêm",
+    "thinking_default": "Bạn đang nghĩ gì?",
+    "thinking_with_name": "{{name}} đang nghĩ gì?",
+    "you": "Bạn",
+    "image": "Ảnh",
+    "emotion": "Cảm xúc",
+    "feeling": "đang cảm thấy",
+    "feeling_state": "đang {{emotion}}",
+    "post_btn": "Đăng",
+    "visibility_public": "Công khai",
+    "visibility_friends": "Bạn bè",
+    "visibility_private": "Chỉ mình tôi",
+    "anonymous": "Ẩn danh",
+    "delete_post": "Xóa bài",
+    "comments": "bình luận",
+    "like": "Thích",
+    "comment": "Bình luận",
+    "share": "Chia sẻ",
+    "write_comment": "Viết bình luận..."
+  },
+  "emotions": {
+    "happy": "Đang vui",
+    "sad": "Buồn",
+    "motivated": "Cố lên",
+    "excited": "Hào hứng",
+    "tired": "Mệt mỏi",
+    "thinking": "Suy nghĩ",
+    "confident": "Tự tin",
+    "celebrating": "Ăn mừng",
+    "stressed": "Căng thẳng",
+    "loved": "Yêu thương"
+  },
+  "time": {
+    "just_now": "Vừa xong",
+    "minutes_ago": "{{count}} phút trước",
+    "hours_ago": "{{count}} giờ trước",
+    "days_ago": "{{count}} ngày trước"
+  },
+  "messages": {
+    "load_feed_error": "Không thể tải feed",
+    "init_error": "Lỗi khởi tạo",
+    "post_created": "Đã đăng bài!",
+    "post_failed": "Đăng bài thất bại",
+    "load_comments_error": "Không thể tải bình luận",
+    "action_failed": "Thao tác thất bại",
+    "send_comment_error": "Không thể gửi bình luận",
+    "delete_post_confirm": "Xóa bài đăng này?",
+    "post_deleted": "Đã xóa bài đăng",
+    "delete_error": "Không thể xóa"
+  }
+}

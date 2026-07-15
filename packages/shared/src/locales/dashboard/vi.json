@@ -1,0 +1,121 @@
+{
+  "labels": {
+    "recent_grades": "Điểm gần đây",
+    "course": "Khóa học",
+    "assignment": "Bài tập",
+    "score": "Điểm",
+    "date": "Ngày",
+    "progress": "Tiến độ",
+    "performance_over_time": "Hiệu suất theo thời gian",
+    "chart_placeholder": "Biểu đồ sẽ được hiển thị ở đây",
+    "course_distribution": "Phân bố khóa học",
+    "gpa": "GPA",
+    "courses": "Khóa học",
+    "assignments": "Bài tập",
+    "attendance": "Chuyên cần"
+  },
+  "space": {
+    "loading": "Đang tải dữ liệu...",
+    "greeting": {
+      "night": "Chào đêm khuya",
+      "morning": "Chào buổi sáng",
+      "afternoon": "Chào buổi chiều",
+      "evening": "Chào buổi tối",
+      "with_name": "{{greeting}}, {{name}}!"
+    },
+    "current_time": "Giờ hiện tại",
+    "stat": {
+      "classrooms": "Lớp học",
+      "students": "Học sinh"
+    },
+    "stats": {
+      "total_classrooms": "Tổng lớp học",
+      "total_classrooms_sub": "+3 tháng này",
+      "active_students": "Học sinh đang học",
+      "active_students_sub": "Từ các lớp đang mở",
+      "completion_rate": "Tỉ lệ hoàn thành",
+      "completion_rate_sub": "+6% so với kỳ trước",
+      "certificates": "Chứng chỉ đã cấp",
+      "certificates_sub": "12 tuần qua"
+    },
+    "weekly_chart": {
+      "title": "Hoạt động tuần này",
+      "enrolled": "Đăng ký",
+      "submitted": "Nộp bài",
+      "enrolled_title": "{{count}} đăng ký",
+      "submitted_title": "{{count}} nộp bài"
+    },
+    "activity": {
+      "title": "Hoạt động gần đây",
+      "empty": "Chưa có hoạt động nào.",
+      "event": {
+        "classroom_created": "Lớp học mới được tạo",
+        "document_uploaded": "Tải lên tài liệu",
+        "document_deleted": "Xóa tài liệu",
+        "exam_created": "Tạo bài kiểm tra",
+        "exam_published": "Phát hành bài kiểm tra",
+        "exam_opened": "Mở ca thi trực tuyến",
+        "exam_closed": "Đóng ca thi",
+        "exam_deleted": "Xóa bài kiểm tra",
+        "quiz_assigned": "Giao đề trắc nghiệm",
+        "meeting_started": "Mở buổi học trực tuyến",
+        "meeting_ended": "Kết thúc buổi học",
+        "member_joined": "Học sinh đăng ký",
+        "member_approved": "Duyệt học sinh vào lớp",
+        "member_rejected": "Từ chối yêu cầu",
+        "member_kicked": "Kick học sinh",
+        "member_left": "Học sinh rời lớp",
+        "exam_submitted": "Học sinh nộp bài"
+      },
+      "time": {
+        "just_now": "Vừa xong",
+        "minutes_ago": "{{count}} phút trước",
+        "hours_ago": "{{count}} giờ trước",
+        "days_ago": "{{count}} ngày trước"
+      }
+    },
+    "top_classes": {
+      "title": "Lớp học nổi bật",
+      "students_count": "{{current}}/{{max}} hs",
+      "progress": "Tiến độ: {{percent}}%"
+    },
+    "org_status": {
+      "title": "Trạng thái tổ chức",
+      "active_classrooms": "Lớp học đang mở",
+      "storage": "Dung lượng lưu trữ",
+      "api_calls": "API Calls tháng này",
+      "current_plan": "Gói hiện tại: ",
+      "active_badge": "Active"
+    }
+  },
+  "quotes": [
+    {
+      "text": "Giáo dục là vũ khí mạnh nhất bạn có thể dùng để thay đổi thế giới.",
+      "author": "Nelson Mandela"
+    },
+    {
+      "text": "Người thầy ảnh hưởng đến cõi đời đời, không ai biết được ảnh hưởng của họ dừng lại ở đâu.",
+      "author": "Henry Adams"
+    },
+    {
+      "text": "Mục đích của giáo dục là biến gương thành cửa sổ.",
+      "author": "Sydney J. Harris"
+    },
+    {
+      "text": "Dạy học không phải là đổ đầy một cái xô, mà là thắp sáng một ngọn lửa.",
+      "author": "W. B. Yeats"
+    },
+    {
+      "text": "Mọi đứa trẻ đều là thiên tài. Nhưng nếu bạn đánh giá một con cá qua khả năng leo cây...",
+      "author": "Albert Einstein"
+    },
+    {
+      "text": "Học không bao giờ làm mệt trí óc. Sự nhàm chán đến từ sự lặp lại, không từ sự học hỏi.",
+      "author": "Leonardo da Vinci"
+    },
+    {
+      "text": "Giáo viên giỏi nhất là người dạy trò tìm ra câu trả lời, không phải cho họ câu trả lời.",
+      "author": "Lao Tzu"
+    }
+  ]
+}

@@ -97,6 +97,7 @@ import { chatApi } from '@/lib/api/chat';
 import ClassroomChatPanel from '@/components/chat/ClassroomChatPanel';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { useRTC } from '@/lib/hooks/use-rtc';
+import { useTranslation } from '@shared/components/LocaleProvider';
 import {
   CartesianGrid,
   Line,
@@ -114,60 +115,48 @@ interface ClassroomDetailsPageProps {
 
 import type { ActivityLogEventType } from '@/lib/api/types';
 
-function getActivityMeta(eventType: ActivityLogEventType): {
+function getActivityMeta(eventType: ActivityLogEventType, t: (key: string) => string): {
   icon: React.ElementType;
   color: string;
   bg: string;
   label: string;
 } {
   const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; label: string }> = {
-    classroom_created:  { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light',  label: 'Lớp học được tạo' },
-    document_uploaded:  { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-100',    label: 'Tài liệu mới được tải lên' },
-    document_deleted:   { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: 'Xóa tài liệu' },
-    exam_created:       { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-100',  label: 'Tạo bài kiểm tra' },
-    exam_published:     { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-100',   label: 'Phát hành bài kiểm tra' },
-    exam_opened:        { icon: Timer,         color: 'text-emerald-600',bg: 'bg-emerald-100', label: 'Mở ca thi trực tuyến' },
-    exam_closed:        { icon: ClockIcon,     color: 'text-muted-foreground',  bg: 'bg-muted',   label: 'Đóng ca thi' },
-    exam_deleted:       { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: 'Xóa bài kiểm tra' },
-    quiz_assigned:      { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-100',  label: 'Giao đề thi trắc nghiệm' },
-    meeting_started:    { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-100',     label: 'Mở buổi học trực tuyến' },
-    meeting_ended:      { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted',   label: 'Kết thúc buổi học' },
-    member_joined:      { icon: UserPlus,      color: 'text-blue-500',   bg: 'bg-blue-100',    label: 'Học sinh đăng ký' },
-    member_approved:    { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-100',   label: 'Duyệt học sinh vào lớp' },
-    member_rejected:    { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-100',     label: 'Từ chối yêu cầu' },
-    member_kicked:      { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-100',     label: 'Học sinh bị kick' },
-    member_left:        { icon: Users,         color: 'text-muted-foreground',  bg: 'bg-muted',   label: 'Học sinh rời lớp' },
-    exam_submitted:     { icon: FileCheck,     color: 'text-teal-600',   bg: 'bg-teal-100',    label: 'Học sinh nộp bài' },
+    classroom_created:  { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light',  label: t('classroom.ui.activity_classroom_created') },
+    document_uploaded:  { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-100',    label: t('classroom.ui.activity_document_uploaded') },
+    document_deleted:   { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: t('classroom.ui.activity_document_deleted') },
+    exam_created:       { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-100',  label: t('classroom.ui.activity_exam_created') },
+    exam_published:     { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-100',   label: t('classroom.ui.activity_exam_published') },
+    exam_opened:        { icon: Timer,         color: 'text-emerald-600',bg: 'bg-emerald-100', label: t('classroom.ui.activity_exam_opened') },
+    exam_closed:        { icon: ClockIcon,     color: 'text-muted-foreground',  bg: 'bg-muted',   label: t('classroom.ui.activity_exam_closed') },
+    exam_deleted:       { icon: Trash2,        color: 'text-red-500',    bg: 'bg-red-100',     label: t('classroom.ui.activity_exam_deleted') },
+    quiz_assigned:      { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-100',  label: t('classroom.ui.activity_quiz_assigned') },
+    meeting_started:    { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-100',     label: t('classroom.ui.activity_meeting_started') },
+    meeting_ended:      { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted',   label: t('classroom.ui.activity_meeting_ended') },
+    member_joined:      { icon: UserPlus,      color: 'text-blue-500',   bg: 'bg-blue-100',    label: t('classroom.ui.activity_member_joined') },
+    member_approved:    { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-100',   label: t('classroom.ui.activity_member_approved') },
+    member_rejected:    { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-100',     label: t('classroom.ui.activity_member_rejected') },
+    member_kicked:      { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-100',     label: t('classroom.ui.activity_member_kicked') },
+    member_left:        { icon: Users,         color: 'text-muted-foreground',  bg: 'bg-muted',   label: t('classroom.ui.activity_member_left') },
+    exam_submitted:     { icon: FileCheck,     color: 'text-teal-600',   bg: 'bg-teal-100',    label: t('classroom.ui.activity_exam_submitted') },
   };
   return map[eventType] ?? { icon: ClipboardList, color: 'text-muted-foreground', bg: 'bg-muted', label: eventType };
 }
 
-const EXAM_KIND_OPTIONS = [
-  {
-    key: 'midterm',
-    label: 'Kiem tra giua ki',
-    description: 'Bài kiểm tra giữa kỳ của lớp',
-    keywords: ['kiem tra giua ki', 'kiểm tra giữa kì', 'kiểm tra giữa kỳ', 'giua ki', 'giữa kì', 'giữa kỳ'],
-  },
-  {
-    key: 'final',
-    label: 'Kiem Tra Cuoi Ki',
-    description: 'Bài kiểm tra cuối kỳ của lớp',
-    keywords: ['kiem tra cuoi ki', 'kiểm tra cuối kì', 'kiểm tra cuối kỳ', 'cuoi ki', 'cuối kì', 'cuối kỳ'],
-  },
-  {
-    key: 'regular',
-    label: 'Kiem Tra Thuong Xuyen',
-    description: 'Bài kiểm tra thường xuyên',
-    keywords: ['kiem tra thuong xuyen', 'kiểm tra thường xuyên', 'thuong xuyen', 'thường xuyên'],
-  },
-] as const;
+type ExamKind = 'midterm' | 'final' | 'regular';
 
-type ExamKind = typeof EXAM_KIND_OPTIONS[number]['key'];
+const EXAM_KIND_KEYWORDS: Record<ExamKind, string[]> = {
+  midterm: ['kiem tra giua ki', 'kiểm tra giữa kì', 'kiểm tra giữa kỳ', 'giua ki', 'giữa kì', 'giữa kỳ'],
+  final: ['kiem tra cuoi ki', 'kiểm tra cuối kì', 'kiểm tra cuối kỳ', 'cuoi ki', 'cuối kì', 'cuối kỳ'],
+  regular: ['kiem tra thuong xuyen', 'kiểm tra thường xuyên', 'thuong xuyen', 'thường xuyên'],
+};
 
 export default function ClassroomDetailsPage({ params }: ClassroomDetailsPageProps) {
   const { uid } = use(params);
   const router = useRouter();
+  const { t, formatDateTime: localeFormatDateTime, formatDate: localeFormatDate, locale } = useTranslation();
+  const formatDateTime = React.useCallback((v: string) => (v ? localeFormatDateTime(v) : '--'), [localeFormatDateTime]);
+  const formatDate = React.useCallback((v: string | null | undefined) => (v ? localeFormatDate(v) : '--'), [localeFormatDate]);
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
@@ -227,9 +216,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const AI_MODES: { key: AiMode; label: string; icon: React.ElementType; placeholder: string; description: string }[] = [
-    { key: 'doc',    label: 'Hỏi tài liệu',  icon: BookOpen,    placeholder: 'Hỏi về nội dung tài liệu, bài giảng...', description: 'Tìm kiếm và trả lời từ tài liệu đã tải lên' },
-    { key: 'manage', label: 'Quản lý lớp',   icon: Users,       placeholder: 'Hỏi về học sinh, thống kê, bài thi...', description: 'Truy vấn dữ liệu lớp học qua công cụ' },
-    { key: 'free',   label: 'Hỏi tự do',     icon: Sparkles,    placeholder: 'Đặt câu hỏi bất kỳ...', description: 'AI trả lời từ kiến thức của mình' },
+    { key: 'doc',    label: t('classroom.ui.ai_mode_doc_label'),    icon: BookOpen,    placeholder: t('classroom.ui.ai_mode_doc_placeholder'),    description: t('classroom.ui.ai_mode_doc_desc') },
+    { key: 'manage', label: t('classroom.ui.ai_mode_manage_label'), icon: Users,       placeholder: t('classroom.ui.ai_mode_manage_placeholder'), description: t('classroom.ui.ai_mode_manage_desc') },
+    { key: 'free',   label: t('classroom.ui.ai_mode_free_label'),   icon: Sparkles,    placeholder: t('classroom.ui.ai_mode_free_placeholder'),   description: t('classroom.ui.ai_mode_free_desc') },
   ];
 
   const [exams, setExams] = useState<Exam[]>([]);
@@ -262,7 +251,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         }
       } catch (error) {
         console.error("Failed to fetch classroom details:", error);
-        toast.error("Không thể tải thông tin phòng học");
+        toast.error(t('classroom.ui.classroom_load_error'));
       } finally {
         setFetching(false);
       }
@@ -308,7 +297,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         }
       })
       .catch(() => {
-        toast.error('Không thể tải kênh thảo luận');
+        toast.error(t('classroom.messages.chat_load_error'));
       });
   }, [activeTab, uid, conversationUid]);
 
@@ -337,7 +326,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       const rooms = await spaceApi.meetingRooms.getByClassroom(uid);
       setMeetingRooms(rooms);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tải phòng họp');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.meetings_load_error'));
     } finally {
       setLoadingMeetings(false);
     }
@@ -356,7 +345,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       const data = await quizApi.list(uid);
       setAssignedQuizzes(data);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách bài thi trắc nghiệm');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.quiz_load_error'));
     } finally {
       setLoadingQuizzes(false);
     }
@@ -382,7 +371,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     setLoadingMembers(true);
     spaceApi.classrooms.members(uid)
       .then(setMembers)
-      .catch(() => toast.error('Không thể tải danh sách sinh viên'))
+      .catch(() => toast.error(t('classroom.ui.students_load_error')))
       .finally(() => setLoadingMembers(false));
   }, [activeTab, uid]);
 
@@ -401,7 +390,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         for (const e of globalEntries)    map.set(e.consumer_uid, e); // global ghi đè
         setBlacklist(Array.from(map.values()));
       })
-      .catch(() => toast.error('Không thể tải danh sách chặn'))
+      .catch(() => toast.error(t('classroom.ui.blacklist_load_error')))
       .finally(() => setLoadingBlacklist(false));
   }, [activeTab, uid]);
 
@@ -409,7 +398,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     setLoadingPending(true);
     spaceApi.classrooms.pendingMembers(uid)
       .then(setPendingMembers)
-      .catch(() => toast.error('Không thể tải danh sách chờ duyệt'))
+      .catch(() => toast.error(t('classroom.ui.pending_load_error')))
       .finally(() => setLoadingPending(false));
   }, [uid]);
 
@@ -426,9 +415,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       const approved = await spaceApi.classrooms.approveMember(uid, member.member_id);
       setPendingMembers(prev => prev.filter(m => m.member_id !== member.member_id));
       setMembers(prev => [...prev, approved]);
-      toast.success(`Đã duyệt "${member.member_name}" vào lớp`);
+      toast.success(t('classroom.ui.pending_approve_success', undefined, { name: member.member_name }));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể duyệt thành viên');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.pending_approve_error'));
     } finally {
       setApprovingId(null);
     }
@@ -439,9 +428,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     try {
       await spaceApi.classrooms.rejectMember(uid, member.member_id);
       setPendingMembers(prev => prev.filter(m => m.member_id !== member.member_id));
-      toast.success(`Đã từ chối "${member.member_name}"`);
+      toast.success(t('classroom.ui.pending_reject_success', undefined, { name: member.member_name }));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể từ chối thành viên');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.pending_reject_error'));
     } finally {
       setRejectingId(null);
     }
@@ -459,10 +448,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     try {
       await spaceApi.classrooms.kickMember(uid, memberToKick.member_id);
       setMembers(prev => prev.filter(m => m.member_id !== memberToKick.member_id));
-      toast.success(`Đã kick "${memberToKick.member_name}" ra khỏi lớp`);
+      toast.success(t('classroom.ui.kick_success', undefined, { name: memberToKick.member_name }));
       setMemberToKick(null);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể kick sinh viên');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.kick_error'));
     } finally {
       setKickingId(null);
     }
@@ -475,30 +464,30 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     try {
       if (scope === 'global') {
         await spaceApi.classrooms.addGlobalBlacklist(member.member_id);
-        toast.success(`Đã chặn toàn cục "${member.member_name}"`);
+        toast.success(t('classroom.ui.block_global_success', undefined, { name: member.member_name }));
       } else {
         await spaceApi.classrooms.addClassroomBlacklist(uid, member.member_id);
-        toast.success(`Đã chặn "${member.member_name}" khỏi lớp này`);
+        toast.success(t('classroom.ui.block_classroom_success', undefined, { name: member.member_name }));
       }
       try { await spaceApi.classrooms.kickMember(uid, member.member_id); } catch { /* already kicked */ }
       setMembers(prev => prev.filter(m => m.member_id !== member.member_id));
       setMemberToBlock(null);
     } catch {
-      toast.error('Không thể chặn sinh viên.');
+      toast.error(t('classroom.ui.block_error'));
     } finally {
       setBlockingMemberId(null);
     }
   };
 
   const handleUnassignQuiz = async (quiz: Quiz) => {
-    if (!window.confirm(`Bỏ giao bài thi "${quiz.title}" khỏi lớp này?`)) return;
+    if (!window.confirm(t('classroom.ui.quiz_unassign_confirm', undefined, { title: quiz.title }))) return;
     setUnassigningUid(quiz.uid);
     try {
       await quizApi.unassignFromClassroom(quiz.uid, uid);
       setAssignedQuizzes(prev => prev.filter(q => q.uid !== quiz.uid));
-      toast.success('Đã bỏ giao đề thi');
+      toast.success(t('classroom.ui.quiz_unassign_success'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể bỏ giao đề thi');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.quiz_unassign_error'));
     } finally {
       setUnassigningUid(null);
     }
@@ -512,9 +501,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         camera_required: exam.camera_required ?? false,
       });
       setExams(prev => prev.map(e => e.uid === exam.uid ? opened.exam : e));
-      toast.success(`Đã mở ca thi cho ${opened.sessions.length} sinh viên`);
+      toast.success(t('classroom.ui.exams_open_success', undefined, { count: opened.sessions.length }));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Không thể mở ca thi");
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.exams_open_error'));
     }
   };
 
@@ -524,9 +513,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       setExams(prev => prev.map(e =>
         e.uid === exam.uid ? { ...e, is_online_active: false, status: 'closed' } : e
       ));
-      toast.success("Đã đóng ca thi");
+      toast.success(t('classroom.ui.exams_close_success'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Không thể đóng ca thi");
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.exams_close_error'));
     }
   };
 
@@ -536,7 +525,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       const data = await spaceApi.exams.listByClassroom(uid);
       setExams(getCanManageExams() ? data : data.filter(exam => exam.status === 'published'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách bài kiểm tra');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.exams_load_error'));
     } finally {
       setLoadingExams(false);
     }
@@ -564,19 +553,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       if (token) headers['Authorization'] = `Bearer ${token}`;
       const query = section ? `?section=${encodeURIComponent(section)}` : '';
       const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/${query}`, { headers });
-      if (!res.ok) throw new Error('Không thể tải danh sách tài liệu');
+      if (!res.ok) throw new Error(t('classroom.ui.docs_load_error'));
       const data = await res.json() as Array<{ uid: string; name: string; file_type: string; url: string; size: number; metadata: Record<string, string>; created_at: string }>;
       setDocuments(data.map(d => ({
         uid: d.uid,
         name: d.name,
         size: formatFileSize(d.size ?? 0),
-        date: new Date(d.created_at).toLocaleDateString('vi-VN'),
+        date: localeFormatDate(d.created_at),
         url: d.url,
         file_type: d.file_type,
         section: d.metadata?.section ?? '',
       })));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tải tài liệu');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.docs_load_error_generic'));
     } finally {
       setLoadingDocs(false);
     }
@@ -644,13 +633,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         void fetchAiSessions();
       }
     } catch (err) {
-      toast.error('Không thể tạo hội thoại mới');
+      toast.error(t('classroom.ui.ai_create_session_error'));
     }
   };
 
   const clearAiSession = async () => {
     if (!aiSessionId) return;
-    if (!window.confirm('Bạn có chắc muốn xóa lịch sử hội thoại này?')) return;
+    if (!window.confirm(t('classroom.ui.ai_delete_confirm'))) return;
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
@@ -667,7 +656,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         void fetchAiSessions();
       }
     } catch (err) {
-      toast.error('Không thể xóa hội thoại');
+      toast.error(t('classroom.ui.ai_delete_session_error'));
     }
   };
 
@@ -715,7 +704,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       mediaRecorder.start();
       setIsRecording(true);
     } catch (err) {
-      toast.error('Không thể truy cập microphone');
+      toast.error(t('classroom.ui.ai_mic_error'));
     }
   };
 
@@ -758,7 +747,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         body: body,
       });
 
-      if (!res.ok || !res.body) throw new Error('Không thể kết nối AI');
+      if (!res.ok || !res.body) throw new Error(t('classroom.ui.ai_connect_error'));
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -813,7 +802,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             } else if (event.type === 'error') {
               setAiMessages(prev => {
                 const last = prev[prev.length - 1];
-                return [...prev.slice(0, -1), { ...last, loading: false, text: event.message ?? 'Có lỗi xảy ra' }];
+                return [...prev.slice(0, -1), { ...last, loading: false, text: event.message ?? t('classroom.ui.ai_error_generic') }];
               });
             }
           } catch { /* ignore malformed SSE lines */ }
@@ -830,7 +819,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         return last ? [...prev.slice(0, -1), {
           ...last,
           loading: false,
-          text: err instanceof Error ? err.message : 'Có lỗi xảy ra',
+          text: err instanceof Error ? err.message : t('classroom.ui.ai_error_generic'),
         }] : prev;
       });
     } finally {
@@ -858,28 +847,28 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({})) as Record<string, unknown>;
-        throw new Error((err.message as string) || (err.detail as string) || 'Upload thất bại');
+        throw new Error((err.message as string) || (err.detail as string) || t('classroom.ui.upload_failed_label'));
       }
       const data = await res.json() as { uid: string; name: string; file_type: string; url: string; size: number; metadata: Record<string, string>; created_at: string };
       setDocuments(prev => [{
         uid: data.uid,
         name: data.name,
         size: formatFileSize(data.size ?? file.size),
-        date: new Date(data.created_at).toLocaleDateString('vi-VN'),
+        date: localeFormatDate(data.created_at),
         url: data.url,
         file_type: data.file_type,
         section: data.metadata?.section ?? uploadSection,
       }, ...prev]);
-      toast.success('Đã tải lên tài liệu thành công');
+      toast.success(t('classroom.ui.docs_uploaded_toast'));
     } catch (err: unknown) {
-      toast.error(`Lỗi: ${err instanceof Error ? err.message : 'Không thể tải lên'}`);
+      toast.error(`${t('classroom.ui.docs_upload_error')}: ${err instanceof Error ? err.message : t('classroom.ui.docs_upload_error')}`);
     } finally {
       setUploadingDoc(false);
     }
   };
 
   const handleDeleteDoc = async (docUid: string) => {
-    if (!window.confirm('Xóa tài liệu này?')) return;
+    if (!window.confirm(t('classroom.ui.docs_delete_confirm'))) return;
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
@@ -889,26 +878,26 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         method: 'DELETE',
         headers,
       });
-      if (!res.ok && res.status !== 204) throw new Error('Không thể xóa tài liệu');
+      if (!res.ok && res.status !== 204) throw new Error(t('classroom.ui.docs_delete_error'));
       setDocuments(prev => prev.filter(d => d.uid !== docUid));
-      toast.success('Đã xóa tài liệu');
+      toast.success(t('classroom.ui.docs_deleted_toast'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể xóa tài liệu');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.docs_delete_error'));
     }
   };
 
   const handleDeleteExam = async (exam: Exam) => {
     if (!canManageExams || deletingExamUid) return;
-    const confirmed = window.confirm(`Xóa bài kiểm tra "${exam.title}"?`);
+    const confirmed = window.confirm(t('classroom.ui.exams_delete_confirm', undefined, { title: exam.title }));
     if (!confirmed) return;
 
     setDeletingExamUid(exam.uid);
     try {
       await spaceApi.exams.deleteExam(exam.uid);
       setExams(prev => prev.filter(item => item.uid !== exam.uid));
-      toast.success('Đã xóa bài kiểm tra');
+      toast.success(t('classroom.ui.exams_deleted'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể xóa bài kiểm tra');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.exams_delete_error'));
     } finally {
       setDeletingExamUid(null);
     }
@@ -930,9 +919,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       });
       setMeetingRooms(prev => [room, ...prev.filter(item => item.uid !== room.uid)]);
       await startMediaShare(source);
-      toast.success(source === 'screen' ? 'Đã mở phòng họp và chia sẻ màn hình' : 'Đã mở phòng họp và bật camera');
+      toast.success(source === 'screen' ? t('classroom.ui.meeting_start_success_screen') : t('classroom.ui.meeting_start_success_camera'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể mở phòng họp');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.meeting_start_error'));
     } finally {
       setMeetingAction(null);
     }
@@ -946,9 +935,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       stopScreenShare();
       const ended = await spaceApi.meetingRooms.end(activeMeeting.uid);
       setMeetingRooms(prev => prev.map(room => room.uid === ended.uid ? ended : room));
-      toast.success('Đã kết thúc phòng họp');
+      toast.success(t('classroom.ui.meeting_ended_toast'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể kết thúc phòng họp');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.meeting_end_error'));
     } finally {
       setMeetingAction(null);
     }
@@ -958,7 +947,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     if (!linkData || !classroom) return;
 
     try {
-      toast.info('Đang tạo ảnh QR...');
+      toast.info(t('classroom.messages.creating_qr'));
       const joinUrl = `${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`;
 
       let svgString = renderToStaticMarkup(
@@ -996,19 +985,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           downloadLink.click();
           document.body.removeChild(downloadLink);
 
-          toast.success('Đã tải mã QR xuống');
+          toast.success(t('classroom.messages.qr_downloaded'));
         }
         URL.revokeObjectURL(blobUrl);
       };
 
       img.onerror = () => {
-        toast.error('Có lỗi xảy ra khi tạo ảnh QR');
+        toast.error(t('classroom.ui.qr_error_generic'));
         URL.revokeObjectURL(blobUrl);
       };
 
       img.src = blobUrl;
     } catch {
-      toast.error('Không thể tải mã QR');
+      toast.error(t('classroom.ui.qr_download_error'));
     }
   };
 
@@ -1016,7 +1005,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     return (
       <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
         <Loader2 size={40} className="animate-spin mb-4" />
-        <p className="text-sm font-medium">Đang tải dữ liệu phòng học...</p>
+        <p className="text-sm font-medium">{t('classroom.ui.classroom_loading')}</p>
       </div>
     );
   }
@@ -1024,8 +1013,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   if (!classroom) return null;
 
   const visibleExams = canManageExams ? exams : exams.filter(exam => exam.status === 'published');
-  const selectedKind = EXAM_KIND_OPTIONS.find(kind => kind.key === selectedExamKind) || EXAM_KIND_OPTIONS[0];
-  const filteredExams = visibleExams.filter(exam => isExamInKind(exam, selectedExamKind));
+  const selectedKind: ExamKind = (['midterm', 'final', 'regular'] as ExamKind[]).includes(selectedExamKind) ? selectedExamKind : 'midterm';
+  const filteredExams = visibleExams.filter(exam => isExamInKind(exam, selectedKind));
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-10">
@@ -1043,10 +1032,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           <div>
             <div className="flex items-center gap-3 mb-1">
               <span className="text-[10px] font-black bg-primary-brand text-white px-2.5 py-1 rounded-md uppercase tracking-widest shadow-sm">
-                ID: {classroom.pid}
+                {t('classroom.ui.classroom_id_badge', undefined, { id: classroom.pid })}
               </span>
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em]">
-                PHÒNG HỌC
+                {t('classroom.ui.page_subtitle')}
               </span>
             </div>
             <h1 className="text-3xl font-bold text-foreground tracking-tight">{classroom.name}</h1>
@@ -1060,14 +1049,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             className="h-12 rounded-xl px-6 gap-2.5 font-bold text-xs border-border hover:bg-card text-muted-foreground uppercase tracking-widest bg-muted/50"
           >
             <Settings size={18} />
-            THIẾT LẬP
+            {t('classroom.ui.settings_btn')}
           </Button>
           <Button
             onClick={() => { setShowPendingSheet(true); loadPendingMembers(); }}
             className="relative h-12 bg-amber-500 hover:bg-amber-600 text-white rounded-xl px-6 gap-2.5 font-bold text-xs shadow-lg shadow-amber-500/20 uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
             <Users size={18} />
-            PHÊ DUYỆT
+            {t('classroom.ui.approve_btn')}
             {pendingMembers.length > 0 && (
               <span className="absolute -top-2 -right-2 min-w-[20px] h-5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center px-1 shadow">
                 {pendingMembers.length}
@@ -1087,7 +1076,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {/* Expand button */}
               <button
                 onClick={() => setSidebarCollapsed(false)}
-                title="Mở rộng sidebar"
+                title={t('classroom.ui.expand_sidebar')}
                 className="w-full flex justify-center py-3 hover:bg-muted transition-colors"
               >
                 <ChevronsRight size={16} className="text-muted-foreground" />
@@ -1095,16 +1084,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="mx-3 border-t border-border mb-1" />
               {/* All tabs as icons */}
               {([
-                { id: 'info',     label: 'Thông tin chung',    icon: Info },
-                { id: 'docs',     label: 'Tài liệu học tập',   icon: FileText },
-                { id: 'ai',       label: 'AI Trợ giảng',       icon: Bot },
-                { id: 'chat',     label: 'Thảo luận lớp học',  icon: MessageSquare },
-                { id: 'meeting',  label: 'Phòng họp',          icon: Video },
-                { id: 'exams',    label: 'Bài tập',       icon: ClipboardList },
-                { id: 'final_exams', label: 'Kì Thi',           icon: BarChart2 },
-                { id: 'quiz',     label: 'Quizz Game',     icon: Gamepad2 },
-                { id: 'students',  label: 'Danh sách sinh viên', icon: Users },
-                { id: 'blacklist', label: 'Danh sách chặn',      icon: ShieldBan },
+                { id: 'info',     label: t('classroom.ui.tab_info'),     icon: Info },
+                { id: 'docs',     label: t('classroom.ui.tab_docs'),     icon: FileText },
+                { id: 'ai',       label: t('classroom.ui.tab_ai'),       icon: Bot },
+                { id: 'chat',     label: t('classroom.ui.tab_chat'),     icon: MessageSquare },
+                { id: 'meeting',  label: t('classroom.ui.tab_meeting'),  icon: Video },
+                { id: 'exams',    label: t('classroom.ui.tab_exams'),    icon: ClipboardList },
+                { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
+                { id: 'quiz',     label: t('classroom.ui.tab_quiz'),     icon: Gamepad2 },
+                { id: 'students',  label: t('classroom.ui.tab_students'),  icon: Users },
+                { id: 'blacklist', label: t('classroom.ui.tab_blacklist'), icon: ShieldBan },
               ] as const).map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === id;
                 return (
@@ -1130,10 +1119,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
               {/* Collapse button */}
               <div className="flex items-center justify-between px-5 py-2.5 border-b border-border">
-                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">MENU</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{t('classroom.ui.menu_label')}</span>
                 <button
                   onClick={() => setSidebarCollapsed(true)}
-                  title="Thu nhỏ sidebar"
+                  title={t('classroom.ui.collapse_sidebar')}
                   className="rounded-lg p-1 hover:bg-muted transition-colors"
                 >
                   <ChevronsLeft size={15} className="text-muted-foreground" />
@@ -1145,17 +1134,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 onClick={() => toggleGroup('classroom')}
                 className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
-                Thông tin lớp
+                {t('classroom.ui.group_class_info')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.classroom ? '' : '-rotate-90'}`} />
               </button>
               {openGroups.classroom && (
                 <div className="pb-1 px-1">
                   {[
-                    { id: 'info',    label: 'Thông tin chung',   icon: Info },
-                    { id: 'docs',    label: 'Tài liệu học tập',  icon: FileText },
-                    { id: 'ai',      label: 'AI Trợ giảng',      icon: Bot },
-                    { id: 'chat',    label: 'Thảo luận lớp học', icon: MessageSquare },
-                    { id: 'meeting', label: 'Phòng họp',         icon: Video },
+                    { id: 'info',    label: t('classroom.ui.tab_info'),    icon: Info },
+                    { id: 'docs',    label: t('classroom.ui.tab_docs'),    icon: FileText },
+                    { id: 'ai',      label: t('classroom.ui.tab_ai'),      icon: Bot },
+                    { id: 'chat',    label: t('classroom.ui.tab_chat'),    icon: MessageSquare },
+                    { id: 'meeting', label: t('classroom.ui.tab_meeting'), icon: Video },
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
@@ -1185,15 +1174,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 onClick={() => toggleGroup('learning')}
                 className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
-                Học tập & Đánh giá
+                {t('classroom.ui.group_learning')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.learning ? '' : '-rotate-90'}`} />
               </button>
               {openGroups.learning && (
                 <div className="pb-1 px-1">
                   {[
-                    { id: 'final_exams', label: 'Kì Thi', icon: BarChart2 },
-                    { id: 'exams', label: 'Bài tập', icon: ClipboardList },
-                    { id: 'quiz',  label: 'Quizz Game',    icon: Gamepad2 },
+                    { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
+                    { id: 'exams', label: t('classroom.ui.tab_exams'), icon: ClipboardList },
+                    { id: 'quiz',  label: t('classroom.ui.tab_quiz'),    icon: Gamepad2 },
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
@@ -1220,7 +1209,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 onClick={() => toggleGroup('students')}
                 className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
-                Quản lý sinh viên
+                {t('classroom.ui.group_students')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.students ? '' : '-rotate-90'}`} />
               </button>
               {openGroups.students && (
@@ -1236,7 +1225,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
                         <Users size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
-                        Danh sách sinh viên
+                        {t('classroom.ui.tab_students')}
                         {members.filter(m => m.role === 'student').length > 0 && (
                           <span className="ml-auto text-[10px] font-black bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
                             {members.filter(m => m.role === 'student').length}
@@ -1256,7 +1245,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
                         <ShieldBan size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
-                        Danh sách chặn
+                        {t('classroom.ui.tab_blacklist')}
                         {blacklist.length > 0 && (
                           <span className="ml-auto text-[10px] font-black bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">
                             {blacklist.length}
@@ -1272,12 +1261,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {!sidebarCollapsed && <>
             <Card className="border-border shadow-sm rounded-[32px] overflow-hidden bg-card p-8">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">SĨ SỐ LỚP</h3>
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">{t('classroom.ui.class_size_title')}</h3>
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="text-5xl font-bold text-foreground tracking-tighter">
                   {members.filter(m => m.role === 'student').length}
                 </span>
-                <span className="text-muted-foreground font-bold text-lg">/ {classroom.max_students} học sinh</span>
+                <span className="text-muted-foreground font-bold text-lg">{t('classroom.ui.students_count_suffix', undefined, { count: classroom.max_students })}</span>
               </div>
               <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden border border-border p-0.5">
                 <div
@@ -1292,14 +1281,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <QrCode size={140} />
               </div>
               <div className="relative">
-                <h3 className="text-[10px] font-bold text-primary-brand-muted uppercase tracking-[0.3em] mb-4">MÃ THAM GIA</h3>
-                <div className="text-4xl font-bold tracking-[0.2em] mb-8">{linkData?.code || '------'}</div>
+                <h3 className="text-[10px] font-bold text-primary-brand-muted uppercase tracking-[0.3em] mb-4">{t('classroom.ui.join_code_title')}</h3>
+                <div className="text-4xl font-bold tracking-[0.2em] mb-8">{linkData?.code || t('classroom.ui.join_code_fallback')}</div>
                 <Button
                   variant="ghost"
                   onClick={handleDownloadQr}
                   className="w-full bg-card/10 hover:bg-card/20 backdrop-blur-md text-white rounded-2xl h-12 font-bold text-xs tracking-widest gap-3 border border-white/10 transition-all uppercase"
                 >
-                  <QrCode size={18} /> TẢI MÃ QR
+                  <QrCode size={18} /> {t('classroom.ui.download_qr_action')}
                 </Button>
               </div>
             </Card>
@@ -1316,7 +1305,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                     <Info size={22} />
                   </div>
-                  Mô tả phòng học
+                  {t('classroom.ui.info_description_title')}
                 </h3>
                 <div className="bg-muted/50 p-8 rounded-3xl border border-border text-muted-foreground font-medium leading-relaxed italic text-lg relative">
                   <span className="absolute -top-4 -left-2 text-6xl text-muted-foreground/10 font-serif opacity-50">&ldquo;</span>
@@ -1332,7 +1321,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                       <QrCode size={22} />
                     </div>
-                    Mã QR tham gia
+                    {t('classroom.ui.info_qr_card_title')}
                   </h3>
                   <div className="p-10 bg-card rounded-[40px] border-2 border-dashed border-border mb-10 shadow-inner group transition-all hover:border-primary-brand/50">
                     <div className="p-6 bg-muted rounded-[32px] border border-border group-hover:scale-105 transition-transform duration-500">
@@ -1348,11 +1337,11 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       )}
                     </div>
                   </div>
-                  <Button 
-                    onClick={handleDownloadQr} 
+                  <Button
+                    onClick={handleDownloadQr}
                     className="w-full h-14 bg-primary-brand/10 hover:bg-primary-brand/20 text-primary-brand rounded-[20px] font-bold text-xs gap-3 transition-all uppercase tracking-widest"
                   >
-                    <Download size={20} /> TẢI ẢNH QR XUỐNG
+                    <Download size={20} /> {t('classroom.ui.info_qr_download')}
                   </Button>
                 </div>
 
@@ -1363,7 +1352,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                         <RotateCcw size={22} />
                       </div>
-                      Lịch sử hoạt động
+                      {t('classroom.ui.info_activity_title')}
                     </h3>
                     <div className="flex items-center gap-2">
                       <div className="flex bg-muted rounded-xl p-1 gap-1">
@@ -1377,7 +1366,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                 : 'text-muted-foreground hover:text-foreground'
                             }`}
                           >
-                            {lvl === 'major' ? 'Chính' : 'Chi tiết'}
+                            {lvl === 'major' ? t('classroom.ui.info_level_major') : t('classroom.ui.info_level_detail')}
                           </button>
                         ))}
                       </div>
@@ -1385,7 +1374,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         onClick={() => router.push(`/space/classrooms/${uid}/activity`)}
                         className="flex items-center gap-1.5 text-[10px] font-black text-primary-brand hover:text-primary-brand uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-primary-brand-light transition-all"
                       >
-                        Xem tất cả
+                        {t('classroom.ui.info_view_all')}
                         <ChevronRight size={13} />
                       </button>
                     </div>
@@ -1398,12 +1387,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ) : activityLogs.length === 0 ? (
                     <div className="text-center py-10 text-muted-foreground">
                       <RotateCcw size={32} className="mx-auto mb-3 opacity-20" />
-                      <p className="text-sm font-medium">Chưa có hoạt động nào được ghi lại</p>
+                      <p className="text-sm font-medium">{t('classroom.ui.info_no_activity')}</p>
                     </div>
                   ) : (
                     <div className="space-y-0 pl-3 overflow-y-auto max-h-80">
                       {activityLogs.map((log, idx) => {
-                        const { icon: Icon, color, bg, label } = getActivityMeta(log.event_type);
+                        const { icon: Icon, color, bg, label } = getActivityMeta(log.event_type, t);
                         const isLast = idx === activityLogs.length - 1;
                         return (
                           <div
@@ -1423,7 +1412,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                               <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-2">
                                 {log.actor_name && <span className="font-bold">{log.actor_name}</span>}
                                 <span>•</span>
-                                <span>{new Date(log.created_at).toLocaleString('vi-VN')}</span>
+                                <span>{localeFormatDateTime(log.created_at)}</span>
                               </div>
                             </div>
                           </div>
@@ -1442,8 +1431,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="p-8 border-b border-border bg-muted/50">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-xl font-bold text-foreground">Tài liệu học tập</h3>
-                    <p className="text-sm text-muted-foreground font-medium mt-1">Quản lý và chia sẻ học liệu của lớp học</p>
+                    <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.docs_title')}</h3>
+                    <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.docs_subtitle')}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     {/* Section input for upload */}
@@ -1453,7 +1442,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         type="text"
                         value={uploadSection}
                         onChange={e => setUploadSection(e.target.value)}
-                        placeholder="Mục (vd: tuần 1)"
+                        placeholder={t('classroom.ui.docs_section_placeholder')}
                         className="pl-8 pr-3 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 w-40"
                       />
                     </div>
@@ -1465,7 +1454,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-primary-brand/20 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
                     >
                       {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={18} />}
-                      {uploadingDoc ? 'ĐANG TẢI...' : 'TẢI LÊN'}
+                      {uploadingDoc ? t('classroom.ui.docs_uploading') : t('classroom.ui.docs_upload')}
                     </Button>
                   </div>
                 </div>
@@ -1480,7 +1469,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         onClick={() => setFilterSection('')}
                         className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === '' ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'}`}
                       >
-                        Tất cả
+                        {t('classroom.ui.docs_filter_all')}
                       </button>
                       {sections.map(s => (
                         <button
@@ -1507,8 +1496,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4 border border-border">
                       <File size={32} className="opacity-40" />
                     </div>
-                    <p className="text-base font-bold text-foreground">Chưa có tài liệu nào</p>
-                    <p className="text-sm font-medium mt-1">Nhấn &ldquo;Tải lên&rdquo; để thêm học liệu</p>
+                    <p className="text-base font-bold text-foreground">{t('classroom.ui.docs_empty')}</p>
+                    <p className="text-sm font-medium mt-1">{t('classroom.ui.docs_empty_hint')}</p>
                   </div>
                 )}
                 {!loadingDocs && documents
@@ -1533,7 +1522,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             </span>
                           )}
                           <span>{doc.size}</span>
-                          <span>Đã tải lên {doc.date}</span>
+                          <span>{t('classroom.ui.docs_uploaded_at', undefined, { date: doc.date })}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1562,7 +1551,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {/* AI Sidebar */}
               <div className="w-72 border-r border-border bg-muted/20 flex flex-col hidden md:flex">
                 <div className="p-6 border-b border-border flex items-center justify-between bg-card">
-                  <h4 className="font-bold text-sm text-foreground">Lịch sử hội thoại</h4>
+                  <h4 className="font-bold text-sm text-foreground">{t('classroom.ui.ai_history_title')}</h4>
                   <Button variant="ghost" size="icon" onClick={createNewAiSession} className="h-8 w-8 rounded-lg hover:bg-primary-brand-light hover:text-primary-brand">
                     <Plus size={16} />
                   </Button>
@@ -1570,7 +1559,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
                   {aiSessions.length === 0 ? (
                     <div className="text-center py-10 px-4">
-                      <p className="text-xs text-muted-foreground">Chưa có hội thoại nào</p>
+                      <p className="text-xs text-muted-foreground">{t('classroom.ui.ai_no_conversations')}</p>
                     </div>
                   ) : (
                     aiSessions.map((s) => (
@@ -1578,20 +1567,20 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         key={s.session_id}
                         onClick={() => setAiSessionId(s.session_id)}
                         className={`w-full text-left p-3 rounded-xl transition-all duration-200 group ${
-                          aiSessionId === s.session_id 
-                            ? 'bg-primary-brand text-white shadow-md shadow-primary-brand/20' 
+                          aiSessionId === s.session_id
+                            ? 'bg-primary-brand text-white shadow-md shadow-primary-brand/20'
                             : 'hover:bg-primary-brand-light/50 text-muted-foreground hover:text-primary-brand'
                         }`}
                       >
                         <p className={`text-xs font-bold truncate ${aiSessionId === s.session_id ? 'text-white' : 'text-foreground group-hover:text-primary-brand'}`}>
-                          {s.title || 'Hội thoại mới'}
+                          {s.title || t('classroom.ui.ai_new_conversation')}
                         </p>
                         <div className="flex items-center justify-between mt-1.5">
                           <span className={`text-[10px] ${aiSessionId === s.session_id ? 'text-white/70' : 'text-muted-foreground'}`}>
-                            {s.msg_count} tin nhắn
+                            {t('classroom.ui.ai_messages_count', undefined, { count: s.msg_count })}
                           </span>
                           <span className={`text-[10px] ${aiSessionId === s.session_id ? 'text-white/70' : 'text-muted-foreground'}`}>
-                            {new Date(s.updated_at).toLocaleDateString('vi-VN')}
+                            {localeFormatDate(s.updated_at)}
                           </span>
                         </div>
                       </button>
@@ -1608,7 +1597,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <Bot size={24} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">AI Trợ giảng</h3>
+                  <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.ai_assistant')}</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-0.5">
                     {AI_MODES.find(m => m.key === aiMode)?.description}
                   </p>
@@ -1627,7 +1616,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       onClick={clearAiSession}
                       className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
                     >
-                      Xoá lịch sử
+                      {t('classroom.ui.ai_clear_history')}
                     </Button>
                   )}
                 </div>
@@ -1640,10 +1629,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="w-20 h-20 rounded-full bg-primary-brand-light flex items-center justify-center mb-4 border border-primary-brand-muted">
                       <Sparkles size={32} className="text-primary-brand" />
                     </div>
-                    <p className="text-lg font-bold text-foreground">Xin chào! Tôi là AI Trợ giảng</p>
+                    <p className="text-lg font-bold text-foreground">{t('classroom.ui.ai_greeting')}</p>
                     <p className="text-sm text-muted-foreground mt-2 max-w-sm leading-relaxed">
-                      Tôi có thể trả lời câu hỏi dựa trên tài liệu đã tải lên.
-                      Hãy vào tab &ldquo;Tài liệu học tập&rdquo; để tải lên tài liệu trước, rồi đặt câu hỏi!
+                      {t('classroom.ui.ai_greeting_desc')}
                     </p>
                   </div>
                 )}
@@ -1684,7 +1672,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </div>
                       {msg.tool_calls && msg.tool_calls.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">AI đã thực hiện</p>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('classroom.ui.ai_executed')}</p>
                           {msg.tool_calls.map((tc, j) => (
                             <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center gap-2">
                               <span className="shrink-0 text-primary-brand">⚙</span>
@@ -1700,10 +1688,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       )}
                       {msg.sources && msg.sources.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Nguồn tham khảo</p>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('classroom.ui.ai_sources')}</p>
                           {msg.sources.slice(0, 3).map((src, j) => (
                             <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center justify-between gap-3">
-                              <span className="truncate">{src.metadata?.doc_name ?? src.metadata?.resource_uid ?? 'Tài liệu'}</span>
+                              <span className="truncate">{src.metadata?.doc_name ?? src.metadata?.resource_uid ?? t('classroom.ui.ai_doc_label')}</span>
                               <span className="shrink-0 font-bold text-primary-brand">{(src.score * 100).toFixed(0)}%</span>
                             </div>
                           ))}
@@ -1746,7 +1734,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         className="flex-1 h-12 flex items-center justify-center gap-2 bg-rose-500 text-white rounded-2xl text-xs font-black uppercase tracking-wide animate-pulse"
                       >
                         <Square size={14} fill="white" />
-                        Đang ghi âm...
+                        {t('classroom.ui.ai_speaking')}
                       </button>
                     ) : (
                       <>
@@ -1754,7 +1742,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           disabled={aiLoading}
                           onClick={() => void startRecording()}
                           className="h-12 w-12 flex items-center justify-center bg-muted text-muted-foreground rounded-2xl hover:bg-primary-brand-light hover:text-primary-brand disabled:opacity-50 transition-all shrink-0"
-                          title="Nói với AI"
+                          title={t('classroom.ui.ai_mic_title')}
                         >
                           <Mic size={18} />
                         </button>
@@ -1763,7 +1751,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           value={aiQuestion}
                           onChange={e => setAiQuestion(e.target.value)}
                           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
-                          placeholder={AI_MODES.find(m => m.key === aiMode)?.placeholder ?? 'Đặt câu hỏi...'}
+                          placeholder={AI_MODES.find(m => m.key === aiMode)?.placeholder ?? t('classroom.ui.ai_placeholder')}
                           disabled={aiLoading}
                           className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
                         />
@@ -1794,7 +1782,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
                   <Loader2 className="animate-spin mb-4 text-primary-brand" size={40} />
-                  <p className="text-sm font-bold uppercase tracking-widest">Đang tải kênh thảo luận...</p>
+                  <p className="text-sm font-bold uppercase tracking-widest">{t('classroom.labels.chat_loading')}</p>
                 </div>
               )}
             </div>
@@ -1804,8 +1792,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="flex h-full flex-col animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
               <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">Phòng họp trực tuyến</h3>
-                  <p className="text-sm text-muted-foreground font-medium mt-1">Mở buổi học trực tuyến và chia sẻ màn hình cho sinh viên</p>
+                  <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.meeting_title')}</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.meeting_subtitle')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
@@ -1814,9 +1802,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       : 'border-border bg-card text-muted-foreground'
                   }`}>
                     {activeMeeting ? <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> : <WifiOff size={14} />}
-                    {activeMeeting ? 'Đang hoạt động' : 'Ngoại tuyến'}
+                    {activeMeeting ? t('classroom.ui.meeting_status_active') : t('classroom.ui.meeting_status_offline')}
                   </span>
-                  
+
                   {activeMeeting ? (
                     <div className="flex items-center gap-3">
                       {!localStream ? (
@@ -1827,7 +1815,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             className="h-12 rounded-2xl bg-primary-brand px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
-                            Chia sẻ màn hình
+                            {t('classroom.ui.meeting_share_screen')}
                           </Button>
                           <Button
                             onClick={() => void handleStartMeeting('camera')}
@@ -1836,7 +1824,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-border hover:bg-muted uppercase tracking-widest"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
-                            Bật camera
+                            {t('classroom.ui.meeting_enable_camera')}
                           </Button>
                         </>
                       ) : (
@@ -1847,7 +1835,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-rose-200 text-rose-600 hover:bg-rose-50 uppercase tracking-widest"
                         >
                           <WifiOff size={18} />
-                          Dừng phát
+                          {t('classroom.ui.meeting_stop_streaming')}
                         </Button>
                       )}
                       <Button
@@ -1857,7 +1845,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold shadow-lg shadow-rose-100 uppercase tracking-widest"
                       >
                         {meetingAction === 'end' ? <Loader2 size={18} className="animate-spin" /> : <X size={18} />}
-                        Kết thúc
+                        {t('classroom.ui.meeting_end')}
                       </Button>
                     </div>
                   ) : (
@@ -1868,7 +1856,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         className="h-12 rounded-2xl bg-primary-brand px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest"
                       >
                         {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
-                        Mở phòng họp
+                        {t('classroom.ui.meeting_start')}
                       </Button>
                     </div>
                   )}
@@ -1884,34 +1872,34 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Trạng thái</div>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_status_label')}</div>
                         <div className="text-lg font-bold text-foreground flex items-center gap-2">
                           {activeMeeting ? (
                             <>
                               <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                              Đang dạy trực tuyến
+                              {t('classroom.ui.meeting_teaching')}
                             </>
-                          ) : 'Sẵn sàng mở lớp'}
+                          ) : t('classroom.ui.meeting_ready')}
                         </div>
                         <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">
-                          {activeMeeting ? `Bắt đầu lúc ${formatDateTime(activeMeeting.started_at || activeMeeting.created_at)}` : 'Sinh viên sẽ thấy thông báo khi bạn mở phòng.'}
+                          {activeMeeting ? `${t('classroom.ui.meeting_started_at', undefined, { time: formatDateTime(activeMeeting.started_at || activeMeeting.created_at) })}` : t('classroom.ui.meeting_ready_desc')}
                         </div>
                       </div>
                       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Kết nối thời gian thực</div>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_real_time')}</div>
                         <div className="flex items-center gap-3 text-lg font-bold text-foreground">
                           {rtcConnected ? <Wifi size={20} className="text-emerald-500" /> : <WifiOff size={20} className="text-muted-foreground/50" />}
-                          {rtcConnected ? 'Đã kết nối' : 'Đang chờ...'}
+                          {rtcConnected ? t('classroom.ui.meeting_connected') : t('classroom.ui.meeting_waiting')}
                         </div>
-                        <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">Kênh tín hiệu bảo mật dùng mã lớp độc nhất.</div>
+                        <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">{t('classroom.ui.meeting_real_time_desc')}</div>
                       </div>
                       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Phòng gần nhất</div>
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_latest')}</div>
                         <div className="text-sm font-bold text-foreground truncate">
-                          {latestMeeting?.title || 'Chưa có lịch sử'}
+                          {latestMeeting?.title || t('classroom.ui.meeting_no_history')}
                         </div>
                         <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">
-                          {latestMeeting ? `Hoạt động: ${formatDateTime(latestMeeting.created_at)}` : 'Mở phòng để tạo lịch sử dạy học.'}
+                          {latestMeeting ? `${t('classroom.ui.meeting_started_at', undefined, { time: formatDateTime(latestMeeting.created_at) })}` : t('classroom.ui.meeting_no_history_desc')}
                         </div>
                       </div>
                     </div>
@@ -1919,19 +1907,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="rounded-[40px] border border-border bg-slate-950 p-6 shadow-2xl shadow-primary-brand/10">
                       {localStream ? (
                         <div className="rounded-[24px] overflow-hidden border border-slate-800">
-                          <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Camera đang phát' : 'Màn hình đang chia sẻ'} />
+                          <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? t('classroom.ui.meeting_camera_streaming') : t('classroom.ui.meeting_screen_sharing')} />
                         </div>
                       ) : remoteStream ? (
                         <div className="rounded-[24px] overflow-hidden border border-slate-800">
-                          <ScreenShareViewer stream={remoteStream} label="Nguồn phát từ người tham gia" />
+                          <ScreenShareViewer stream={remoteStream} label={t('classroom.ui.meeting_remote_stream')} />
                         </div>
                       ) : (
                         <div className="flex aspect-video flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-800 text-center text-muted-foreground bg-slate-900/50">
                           <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-6">
                             <Video size={32} className="opacity-40" />
                           </div>
-                          <p className="text-base font-bold text-muted-foreground uppercase tracking-[0.2em]">Tín hiệu trống</p>
-                          <p className="mt-2 text-sm font-medium text-muted-foreground">Nhấn &ldquo;Mở phòng họp&rdquo; để bắt đầu phiên làm việc trực tuyến.</p>
+                          <p className="text-base font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('classroom.ui.meeting_signal_empty')}</p>
+                          <p className="mt-2 text-sm font-medium text-muted-foreground">{t('classroom.ui.meeting_signal_empty_desc')}</p>
                         </div>
                       )}
                     </div>
@@ -1945,8 +1933,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
               <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">Bài kiểm tra</h3>
-                  <p className="text-sm text-muted-foreground font-medium mt-1">Quản lý các đợt kiểm tra đánh giá của lớp</p>
+                  <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.exams_title')}</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.exams_subtitle')}</p>
                 </div>
                 {canManageExams && (
                   <Button
@@ -1954,24 +1942,24 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     className="h-12 rounded-2xl bg-primary-brand px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                   >
                     <Plus size={20} />
-                    Tạo bài kiểm tra
+                    {t('classroom.ui.exams_create')}
                   </Button>
                 )}
               </div>
 
               <div className="p-10 flex-1 overflow-y-auto space-y-8">
                 <div className="flex items-center gap-3 bg-muted p-1.5 rounded-2xl border border-border w-fit">
-                  {EXAM_KIND_OPTIONS.map(kind => (
+                  {(['midterm', 'final', 'regular'] as ExamKind[]).map(kind => (
                     <button
-                      key={kind.key}
-                      onClick={() => setSelectedExamKind(kind.key)}
+                      key={kind}
+                      onClick={() => setSelectedExamKind(kind)}
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
-                        selectedExamKind === kind.key 
-                          ? 'bg-card text-primary-brand shadow-sm border border-border' 
+                        selectedExamKind === kind
+                          ? 'bg-card text-primary-brand shadow-sm border border-border'
                           : 'text-muted-foreground hover:text-muted-foreground'
                       }`}
                     >
-                      {kind.label}
+                      {t(`classroom.ui.exam_kind_${kind}`)}
                     </button>
                   ))}
                 </div>
@@ -1986,8 +1974,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <ClipboardList size={24} className="opacity-40" />
                       </div>
-                      <p className="text-sm font-bold text-foreground uppercase tracking-widest">Không tìm thấy bài kiểm tra</p>
-                      <p className="text-xs font-medium mt-1">Chưa có dữ liệu cho mục {selectedKind.label.toLowerCase()}</p>
+                      <p className="text-sm font-bold text-foreground uppercase tracking-widest">{t('classroom.ui.exams_empty')}</p>
+                      <p className="text-xs font-medium mt-1">{t('classroom.ui.exams_empty_kind', undefined, { kind: t(`classroom.ui.exam_kind_${selectedKind}`).toLowerCase() })}</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
@@ -2004,14 +1992,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                               <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider border ${
                                 exam.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-muted text-muted-foreground border-border'
                               }`}>
-                                {exam.status === 'published' ? 'Đã đăng' : 'Bản nháp'}
+                                {exam.status === 'published' ? t('classroom.ui.exams_published') : t('classroom.ui.exams_draft')}
                               </span>
                             </div>
                             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                               <span className="flex items-center gap-1.5"><FileText size={12} /> {exam.content_type}</span>
                               <span className="flex items-center gap-1.5"><Clock size={12} /> {formatDateTime(exam.due_date)}</span>
                               {exam.created_at && (
-                                <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(exam.created_at).toLocaleDateString('vi-VN')}</span>
+                                <span className="flex items-center gap-1.5"><Calendar size={12} /> {localeFormatDate(exam.created_at)}</span>
                               )}
                             </div>
                           </div>
@@ -2022,13 +2010,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                               className="h-10 rounded-xl px-4 font-bold text-xs gap-2 uppercase tracking-widest"
                             >
                               <ClipboardCheck size={14} />
-                              Bảng điểm
+                              {t('classroom.ui.exams_grade_table')}
                             </Button>
                             <Button
                               onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)}
                               className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-primary-brand hover:text-white text-muted-foreground transition-all border border-border hover:border-primary-brand uppercase tracking-widest"
                             >
-                              Chi tiết
+                              {t('classroom.ui.exams_view_detail')}
                             </Button>
                             {canManageExams && (
                               <DropdownMenu>
@@ -2040,15 +2028,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                 <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
                                   <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
                                     <Pencil size={16} className="mr-3 text-muted-foreground" />
-                                    Chỉnh sửa
+                                    {t('classroom.ui.exams_edit')}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator className="my-2 bg-muted" />
-                                  <DropdownMenuItem 
+                                  <DropdownMenuItem
                                     className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-rose-600 cursor-pointer"
                                     onClick={() => void handleDeleteExam(exam)}
                                   >
                                     <Trash2 size={16} className="mr-3" />
-                                    Xóa bài
+                                    {t('classroom.ui.exams_delete')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -2075,15 +2063,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <div className="px-10 pt-10 pb-0 border-b border-border bg-muted/50">
                   <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between mb-6">
                     <div>
-                      <h3 className="text-xl font-bold text-foreground">Kì Thi</h3>
-                      <p className="text-sm text-muted-foreground font-medium mt-1">Tổ chức và quản lý các kì thi trực tuyến</p>
+                      <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.final_exams_title')}</h3>
+                      <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.final_exams_subtitle')}</p>
                     </div>
                     <Button
                       onClick={() => setShowOpenExamModal(true)}
                       className="h-12 rounded-2xl bg-primary-brand px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                     >
                       <Wifi size={20} />
-                      Mở ca thi
+                      {t('classroom.ui.final_exams_open')}
                     </Button>
                   </div>
 
@@ -2102,7 +2090,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         {activeExams.length > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />}
                         <span className={`relative inline-flex rounded-full h-2 w-2 ${activeExams.length > 0 ? 'bg-rose-500' : 'bg-muted-foreground/30'}`} />
                       </span>
-                      Đang thi
+                      {t('classroom.ui.final_exams_ongoing')}
                       <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'ongoing' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'}`}>
                         {activeExams.length}
                       </span>
@@ -2116,7 +2104,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           : 'border-transparent text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      Đã thi
+                      {t('classroom.ui.final_exams_closed')}
                       <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'closed' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'}`}>
                         {completedExams.length}
                       </span>
@@ -2135,21 +2123,21 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <BarChart2 size={24} className="opacity-40 text-muted-foreground" />
                       </div>
-                      <p className="text-sm font-black text-foreground uppercase tracking-widest">Chưa có ca thi nào</p>
-                      <p className="text-xs font-medium mt-1 mb-6 text-muted-foreground">Nhấn &ldquo;Mở ca thi&rdquo; để bắt đầu kì thi đầu tiên</p>
+                      <p className="text-sm font-black text-foreground uppercase tracking-widest">{t('classroom.ui.final_exams_empty')}</p>
+                      <p className="text-xs font-medium mt-1 mb-6 text-muted-foreground">{t('classroom.ui.final_exams_empty_hint')}</p>
                       <Button
                         onClick={() => setShowOpenExamModal(true)}
                         className="h-10 rounded-xl bg-primary-brand px-6 gap-2 text-xs font-bold text-white hover:bg-primary-brand-dark uppercase tracking-widest"
                       >
                         <Wifi size={15} />
-                        Mở ca thi đầu tiên
+                        {t('classroom.ui.final_exams_open_first')}
                       </Button>
                     </div>
                   ) : tabExams.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-[28px] border border-dashed border-border">
                       <BarChart2 size={28} className="opacity-20 text-muted-foreground mb-3" />
                       <p className="text-sm font-bold text-muted-foreground">
-                        {examSubTab === 'ongoing' ? 'Không có ca thi nào đang diễn ra' : 'Chưa có ca thi nào kết thúc'}
+                        {examSubTab === 'ongoing' ? t('classroom.ui.final_exams_no_ongoing') : t('classroom.ui.final_exams_no_closed')}
                       </p>
                     </div>
                   ) : (
@@ -2166,36 +2154,36 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                 <div className="flex items-center gap-2 mb-1">
                                   <h4 className="text-sm font-black text-foreground truncate">{exam.title}</h4>
                                   <span className="shrink-0 text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100 uppercase animate-pulse">
-                                    • LIVE
+                                    {t('classroom.ui.final_exams_live')}
                                   </span>
                                 </div>
                                 <p className="text-[10px] font-bold text-muted-foreground">
-                                  Bắt đầu: {exam.opened_at ? formatDateTime(exam.opened_at) : '--'}
+                                  {t('classroom.ui.final_exams_start', undefined, { time: exam.opened_at ? formatDateTime(exam.opened_at) : '--' })}
                                 </p>
                                 <div className="mt-2 flex flex-wrap gap-1.5">
                                   <span className="flex items-center gap-1 rounded-full bg-primary-brand-light border border-primary-brand-muted px-2 py-0.5 text-[10px] font-black text-primary-brand">
                                     <Timer size={9} />
-                                    {exam.duration_seconds ? `${Math.round(exam.duration_seconds / 60)} phút` : 'Không giới hạn'}
+                                    {exam.duration_seconds ? t('classroom.ui.final_exams_minutes', undefined, { count: Math.round(exam.duration_seconds / 60) }) : t('classroom.ui.quiz_no_limit')}
                                   </span>
                                   <span className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-600">
                                     <Clock size={9} />
-                                    Muộn: {exam.late_threshold_seconds ? `${Math.round(exam.late_threshold_seconds / 60)}p` : 'Không'}
+                                    {exam.late_threshold_seconds ? t('classroom.ui.final_exams_late', undefined, { minutes: Math.round(exam.late_threshold_seconds / 60) }) : t('classroom.ui.final_exams_no_late')}
                                   </span>
                                   <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${exam.camera_required ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-muted/50 border-border text-muted-foreground'}`}>
                                     <Camera size={9} />
-                                    {exam.camera_required ? 'Camera' : 'Không camera'}
+                                    {exam.camera_required ? t('classroom.ui.final_exams_camera') : t('classroom.ui.final_exams_no_camera')}
                                   </span>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 <Button onClick={() => setGradeTableExam(exam)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
-                                  <ClipboardCheck size={13} />Bảng điểm
+                                  <ClipboardCheck size={13} />{t('classroom.ui.exams_grade_table')}
                                 </Button>
                                 <Button onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
-                                  Chi tiết
+                                  {t('classroom.ui.exams_view_detail')}
                                 </Button>
                                 <Button onClick={() => void handleCloseOnline(exam)} size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5 bg-rose-600 hover:bg-rose-700 text-white">
-                                  <WifiOff size={13} />Đóng thi
+                                  <WifiOff size={13} />{t('classroom.ui.exams_close_session')}
                                 </Button>
                               </div>
                             </div>
@@ -2211,15 +2199,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             <div className="flex-1 min-w-0">
                               <h4 className="text-sm font-black text-foreground truncate group-hover:text-primary-brand transition-colors">{exam.title}</h4>
                               <p className="text-[10px] font-bold text-muted-foreground mt-0.5">
-                                Đã thi: {exam.opened_at ? formatDateTime(exam.opened_at) : '--'}
+                                {t('classroom.ui.final_exams_done_at', undefined, { time: exam.opened_at ? formatDateTime(exam.opened_at) : '--' })}
                               </p>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               <Button onClick={() => setGradeTableExam(exam)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
-                                <ClipboardCheck size={13} />Bảng điểm
+                                <ClipboardCheck size={13} />{t('classroom.ui.exams_grade_table')}
                               </Button>
                               <Button onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)} variant="outline" size="sm" className="h-9 rounded-xl px-3 font-bold text-xs gap-1.5">
-                                Chi tiết
+                                {t('classroom.ui.exams_view_detail')}
                               </Button>
                             </div>
                           </div>
@@ -2235,8 +2223,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
               <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">Thi trắc nghiệm</h3>
-                  <p className="text-sm text-muted-foreground font-medium mt-1">Giao bài tập trắc nghiệm cho sinh viên trong lớp</p>
+                  <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.quiz_section_title')}</h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.quiz_section_subtitle')}</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -2245,14 +2233,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     className="h-12 rounded-2xl px-6 gap-3 text-xs font-bold uppercase tracking-widest transition-all"
                   >
                     <Wand2 size={18} />
-                    Tạo đề mới
+                    {t('classroom.ui.quiz_create_new_btn')}
                   </Button>
                   <Button
                     onClick={() => setShowAssignModal(true)}
                     className="h-12 rounded-2xl bg-primary-brand px-8 gap-3 text-xs font-bold text-white shadow-lg shadow-primary-brand/10 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                   >
                     <Plus size={20} />
-                    Giao đề mới
+                    {t('classroom.ui.quiz_assign_new_btn')}
                   </Button>
                 </div>
               </div>
@@ -2267,8 +2255,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Gamepad2 size={24} className="opacity-40" />
                     </div>
-                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có đề thi nào được giao</p>
-                    <p className="text-xs font-medium mt-1">Nhấn &ldquo;Giao đề mới&rdquo; để thêm hoạt động cho lớp</p>
+                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">{t('classroom.ui.quiz_empty_title')}</p>
+                    <p className="text-xs font-medium mt-1">{t('classroom.ui.quiz_empty_hint')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4">
@@ -2283,14 +2271,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <div className="flex-1 min-w-0">
                             <h4 className="text-base font-bold text-foreground group-hover:text-primary-brand transition-colors mb-1.5">{quiz.title}</h4>
                             <div className="flex items-center gap-4 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                              <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{quiz.questions_count} câu hỏi</span>
-                              <span className="flex items-center gap-1.5"><Clock size={12} /> {timeLimitMin > 0 ? `${timeLimitMin} phút` : 'Không giới hạn'}</span>
-                              <span className="flex items-center gap-1.5"><RefreshCw size={12} /> {assignment?.max_attempts ? `${assignment.max_attempts} lần thử` : 'Vô hạn'}</span>
+                              <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{t('classroom.ui.quiz_questions_count', undefined, { count: quiz.questions_count })}</span>
+                              <span className="flex items-center gap-1.5"><Clock size={12} /> {timeLimitMin > 0 ? t('classroom.ui.quiz_time_limit_value', undefined, { count: timeLimitMin }) : t('classroom.ui.quiz_no_limit')}</span>
+                              <span className="flex items-center gap-1.5"><RefreshCw size={12} /> {assignment?.max_attempts ? t('classroom.ui.quiz_max_attempts_value', undefined, { count: assignment.max_attempts }) : t('classroom.ui.quiz_unlimited')}</span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
                               className="h-11 w-11 rounded-xl text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100"
                               onClick={() => void handleUnassignQuiz(quiz)}
@@ -2313,13 +2301,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
                 <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-foreground">Danh sách chặn</h3>
+                    <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.blacklist_title')}</h3>
                     <p className="text-sm text-muted-foreground font-medium mt-1">
-                      {loadingBlacklist ? 'Đang tải...' : (
+                      {loadingBlacklist ? t('classroom.ui.blacklist_loading') : (
                         <>
-                          {blacklist.filter(e => e.scope === 'classroom').length} chặn lớp này
+                          {t('classroom.ui.blacklist_count_classroom', undefined, { count: blacklist.filter(e => e.scope === 'classroom').length })}
                           {' · '}
-                          {blacklist.filter(e => e.scope === 'global').length} chặn toàn cục
+                          {t('classroom.ui.blacklist_count_global', undefined, { count: blacklist.filter(e => e.scope === 'global').length })}
                         </>
                       )}
                     </p>
@@ -2335,18 +2323,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <ShieldBan size={24} className="opacity-40" />
                       </div>
-                      <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có ai bị chặn</p>
-                      <p className="text-xs font-medium mt-1">Dùng nút Chặn trong trang chi tiết sinh viên để thêm</p>
+                      <p className="text-sm font-bold text-foreground uppercase tracking-widest">{t('classroom.ui.blacklist_empty')}</p>
+                      <p className="text-xs font-medium mt-1">{t('classroom.ui.blacklist_empty_hint')}</p>
                     </div>
                   ) : (
                     <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-sm">
                       <table className="w-full text-left">
                         <thead>
                           <tr className="border-b border-border text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                            <th className="px-6 py-4">Người dùng</th>
-                            <th className="px-6 py-4">Lý do</th>
-                            <th className="px-6 py-4">Ngày chặn</th>
-                            <th className="px-6 py-4 text-right">Hành động</th>
+                            <th className="px-6 py-4">{t('classroom.ui.blacklist_th_user')}</th>
+                            <th className="px-6 py-4">{t('classroom.ui.blacklist_th_reason')}</th>
+                            <th className="px-6 py-4">{t('classroom.ui.blacklist_th_blocked_at')}</th>
+                            <th className="px-6 py-4 text-right">{t('classroom.ui.blacklist_th_actions')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -2364,16 +2352,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                         ? 'bg-rose-100 text-rose-600'
                                         : 'bg-orange-100 text-orange-600'
                                     }`}>
-                                      {entry.scope === 'global' ? '🌐 Toàn cục' : '🏫 Lớp này'}
+                                      {entry.scope === 'global' ? t('classroom.ui.blacklist_scope_global') : t('classroom.ui.blacklist_scope_classroom')}
                                     </span>
                                   </div>
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-xs text-muted-foreground max-w-xs">
-                                {entry.reason || <span className="italic opacity-50">Không có lý do</span>}
+                                {entry.reason || <span className="italic opacity-50">{t('classroom.ui.blacklist_no_reason')}</span>}
                               </td>
                               <td className="px-6 py-4 text-xs font-bold text-muted-foreground">
-                                {entry.created_at ? new Date(entry.created_at).toLocaleDateString('vi-VN') : '—'}
+                                {entry.created_at ? localeFormatDate(entry.created_at) : '—'}
                               </td>
                               <td className="px-6 py-4 text-right">
                                 <Button
@@ -2390,9 +2378,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                         await spaceApi.classrooms.removeClassroomBlacklist(uid, entry.consumer_uid);
                                       }
                                       setBlacklist(prev => prev.filter(e => e.consumer_uid !== entry.consumer_uid));
-                                      toast.success('Đã hủy chặn thành công.');
+                                      toast.success(t('classroom.ui.blacklist_unblock_success'));
                                     } catch {
-                                      toast.error('Không thể hủy chặn.');
+                                      toast.error(t('classroom.ui.blacklist_unblock_error'));
                                     } finally {
                                       setUnblockingId(null);
                                     }
@@ -2401,7 +2389,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   {unblockingId === entry.consumer_uid
                                     ? <Loader2 size={13} className="animate-spin" />
                                     : <ShieldOff size={13} />}
-                                  Hủy chặn
+                                  {t('classroom.ui.blacklist_unblock')}
                                 </Button>
                               </td>
                             </tr>
@@ -2420,9 +2408,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
               <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-foreground">Danh sách sinh viên</h3>
+                  <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.students_title')}</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-1">
-                    {loadingMembers ? 'Đang tải...' : `${members.filter(m => m.role === 'student').length} sinh viên trong lớp`}
+                    {loadingMembers ? t('classroom.ui.students_loading') : t('classroom.ui.students_count_in_class', undefined, { count: members.filter(m => m.role === 'student').length })}
                   </p>
                 </div>
               </div>
@@ -2437,17 +2425,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Users size={24} className="opacity-40" />
                     </div>
-                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">Chưa có sinh viên nào</p>
-                    <p className="text-xs font-medium mt-1">Chia sẻ link tham gia để sinh viên vào lớp</p>
+                    <p className="text-sm font-bold text-foreground uppercase tracking-widest">{t('classroom.ui.students_empty')}</p>
+                    <p className="text-xs font-medium mt-1">{t('classroom.ui.students_empty_hint')}</p>
                   </div>
                 ) : (
                   <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-sm">
                     <table className="w-full text-left">
                       <thead>
                         <tr className="border-b border-border text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                          <th className="px-6 py-4">Sinh viên</th>
-                          <th className="px-6 py-4">Ngày tham gia</th>
-                          <th className="px-6 py-4 text-right">Hành động</th>
+                          <th className="px-6 py-4">{t('classroom.ui.students_th_member')}</th>
+                          <th className="px-6 py-4">{t('classroom.ui.students_th_joined_at')}</th>
+                          <th className="px-6 py-4 text-right">{t('classroom.ui.students_th_actions')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -2465,7 +2453,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                 )}
                                 <div>
                                   <div className="text-sm font-bold text-foreground">{member.member_name}</div>
-                                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Sinh viên</div>
+                                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('classroom.ui.students_role_badge')}</div>
                                 </div>
                               </div>
                             </td>
@@ -2484,30 +2472,30 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                 <DropdownMenuContent align="end" className="w-52">
                                   <DropdownMenuItem onClick={() => router.push(`/space/classrooms/${uid}/students/${member.member_id}`)}>
                                     <ClipboardCheck size={14} className="mr-2" />
-                                    Chi tiết
+                                    {t('classroom.ui.students_action_view_detail')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => router.push(`/space/classrooms/${uid}/students/${member.member_id}/analyze`)}>
                                     <BarChart2 size={14} className="mr-2" />
-                                    Phân tích
+                                    {t('classroom.ui.students_action_view_analysis')}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem variant="destructive" onClick={() => setMemberToKick(member)}>
                                     <UserX size={14} className="mr-2" />
-                                    Kick
+                                    {t('classroom.ui.students_action_kick')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     variant="destructive"
                                     onClick={() => setMemberToBlock({ member, scope: 'classroom' })}
                                   >
                                     <ShieldBan size={14} className="mr-2" />
-                                    Chặn lớp này
+                                    {t('classroom.ui.students_action_block_classroom')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     variant="destructive"
                                     onClick={() => setMemberToBlock({ member, scope: 'global' })}
                                   >
                                     <ShieldBan size={14} className="mr-2" />
-                                    Chặn toàn cục
+                                    {t('classroom.ui.students_action_block_global')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -2532,7 +2520,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           onAssigned={(quiz) => {
             setAssignedQuizzes(prev => [quiz, ...prev]);
             setShowAssignModal(false);
-            toast.success('Đã giao quiz thành công');
+            toast.success(t('classroom.labels.quiz_assigned_toast'));
           }}
           localAssigned={new Set(assignedQuizzes.map(q => q.uid))}
         />
@@ -2546,7 +2534,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             setExams(prev => [exam, ...prev.filter(item => item.uid !== exam.uid)]);
             setShowOpenExamModal(false);
             setActiveTab('final_exams');
-            toast.success(`Đã mở ca thi cho ${studentCount} sinh viên`);
+            toast.success(t('classroom.ui.exams_open_success', undefined, { count: studentCount }));
           }}
         />
       )}
@@ -2559,7 +2547,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           onSaved={(updated) => {
             setAssignedQuizzes(prev => prev.map(q => q.uid === updated.uid ? updated : q));
             setEditingQuiz(null);
-            toast.success('Đã cập nhật cài đặt');
+            toast.success(t('classroom.labels.settings_updated_toast'));
           }}
         />
       )}
@@ -2587,7 +2575,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
               <div className="text-white mt-1">
                 <DialogTitle className="text-lg font-black text-white">{memberToKick?.member_name}</DialogTitle>
-                <p className="text-xs font-bold text-white/60 uppercase tracking-widest mt-0.5">Sinh viên</p>
+                <p className="text-xs font-bold text-white/60 uppercase tracking-widest mt-0.5">{t('classroom.ui.students_role_badge')}</p>
               </div>
             </div>
           </div>
@@ -2595,22 +2583,21 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           <div className="px-8 pt-6 pb-8 bg-card">
             <div className="text-center space-y-3 mb-6">
               <DialogDescription className="text-sm font-bold text-foreground">
-                Kick sinh viên này ra khỏi lớp?
+                {t('classroom.ui.kick_dialog_title', undefined, { name: memberToKick?.member_name ?? '' })}
               </DialogDescription>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Sinh viên sẽ bị xóa khỏi lớp ngay lập tức.<br/>
-                Họ vẫn có thể tham gia lại qua link mời.
+                {t('classroom.ui.kick_dialog_desc2')}
               </p>
             </div>
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm border-border"
                 onClick={() => setMemberToKick(null)} disabled={!!kickingId}>
-                Huỷ bỏ
+                {t('classroom.ui.kick_dialog_cancel')}
               </Button>
               <Button className="flex-1 h-11 rounded-xl font-bold text-sm bg-rose-600 hover:bg-rose-700 text-white gap-2"
                 onClick={() => void handleKickConfirm()} disabled={!!kickingId}>
                 {kickingId ? <Loader2 size={15} className="animate-spin" /> : <UserX size={15} />}
-                Kick ngay
+                {t('classroom.ui.kick_dialog_confirm')}
               </Button>
             </div>
           </div>
@@ -2645,7 +2632,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="text-white mt-1">
                 <DialogTitle className="text-lg font-black text-white">{memberToBlock?.member.member_name}</DialogTitle>
                 <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest bg-white/20 text-white px-2.5 py-0.5 rounded-full mt-1">
-                  {memberToBlock?.scope === 'global' ? '🌐 Chặn toàn cục' : '🏫 Chặn lớp này'}
+                  {memberToBlock?.scope === 'global' ? t('classroom.ui.block_global_label') : t('classroom.ui.block_classroom_label')}
                 </span>
               </div>
             </div>
@@ -2656,21 +2643,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {memberToBlock?.scope === 'global' ? (
                 <>
                   <DialogDescription className="text-sm font-bold text-foreground">
-                    Chặn toàn cục sinh viên này?
+                    {t('classroom.ui.block_dialog_global_title')}
                   </DialogDescription>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Sinh viên sẽ <span className="font-black text-rose-600">không thể vào bất kỳ lớp nào</span> của bạn.<br/>
-                    Bạn có thể hủy chặn bất cứ lúc nào trong tab Danh sách chặn.
+                    {t('classroom.ui.block_dialog_global_desc')}
                   </p>
                 </>
               ) : (
                 <>
                   <DialogDescription className="text-sm font-bold text-foreground">
-                    Chặn sinh viên khỏi lớp này?
+                    {t('classroom.ui.block_dialog_classroom_title')}
                   </DialogDescription>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Sinh viên sẽ bị xóa và <span className="font-black text-orange-600">không thể vào lớp này</span>.<br/>
-                    Họ vẫn có thể tham gia các lớp khác của bạn.
+                    {t('classroom.ui.block_dialog_classroom_desc')}
                   </p>
                 </>
               )}
@@ -2678,7 +2663,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm border-border"
                 onClick={() => setMemberToBlock(null)} disabled={!!blockingMemberId}>
-                Huỷ bỏ
+                {t('classroom.ui.block_dialog_cancel')}
               </Button>
               <Button
                 className={`flex-1 h-11 rounded-xl font-bold text-sm text-white gap-2 ${
@@ -2690,7 +2675,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 disabled={!!blockingMemberId}
               >
                 {blockingMemberId ? <Loader2 size={15} className="animate-spin" /> : <ShieldBan size={15} />}
-                {memberToBlock?.scope === 'global' ? 'Chặn toàn cục' : 'Chặn lớp này'}
+                {memberToBlock?.scope === 'global' ? t('classroom.ui.block_dialog_confirm_global') : t('classroom.ui.block_dialog_confirm_classroom')}
               </Button>
             </div>
           </div>
@@ -2734,9 +2719,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-8 py-6">
               <div>
-                <h2 className="text-xl font-black text-foreground">Phê duyệt thành viên</h2>
+                <h2 className="text-xl font-black text-foreground">{t('classroom.ui.pending_title')}</h2>
                 <p className="mt-1 text-sm font-medium text-muted-foreground">
-                  {loadingPending ? 'Đang tải...' : `${pendingMembers.length} yêu cầu đang chờ`}
+                  {loadingPending ? t('classroom.ui.students_loading') : t('classroom.ui.pending_count', undefined, { count: pendingMembers.length })}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -2748,7 +2733,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     onClick={() => void handleApproveAll()}
                   >
                     <Check size={13} />
-                    Chấp nhận hết
+                    {t('classroom.ui.pending_approve_all')}
                   </Button>
                 )}
                 <button
@@ -2771,8 +2756,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
                     <Users size={28} className="text-muted-foreground/50" />
                   </div>
-                  <p className="text-sm font-bold text-muted-foreground">Không có yêu cầu nào</p>
-                  <p className="text-xs font-medium text-muted-foreground">Tất cả yêu cầu đã được xử lý</p>
+                  <p className="text-sm font-bold text-muted-foreground">{t('classroom.ui.pending_empty')}</p>
+                  <p className="text-xs font-medium text-muted-foreground">{t('classroom.ui.pending_empty_desc')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -2809,7 +2794,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           {approvingId === member.member_id
                             ? <Loader2 size={13} className="animate-spin" />
                             : <Check size={13} />}
-                          Duyệt
+                          {t('classroom.ui.pending_approve')}
                         </Button>
                         <Button
                           size="sm"
@@ -2821,7 +2806,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           {rejectingId === member.member_id
                             ? <Loader2 size={13} className="animate-spin" />
                             : <X size={13} />}
-                          Từ chối
+                          {t('classroom.ui.pending_reject')}
                         </Button>
                       </div>
                     </div>
@@ -2837,7 +2822,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-muted-foreground transition-colors"
               >
                 <RefreshCw size={13} />
-                Làm mới danh sách
+                {t('classroom.ui.pending_refresh')}
               </button>
             </div>
           </div>
@@ -2860,6 +2845,7 @@ function AssignQuizModal({
   onAssigned: (quiz: Quiz) => void;
   localAssigned: Set<string>;
 }) {
+  const { t } = useTranslation();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(false);
   const [pendingQuiz, setPendingQuiz] = useState<Quiz | null>(null);
@@ -2876,10 +2862,10 @@ function AssignQuizModal({
       setQuizzes(data);
       setLoading(false);
     }).catch(() => {
-      toast.error('Không thể tải thư viện đề thi');
+      toast.error(t('quiz.assign_modal.load_error'));
       setLoading(false);
     });
-  }, []);
+  }, [t]);
 
   const handleConfirmAssign = async () => {
     if (!pendingQuiz) return;
@@ -2895,7 +2881,7 @@ function AssignQuizModal({
       });
       onAssigned({ ...pendingQuiz, assigned_classrooms: [assignment] });
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể giao đề thi');
+      toast.error(err instanceof Error ? err.message : t('quiz.assign_modal.assign_error'));
     } finally {
       setAssigning(false);
     }
@@ -2907,7 +2893,7 @@ function AssignQuizModal({
         <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
           <div className="p-8 border-b border-border flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-foreground">Cài đặt giao đề thi</h2>
+              <h2 className="text-xl font-bold text-foreground">{t('quiz.assign_modal.settings_title')}</h2>
               <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setPendingQuiz(null)} className="rounded-xl text-muted-foreground">
@@ -2918,12 +2904,12 @@ function AssignQuizModal({
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.assign_modal.time_label')}</label>
                 <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
                   className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
               <div className="space-y-2.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.assign_modal.max_attempts_label')}</label>
                 <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
                   className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
@@ -2931,9 +2917,9 @@ function AssignQuizModal({
 
             <div className="space-y-4">
               {[
-                { label: 'Trộn câu hỏi', icon: Shuffle, val: shuffleQuestions, set: setShuffleQuestions },
-                { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
-                { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
+                { label: t('quiz.assign_modal.shuffle_questions'), icon: Shuffle, val: shuffleQuestions, set: setShuffleQuestions },
+                { label: t('quiz.assign_modal.shuffle_options'), icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
+                { label: t('quiz.assign_modal.show_explanation'), icon: HelpCircle, val: showExplanation, set: setShowExplanation },
               ].map(item => (
                 <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
                   <div className="flex items-center gap-3 text-sm font-bold text-foreground">
@@ -2948,7 +2934,7 @@ function AssignQuizModal({
 
           <div className="p-8 pt-0 flex gap-4">
             <Button variant="outline" onClick={() => setPendingQuiz(null)} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
-              Quay lại
+              {t('quiz.assign_modal.back')}
             </Button>
             <Button
               onClick={() => void handleConfirmAssign()}
@@ -2956,7 +2942,7 @@ function AssignQuizModal({
               className="flex-1 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-primary-brand/20 uppercase tracking-widest transition-all"
             >
               {assigning ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
-              Giao cho lớp
+              {t('quiz.assign_modal.assign_to_class')}
             </Button>
           </div>
         </div>
@@ -2969,8 +2955,8 @@ function AssignQuizModal({
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[80vh] flex flex-col">
         <div className="p-8 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-foreground">Chọn đề thi để giao</h2>
-            <p className="text-sm text-muted-foreground font-medium mt-1">Nhấn vào đề thi để cài đặt và giao cho lớp</p>
+            <h2 className="text-xl font-bold text-foreground">{t('quiz.assign_modal.select_quiz_title')}</h2>
+            <p className="text-sm text-muted-foreground font-medium mt-1">{t('quiz.assign_modal.select_quiz_hint')}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground">
             <X size={20} />
@@ -2985,8 +2971,8 @@ function AssignQuizModal({
           ) : quizzes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
               <BookOpen size={48} className="mb-4 opacity-40" />
-              <p className="text-sm font-bold text-foreground uppercase tracking-widest">Thư viện đề thi trống</p>
-              <p className="text-xs font-medium mt-1">Hãy tạo đề thi mới trong hệ thống trước</p>
+              <p className="text-sm font-bold text-foreground uppercase tracking-widest">{t('quiz.assign_modal.library_empty')}</p>
+              <p className="text-xs font-medium mt-1">{t('quiz.assign_modal.library_empty_hint')}</p>
             </div>
           ) : (
             quizzes.map(quiz => {
@@ -3009,13 +2995,13 @@ function AssignQuizModal({
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-foreground group-hover:text-primary-brand transition-colors">{quiz.title}</div>
                     <div className="flex items-center gap-3 mt-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                      <span className="bg-muted px-2 py-0.5 rounded border border-border">{quiz.questions_count} câu hỏi</span>
+                      <span className="bg-muted px-2 py-0.5 rounded border border-border">{t('quiz.assign_modal.questions_count', undefined, { count: quiz.questions_count })}</span>
                     </div>
                   </div>
                   {assigned ? (
-                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-card border border-emerald-100 px-3 py-1 rounded-full shrink-0 tracking-widest">Đã giao</span>
+                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-card border border-emerald-100 px-3 py-1 rounded-full shrink-0 tracking-widest">{t('quiz.assign_modal.assigned_badge')}</span>
                   ) : (
-                    <span className="text-[10px] font-black text-primary-brand uppercase bg-primary-brand-light border border-primary-brand-light px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">Chọn</span>
+                    <span className="text-[10px] font-black text-primary-brand uppercase bg-primary-brand-light border border-primary-brand-light px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">{t('quiz.assign_modal.select_badge')}</span>
                   )}
                 </button>
               );
@@ -3025,7 +3011,7 @@ function AssignQuizModal({
 
         <div className="p-8 border-t border-border">
           <Button onClick={onClose} variant="outline" className="w-full rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
-            Đóng cửa sổ
+            {t('quiz.assign_modal.close_window')}
           </Button>
         </div>
       </div>
@@ -3042,6 +3028,7 @@ function OpenOnlineExamModal({
   onClose: () => void;
   onOpened: (exam: Exam, studentCount: number) => void;
 }) {
+  const { t } = useTranslation();
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedExamUid, setSelectedExamUid] = useState('');
@@ -3067,10 +3054,10 @@ function OpenOnlineExamModal({
       }
       setLoading(false);
     }).catch(() => {
-      toast.error('Không thể tải danh sách bài thi');
+      toast.error(t('classroom.ui.exams_load_error'));
       setLoading(false);
     });
-  }, [classroomUid]);
+  }, [classroomUid, t]);
 
   const selectedExam = exams.find(e => e.uid === selectedExamUid);
 
@@ -3083,7 +3070,7 @@ function OpenOnlineExamModal({
 
   const handleOpenExam = async () => {
     if (!selectedExam) {
-      toast.error('Vui lòng chọn bài thi để mở ca thi');
+      toast.error(t('classroom.ui.exams_select_to_open'));
       return;
     }
 
@@ -3096,7 +3083,7 @@ function OpenOnlineExamModal({
       });
       onOpened(opened.exam, opened.sessions.length);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể mở ca thi');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.exams_open_error'));
     } finally {
       setOpening(false);
     }
@@ -3107,8 +3094,8 @@ function OpenOnlineExamModal({
       <div className="w-full max-w-4xl h-[90vh] bg-card rounded-[40px] shadow-2xl border border-border flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
         <div className="flex items-center justify-between p-8 border-b border-border bg-muted/30">
           <div>
-            <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">Mở ca thi trực tuyến</h2>
-            <p className="text-sm font-medium text-muted-foreground">Chọn bài thi từ danh sách lớp để bắt đầu ca thi</p>
+            <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">{t('classroom.ui.final_exams_open')}</h2>
+            <p className="text-sm font-medium text-muted-foreground">{t('classroom.ui.final_exams_subtitle')}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} disabled={opening} className="rounded-xl text-muted-foreground">
             <X size={20} />
@@ -3119,7 +3106,7 @@ function OpenOnlineExamModal({
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               <ClipboardList size={14} />
-              Chọn bài thi trực tuyến
+              {t('classroom.ui.final_exams_open')}
             </div>
             {loading ? (
               <div className="flex h-32 items-center justify-center rounded-2xl border border-border bg-muted/40">
@@ -3128,8 +3115,8 @@ function OpenOnlineExamModal({
             ) : exams.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center">
                 <ClipboardList size={36} className="mx-auto mb-3 text-muted-foreground/40" />
-                <p className="text-sm font-bold text-foreground">Chưa có bài thi trực tuyến nào</p>
-                <p className="mt-1 text-xs font-medium text-muted-foreground">Hãy tạo bài thi trong phần Quản lý đề thi trước</p>
+                <p className="text-sm font-bold text-foreground">{t('classroom.ui.final_exams_empty')}</p>
+                <p className="mt-1 text-xs font-medium text-muted-foreground">{t('classroom.ui.final_exams_empty_hint')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -3153,7 +3140,7 @@ function OpenOnlineExamModal({
                         </div>
                         <div className="min-w-0">
                           <div className="truncate text-sm font-bold text-foreground">{exam.title}</div>
-                          <div className="mt-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">{exam.duration_seconds ? Math.round(exam.duration_seconds / 60) : 0} phút</div>
+                          <div className="mt-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">{exam.duration_seconds ? `${Math.round(exam.duration_seconds / 60)} phút` : t('classroom.ui.quiz_no_limit')}</div>
                         </div>
                       </div>
                     </button>
@@ -3167,7 +3154,7 @@ function OpenOnlineExamModal({
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="px-1 text-sm font-bold text-foreground">Thời gian làm bài (phút) <span className="text-rose-500">*</span></span>
+                  <span className="px-1 text-sm font-bold text-foreground">{t('classroom.ui.exam_duration_label')} <span className="text-rose-500">*</span></span>
                   <input
                     type="number"
                     min={1}
@@ -3179,7 +3166,7 @@ function OpenOnlineExamModal({
                 </label>
 
                 <label className="space-y-2">
-                  <span className="px-1 text-sm font-bold text-foreground">Vào trễ tối đa (phút)</span>
+                  <span className="px-1 text-sm font-bold text-foreground">{t('classroom.ui.late_threshold_label')}</span>
                   <input
                     type="number"
                     min={0}
@@ -3187,7 +3174,7 @@ function OpenOnlineExamModal({
                     onChange={event => setLateThresholdMin(Number(event.target.value))}
                     disabled={opening}
                     className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
-                    placeholder="0 = Không giới hạn"
+                    placeholder={t('classroom.ui.no_time_limit_hint')}
                   />
                 </label>
               </div>
@@ -3199,11 +3186,9 @@ function OpenOnlineExamModal({
                     <Camera size={20} />
                   </div>
                   <div>
-                    <div className="text-sm font-black text-foreground">Yêu cầu camera & nhận diện khuôn mặt</div>
+                    <div className="text-sm font-black text-foreground">{t('classroom.ui.camera_required_label')}</div>
                     <div className="mt-0.5 text-xs font-medium text-muted-foreground">
-                      {cameraRequired
-                        ? 'Học sinh bắt buộc bật camera và xác thực khuôn mặt trong suốt bài thi'
-                        : 'Học sinh không bắt buộc dùng camera — nhấn để bật'}
+                      {cameraRequired ? t('classroom.ui.camera_required_short') : t('classroom.ui.camera_optional_label')}
                     </div>
                   </div>
                 </div>
@@ -3223,7 +3208,7 @@ function OpenOnlineExamModal({
 
         <div className="p-8 border-t border-border flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <Button variant="outline" onClick={onClose} disabled={opening} className="rounded-[20px] font-bold text-xs h-12 px-6 uppercase tracking-widest border-border">
-            Hủy
+            {t('classroom.labels.cancel')}
           </Button>
           <Button
             onClick={() => void handleOpenExam()}
@@ -3231,7 +3216,7 @@ function OpenOnlineExamModal({
             className="rounded-[20px] bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs h-12 px-8 gap-3 shadow-lg shadow-primary-brand/20 uppercase tracking-widest transition-all"
           >
             {opening ? <Loader2 size={18} className="animate-spin" /> : <Wifi size={18} />}
-            Bắt đầu ca thi
+            {t('classroom.ui.final_exams_open')}
           </Button>
         </div>
       </div>
@@ -3250,6 +3235,7 @@ function EditSettingsModal({
   onClose: () => void;
   onSaved: (updated: Quiz) => void;
 }) {
+  const { t } = useTranslation();
   const existing = quiz.assigned_classrooms?.[0];
   const [timeLimitMin, setTimeLimitMin] = useState(
     existing?.time_limit_seconds ? Math.round(existing.time_limit_seconds / 60) : 0
@@ -3274,7 +3260,7 @@ function EditSettingsModal({
       });
       onSaved({ ...quiz, assigned_classrooms: [assignment] });
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể cập nhật');
+      toast.error(err instanceof Error ? err.message : t('quiz.settings_modal.save_error'));
     } finally {
       setSaving(false);
     }
@@ -3285,7 +3271,7 @@ function EditSettingsModal({
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
         <div className="p-8 border-b border-border flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-foreground">Cài đặt Quiz</h2>
+            <h2 className="text-xl font-bold text-foreground">{t('quiz.settings_modal.title')}</h2>
             <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{quiz.title}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground">
@@ -3296,12 +3282,12 @@ function EditSettingsModal({
         <div className="p-8 space-y-8">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> Thời gian (phút)</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.settings_modal.time_label')}</label>
               <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
                 className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> Số lần tối đa</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.settings_modal.max_attempts_label')}</label>
               <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
                 className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
@@ -3309,7 +3295,7 @@ function EditSettingsModal({
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Điểm đạt: {passingScore}%</label>
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('quiz.settings_modal.passing_score_label', undefined, { score: passingScore })}</label>
             </div>
             <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
               className="w-full accent-primary-brand" />
@@ -3317,9 +3303,9 @@ function EditSettingsModal({
 
           <div className="space-y-4">
             {[
-              { label: 'Trộn câu hỏi', icon: Shuffle, val: shuffleQuestions, set: setShuffleQuestions },
-              { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
-              { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
+              { label: t('quiz.settings_modal.shuffle_questions'), icon: Shuffle, val: shuffleQuestions, set: setShuffleQuestions },
+              { label: t('quiz.settings_modal.shuffle_options'), icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
+              { label: t('quiz.settings_modal.show_explanation'), icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
               <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
                 <div className="flex items-center gap-3 text-sm font-bold text-foreground">
@@ -3334,7 +3320,7 @@ function EditSettingsModal({
 
         <div className="p-8 pt-0 flex gap-4">
           <Button variant="outline" onClick={onClose} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
-            Hủy
+            {t('quiz.settings_modal.cancel')}
           </Button>
           <Button
             onClick={() => void handleSave()}
@@ -3342,7 +3328,7 @@ function EditSettingsModal({
             className="flex-1 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-[20px] font-bold text-xs h-14 gap-3 shadow-lg shadow-primary-brand/20 uppercase tracking-widest transition-all"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
-            Lưu cài đặt
+            {t('quiz.settings_modal.save')}
           </Button>
         </div>
       </div>
@@ -3361,15 +3347,16 @@ function StudentDetailsModal({
   classroomUid: string;
   onClose: () => void;
 }) {
+  const { t, formatDateTime } = useTranslation();
   const [records, setRecords] = useState<StudentExamRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     spaceApi.classrooms.studentSubmissions(classroomUid, member.member_id)
       .then(setRecords)
-      .catch(() => toast.error('Không thể tải dữ liệu'))
+      .catch(() => toast.error(t('classroom.ui.score_load_error')))
       .finally(() => setLoading(false));
-  }, [classroomUid, member.member_id]);
+  }, [classroomUid, member.member_id, t]);
 
   const submitted = records.filter(r => r.submission).length;
   const graded = records.filter(r => r.submission?.grade != null).length;
@@ -3393,7 +3380,7 @@ function StudentDetailsModal({
             )}
             <div>
               <h2 className="text-xl font-black text-foreground">{member.member_name}</h2>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Sinh viên • Tham gia {formatDateTime(member.joined_at)}</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">{t('classroom.ui.score_member_label', undefined, { time: formatDateTime(member.joined_at) })}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground shrink-0">
@@ -3404,9 +3391,9 @@ function StudentDetailsModal({
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 px-8 py-5 border-b border-border shrink-0">
           {[
-            { label: 'Tổng bài thi', value: records.length, color: 'text-foreground' },
-            { label: 'Đã nộp', value: submitted, color: 'text-primary-brand' },
-            { label: 'Điểm TB', value: avgGrade != null ? avgGrade.toFixed(1) : '--', color: 'text-emerald-600' },
+            { label: t('classroom.ui.score_total_exams'), value: records.length, color: 'text-foreground' },
+            { label: t('classroom.ui.score_submitted'), value: submitted, color: 'text-primary-brand' },
+            { label: t('classroom.ui.score_avg'), value: avgGrade != null ? avgGrade.toFixed(1) : '--', color: 'text-emerald-600' },
           ].map(s => (
             <div key={s.label} className="bg-muted rounded-2xl p-4 text-center">
               <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
@@ -3424,16 +3411,16 @@ function StudentDetailsModal({
           ) : records.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
               <ClipboardCheck size={36} className="mb-3 opacity-30" />
-              <p className="text-sm font-medium">Chưa có bài thi nào</p>
+              <p className="text-sm font-medium">{t('classroom.ui.score_no_submission')}</p>
             </div>
           ) : (
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
-                  <th className="pb-3">Bài kiểm tra</th>
-                  <th className="pb-3">Trạng thái</th>
-                  <th className="pb-3">Ngày nộp</th>
-                  <th className="pb-3 text-right">Điểm</th>
+                  <th className="pb-3">{t('classroom.ui.score_grade_th_exam')}</th>
+                  <th className="pb-3">{t('classroom.ui.score_grade_th_status')}</th>
+                  <th className="pb-3">{t('classroom.ui.score_grade_th_submitted_at')}</th>
+                  <th className="pb-3 text-right">{t('classroom.ui.score_grade_th_grade')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -3443,10 +3430,10 @@ function StudentDetailsModal({
                     <td className="py-3 pr-4">
                       {r.submission ? (
                         <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${getSubmissionStatusClass(r.submission.status)}`}>
-                          {getSubmissionStatusLabel(r.submission.status)}
+                          {getSubmissionStatusLabel(r.submission.status, t)}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-muted text-muted-foreground">Chưa nộp</span>
+                        <span className="text-[10px] font-black uppercase px-2 py-1 rounded-full bg-muted text-muted-foreground">{t('classroom.ui.score_status_not_submitted')}</span>
                       )}
                     </td>
                     <td className="py-3 pr-4 text-xs font-bold text-muted-foreground">
@@ -3483,15 +3470,16 @@ function StudentAnalyzeModal({
   classroomUid: string;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<StudentExamRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     spaceApi.classrooms.studentSubmissions(classroomUid, member.member_id)
       .then(setRecords)
-      .catch(() => toast.error('Không thể tải dữ liệu'))
+      .catch(() => toast.error(t('classroom.ui.score_load_error')))
       .finally(() => setLoading(false));
-  }, [classroomUid, member.member_id]);
+  }, [classroomUid, member.member_id, t]);
 
   const graded = records.filter(r => r.submission?.grade != null);
   const chartData = graded.map((r, i) => ({
@@ -3526,8 +3514,8 @@ function StudentAnalyzeModal({
               </div>
             )}
             <div>
-              <h2 className="text-xl font-black text-foreground">Phân tích — {member.member_name}</h2>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Thống kê học tập</p>
+              <h2 className="text-xl font-black text-foreground">{t('classroom.ui.analyze_title', undefined, { name: member.member_name })}</h2>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mt-0.5">{t('classroom.ui.analyze_subtitle')}</p>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground shrink-0">
@@ -3546,11 +3534,11 @@ function StudentAnalyzeModal({
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-muted rounded-2xl p-5 text-center">
                   <div className="text-2xl font-black text-foreground">{submissionRate}%</div>
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">Tỷ lệ nộp bài</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{t('classroom.ui.analyze_submission_rate')}</div>
                 </div>
                 <div className="bg-muted rounded-2xl p-5 text-center">
                   <div className="text-2xl font-black text-emerald-600">{avgGrade}</div>
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">Điểm trung bình</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{t('classroom.ui.analyze_avg_score')}</div>
                 </div>
                 <div className="bg-muted rounded-2xl p-5 text-center flex flex-col items-center gap-1">
                   {trend > 0
@@ -3561,7 +3549,7 @@ function StudentAnalyzeModal({
                   <div className={`text-2xl font-black ${trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-rose-600' : 'text-muted-foreground'}`}>
                     {trend > 0 ? `+${trend.toFixed(1)}` : trend.toFixed(1)}
                   </div>
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Xu hướng</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('classroom.ui.analyze_trend')}</div>
                 </div>
               </div>
 
@@ -3569,26 +3557,26 @@ function StudentAnalyzeModal({
               {chartData.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-40 text-muted-foreground bg-muted rounded-2xl">
                   <BarChart2 size={36} className="mb-3 opacity-30" />
-                  <p className="text-sm font-medium">Chưa có điểm nào được chấm</p>
+                  <p className="text-sm font-medium">{t('classroom.ui.analyze_no_grade')}</p>
                 </div>
               ) : (
                 <div className="bg-muted rounded-2xl p-6">
-                  <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4">Điểm theo từng bài kiểm tra</p>
+                  <p className="text-xs font-black text-muted-foreground uppercase tracking-widest mb-4">{t('classroom.ui.analyze_chart_title')}</p>
                   <GradeLineChart data={chartData} />
                 </div>
               )}
 
               {/* Assessment */}
               <div className="rounded-2xl border border-border p-5 space-y-3">
-                <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Nhận xét tự động</p>
+                <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t('classroom.ui.analyze_auto_assessment')}</p>
                 <p className="text-sm font-medium text-foreground leading-relaxed">
-                  {submissionRate === 0 && 'Sinh viên chưa nộp bài nào. Cần theo dõi và nhắc nhở.'}
-                  {submissionRate > 0 && submissionRate < 50 && 'Tỷ lệ nộp bài thấp. Sinh viên cần chú ý hơn đến deadline.'}
-                  {submissionRate >= 50 && submissionRate < 100 && trend >= 0 && 'Sinh viên tích cực, điểm số có xu hướng ổn định hoặc đi lên. Tiếp tục phát huy!'}
-                  {submissionRate >= 50 && submissionRate < 100 && trend < 0 && 'Tỷ lệ nộp bài ổn nhưng điểm đang giảm. Cần hỗ trợ thêm.'}
-                  {submissionRate === 100 && trend > 0 && 'Sinh viên xuất sắc — nộp đầy đủ và điểm liên tục tăng. Rất cố gắng!'}
-                  {submissionRate === 100 && trend === 0 && 'Sinh viên chăm chỉ, nộp đầy đủ bài và giữ điểm ổn định.'}
-                  {submissionRate === 100 && trend < 0 && 'Nộp bài đầy đủ nhưng điểm có xu hướng giảm. Cần xem lại chất lượng.'}
+                  {submissionRate === 0 && t('classroom.ui.analyze_no_submission_msg')}
+                  {submissionRate > 0 && submissionRate < 50 && t('classroom.ui.analyze_low_submission_msg')}
+                  {submissionRate >= 50 && submissionRate < 100 && trend >= 0 && t('classroom.ui.analyze_stable_msg')}
+                  {submissionRate >= 50 && submissionRate < 100 && trend < 0 && t('classroom.ui.analyze_grade_declining_msg')}
+                  {submissionRate === 100 && trend > 0 && t('classroom.ui.analyze_excellent_msg')}
+                  {submissionRate === 100 && trend === 0 && t('classroom.ui.analyze_consistent_msg')}
+                  {submissionRate === 100 && trend < 0 && t('classroom.ui.analyze_submitted_low_grade_msg')}
                 </p>
               </div>
             </>
@@ -3602,6 +3590,7 @@ function StudentAnalyzeModal({
 // ── Grade Line Chart (recharts) ───────────────────────────────────────────────
 
 function GradeLineChart({ data }: { data: { name: string; grade: number; index: number }[] }) {
+  const { t } = useTranslation();
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
@@ -3610,9 +3599,9 @@ function GradeLineChart({ data }: { data: { name: string; grade: number; index: 
         <YAxis domain={[0, 10]} tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} />
         <Tooltip
           contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 12, fontWeight: 700 }}
-          formatter={value => [typeof value === 'number' ? value.toFixed(1) : String(value ?? '--'), 'Điểm']}
+          formatter={value => [typeof value === 'number' ? value.toFixed(1) : String(value ?? '--'), t('classroom.ui.score_avg')]}
         />
-        <ReferenceLine y={5} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: 'Đạt', fontSize: 10, fill: '#f59e0b' }} />
+        <ReferenceLine y={5} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: t('classroom.ui.analyze_trend'), fontSize: 10, fill: '#f59e0b' }} />
         <Line
           type="monotone"
           dataKey="grade"
@@ -3637,6 +3626,7 @@ function ExamGradeTableModal({
   classroomUid: string;
   onClose: () => void;
 }) {
+  const { t, formatDateTime } = useTranslation();
   type GradeFilter = 'all' | 'submitted' | 'missing' | 'graded' | 'ungraded';
   type GradeRow = { member: ClassroomMember; submission: import('@/lib/api/types').ExamSubmission | null };
 
@@ -3663,11 +3653,11 @@ function ExamGradeTableModal({
       setStudents(memberData.filter(member => member.role === 'student' && member.status === 'approved'));
       setSubmissions(submissionData);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Không thể tải bảng điểm');
+      setError(err instanceof Error ? err.message : t('classroom.ui.score_load_error'));
     } finally {
       setLoading(false);
     }
-  }, [classroomUid, exam.uid]);
+  }, [classroomUid, exam.uid, t]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Opening the modal initiates its data request.
@@ -3729,18 +3719,18 @@ function ExamGradeTableModal({
   });
 
   const filters: { value: GradeFilter; label: string; count: number }[] = [
-    { value: 'all', label: 'Tất cả', count: rows.length },
-    { value: 'submitted', label: 'Đã nộp', count: submitted },
-    { value: 'missing', label: 'Chưa nộp', count: missing },
-    { value: 'graded', label: 'Đã chấm', count: graded },
-    { value: 'ungraded', label: 'Chưa chấm', count: Math.max(0, submitted - graded) },
+    { value: 'all', label: t('classroom.ui.grade_table_filter_all'), count: rows.length },
+    { value: 'submitted', label: t('classroom.ui.grade_table_filter_submitted'), count: submitted },
+    { value: 'missing', label: t('classroom.ui.grade_table_filter_missing'), count: missing },
+    { value: 'graded', label: t('classroom.ui.grade_table_filter_graded'), count: graded },
+    { value: 'ungraded', label: t('classroom.ui.grade_table_filter_ungraded'), count: Math.max(0, submitted - graded) },
   ];
 
   const handleSaveGrade = async () => {
     if (!activeRow?.submission) return;
     const score = Number(grade);
     if (grade.trim() === '' || !Number.isFinite(score) || score < 0 || score > 10) {
-      toast.error('Điểm cần nằm trong khoảng 0 đến 10');
+      toast.error(t('classroom.ui.score_range_error'));
       return;
     }
     try {
@@ -3750,9 +3740,9 @@ function ExamGradeTableModal({
         feedback: feedback.trim(),
       });
       setSubmissions(previous => previous.map(submission => submission.uid === updated.uid ? updated : submission));
-      toast.success('Đã lưu điểm và nhận xét');
+      toast.success(t('classroom.ui.score_save_success'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể lưu điểm');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.score_save_error'));
     } finally {
       setSaving(false);
     }
@@ -3760,8 +3750,8 @@ function ExamGradeTableModal({
 
   const buildAIGradeRequest = (defaultOverwrite: boolean) => {
     const rubric = window.prompt(
-      'Nhập rubric cho AI chấm điểm. Có thể để trống để dùng rubric mặc định.',
-      'Thang điểm 10. Chấm đúng ý, đầy đủ dẫn chứng, lập luận rõ ràng. Trừ điểm nếu thiếu ý chính hoặc không dựa trên tài liệu.'
+      t('classroom.ui.ai_grading_prompt_hint'),
+      t('classroom.ui.ai_grading_prompt_default')
     );
     if (rubric === null) return null;
     return {
@@ -3785,9 +3775,9 @@ function ExamGradeTableModal({
         setGrade(updated.grade != null ? String(updated.grade) : '');
         setFeedback(updated.feedback || '');
       }
-      toast.success(`AI đã chấm bài của ${row.member.member_name}`);
+      toast.success(t('classroom.ui.ai_graded_one', undefined, { name: row.member.member_name }));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'AI không thể chấm bài này');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.ai_cannot_grade'));
     } finally {
       setAiGradingTarget(null);
     }
@@ -3797,7 +3787,7 @@ function ExamGradeTableModal({
     if (aiGradingTarget) return;
     const ungradedCount = rows.filter(row => row.submission && row.submission.grade == null).length;
     if (ungradedCount === 0) {
-      const overwrite = window.confirm('Tất cả bài đã có điểm. Bạn có muốn AI chấm lại và ghi đè điểm hiện tại không?');
+      const overwrite = window.confirm(t('classroom.ui.ai_grade_confirm_overwrite'));
       if (!overwrite) return;
     }
     const request = buildAIGradeRequest(ungradedCount === 0);
@@ -3808,12 +3798,12 @@ function ExamGradeTableModal({
       const result = await spaceApi.exams.aiGradeExamSubmissions(exam.uid, request);
       const updatedByUid = new Map(result.results.map(item => [item.submission.uid, item.submission]));
       setSubmissions(previous => previous.map(submission => updatedByUid.get(submission.uid) || submission));
-      toast.success(`AI đã chấm ${result.graded}/${result.total} bài`);
+      toast.success(t('classroom.ui.ai_graded_summary', undefined, { graded: result.graded, total: result.total }));
       if (result.failed > 0) {
-        toast.warning(`${result.failed} bài chưa chấm được. Kiểm tra bài nộp dạng file hoặc bài đã có điểm.`);
+        toast.warning(t('classroom.ui.ai_grade_partial_failure', undefined, { count: result.failed }));
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể chấm tất cả bằng AI');
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.score_ai_regrade_failed'));
     } finally {
       setAiGradingTarget(null);
     }
@@ -3825,23 +3815,23 @@ function ExamGradeTableModal({
         <div className="shrink-0 border-b border-border/70 bg-card px-5 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-brand">Bảng điểm</p>
+              <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-brand">{t('classroom.ui.grade_table_title')}</p>
               <h2 className="truncate text-lg font-semibold tracking-tight text-slate-950 sm:text-xl">{exam.title}</h2>
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
                 <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getExamStatusClass(exam.status)}`}>
-                  {getExamStatusLabel(exam.status)}
+                  {getExamStatusLabel(exam.status, t)}
                 </span>
                 <span className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50/80 px-2.5 py-1.5">
                   <Calendar size={13} />
-                  Hạn nộp: {exam.due_date ? formatDateTime(exam.due_date) : '--'}
+                  {t('classroom.ui.grade_table_due', undefined, { time: exam.due_date ? formatDateTime(exam.due_date) : '--' })}
                 </span>
                 <span className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/50/80 px-2.5 py-1.5">
                   <Users size={13} />
-                  {loading ? '--' : students.length} sinh viên
+                  {t('classroom.ui.grade_table_students', undefined, { count: loading ? 0 : students.length })}
                 </span>
                 <span className="flex items-center gap-1.5 rounded-lg border border-primary-brand-light bg-primary-brand-light/70 px-2.5 py-1.5 text-primary-brand">
                   <ClipboardCheck size={13} />
-                  {loading ? '--' : submitted} đã nộp
+                  {t('classroom.ui.grade_table_submitted_count', undefined, { count: loading ? 0 : submitted })}
                 </span>
               </div>
             </div>
@@ -3854,27 +3844,27 @@ function ExamGradeTableModal({
         <div className="grid shrink-0 gap-3 border-b border-border/70 bg-card px-5 py-4 md:grid-cols-4 sm:px-6">
           <div className="rounded-xl border border-primary-brand-light bg-primary-brand-light/60 p-3 shadow-sm">
             <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-muted-foreground">Tỉ lệ nộp bài</p>
+              <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_submission_rate')}</p>
               <span className="text-lg font-semibold tracking-tight text-primary-brand">{loading ? '--' : `${submissionRate}%`}</span>
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">{loading ? 'Đang tải...' : `${submitted}/${students.length} sinh viên`}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{loading ? t('classroom.ui.students_loading') : t('classroom.ui.grade_table_submission_rate_detail', undefined, { submitted, total: students.length })}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-primary-brand-light">
               <div className="h-full rounded-full bg-primary-brand transition-all duration-500" style={{ width: `${submissionRate}%` }} />
             </div>
           </div>
           <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3 shadow-sm">
             <div className="flex items-start justify-between">
-              <p className="text-[11px] font-medium text-muted-foreground">Điểm trung bình</p>
+              <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_avg_score')}</p>
               <span className="text-lg font-semibold tracking-tight text-emerald-700">{loading ? '--' : avg}</span>
             </div>
-            <p className="mt-1 text-[11px] text-muted-foreground">{graded > 0 ? `${graded} bài đã chấm` : 'Chưa có điểm'}</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">{graded > 0 ? t('classroom.ui.grade_table_avg_score_detail', undefined, { count: graded }) : t('classroom.ui.grade_table_avg_score_empty')}</p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-emerald-100">
               <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${averageRate}%` }} />
             </div>
           </div>
           {[
-            { label: 'Đang chờ chấm', value: Math.max(0, submitted - graded), detail: `${gradingRate}% hoàn tất`, color: 'text-primary-brand', surface: 'border-border bg-card' },
-            { label: 'Chưa nộp', value: missing, detail: 'Cần theo dõi', color: 'text-rose-600', surface: 'border-rose-100 bg-rose-50/30' },
+            { label: t('classroom.ui.grade_table_pending_grading'), value: Math.max(0, submitted - graded), detail: t('classroom.ui.grade_table_pending_detail', undefined, { rate: gradingRate }), color: 'text-primary-brand', surface: 'border-border bg-card' },
+            { label: t('classroom.ui.grade_table_missing_label'), value: missing, detail: t('classroom.ui.grade_table_missing_detail'), color: 'text-rose-600', surface: 'border-rose-100 bg-rose-50/30' },
           ].map(metric => (
             <div key={metric.label} className={`rounded-xl border p-3 shadow-sm ${metric.surface}`}>
               <p className="text-[11px] font-medium text-muted-foreground">{metric.label}</p>
@@ -3891,7 +3881,7 @@ function ExamGradeTableModal({
               <input
                 value={query}
                 onChange={event => setQuery(event.target.value)}
-                placeholder="Tìm theo tên hoặc MSSV..."
+                placeholder={t('classroom.ui.grade_table_search_placeholder')}
                 className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-4 text-sm font-medium text-foreground shadow-sm outline-none transition focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
               />
             </label>
@@ -3921,39 +3911,39 @@ function ExamGradeTableModal({
               className="h-9 shrink-0 rounded-lg bg-primary-brand px-3 text-xs font-medium text-white shadow-sm hover:bg-primary-brand-dark disabled:opacity-60"
             >
               {aiGradingTarget === 'all' ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
-              AI chấm tất cả
+              {t('classroom.ui.grade_table_ai_grade_all')}
             </Button>
           </div>
 
           {loading ? (
             <div className="flex min-h-56 flex-1 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground">
               <Loader2 size={32} className="animate-spin text-primary-brand" />
-              <p className="ml-3 text-sm font-bold">Đang tải bảng điểm...</p>
+              <p className="ml-3 text-sm font-bold">{t('classroom.ui.grade_table_loading')}</p>
             </div>
           ) : error ? (
             <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-2xl border border-rose-100 bg-card p-6 text-center">
               <AlertCircle size={32} className="mb-3 text-rose-400" />
-              <p className="text-sm font-black text-foreground">Không thể tải bảng điểm</p>
+              <p className="text-sm font-black text-foreground">{t('classroom.ui.score_load_error')}</p>
               <p className="mt-1 max-w-md text-xs font-medium text-muted-foreground">{error}</p>
               <Button onClick={() => void loadGradeTable()} className="mt-4 rounded-xl bg-primary-brand px-5 text-white">
-                Tải lại
+                {t('classroom.ui.grade_table_retry')}
               </Button>
             </div>
           ) : students.length === 0 ? (
-            <GradeTableEmptyState title="Chưa có sinh viên trong lớp" description="Sinh viên tham gia lớp sẽ xuất hiện tại bảng điểm." />
+            <GradeTableEmptyState title={t('classroom.ui.grade_table_empty_no_students_title')} description={t('classroom.ui.grade_table_empty_no_students_desc')} />
           ) : visibleRows.length === 0 ? (
-            <GradeTableEmptyState title="Không có kết quả phù hợp" description="Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái." />
+            <GradeTableEmptyState title={t('classroom.ui.grade_table_empty_no_match_title')} description={t('classroom.ui.grade_table_empty_no_match_desc')} />
           ) : (
             <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border/80 bg-card shadow-sm">
               <table className="w-full min-w-[850px] text-left">
                 <thead className="sticky top-0 z-[1] border-b border-border bg-muted/50/95 backdrop-blur">
                   <tr className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    <th className="px-4 py-3">Sinh viên</th>
-                    <th className="px-4 py-3">Bài nộp</th>
-                    <th className="px-4 py-3">Thời gian nộp</th>
-                    <th className="px-4 py-3">Điểm</th>
-                    <th className="px-4 py-3">Chấm điểm</th>
-                    <th className="px-4 py-3 text-right">Thao tác</th>
+                    <th className="px-4 py-3">{t('classroom.ui.grade_table_col_student')}</th>
+                    <th className="px-4 py-3">{t('classroom.ui.grade_table_col_submission')}</th>
+                    <th className="px-4 py-3">{t('classroom.ui.grade_table_col_submitted_at')}</th>
+                    <th className="px-4 py-3">{t('classroom.ui.grade_table_col_grade')}</th>
+                    <th className="px-4 py-3">{t('classroom.ui.grade_table_col_grading')}</th>
+                    <th className="px-4 py-3 text-right">{t('classroom.ui.grade_table_col_actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -3982,7 +3972,7 @@ function ExamGradeTableModal({
                             <GradingBadge submission={submission} />
                             {submission?.grading_method === 'ai' && (
                               <span className="rounded-full border border-violet-100 bg-primary-brand-light px-2.5 py-1 text-[10px] font-semibold text-violet-700">
-                                AI chấm
+                                {t('classroom.ui.grade_table_ai_graded_badge')}
                               </span>
                             )}
                           </div>
@@ -3999,10 +3989,10 @@ function ExamGradeTableModal({
                                   onClick={() => void handleAIGradeSubmission(row)}
                                 >
                                   {aiGradingTarget === submission.uid ? <Loader2 size={14} className="animate-spin" /> : <Wand2 size={14} />}
-                                  AI chấm
+                                  {t('classroom.ui.grade_table_ai_grade_single')}
                                 </Button>
                                 <Button size="sm" className="h-8 rounded-lg bg-primary-brand px-3 text-xs font-medium text-white shadow-sm hover:bg-primary-brand-dark" onClick={() => openSubmission(row)}>
-                                  {submission.grade == null ? 'Chấm điểm' : 'Xem điểm'}
+                                  {submission.grade == null ? t('classroom.ui.grade_table_action_grade') : t('classroom.ui.grade_table_action_view_grade')}
                                 </Button>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
@@ -4012,21 +4002,21 @@ function ExamGradeTableModal({
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" className="w-44 rounded-lg border-border p-1 shadow-lg">
                                     <DropdownMenuItem onClick={() => openSubmission(row)} className="gap-2 rounded-md text-xs font-medium">
-                                      <Eye size={14} /> Xem chi tiết
+                                      <Eye size={14} /> {t('classroom.ui.grade_table_action_view')}
                                     </DropdownMenuItem>
                                     {submission.resource_url && (
                                       <DropdownMenuItem
                                         onClick={() => window.open(submission.resource_url!, '_blank', 'noopener,noreferrer')}
                                         className="gap-2 rounded-md text-xs font-medium"
                                       >
-                                        <Download size={14} /> Mở file nộp
+                                        <Download size={14} /> {t('classroom.ui.grade_table_action_open_file')}
                                       </DropdownMenuItem>
                                     )}
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               </>
                             ) : (
-                              <span className="text-xs font-medium text-muted-foreground">Không có bài nộp</span>
+                              <span className="text-xs font-medium text-muted-foreground">{t('classroom.ui.grade_table_no_submission')}</span>
                             )}
                           </div>
                         </td>
@@ -4090,18 +4080,20 @@ function StudentIdentity({ member }: { member: ClassroomMember }) {
 }
 
 function SubmissionBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
+  const { t } = useTranslation();
   if (!submission) {
-    return <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">Chưa nộp</span>;
+    return <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[10px] font-semibold text-muted-foreground">{t('classroom.ui.score_status_not_submitted')}</span>;
   }
-  return <span className="rounded-full border border-primary-brand-light bg-primary-brand-light px-2.5 py-1 text-[10px] font-semibold text-primary-brand">Đã nộp</span>;
+  return <span className="rounded-full border border-primary-brand-light bg-primary-brand-light px-2.5 py-1 text-[10px] font-semibold text-primary-brand">{t('classroom.ui.score_status_submitted')}</span>;
 }
 
 function GradingBadge({ submission }: { submission: import('@/lib/api/types').ExamSubmission | null }) {
+  const { t } = useTranslation();
   if (!submission) return <span className="text-xs font-medium text-muted-foreground/60">--</span>;
   if (submission.grade != null) {
-    return <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">Đã chấm</span>;
+    return <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">{t('classroom.ui.score_status_graded')}</span>;
   }
-  return <span className="rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold text-orange-700">Chờ chấm</span>;
+  return <span className="rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold text-orange-700">{t('classroom.ui.score_status_pending')}</span>;
 }
 
 function SubmissionGradingDrawer({
@@ -4127,16 +4119,17 @@ function SubmissionGradingDrawer({
   onAIGrade: () => void;
   onClose: () => void;
 }) {
+  const { t, formatDateTime } = useTranslation();
   const { member, submission } = row;
   const resourceUrl = submission.resource_url || (submission.content_type !== 'markdown' ? submission.content : '');
 
   return (
     <div className="absolute inset-0 z-10 flex justify-end bg-slate-950/30">
-      <button type="button" aria-label="Đóng chi tiết bài nộp" className="absolute inset-0" onClick={onClose} />
+      <button type="button" aria-label={t('classroom.ui.close_submission_detail')} className="absolute inset-0" onClick={onClose} />
       <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl animate-in slide-in-from-right duration-200">
         <div className="flex items-start justify-between gap-4 border-b border-border p-4 sm:p-5">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-brand">Chi tiết bài nộp</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary-brand">{t('classroom.ui.submission_detail_title')}</p>
             <div className="mt-3"><StudentIdentity member={member} /></div>
           </div>
           <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-muted-foreground" onClick={onClose}>
@@ -4147,29 +4140,29 @@ function SubmissionGradingDrawer({
         <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-5">
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-border bg-muted/50 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Nộp lúc</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_field_submitted_at')}</p>
               <p className="mt-1 text-xs font-medium text-foreground">{submission.submitted_at ? formatDateTime(submission.submitted_at) : '--'}</p>
             </div>
             <div className="rounded-lg border border-border bg-muted/50 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Trạng thái</p>
-              <p className="mt-1 text-xs font-medium text-foreground">{submission.grade != null ? 'Đã chấm điểm' : 'Chờ chấm điểm'}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_field_status')}</p>
+              <p className="mt-1 text-xs font-medium text-foreground">{submission.grade != null ? t('classroom.ui.submission_status_graded_full') : t('classroom.ui.submission_status_pending_full')}</p>
             </div>
           </div>
 
           <section>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Nội dung bài nộp</h3>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_content_title')}</h3>
             {submission.content_type === 'markdown' && submission.content ? (
               <div className="max-h-44 overflow-y-auto whitespace-pre-wrap rounded-lg border border-border bg-muted/50 p-3.5 text-sm font-medium leading-relaxed text-foreground">
                 {submission.content}
               </div>
             ) : (
               <p className="rounded-lg border border-dashed border-border p-3.5 text-sm font-medium text-muted-foreground">
-                Bài nộp không có nội dung văn bản.
+                {t('classroom.ui.submission_content_empty')}
               </p>
             )}
             {resourceUrl && (
               <a href={resourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-between rounded-lg border border-primary-brand-light bg-primary-brand-light p-3 text-sm font-medium text-primary-brand transition hover:border-primary-brand-muted hover:bg-primary-brand-light/70">
-                <span className="flex items-center gap-2"><FileText size={16} /> {submission.resource_name || 'File đính kèm'}</span>
+                <span className="flex items-center gap-2"><FileText size={16} /> {submission.resource_name || t('classroom.ui.submission_attach_default')}</span>
                 <Download size={15} />
               </a>
             )}
@@ -4181,11 +4174,11 @@ function SubmissionGradingDrawer({
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-card px-2.5 py-1 text-[10px] font-semibold text-violet-700 ring-1 ring-violet-100">
                     <Wand2 size={12} />
-                    AI đã chấm
+                    {t('classroom.ui.ai_graded_badge')}
                   </span>
                   {submission.ai_confidence != null && (
                     <span className="text-[11px] font-medium text-violet-700">
-                      Tin cậy {(submission.ai_confidence * 100).toFixed(0)}%
+                      {t('classroom.ui.ai_confidence_label', undefined, { value: (submission.ai_confidence * 100).toFixed(0) })}
                     </span>
                   )}
                 </div>
@@ -4207,11 +4200,11 @@ function SubmissionGradingDrawer({
                 )}
                 {submission.ai_sources && submission.ai_sources.length > 0 && (
                   <div className="mt-3 border-t border-violet-100 pt-2">
-                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700">Nguồn tài liệu</p>
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700">{t('classroom.ui.ai_sources_label')}</p>
                     <div className="space-y-1">
                       {submission.ai_sources.slice(0, 3).map((source, index) => (
                         <div key={`${source.resource_uid || source.doc_name}-${index}`} className="flex items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground">
-                          <span className="truncate">{source.doc_name || source.resource_uid || 'Tài liệu lớp học'}</span>
+                          <span className="truncate">{source.doc_name || source.resource_uid || t('classroom.ui.ai_source_default')}</span>
                           {typeof source.score === 'number' && <span>{(source.score * 100).toFixed(0)}%</span>}
                         </div>
                       ))}
@@ -4221,7 +4214,7 @@ function SubmissionGradingDrawer({
               </div>
             )}
             <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Điểm (0 - 10)</span>
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.score_field_label')}</span>
               <input
                 value={grade}
                 onChange={event => onGradeChange(event.target.value)}
@@ -4229,17 +4222,17 @@ function SubmissionGradingDrawer({
                 min="0"
                 max="10"
                 step="0.1"
-                placeholder="Nhập điểm"
+                placeholder={t('classroom.ui.score_enter_placeholder')}
                 className="h-11 w-full rounded-lg border border-border px-3.5 text-base font-semibold text-foreground outline-none focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
               />
             </label>
             <label className="block">
-              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">Nhận xét</span>
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_feedback_label')}</span>
               <textarea
                 value={feedback}
                 onChange={event => onFeedbackChange(event.target.value)}
                 rows={4}
-                placeholder="Nhập nhận xét cho sinh viên..."
+                placeholder={t('classroom.ui.feedback_placeholder')}
                 className="w-full resize-none rounded-lg border border-border p-3.5 text-sm font-medium text-foreground outline-none focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
               />
             </label>
@@ -4249,11 +4242,11 @@ function SubmissionGradingDrawer({
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Button onClick={onAIGrade} disabled={saving || aiGrading} variant="outline" className="h-11 rounded-lg border-primary-brand-muted font-medium text-violet-700 hover:bg-primary-brand-light">
               {aiGrading ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
-              AI chấm
+              {t('classroom.ui.ai_grade_btn')}
             </Button>
             <Button onClick={onSave} disabled={saving || aiGrading} className="h-11 rounded-lg bg-primary-brand font-medium text-white shadow-sm hover:bg-primary-brand-dark">
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              {submission.grade == null ? 'Lưu điểm' : 'Cập nhật điểm'}
+              {submission.grade == null ? t('classroom.ui.score_save_btn') : t('classroom.ui.score_update_btn')}
             </Button>
           </div>
         </div>
@@ -4269,9 +4262,9 @@ function getSubmissionStatusClass(status: string) {
   return 'bg-muted text-muted-foreground';
 }
 
-function getSubmissionStatusLabel(status: string) {
-  if (status.toLowerCase() === 'graded') return 'Đã chấm';
-  return 'Đã nộp';
+function getSubmissionStatusLabel(status: string, t: (key: string) => string) {
+  if (status.toLowerCase() === 'graded') return t('classroom.ui.score_status_graded');
+  return t('classroom.ui.score_status_submitted');
 }
 
 function getExamStatusClass(status: string) {
@@ -4288,24 +4281,21 @@ function getExamStatusClass(status: string) {
   return 'bg-muted text-muted-foreground border border-border';
 }
 
-function getExamStatusLabel(status: string) {
+function getExamStatusLabel(status: string, t: (key: string) => string) {
   const normalized = status.toLowerCase();
-  if (normalized === 'active' || normalized === 'published' || normalized === 'open') return 'Đang mở';
-  if (normalized === 'draft') return 'Bản nháp';
-  if (normalized === 'closed' || normalized === 'expired') return 'Đã đóng';
+  if (normalized === 'active' || normalized === 'published' || normalized === 'open') return t('classroom.ui.exam_status_open');
+  if (normalized === 'draft') return t('classroom.ui.draft_label');
+  if (normalized === 'closed' || normalized === 'expired') return t('classroom.ui.exam_status_closed');
   return status;
 }
 
 function isExamInKind(exam: Exam, kind: ExamKind) {
-  const option = EXAM_KIND_OPTIONS.find(item => item.key === kind);
-  if (!option) return false;
-
   const title = normalizeText(exam.title);
-  return option.keywords.some(keyword => title.includes(normalizeText(keyword)));
+  return EXAM_KIND_KEYWORDS[kind].some(keyword => title.includes(normalizeText(keyword)));
 }
 
 function isExamKind(value: string | null): value is ExamKind {
-  return EXAM_KIND_OPTIONS.some(option => option.key === value);
+  return value === 'midterm' || value === 'final' || value === 'regular';
 }
 
 function normalizeText(value: string) {
@@ -4314,13 +4304,6 @@ function normalizeText(value: string) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
-}
-
-function formatDateTime(value: string) {
-  if (!value) return '--';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString('vi-VN');
 }
 
 function getCanManageExams() {
