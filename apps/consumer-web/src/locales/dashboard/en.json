@@ -1,0 +1,17 @@
+{
+  "labels": {
+    "recent_grades": "Recent Grades",
+    "course": "Course",
+    "assignment": "Assignment",
+    "score": "Score",
+    "date": "Date",
+    "progress": "Progress",
+    "performance_over_time": "Performance Over Time",
+    "chart_placeholder": "Chart visualization would go here",
+    "course_distribution": "Course Distribution",
+    "gpa": "GPA",
+    "courses": "Courses",
+    "assignments": "Assignments",
+    "attendance": "Attendance"
+  }
+}

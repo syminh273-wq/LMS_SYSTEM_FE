@@ -1,0 +1,77 @@
+{
+  "title": "LMS Administration",
+  "subtitle": "Manage Consumers and Spaces from the backend.",
+  "reload": "Reload",
+  "dashboard_btn": "Dashboard",
+  "load_error": "Could not load administration data.",
+  "action_error": "Action failed.",
+  "consumers": {
+    "section_title": "Consumers",
+    "empty": "No consumers have been created yet.",
+    "loading": "Loading consumers...",
+    "form": {
+      "username": "Username",
+      "username_placeholder": "johndoe",
+      "email": "Email",
+      "email_placeholder": "john@example.com",
+      "full_name": "Full name",
+      "full_name_placeholder": "John Doe",
+      "phone": "Phone number",
+      "phone_placeholder": "0987654321",
+      "avatar": "Avatar URL",
+      "avatar_placeholder": "https://example.com/avatar.jpg"
+    },
+    "actions": {
+      "create": "Create",
+      "update_selected": "Update selected",
+      "deselect": "Deselect",
+      "created": "Consumer created.",
+      "updated": "Consumer updated.",
+      "deactivated": "Consumer deactivated.",
+      "deleted": "Consumer deleted.",
+      "detail": "Details",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "no_name": "No Name",
+      "no_username": "no-username"
+    }
+  },
+  "spaces": {
+    "section_title": "Spaces",
+    "empty": "No spaces have been created yet.",
+    "loading": "Loading spaces...",
+    "form": {
+      "name": "Space name",
+      "name_placeholder": "Technology Academy",
+      "slug": "Slug",
+      "slug_placeholder": "tech-academy",
+      "description": "Description",
+      "description_placeholder": "Online learning platform...",
+      "logo": "Logo URL",
+      "logo_placeholder": "https://...",
+      "cover": "Cover URL",
+      "cover_placeholder": "https://..."
+    },
+    "actions": {
+      "create": "Create",
+      "update_selected": "Update selected",
+      "deselect": "Deselect",
+      "created": "Space created.",
+      "updated": "Space updated.",
+      "deactivated": "Space deactivated.",
+      "deleted": "Space deleted.",
+      "detail": "Details",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "no_description": "No description provided for this space."
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "labels": {
+    "title": "Lịch học thuật",
+    "subtitle": "Quản lý lịch trình và các deadline sắp tới của bạn.",
+    "new_event": "Sự kiện mới",
+    "month_label": "Tháng 6 2026",
+    "view_day": "Ngày",
+    "view_week": "Tuần",
+    "view_month": "Tháng",
+    "days_sun": "CN",
+    "days_mon": "T2",
+    "days_tue": "T3",
+    "days_wed": "T4",
+    "days_thu": "T5",
+    "days_fri": "T6",
+    "days_sat": "T7",
+    "upcoming": "Sắp tới",
+    "sync_google_title": "Đồng bộ với Google",
+    "sync_google_desc": "Kết nối lịch học thuật với các thiết bị cá nhân của bạn.",
+    "connect_now": "Kết nối ngay"
+  }
+}

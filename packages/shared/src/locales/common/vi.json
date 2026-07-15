@@ -1,0 +1,32 @@
+{
+  "labels": {
+    "search_placeholder": "Tìm kiếm tài liệu...",
+    "student_account": "Tài khoản học sinh",
+    "user": "Người dùng",
+    "logout": "Đăng xuất",
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "confirm": "Xác nhận",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "submit": "Gửi",
+    "close": "Đóng",
+    "download": "Tải xuống",
+    "yes": "Có",
+    "no": "Không"
+  },
+  "actions": {
+    "add": "Thêm",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "remove": "Xóa"
+  },
+  "messages": {
+    "success": "Thành công",
+    "error": "Lỗi",
+    "something_went_wrong": "Đã xảy ra lỗi. Vui lòng thử lại."
+  }
+}

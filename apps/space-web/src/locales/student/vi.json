@@ -1,0 +1,13 @@
+{
+  "title": "Quản lý học sinh",
+  "subtitle": "Tất cả học sinh đã từng học trong các lớp của bạn",
+  "total_badge": "{{count}} học sinh",
+  "search_placeholder": "Tìm theo tên hoặc email...",
+  "search_empty_title": "Không tìm thấy học sinh phù hợp",
+  "search_empty_desc": "Thử tên hoặc email khác",
+  "list_empty_title": "Chưa có học sinh",
+  "list_empty_desc": "Học sinh sẽ xuất hiện ở đây sau khi được duyệt vào một trong các lớp của bạn",
+  "no_name": "(Chưa có tên)",
+  "no_email": "—",
+  "first_joined": "Tham gia lần đầu {{date}}"
+}

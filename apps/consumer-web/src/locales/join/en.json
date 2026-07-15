@@ -1,0 +1,25 @@
+{
+  "labels": {
+    "processing_code": "Processing join code...",
+    "processing_help": "Please wait while we verify your access.",
+    "request_sent_title": "Request Sent!",
+    "request_sent_classroom": "Your request to join the classroom is pending teacher approval:",
+    "request_sent_resource": "Your request to join the resource is pending teacher approval:",
+    "default_room_name": "New Room",
+    "pending_notice": "You will be able to enter the class after the teacher approves your request.",
+    "back_to_classes": "Back to class list",
+    "error_title": "Sorry, something went wrong",
+    "retry": "Try Again",
+    "back_home": "Back to home"
+  },
+  "messages": {
+    "join_request_sent": "Your join request has been sent, please wait for teacher approval!",
+    "join_failed": "Join failed",
+    "invalid_code": "Join code is invalid or has expired"
+  },
+  "buttons": {
+    "retry": "Try Again",
+    "back_home": "Back to home",
+    "back_to_classes": "Back to class list"
+  }
+}

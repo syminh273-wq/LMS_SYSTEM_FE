@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "dashboard": "Bảng điều khiển",
+    "classrooms": "Lớp học",
+    "quizzes": "Thư viện Quiz",
+    "students": "Học sinh",
+    "settings": "Cài đặt",
+    "admin": "Quản trị"
+  },
+  "page_title": {
+    "space_admin": "Quản trị Space"
+  },
+  "actions": {
+    "logout": "Đăng xuất",
+    "expand_menu": "Mở rộng menu",
+    "collapse_menu": "Thu nhỏ menu"
+  },
+  "search": {
+    "trigger_label": "Tìm kiếm mọi thứ...",
+    "dialog_aria_label": "Tìm kiếm toàn cục",
+    "placeholder": "Tìm lớp học, bài thi, quiz, học sinh...",
+    "empty_prompt": "Nhập để tìm kiếm trong toàn bộ LMS",
+    "no_results_for": "Không có kết quả cho \"{{query}}\"",
+    "untitled": "(Chưa có tiêu đề)",
+    "results_count_one": "Tìm thấy {{count}} kết quả",
+    "results_count_other": "Tìm thấy {{count}} kết quả",
+    "navigate": "điều hướng",
+    "open": "mở",
+    "type_classroom": "Lớp học",
+    "type_exam": "Bài kiểm tra",
+    "type_quiz": "Quiz",
+    "type_consumer": "Học sinh",
+    "type_resource": "Tài liệu"
+  },
+  "notifications": {
+    "aria_label": "Thông báo",
+    "title": "Thông báo",
+    "mark_all_read": "Đánh dấu đã đọc tất cả",
+    "empty": "Chưa có thông báo nào",
+    "just_now": "Vừa xong",
+    "minutes_ago": "{{count}} phút trước",
+    "hours_ago": "{{count}} giờ trước",
+    "days_ago": "{{count}} ngày trước"
+  },
+  "language_switcher": {
+    "aria_label": "Bộ chuyển ngôn ngữ"
+  }
+}

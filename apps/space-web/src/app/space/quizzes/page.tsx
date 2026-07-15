@@ -11,9 +11,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 export default function QuizLibraryPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(true);
   const [showGenerateModal, setShowGenerateModal] = useState(false);
@@ -25,29 +27,35 @@ export default function QuizLibraryPage() {
         const data = await quizApi.list();
         setQuizzes(data);
       } catch (err: unknown) {
-        toast.error(err instanceof Error ? err.message : 'Không thể tải danh sách quiz');
+        toast.error(err instanceof Error ? err.message : t('quiz.load_error'));
       } finally {
         setLoading(false);
       }
     };
     void loadQuizzes();
-  }, []);
+  }, [t]);
 
   const handleDelete = async (quiz: Quiz) => {
-    if (!window.confirm(`Xóa quiz "${quiz.title}"? Thao tác này sẽ hủy tất cả phân công lớp học.`)) return;
+    if (!window.confirm(t('quiz.delete_confirm', undefined, { title: quiz.title }))) return;
     try {
       await quizApi.deleteQuiz(quiz.uid);
       setQuizzes(prev => prev.filter(q => q.uid !== quiz.uid));
-      toast.success('Đã xóa quiz');
+      toast.success(t('quiz.delete_success'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể xóa quiz');
+      toast.error(err instanceof Error ? err.message : t('quiz.delete_error'));
     }
   };
 
   const handleGenerated = (quiz: Quiz) => {
     setQuizzes(prev => [quiz, ...prev]);
     setShowGenerateModal(false);
-    toast.success(`Đã tạo quiz "${quiz.title}"`);
+    toast.success(t('quiz.create_success', undefined, { title: quiz.title }));
+  };
+
+  const STATUS_LABEL_KEY: Record<string, string> = {
+    draft: 'quiz.status.draft',
+    published: 'quiz.status.published',
+    archived: 'quiz.status.archived',
   };
 
   return (
@@ -55,9 +63,9 @@ export default function QuizLibraryPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-foreground tracking-tight">Thư viện Quiz</h1>
+          <h1 className="text-2xl font-black text-foreground tracking-tight">{t('quiz.title')}</h1>
           <p className="text-sm text-muted-foreground font-medium mt-1">
-            Quản lý và tạo quiz từ tài liệu, phân công cho các lớp học
+            {t('quiz.subtitle')}
           </p>
         </div>
         <Button
@@ -65,7 +73,7 @@ export default function QuizLibraryPage() {
           className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-xl h-10 px-5 gap-2 shadow-lg shadow-primary-brand/20"
         >
           <Wand2 size={16} />
-          TẠO QUIZ MỚI
+          {t('quiz.create_btn')}
         </Button>
       </div>
 
@@ -77,10 +85,10 @@ export default function QuizLibraryPage() {
       ) : quizzes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-muted-foreground border-2 border-dashed border-border rounded-3xl">
           <BookOpen size={48} className="mb-4 opacity-30" />
-          <p className="text-sm font-medium">Chưa có quiz nào</p>
-          <p className="text-xs mt-1 mb-6">Nhấn &ldquo;Tạo Quiz Mới&rdquo; để tạo quiz từ tài liệu PDF hoặc văn bản</p>
+          <p className="text-sm font-medium">{t('quiz.empty')}</p>
+          <p className="text-xs mt-1 mb-6">{t('quiz.empty_hint')}</p>
           <Button onClick={() => setShowGenerateModal(true)} variant="outline" className="rounded-xl gap-2 font-bold text-xs">
-            <Plus size={16} /> TẠO QUIZ ĐẦU TIÊN
+            <Plus size={16} /> {t('quiz.create_first_btn')}
           </Button>
         </div>
       ) : (
@@ -101,7 +109,7 @@ export default function QuizLibraryPage() {
                     ? 'bg-muted text-muted-foreground border-border'
                     : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                 }`}>
-                  {quiz.status}
+                  {t(STATUS_LABEL_KEY[quiz.status] ?? 'quiz.status.draft')}
                 </span>
               </div>
 
@@ -111,9 +119,9 @@ export default function QuizLibraryPage() {
                   <p className="text-xs text-muted-foreground font-medium mt-1 line-clamp-2">{quiz.description}</p>
                 )}
                 <div className="mt-3 flex items-center gap-3 text-[11px] font-bold text-muted-foreground uppercase">
-                  <span>{quiz.questions_count} câu hỏi</span>
+                  <span>{t('quiz.library.card_questions_count', undefined, { count: quiz.questions_count })}</span>
                   {quiz.assigned_classrooms && quiz.assigned_classrooms.length > 0 && (
-                    <span className="text-primary-brand">{quiz.assigned_classrooms.length} lớp</span>
+                    <span className="text-primary-brand">{t('quiz.library.card_classes_count', undefined, { count: quiz.assigned_classrooms.length })}</span>
                   )}
                 </div>
               </div>
@@ -126,7 +134,7 @@ export default function QuizLibraryPage() {
                   className="flex-1 h-8 rounded-lg gap-1.5 text-xs font-bold"
                 >
                   <Eye size={14} />
-                  Xem chi tiết
+                  {t('quiz.view_detail')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -154,17 +162,25 @@ export default function QuizLibraryPage() {
 
 // ── Generate Quiz Modal ────────────────────────────────────────────────────────
 
-const QUIZ_TYPE_OPTIONS = [
-  { value: 'multiple_choice', label: 'Trắc nghiệm 4 đáp án', desc: 'Mỗi câu có 4 lựa chọn, 1 đáp án đúng', icon: '🔘' },
-  { value: 'true_false',      label: 'Đúng / Sai',            desc: 'Câu phát biểu — học sinh chọn đúng hoặc sai', icon: '✅' },
-  { value: 'fill_blank',      label: 'Điền vào chỗ trống',    desc: 'Câu có chỗ trống, chọn từ đúng để điền', icon: '✏️' },
-  { value: 'scenario',        label: 'Tình huống thực tế',    desc: 'Câu hỏi gắn với kịch bản, áp dụng kiến thức', icon: '🎯' },
+const QUIZ_TYPE_KEYS = [
+  { value: 'multiple_choice', key: 'type_multiple_choice' },
+  { value: 'true_false',      key: 'type_true_false' },
+  { value: 'fill_blank',      key: 'type_fill_blank' },
+  { value: 'scenario',        key: 'type_scenario' },
 ] as const;
 
-type QuizTypeValue = typeof QUIZ_TYPE_OPTIONS[number]['value'];
+const QUIZ_TYPE_ICONS: Record<typeof QUIZ_TYPE_KEYS[number]['value'], string> = {
+  multiple_choice: '🔘',
+  true_false: '✅',
+  fill_blank: '✏️',
+  scenario: '🎯',
+};
+
+type QuizTypeValue = typeof QUIZ_TYPE_KEYS[number]['value'];
 type StreamPhase = 'idle' | 'streaming' | 'done' | 'error';
 
 function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: (quiz: Quiz) => void }) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'text' | 'file'>('text');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -188,8 +204,8 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
   };
 
   const handleGenerate = async () => {
-    if (mode === 'text' && !content.trim()) { toast.error('Vui lòng nhập nội dung văn bản'); return; }
-    if (mode === 'file' && !selectedFile) { toast.error('Vui lòng chọn tài liệu PDF'); return; }
+    if (mode === 'text' && !content.trim()) { toast.error(t('quiz.generate_modal.input_text_required')); return; }
+    if (mode === 'file' && !selectedFile) { toast.error(t('quiz.generate_modal.input_file_required')); return; }
 
     setPhase('streaming');
     setProgress(0);
@@ -217,7 +233,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
           finalTotal = event.total;
           setPhase('done');
           if (!finalUid) {
-            setErrorMsg('Không nhận được ID quiz từ server. Quiz có thể đã được tạo — vui lòng tải lại trang.');
+            setErrorMsg(t('quiz.generate_modal.error_no_uid'));
             setPhase('error');
             return;
           }
@@ -231,10 +247,10 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
         }
       }
       // Stream ended without a done event
-      setErrorMsg('Kết nối stream bị ngắt. Quiz có thể đã được tạo — vui lòng tải lại trang.');
+      setErrorMsg(t('quiz.generate_modal.error_stream_interrupted'));
       setPhase('error');
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Tạo quiz thất bại');
+      setErrorMsg(err instanceof Error ? err.message : t('quiz.generate_modal.error_generic'));
       setPhase('error');
     }
   };
@@ -248,8 +264,8 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
         {/* Modal header */}
         <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
           <div>
-            <h2 className="font-black text-foreground">Tạo Quiz bằng AI</h2>
-            <p className="text-xs text-muted-foreground font-medium mt-0.5">Chọn loại quiz và tải lên tài liệu</p>
+            <h2 className="font-black text-foreground">{t('quiz.generate_modal.title')}</h2>
+            <p className="text-xs text-muted-foreground font-medium mt-0.5">{t('quiz.generate_modal.subtitle')}</p>
           </div>
           {!generating && (
             <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground hover:text-foreground">
@@ -267,11 +283,11 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                   <X size={28} />
                 </div>
                 <div className="text-center">
-                  <p className="font-black text-foreground text-sm">Có lỗi xảy ra</p>
+                  <p className="font-black text-foreground text-sm">{t('quiz.generate_modal.error_title')}</p>
                   <p className="text-xs text-muted-foreground mt-1">{errorMsg}</p>
                 </div>
                 <Button onClick={() => setPhase('idle')} variant="outline" className="rounded-xl font-bold text-xs h-10 px-6">
-                  Thử lại
+                  {t('quiz.generate_modal.retry')}
                 </Button>
               </>
             ) : phase === 'done' ? (
@@ -281,7 +297,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                 </div>
                 <div className="text-center">
                   <p className="font-black text-foreground">{streamTitle}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Đã tạo {progress} câu hỏi thành công</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('quiz.generate_modal.done_title', undefined, { count: progress })}</p>
                 </div>
               </>
             ) : (
@@ -305,7 +321,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                 </div>
                 <div className="text-center space-y-1 w-full max-w-sm">
                   {streamTitle && <p className="font-black text-foreground text-sm truncate">{streamTitle}</p>}
-                  <p className="text-xs text-primary-brand font-medium animate-pulse">AI đang tạo câu hỏi...</p>
+                  <p className="text-xs text-primary-brand font-medium animate-pulse">{t('quiz.generate_modal.generating')}</p>
                   {lastQuestion && (
                     <p className="text-[11px] text-muted-foreground font-medium mt-3 line-clamp-2 leading-relaxed bg-muted rounded-xl px-4 py-2 border border-border">
                       {lastQuestion}
@@ -320,9 +336,9 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
           <div className="p-6 space-y-6">
             {/* Quiz type */}
             <div className="space-y-2">
-              <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Loại câu hỏi</div>
+              <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.quiz_type_label')}</div>
               <div className="grid grid-cols-2 gap-2">
-                {QUIZ_TYPE_OPTIONS.map(opt => (
+                {QUIZ_TYPE_KEYS.map(opt => (
                   <button
                     key={opt.value}
                     type="button"
@@ -333,11 +349,11 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                         : 'border-border bg-muted/50 hover:border-primary-brand/50'
                     }`}
                   >
-                    <div className="text-lg mb-1">{opt.icon}</div>
+                    <div className="text-lg mb-1">{QUIZ_TYPE_ICONS[opt.value]}</div>
                     <div className={`text-xs font-black ${quizType === opt.value ? 'text-primary-brand' : 'text-foreground'}`}>
-                      {opt.label}
+                      {t(`quiz.generate_modal.${opt.key}_label`)}
                     </div>
-                    <div className="text-[10px] font-medium text-muted-foreground mt-0.5 leading-relaxed">{opt.desc}</div>
+                    <div className="text-[10px] font-medium text-muted-foreground mt-0.5 leading-relaxed">{t(`quiz.generate_modal.${opt.key}_desc`)}</div>
                   </button>
                 ))}
               </div>
@@ -346,8 +362,8 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
             {/* Num questions */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Số câu hỏi</div>
-                <span className="text-sm font-black text-primary-brand">{numQuestions} câu</span>
+                <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.num_questions_label')}</div>
+                <span className="text-sm font-black text-primary-brand">{t('quiz.generate_modal.num_questions_value', undefined, { count: numQuestions })}</span>
               </div>
               <input
                 type="range" min={5} max={30} step={5}
@@ -362,9 +378,9 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
 
             {/* Source */}
             <div className="space-y-3">
-              <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Nguồn tài liệu</div>
+              <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.source_label')}</div>
               <div className="flex gap-2">
-                {([['text', 'Nhập văn bản'], ['file', 'Tải lên PDF']] as const).map(([key, label]) => (
+                {([['text', t('quiz.generate_modal.source_text')], ['file', t('quiz.generate_modal.source_file')]] as const).map(([key, label]) => (
                   <button
                     key={key}
                     type="button"
@@ -384,7 +400,7 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                 <textarea
                   value={content}
                   onChange={e => setContent(e.target.value)}
-                  placeholder="Dán nội dung tài liệu vào đây..."
+                  placeholder={t('quiz.generate_modal.text_placeholder')}
                   rows={6}
                   className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/20 resize-none transition"
                 />
@@ -398,13 +414,13 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
                     <>
                       <FileText size={28} className="text-primary-brand mb-2" />
                       <p className="text-sm font-bold text-foreground">{selectedFile.name}</p>
-                      <p className="text-xs text-primary-brand font-medium mt-1">Nhấn để đổi tệp</p>
+                      <p className="text-xs text-primary-brand font-medium mt-1">{t('quiz.generate_modal.file_change')}</p>
                     </>
                   ) : (
                     <>
                       <UploadCloud size={28} className="text-muted-foreground mb-2" />
-                      <p className="text-sm font-bold text-foreground">Kéo thả hoặc nhấn để chọn</p>
-                      <p className="text-xs text-muted-foreground mt-1">Chỉ chấp nhận file PDF</p>
+                      <p className="text-sm font-bold text-foreground">{t('quiz.generate_modal.file_drop_hint')}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('quiz.generate_modal.file_drop_format')}</p>
                     </>
                   )}
                 </div>
@@ -417,13 +433,13 @@ function GenerateQuizModal({ onClose, onSuccess }: { onClose: () => void; onSucc
         {phase === 'idle' && (
           <div className="p-6 pt-0 flex gap-3 sticky bottom-0 bg-card border-t border-border">
             <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl font-bold text-xs h-11">
-              Hủy
+              {t('quiz.generate_modal.cancel')}
             </Button>
             <Button
               onClick={() => void handleGenerate()}
               className="flex-1 bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl font-bold text-xs h-11 gap-2 shadow-lg shadow-primary-brand/20"
             >
-              <Wand2 size={16} /> TẠO {numQuestions} CÂU HỎI
+              <Wand2 size={16} /> {t('quiz.generate_modal.submit', undefined, { count: numQuestions })}
             </Button>
           </div>
         )}

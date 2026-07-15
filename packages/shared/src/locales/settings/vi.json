@@ -1,0 +1,135 @@
+{
+  "labels": {
+    "settings": "Settings",
+    "consumer": "Consumer",
+    "subtitle": "Quản lý bảo mật tài khoản của bạn",
+    "change_password": "Đổi mật khẩu",
+    "change_password_desc": "Cập nhật mật khẩu định kỳ để bảo vệ tài khoản LMS. Tài khoản đăng nhập bằng Google/Gmail cần quản lý mật khẩu qua Google.",
+    "current_password": "Mật khẩu hiện tại",
+    "new_password": "Mật khẩu mới",
+    "confirm_new_password": "Xác nhận mật khẩu mới",
+    "show_password": "Hiện mật khẩu",
+    "hide_password": "Ẩn mật khẩu",
+    "change_password_button": "Đổi mật khẩu",
+    "changing": "Đang đổi mật khẩu...",
+    "check_min_length": "Ít nhất 8 ký tự",
+    "check_letter": "Có chữ cái",
+    "check_digit_special": "Có số hoặc ký tự đặc biệt"
+  },
+  "messages": {
+    "fill_all_fields": "Vui lòng nhập đầy đủ các trường mật khẩu.",
+    "min_length": "Mật khẩu mới cần có ít nhất 8 ký tự.",
+    "password_mismatch": "Mật khẩu mới và xác nhận mật khẩu không khớp.",
+    "success": "Đã đổi mật khẩu thành công.",
+    "fallback_error": "Không thể đổi mật khẩu. Vui lòng kiểm tra lại thông tin.",
+    "google_account_error": "Tài khoản của bạn đăng nhập bằng Google/Gmail nên không thể đổi mật khẩu tại đây. Vui lòng quản lý mật khẩu trong tài khoản Google của bạn."
+  },
+  "space": {
+    "loading": "Đang tải cấu hình...",
+    "title": "Cài đặt hệ thống",
+    "subtitle": "Quản lý và tùy chỉnh không gian làm việc của bạn",
+    "nav": {
+      "profile": "Thông tin tổ chức",
+      "security": "Bảo mật & Xác thực",
+      "classrooms": "Cấu hình lớp học",
+      "notifications": "Thông báo"
+    },
+    "profile": {
+      "title": "Hồ sơ Space",
+      "subtitle": "Thông tin hiển thị cho học sinh và giáo viên",
+      "upload_logo": "Tải Logo",
+      "upload_hint": "PNG, JPG tối đa 2MB",
+      "name_label": "Tên Space",
+      "slug_label": "Slug (Đường dẫn)",
+      "desc_label": "Mô tả",
+      "theme_color_label": "Màu sắc thương hiệu",
+      "custom_color_hint": "Chọn màu tùy chỉnh",
+      "save": "Lưu hồ sơ",
+      "saved_toast": "Đã lưu cài đặt thành công!",
+      "language_label": "Ngôn ngữ",
+      "language_hint": "Chọn ngôn ngữ hiển thị cho toàn bộ Space",
+      "save_error": "Không thể lưu cài đặt"
+    },
+    "security": {
+      "title": "Bảo mật & Truy cập",
+      "subtitle": "Quản lý các lớp bảo vệ và quy tắc tham gia",
+      "face_id_title": "Xác thực khuôn mặt (FaceID)",
+      "face_id_desc": "Yêu cầu xác thực khi vào phòng học",
+      "domain_title": "Giới hạn Domain Email",
+      "domain_desc": "Chỉ cho phép email từ tổ chức (@school.edu.vn)",
+      "join_code_label": "Mã tham gia mặc định (Join Code)",
+      "generate": "Tạo mới",
+      "save": "Lưu bảo mật",
+      "change_password_title": "Đổi mật khẩu",
+      "change_password_desc": "Cập nhật mật khẩu đăng nhập của bạn",
+      "current_password_label": "Mật khẩu hiện tại",
+      "new_password_label": "Mật khẩu mới",
+      "confirm_password_label": "Xác nhận mật khẩu mới",
+      "change_password_submit": "Đổi mật khẩu",
+      "mismatch_error": "Mật khẩu xác nhận không khớp.",
+      "success": "Đổi mật khẩu thành công!",
+      "error_fallback": "Không thể đổi mật khẩu. Vui lòng kiểm tra lại."
+    },
+    "password": {
+      "mismatch_error": "Mật khẩu xác nhận không khớp.",
+      "success": "Đổi mật khẩu thành công!",
+      "error_fallback": "Không thể đổi mật khẩu. Vui lòng kiểm tra lại."
+    },
+    "classrooms": {
+      "title": "Cấu hình lớp học",
+      "subtitle": "Cài đặt mặc định cho các phòng học mới",
+      "max_students_label": "Sĩ số tối đa mặc định",
+      "view_mode_label": "Giao diện mặc định",
+      "view_grid": "Lưới (Grid)",
+      "view_list": "Danh sách (List)",
+      "features_label": "Tính năng được bật mặc định",
+      "feature_chat": "Trò chuyện công khai",
+      "feature_screen_share": "Chia sẻ màn hình",
+      "feature_record": "Ghi lại buổi học",
+      "feature_breakout": "Phòng thảo luận nhóm",
+      "feature_whiteboard": "Bảng trắng tương tác",
+      "feature_emoji": "Phản hồi bằng Emoji",
+      "save": "Lưu lớp học"
+    },
+    "notifications": {
+      "title": "Tùy chỉnh thông báo",
+      "subtitle": "Kiểm soát các cảnh báo và cập nhật quan trọng",
+      "web_section": "Thông báo qua Web",
+      "email_section": "Thông báo qua Email",
+      "new_student_title": "Học sinh mới tham gia",
+      "new_student_desc": "Nhận thông báo khi có học sinh yêu cầu vào Space",
+      "submission_title": "Bài nộp bài tập mới",
+      "submission_desc": "Thông báo khi học sinh nộp bài tập về nhà",
+      "support_title": "Tin nhắn hỗ trợ",
+      "support_desc": "Thông báo tin nhắn mới từ hệ thống hỗ trợ",
+      "weekly_report_title": "Báo cáo hàng tuần",
+      "weekly_report_desc": "Tóm tắt hoạt động của Space trong tuần",
+      "security_alert_title": "Cảnh báo bảo mật",
+      "security_alert_desc": "Email khi có đăng nhập từ thiết bị lạ",
+      "items": {
+        "new_student": {
+          "title": "Học sinh mới tham gia",
+          "desc": "Nhận thông báo khi có học sinh yêu cầu vào Space"
+        },
+        "submission": {
+          "title": "Bài nộp bài tập mới",
+          "desc": "Thông báo khi học sinh nộp bài tập về nhà"
+        },
+        "support": {
+          "title": "Tin nhắn hỗ trợ",
+          "desc": "Thông báo tin nhắn mới từ hệ thống hỗ trợ"
+        },
+        "weekly_report": {
+          "title": "Báo cáo hàng tuần",
+          "desc": "Tóm tắt hoạt động của Space trong tuần"
+        },
+        "security_alert": {
+          "title": "Cảnh báo bảo mật",
+          "desc": "Email khi có đăng nhập từ thiết bị lạ"
+        }
+      },
+      "save": "Lưu thông báo"
+    },
+    "save_error": "Không thể lưu cài đặt"
+  }
+}

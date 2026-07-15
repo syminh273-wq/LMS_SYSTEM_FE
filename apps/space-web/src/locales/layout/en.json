@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "classrooms": "Classrooms",
+    "quizzes": "Quiz Library",
+    "students": "Students",
+    "settings": "Settings",
+    "admin": "Admin"
+  },
+  "page_title": {
+    "space_admin": "Space Admin"
+  },
+  "actions": {
+    "logout": "Logout",
+    "expand_menu": "Expand menu",
+    "collapse_menu": "Collapse menu"
+  },
+  "search": {
+    "trigger_label": "Search everything...",
+    "dialog_aria_label": "Global search",
+    "placeholder": "Search classrooms, exams, quizzes, students...",
+    "empty_prompt": "Type to search across your LMS",
+    "no_results_for": "No results for \"{{query}}\"",
+    "untitled": "(Untitled)",
+    "results_count_one": "{{count}} result found",
+    "results_count_other": "{{count}} results found",
+    "navigate": "navigate",
+    "open": "open",
+    "type_classroom": "Classrooms",
+    "type_exam": "Exams",
+    "type_quiz": "Quizzes",
+    "type_consumer": "Students",
+    "type_resource": "Resources"
+  },
+  "notifications": {
+    "aria_label": "Notifications",
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minutes ago",
+    "hours_ago": "{{count}} hours ago",
+    "days_ago": "{{count}} days ago"
+  },
+  "language_switcher": {
+    "aria_label": "Language switcher"
+  }
+}

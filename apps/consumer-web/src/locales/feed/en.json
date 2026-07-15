@@ -1,0 +1,57 @@
+{
+  "labels": {
+    "tab_all": "All",
+    "tab_following": "Following",
+    "no_posts_title": "No posts yet",
+    "no_posts_desc": "Be the first to share something!",
+    "load_more": "Load more",
+    "thinking_default": "What's on your mind?",
+    "thinking_with_name": "What's on your mind, {{name}}?",
+    "you": "You",
+    "image": "Image",
+    "emotion": "Emotion",
+    "feeling": "is feeling",
+    "feeling_state": "is {{emotion}}",
+    "post_btn": "Post",
+    "visibility_public": "Public",
+    "visibility_friends": "Friends",
+    "visibility_private": "Only me",
+    "anonymous": "Anonymous",
+    "delete_post": "Delete post",
+    "comments": "comments",
+    "like": "Like",
+    "comment": "Comment",
+    "share": "Share",
+    "write_comment": "Write a comment..."
+  },
+  "emotions": {
+    "happy": "Happy",
+    "sad": "Sad",
+    "motivated": "Motivated",
+    "excited": "Excited",
+    "tired": "Tired",
+    "thinking": "Thinking",
+    "confident": "Confident",
+    "celebrating": "Celebrating",
+    "stressed": "Stressed",
+    "loved": "Loved"
+  },
+  "time": {
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minutes ago",
+    "hours_ago": "{{count}} hours ago",
+    "days_ago": "{{count}} days ago"
+  },
+  "messages": {
+    "load_feed_error": "Cannot load feed",
+    "init_error": "Initialization error",
+    "post_created": "Post published!",
+    "post_failed": "Failed to publish post",
+    "load_comments_error": "Cannot load comments",
+    "action_failed": "Action failed",
+    "send_comment_error": "Cannot send comment",
+    "delete_post_confirm": "Delete this post?",
+    "post_deleted": "Post deleted",
+    "delete_error": "Cannot delete"
+  }
+}

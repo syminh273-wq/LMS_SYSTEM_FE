@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "dashboard": "Bảng điều khiển",
+    "classroom": "Lớp học",
+    "classrooms": "Lớp học",
+    "calendar": "Lịch",
+    "grades": "Điểm số",
+    "quiz_library": "Thư viện bài kiểm tra",
+    "students": "Học sinh",
+    "settings": "Cài đặt",
+    "space_admin": "Quản trị không gian"
+  },
+  "menu": {
+    "my_profile": "Hồ sơ của tôi",
+    "my_classrooms": "Lớp học của tôi",
+    "language": "Ngôn ngữ",
+    "switch_language": "Chuyển ngôn ngữ",
+    "expand_menu": "Mở rộng menu",
+    "collapse_menu": "Thu nhỏ menu"
+  },
+  "header": {
+    "language": {
+      "en": "Tiếng Anh",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "app_shell": {
+    "logout": "Đăng xuất"
+  },
+  "profile_dropdown": {
+    "default_name": "Quản trị viên",
+    "default_email": "Quản trị không gian"
+  }
+}

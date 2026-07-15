@@ -1,0 +1,46 @@
+{
+  "labels": {
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "untitled": "Untitled"
+  },
+  "messages": {
+    "coming_soon": "Coming soon"
+  },
+  "chat": {
+    "title": "Class discussion",
+    "empty_state": "No messages yet. Be the first to start the conversation!",
+    "input_placeholder": "Type a message...",
+    "attach_file": "Attach file",
+    "status_online": "Online",
+    "status_connecting": "Connecting",
+    "status_disconnected": "Disconnected",
+    "reconnecting": "Reconnecting...",
+    "not_connected": "Not connected to chat",
+    "history_load_failed": "Failed to load message history",
+    "load_more_failed": "Failed to load more messages",
+    "typing": "typing...",
+    "upload_failed_prefix": "Upload failed:",
+    "upload_failed_default": "Failed to upload file",
+    "upload_unknown_error": "Unknown error"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "aria_label": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}} minutes ago",
+    "hours_ago": "{{count}} hours ago"
+  },
+  "search": {
+    "trigger_label": "Search",
+    "dialog_aria_label": "Search dialog",
+    "placeholder": "Search...",
+    "empty_prompt": "Type to search...",
+    "no_results": "No results found",
+    "navigate": "Navigate",
+    "open": "Open",
+    "results_count_other": "{{count}} results"
+  }
+}

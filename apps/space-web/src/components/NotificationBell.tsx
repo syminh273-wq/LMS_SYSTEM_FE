@@ -5,6 +5,7 @@ import { Bell, CheckCheck } from 'lucide-react';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
 import firebaseApp from '@/lib/firebase';
 import { notificationApi } from '@/lib/api/notification';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 type FbNotification = {
   uid: string;
@@ -17,6 +18,7 @@ type FbNotification = {
 };
 
 export default function NotificationBell() {
+  const { t, formatDate } = useTranslation();
   const [notifications, setNotifications] = useState<FbNotification[]>([]);
   const [readUids, setReadUids] = useState<Set<string>>(new Set());
   const [open, setOpen] = useState(false);
@@ -109,7 +111,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setOpen(prev => !prev)}
         className="relative p-2 rounded-full hover:bg-muted transition-colors"
-        aria-label="Thông báo"
+        aria-label={t('layout.notifications.aria_label')}
       >
         <Bell size={20} className="text-muted-foreground" />
         {unreadCount > 0 && (
@@ -122,14 +124,14 @@ export default function NotificationBell() {
       {open && (
         <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-border bg-card shadow-xl">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <span className="text-sm font-semibold text-foreground">Thông báo</span>
+            <span className="text-sm font-semibold text-foreground">{t('layout.notifications.title')}</span>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
                 className="flex items-center gap-1 text-xs text-primary-brand hover:text-primary-brand-dark font-medium"
               >
                 <CheckCheck size={13} />
-                Đọc tất cả
+                {t('layout.notifications.mark_all_read')}
               </button>
             )}
           </div>
@@ -137,7 +139,7 @@ export default function NotificationBell() {
           <ul className="max-h-96 overflow-y-auto divide-y divide-border">
             {notifications.length === 0 ? (
               <li className="py-10 text-center text-sm text-muted-foreground">
-                Chưa có thông báo nào
+                {t('layout.notifications.empty')}
               </li>
             ) : (
               notifications.map((n) => {
@@ -161,7 +163,7 @@ export default function NotificationBell() {
                         {n.title}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.content}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at)}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatTime(n.created_at, t, formatDate)}</p>
                     </div>
 
                     {!isRead && (
@@ -178,10 +180,16 @@ export default function NotificationBell() {
   );
 }
 
-function formatTime(iso: string) {
+function formatTime(
+  iso: string,
+  t: (key: string, fallback?: string, values?: Record<string, string | number>) => string,
+  formatDate: (value: string | number | Date) => string,
+) {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (diff < 60) return 'Vừa xong';
-  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-  return new Date(iso).toLocaleDateString('vi-VN');
+  if (diff < 60) return t('layout.notifications.just_now');
+  if (diff < 3600) return t('layout.notifications.minutes_ago', undefined, { count: Math.floor(diff / 60) });
+  if (diff < 86400) return t('layout.notifications.hours_ago', undefined, { count: Math.floor(diff / 3600) });
+  const days = Math.floor(diff / 86400);
+  if (days < 7) return t('layout.notifications.days_ago', undefined, { count: days });
+  return formatDate(iso);
 }

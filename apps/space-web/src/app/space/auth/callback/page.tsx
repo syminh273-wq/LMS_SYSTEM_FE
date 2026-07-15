@@ -2,13 +2,9 @@
 
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useDispatch } from 'react-redux';
-import { setProfile } from '@/lib/redux/userSlice';
-import { accountService } from '@/lib/api/account';
 
 function SpaceAuthCallbackContent() {
   const router = useRouter();
-  const dispatch = useDispatch();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -38,15 +34,7 @@ function SpaceAuthCallbackContent() {
     localStorage.setItem('refreshToken', refresh);
     localStorage.setItem('userType', 'space');
 
-    accountService
-      .getProfile()
-      .then((profile) => {
-        dispatch(setProfile(profile));
-        router.push('/space');
-      })
-      .catch(() => {
-        router.push('/space');
-      });
+    window.location.replace('/space');
   }, []);
 
   return (

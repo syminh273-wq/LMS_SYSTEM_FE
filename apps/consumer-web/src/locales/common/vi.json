@@ -1,0 +1,11 @@
+{
+  "labels": {
+    "welcome": "Chào mừng",
+    "get_started": "Bắt đầu",
+    "learn_more": "Tìm hiểu thêm",
+    "read_more": "Đọc thêm"
+  },
+  "messages": {
+    "coming_soon": "Sắp ra mắt"
+  }
+}

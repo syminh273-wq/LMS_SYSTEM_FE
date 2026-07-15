@@ -27,6 +27,8 @@ export function SpaceProfileDropdown() {
 
   useEffect(() => {
     let mounted = true;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) return;
     accountService.getProfile()
       .then((data) => {
         if (!mounted) return;

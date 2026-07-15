@@ -6,18 +6,16 @@ import { Users, Search, Mail, Calendar, ChevronRight, GraduationCap } from 'luci
 import { studentApi, type StudentSearchResult } from '@/lib/api/student';
 import type { TeacherContact } from '@/lib/api/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 function initials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
 }
 
-function formatDate(val: string | number | null) {
-  if (!val) return '—';
-  const date = typeof val === 'number' ? new Date(val * 1000) : new Date(val);
-  return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-
 export default function StaffPage() {
+  const { t, formatDate: localeFormatDate } = useTranslation();
+  const formatJoinedAt = (val: string | number | null | undefined) =>
+    val ? localeFormatDate(val) : '—';
   const [contacts, setContacts] = useState<TeacherContact[]>([]);
   const [searchResults, setSearchResults] = useState<StudentSearchResult[] | null>(null);
   const [totalContacts, setTotalContacts] = useState(0);
@@ -63,14 +61,14 @@ export default function StaffPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Student Management</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('student.title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            All students who have ever studied in your classrooms
+            {t('student.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2 bg-primary-brand-light dark:bg-indigo-950/40 text-primary-brand dark:text-primary-brand rounded-xl px-4 py-2.5">
           <GraduationCap size={18} />
-          <span className="text-sm font-bold">{totalContacts} students</span>
+          <span className="text-sm font-bold">{t('student.total_badge', undefined, { count: totalContacts })}</span>
         </div>
       </div>
 
@@ -81,7 +79,7 @@ export default function StaffPage() {
           type="text"
           value={query}
           onChange={handleQueryChange}
-          placeholder="Search by name or email..."
+          placeholder={t('student.search_placeholder')}
           className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary-brand/20 dark:text-foreground dark:placeholder:text-muted-foreground"
         />
       </div>
@@ -98,8 +96,8 @@ export default function StaffPage() {
         !searchResults || searchResults.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <Users size={40} className="text-muted-foreground/40 mb-3" />
-            <p className="text-base font-semibold text-foreground">No students match your search</p>
-            <p className="text-sm text-muted-foreground mt-1">Try a different name or email</p>
+            <p className="text-base font-semibold text-foreground">{t('student.search_empty_title')}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t('student.search_empty_desc')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -117,15 +115,15 @@ export default function StaffPage() {
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary-brand dark:group-hover:text-primary-brand transition-colors">
-                    {s.consumer_name || '(No name)'}
+                    {s.consumer_name || t('student.no_name')}
                   </p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 truncate">
                     <Mail size={11} />
-                    {s.consumer_email || '—'}
+                    {s.consumer_email || t('student.no_email')}
                   </p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                     <Calendar size={11} />
-                    First joined {formatDate(s.first_joined_at)}
+                    {t('student.first_joined', undefined, { date: formatJoinedAt(s.first_joined_at) })}
                   </p>
                 </div>
                 <ChevronRight size={16} className="text-muted-foreground/40 group-hover:text-primary-brand flex-shrink-0 mt-1 transition-colors" />
@@ -138,9 +136,9 @@ export default function StaffPage() {
         contacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <Users size={40} className="text-muted-foreground/40 mb-3" />
-            <p className="text-base font-semibold text-foreground">No students yet</p>
+            <p className="text-base font-semibold text-foreground">{t('student.list_empty_title')}</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Students appear here once they are approved in one of your classrooms
+              {t('student.list_empty_desc')}
             </p>
           </div>
         ) : (
@@ -159,15 +157,15 @@ export default function StaffPage() {
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-foreground truncate group-hover:text-primary-brand dark:group-hover:text-primary-brand transition-colors">
-                    {contact.consumer_name || '(No name)'}
+                    {contact.consumer_name || t('student.no_name')}
                   </p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 truncate">
                     <Mail size={11} />
-                    {contact.consumer_email || '—'}
+                    {contact.consumer_email || t('student.no_email')}
                   </p>
                   <p className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                     <Calendar size={11} />
-                    First joined {formatDate(contact.first_joined_at)}
+                    {t('student.first_joined', undefined, { date: formatJoinedAt(contact.first_joined_at) })}
                   </p>
                 </div>
                 <ChevronRight size={16} className="text-muted-foreground/40 group-hover:text-primary-brand flex-shrink-0 mt-1 transition-colors" />

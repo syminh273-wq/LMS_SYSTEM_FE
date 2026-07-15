@@ -1,0 +1,17 @@
+{
+  "labels": {
+    "recent_grades": "Điểm gần đây",
+    "course": "Khóa học",
+    "assignment": "Bài tập",
+    "score": "Điểm",
+    "date": "Ngày",
+    "progress": "Tiến độ",
+    "performance_over_time": "Hiệu suất theo thời gian",
+    "chart_placeholder": "Biểu đồ sẽ được hiển thị ở đây",
+    "course_distribution": "Phân bố khóa học",
+    "gpa": "GPA",
+    "courses": "Khóa học",
+    "assignments": "Bài tập",
+    "attendance": "Chuyên cần"
+  }
+}

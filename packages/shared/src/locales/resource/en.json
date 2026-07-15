@@ -1,0 +1,33 @@
+{
+  "labels": {
+    "records_count": "{{count}} records"
+  },
+  "sharing_modal": {
+    "tab_info": "Info",
+    "tab_docs": "Documents",
+    "tab_chat": "Chat",
+    "badge_classroom": "Classroom",
+    "label_description": "Description",
+    "label_max_students": "Max students",
+    "value_max_students_suffix": " students",
+    "label_created_at": "Created at",
+    "qr_button": "VIEW JOIN QR CODE",
+    "qr_button_loading": "Generating...",
+    "qr_download": "DOWNLOAD QR",
+    "qr_copy": "COPY LINK",
+    "docs_upload_title": "Upload document",
+    "docs_upload_subtitle": "Share learning materials with all students in the class",
+    "docs_upload_button": "CHOOSE FILE",
+    "docs_list_label": "Uploaded documents ({{count}})",
+    "chat_placeholder": "Type a message...",
+    "chat_seed_teacher": "Teacher",
+    "chat_seed_teacher_text": "Welcome to the class!",
+    "chat_seed_me": "You",
+    "chat_seed_me_text": "Hello teacher.",
+    "toast_link_failed": "Failed to fetch sharing link",
+    "toast_qr_not_found": "QR code not found for download",
+    "toast_link_copied": "Join link copied",
+    "toast_qr_downloaded": "QR image downloaded",
+    "qr_filename_prefix": "QR_Class_"
+  }
+}

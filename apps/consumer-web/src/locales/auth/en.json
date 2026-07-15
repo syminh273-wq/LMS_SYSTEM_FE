@@ -1,0 +1,179 @@
+{
+  "login": {
+    "labels": {
+      "brand": "EduSphere",
+      "tagline": "ELITE ENROLLMENT 2026",
+      "hero_title": "Elevate your knowledge.",
+      "hero_subtitle": "A smart learning management system building a digital future for the next generation.",
+      "feature_security_title": "Secure",
+      "feature_security_desc": "Data encrypted to international standards.",
+      "feature_optimization_title": "Optimized",
+      "feature_optimization_desc": "Seamless learning experience.",
+      "title": "Sign in",
+      "welcome_back": "Welcome back to EduSphere.",
+      "no_account": "Don't have an account?",
+      "register_link": "Sign up now",
+      "email_label": "Email address",
+      "password_label": "Password",
+      "forgot_link": "Forgot password?",
+      "submit": "Sign in now",
+      "submit_loading": "Authenticating...",
+      "divider": "Or",
+      "google_login": "Continue with Google"
+    },
+    "placeholders": {
+      "email": "name@company.com",
+      "password": "••••••••"
+    },
+    "messages": {
+      "validation_check": "Please check your login information.",
+      "login_failed_fallback": "Sign in failed"
+    },
+    "errors": {
+      "google_auth_failed": "Google sign in failed. Please try again.",
+      "google_token_failed": "Could not authenticate with Google.",
+      "google_token_invalid": "Invalid Google token.",
+      "account_disabled": "This account has been disabled.",
+      "login_failed_fallback": "Sign in failed.",
+      "default": "Sign in failed"
+    },
+    "validation": {
+      "email_required": "Please enter your email",
+      "password_required": "Please enter your password"
+    }
+  },
+  "register": {
+    "labels": {
+      "brand": "EduSphere",
+      "tagline": "ELITE ENROLLMENT 2026",
+      "hero_title": "Start your journey to excellence.",
+      "hero_subtitle": "Join a community of elite learners and experience a world-class education platform.",
+      "feature_security_title": "Secure",
+      "feature_security_desc": "Data encrypted to international standards.",
+      "feature_optimization_title": "Optimized",
+      "feature_optimization_desc": "Seamless learning experience.",
+      "title": "Sign up",
+      "subtitle": "Become an EduSphere learner today.",
+      "have_account": "Already have an account?",
+      "login_link": "Sign in now",
+      "last_name_label": "Last name",
+      "first_name_label": "First name",
+      "email_label": "Email address",
+      "password_label": "Password",
+      "confirm_password_label": "Confirm password",
+      "terms_prefix": "I agree to the",
+      "terms_link": "Terms of Service",
+      "terms_and": "and",
+      "privacy_link": "Privacy Policy",
+      "terms_suffix": "of EduSphere.",
+      "submit": "Create account now",
+      "submit_loading": "Creating...",
+      "divider": "Or",
+      "google_login": "Continue with Google"
+    },
+    "placeholders": {
+      "last_name": "Nguyen",
+      "first_name": "An",
+      "email": "name@company.com",
+      "password": "••••••••"
+    },
+    "messages": {
+      "success_title": "Congratulations! Your account has been created.",
+      "success_description": "You will be redirected to the sign in page shortly.",
+      "success_fallback": "Sign up successful. Please sign in.",
+      "validation_check": "Please check your registration information.",
+      "register_failed_fallback": "Sign up failed"
+    },
+    "errors": {
+      "register_failed_fallback": "Sign up failed",
+      "default": "Sign up failed"
+    },
+    "validation": {
+      "required": "Required",
+      "password_min": "Minimum 8 characters",
+      "password_mismatch": "Passwords do not match"
+    }
+  },
+  "forgot": {
+    "labels": {
+      "back": "Back to sign in",
+      "title": "Forgot your password?",
+      "subtitle": "Enter your account email and we will send an OTP code to verify.",
+      "email_label": "Email address",
+      "submit": "Send OTP code",
+      "submit_loading": "Sending..."
+    },
+    "placeholders": {
+      "email": "name@company.com"
+    },
+    "messages": {
+      "otp_sent": "OTP code has been sent to your email."
+    },
+    "errors": {
+      "default": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "email_required": "Please enter your email"
+    }
+  },
+  "reset": {
+    "labels": {
+      "back": "Back",
+      "title": "Set a new password",
+      "subtitle": "Your new password must be at least 8 characters.",
+      "new_password_label": "New password",
+      "confirm_password_label": "Confirm password",
+      "submit": "Reset password",
+      "submit_loading": "Updating...",
+      "success_title": "Success!",
+      "success_subtitle": "Password updated. Redirecting to sign in..."
+    },
+    "placeholders": {
+      "password": "••••••••"
+    },
+    "messages": {
+      "password_updated": "Password updated successfully!"
+    },
+    "errors": {
+      "default": "Could not reset password. Please try again."
+    },
+    "validation": {
+      "new_password_required": "Please enter a new password",
+      "new_password_min": "Password must be at least 8 characters",
+      "confirm_password_required": "Please confirm your password",
+      "confirm_password_mismatch": "Password confirmation does not match"
+    }
+  },
+  "otp": {
+    "labels": {
+      "back": "Back",
+      "title": "Enter OTP code",
+      "subtitle": "A 6-digit code has been sent to {{email}}. The code is valid for 5 minutes.",
+      "code_label": "OTP code",
+      "submit": "Verify",
+      "submit_loading": "Verifying...",
+      "resend": "Resend OTP code",
+      "resend_countdown": "Resend in {{seconds}}s"
+    },
+    "placeholders": {
+      "code": "000000"
+    },
+    "messages": {
+      "verified": "Verification successful!",
+      "resend_success": "A new OTP code has been sent."
+    },
+    "errors": {
+      "invalid_code": "OTP code is incorrect or has expired.",
+      "resend_error": "Could not resend the code. Please try again."
+    },
+    "validation": {
+      "code_required": "Please enter the OTP code",
+      "code_pattern": "OTP must be 6 digits"
+    }
+  },
+  "callback": {
+    "labels": {
+      "processing": "Processing sign in..."
+    }
+  }
+}

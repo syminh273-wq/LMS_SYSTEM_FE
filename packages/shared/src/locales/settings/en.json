@@ -1,0 +1,135 @@
+{
+  "labels": {
+    "settings": "Settings",
+    "consumer": "Consumer",
+    "subtitle": "Manage your account security",
+    "change_password": "Change password",
+    "change_password_desc": "Update your password regularly to protect your LMS account. Google/Gmail accounts need to manage their password via Google.",
+    "current_password": "Current password",
+    "new_password": "New password",
+    "confirm_new_password": "Confirm new password",
+    "show_password": "Show password",
+    "hide_password": "Hide password",
+    "change_password_button": "Change password",
+    "changing": "Changing password...",
+    "check_min_length": "At least 8 characters",
+    "check_letter": "Contains a letter",
+    "check_digit_special": "Contains a number or special character"
+  },
+  "messages": {
+    "fill_all_fields": "Please fill in all password fields.",
+    "min_length": "New password must be at least 8 characters long.",
+    "password_mismatch": "New password and confirmation do not match.",
+    "success": "Password changed successfully.",
+    "fallback_error": "Failed to change password. Please check your information.",
+    "google_account_error": "Your account is signed in with Google/Gmail so the password cannot be changed here. Please manage your password in your Google account."
+  },
+  "space": {
+    "loading": "Loading configuration...",
+    "title": "System settings",
+    "subtitle": "Manage and customize your workspace",
+    "nav": {
+      "profile": "Organization profile",
+      "security": "Security & authentication",
+      "classrooms": "Classroom configuration",
+      "notifications": "Notifications"
+    },
+    "profile": {
+      "title": "Space profile",
+      "subtitle": "Information shown to students and teachers",
+      "upload_logo": "Upload logo",
+      "upload_hint": "PNG, JPG up to 2MB",
+      "name_label": "Space name",
+      "slug_label": "Slug (URL)",
+      "desc_label": "Description",
+      "theme_color_label": "Brand color",
+      "custom_color_hint": "Choose a custom color",
+      "save": "Save profile",
+      "saved_toast": "Settings saved successfully!",
+      "language_label": "Language",
+      "language_hint": "Choose the display language for the entire Space",
+      "save_error": "Could not save settings"
+    },
+    "security": {
+      "title": "Security & access",
+      "subtitle": "Manage protection layers and join rules",
+      "face_id_title": "Face authentication (FaceID)",
+      "face_id_desc": "Require verification when entering classrooms",
+      "domain_title": "Restrict email domain",
+      "domain_desc": "Only allow emails from your organization (@school.edu.vn)",
+      "join_code_label": "Default join code",
+      "generate": "Generate",
+      "save": "Save security",
+      "change_password_title": "Change password",
+      "change_password_desc": "Update your sign-in password",
+      "current_password_label": "Current password",
+      "new_password_label": "New password",
+      "confirm_password_label": "Confirm new password",
+      "change_password_submit": "Change password",
+      "mismatch_error": "Password confirmation does not match.",
+      "success": "Password changed successfully!",
+      "error_fallback": "Could not change password. Please try again."
+    },
+    "password": {
+      "mismatch_error": "Password confirmation does not match.",
+      "success": "Password changed successfully!",
+      "error_fallback": "Could not change password. Please check your information."
+    },
+    "classrooms": {
+      "title": "Classroom configuration",
+      "subtitle": "Default settings for new classrooms",
+      "max_students_label": "Default max students",
+      "view_mode_label": "Default view",
+      "view_grid": "Grid",
+      "view_list": "List",
+      "features_label": "Features enabled by default",
+      "feature_chat": "Public chat",
+      "feature_screen_share": "Screen sharing",
+      "feature_record": "Record sessions",
+      "feature_breakout": "Breakout rooms",
+      "feature_whiteboard": "Interactive whiteboard",
+      "feature_emoji": "Emoji reactions",
+      "save": "Save classrooms"
+    },
+    "notifications": {
+      "title": "Notification preferences",
+      "subtitle": "Control important alerts and updates",
+      "web_section": "Web notifications",
+      "email_section": "Email notifications",
+      "new_student_title": "New student joined",
+      "new_student_desc": "Notify when a student requests to join the Space",
+      "submission_title": "New assignment submission",
+      "submission_desc": "Notify when a student submits homework",
+      "support_title": "Support message",
+      "support_desc": "Notify about new messages from the support system",
+      "weekly_report_title": "Weekly report",
+      "weekly_report_desc": "Summary of Space activity for the week",
+      "security_alert_title": "Security alert",
+      "security_alert_desc": "Email when there is a sign-in from an unknown device",
+      "items": {
+        "new_student": {
+          "title": "New student joined",
+          "desc": "Notify when a student requests to join the Space"
+        },
+        "submission": {
+          "title": "New assignment submission",
+          "desc": "Notify when a student submits homework"
+        },
+        "support": {
+          "title": "Support message",
+          "desc": "Notify about new messages from the support system"
+        },
+        "weekly_report": {
+          "title": "Weekly report",
+          "desc": "Summary of Space activity for the week"
+        },
+        "security_alert": {
+          "title": "Security alert",
+          "desc": "Email when there is a sign-in from an unknown device"
+        }
+      },
+      "save": "Save notifications"
+    },
+    "save_error": "Could not save settings"
+  }
+}

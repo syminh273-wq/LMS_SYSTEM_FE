@@ -1,0 +1,37 @@
+{
+  "labels": {
+    "camera_not_found": "Không tìm thấy camera",
+    "camera_not_found_desc": "Thiết bị của bạn không có camera hoặc camera chưa được kết nối.",
+    "retry": "Thử lại",
+    "address_bar_hint": "Nhấn vào đây",
+    "step1": "Nhấn vào biểu tượng 🔒 trên thanh địa chỉ trình duyệt",
+    "step2": "Tìm mục \"Camera\" và chọn \"Cho phép\"",
+    "step3": "Nhấn \"Thử lại\" bên dưới",
+    "not_enrolled_title": "Chưa đăng ký khuôn mặt",
+    "not_enrolled_classroom_desc": "Bạn cần đăng ký khuôn mặt trước khi vào lớp học.",
+    "not_enrolled_exam_desc": "Bạn cần đăng ký khuôn mặt trước khi làm bài kiểm tra.",
+    "enroll_now": "Đăng ký ngay",
+    "verify_classroom_title": "Xác minh để vào lớp",
+    "verify_classroom_desc": "Nhìn thẳng vào camera rồi nhấn xác minh — phiên có hiệu lực 8 giờ",
+    "verify_exam_title": "Xác minh danh tính",
+    "verify_exam_desc": "Nhìn thẳng vào camera rồi nhấn xác minh để vào làm bài",
+    "verifying": "Đang xác minh...",
+    "verify_classroom_button": "Xác minh và vào lớp",
+    "verify_exam_button": "Xác minh và vào làm bài",
+    "enroll_title": "Đăng ký khuôn mặt",
+    "enroll_subtitle": "Nhìn thẳng vào camera rồi nhấn chụp",
+    "enroll_success": "Đăng ký thành công!",
+    "capturing": "Đang xử lý...",
+    "capture_button": "Chụp và đăng ký",
+    "capture_hint": "Đảm bảo khuôn mặt nằm trong khung và đủ ánh sáng",
+    "monitor_label": "Camera",
+    "multiple_faces_warning": "Phát hiện nhiều khuôn mặt!",
+    "no_face_warning": "Không nhận diện được khuôn mặt!"
+  },
+  "messages": {
+    "enroll_fallback_error": "Không thể đăng ký. Vui lòng thử lại.",
+    "verify_no_face": "Không phát hiện khuôn mặt. Đảm bảo đủ ánh sáng và nhìn thẳng vào camera.",
+    "verify_mismatch": "Khuôn mặt không khớp ({{similarity}}% tương đồng). Vui lòng thử lại.",
+    "verify_error": "Lỗi xác minh. Vui lòng thử lại."
+  }
+}
