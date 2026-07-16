@@ -1,0 +1,56 @@
+{
+  "panel": {
+    "title": "Trung tâm tác vụ",
+    "subtitle": "{{count}} đang chạy",
+    "tabs": {
+      "all": "Tất cả",
+      "active": "Đang chạy",
+      "completed": "Hoàn thành",
+      "failed": "Thất bại"
+    },
+    "empty": "Chưa có tác vụ nào",
+    "empty_hint": "Quiz đang được tạo sẽ hiển thị tại đây",
+    "filter_all": "Tất cả",
+    "clear_completed": "Xóa đã hoàn thành",
+    "reconnecting": "Đang kết nối lại…"
+  },
+  "status": {
+    "queued": "Đang chờ",
+    "running": "Đang chạy",
+    "completed": "Hoàn thành",
+    "failed": "Thất bại",
+    "archived": "Đã lưu trữ"
+  },
+  "actions": {
+    "open": "Mở",
+    "retry": "Thử lại",
+    "dismiss": "Bỏ qua",
+    "view": "Xem chi tiết",
+    "remove": "Xóa"
+  },
+  "progress": {
+    "running": "{{percent}}%",
+    "step": "Bước {{current}} / {{total}}",
+    "just_now": "Vừa xong",
+    "minutes_ago": "{{count}} phút trước",
+    "hours_ago": "{{count}} giờ trước",
+    "days_ago": "{{count}} ngày trước"
+  },
+  "toast": {
+    "started": "Đã bắt đầu tạo quiz",
+    "started_desc": "Bạn có thể tiếp tục làm việc trong khi chúng tôi tạo quiz.",
+    "view_tasks": "Xem tác vụ",
+    "completed": "Quiz \"{{title}}\" đã sẵn sàng",
+    "completed_desc": "Nhấn Mở để xem quiz vừa tạo.",
+    "open": "Mở",
+    "failed": "Tạo quiz \"{{title}}\" thất bại",
+    "failed_desc": "Vui lòng thử lại hoặc liên hệ hỗ trợ nếu lỗi tiếp diễn.",
+    "submit_error": "Không thể bắt đầu tạo quiz",
+    "retry_error": "Không thể thử lại tác vụ này",
+    "dismiss_error": "Không thể xóa tác vụ này"
+  },
+  "badge": {
+    "aria_label": "Mở trung tâm tác vụ",
+    "running_count": "{{count}} đang chạy"
+  }
+}

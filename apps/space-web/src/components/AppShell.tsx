@@ -25,8 +25,10 @@ import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { LmsLogo } from '@shared/components/LmsLogo';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import NotificationBell from '@/components/NotificationBell';
+import TaskCenterBell from '@/components/quiz/TaskCenterBell';
 import GlobalSearch from '@/components/GlobalSearch';
 import { SpaceProfileDropdown } from '@/components/layout/space-profile-dropdown';
+import { useQuizTaskPolling } from '@/lib/hooks/useQuizTaskPolling';
 
 function matchesNavPath(pathname: string, href: string) {
   return href === '/space' ? pathname === href : pathname.startsWith(href);
@@ -44,7 +46,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const spaceThemeColor = useSelector((state: RootState) => state.space.themeColor);
 
   useEffect(() => {
-    setMounted(true);
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   // Sync space theme color → brand colors whenever it changes
@@ -53,6 +56,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       dispatch(setBrandColors({ primaryColor: spaceThemeColor }));
     }
   }, [spaceThemeColor, dispatch]);
+
+  useQuizTaskPolling();
 
   const isAuthPage =
     pathname.includes('/space/login') ||
@@ -183,6 +188,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <ThemeToggle />
 
             <LanguageSwitcher variant="compact" />
+
+            <TaskCenterBell />
 
             <NotificationBell />
 

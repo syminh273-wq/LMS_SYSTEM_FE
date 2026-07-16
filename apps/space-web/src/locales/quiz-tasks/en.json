@@ -1,0 +1,56 @@
+{
+  "panel": {
+    "title": "Task Center",
+    "subtitle": "{{count}} active",
+    "tabs": {
+      "all": "All",
+      "active": "Running",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "empty": "No tasks yet",
+    "empty_hint": "Generated quizzes will appear here while they're being created",
+    "filter_all": "All",
+    "clear_completed": "Clear completed",
+    "reconnecting": "Reconnecting…"
+  },
+  "status": {
+    "queued": "Queued",
+    "running": "Running",
+    "completed": "Completed",
+    "failed": "Failed",
+    "archived": "Archived"
+  },
+  "actions": {
+    "open": "Open",
+    "retry": "Retry",
+    "dismiss": "Dismiss",
+    "view": "View details",
+    "remove": "Remove"
+  },
+  "progress": {
+    "running": "{{percent}}%",
+    "step": "Step {{current}} / {{total}}",
+    "just_now": "Just now",
+    "minutes_ago": "{{count}}m ago",
+    "hours_ago": "{{count}}h ago",
+    "days_ago": "{{count}}d ago"
+  },
+  "toast": {
+    "started": "Quiz generation started",
+    "started_desc": "You can continue working while we generate your quiz.",
+    "view_tasks": "View tasks",
+    "completed": "Quiz \"{{title}}\" is ready",
+    "completed_desc": "Click Open to view the generated quiz.",
+    "open": "Open",
+    "failed": "Quiz \"{{title}}\" failed",
+    "failed_desc": "Please try again or contact support if the problem persists.",
+    "submit_error": "Could not start quiz generation",
+    "retry_error": "Could not retry this task",
+    "dismiss_error": "Could not remove this task"
+  },
+  "badge": {
+    "aria_label": "Open task center",
+    "running_count": "{{count}} running"
+  }
+}

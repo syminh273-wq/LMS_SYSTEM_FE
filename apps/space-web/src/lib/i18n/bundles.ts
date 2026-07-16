@@ -18,6 +18,8 @@ import studentEn from '@/locales/student/en.json';
 import studentVi from '@/locales/student/vi.json';
 import quizEn from '@/locales/quiz/en.json';
 import quizVi from '@/locales/quiz/vi.json';
+import quizTasksEn from '@/locales/quiz-tasks/en.json';
+import quizTasksVi from '@/locales/quiz-tasks/vi.json';
 import quizCollectionEn from '@/locales/quiz-collection/en.json';
 import quizCollectionVi from '@/locales/quiz-collection/vi.json';
 import certificateEn from '@/locales/certificate/en.json';
@@ -67,6 +69,7 @@ export const spaceWebBundles: LocaleBundles = {
     admin: adminEn,
     student: studentEn,
     quiz: quizEn,
+    quizTasks: quizTasksEn,
     quizCollection: quizCollectionEn,
     certificate: certificateEn,
     imageUploader: imageUploaderEn,
@@ -96,6 +99,7 @@ export const spaceWebBundles: LocaleBundles = {
     admin: adminVi,
     student: studentVi,
     quiz: quizVi,
+    quizTasks: quizTasksVi,
     quizCollection: quizCollectionVi,
     certificate: certificateVi,
     imageUploader: imageUploaderVi,

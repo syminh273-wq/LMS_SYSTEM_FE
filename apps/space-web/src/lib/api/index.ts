@@ -3,6 +3,7 @@ import { classroomApi } from './classroom';
 import { examApi } from './exam';
 import { meetingRoomApi } from './meeting-room';
 import { quizApi } from './quiz';
+import { quizTasksApi } from './quiz-tasks';
 import { quizCollectionApi, certificateApi } from './quiz-collection';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
@@ -13,7 +14,7 @@ import { studentApi } from './student';
 
 export * from './types';
 export * from './exceptions';
-export { quizApi, quizCollectionApi, certificateApi, studentApi };
+export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -22,6 +23,7 @@ export const api = {
   exams: examApi,
   meetingRooms: meetingRoomApi,
   quizzes: quizApi,
+  quizTasks: quizTasksApi,
   quizCollections: quizCollectionApi,
   certificates: certificateApi,
   spaces: spaceApiInstance,

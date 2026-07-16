@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer, { clearProfile } from './userSlice';
 import spaceReducer from './spaceSlice';
+import quizTasksReducer from './quizTasksSlice';
 import themeReducer from '@shared/lib/redux/themeSlice';
 import BaseRestApiClient from '../api/client';
 
@@ -9,6 +10,7 @@ export const store = configureStore({
     user: userReducer,
     space: spaceReducer,
     theme: themeReducer,
+    quizTasks: quizTasksReducer,
   },
 });
 
