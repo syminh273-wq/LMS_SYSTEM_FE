@@ -1,0 +1,90 @@
+{
+  "title": "Quiz Collections",
+  "subtitle": "Group multiple quizzes into a collection. Award a certificate when students finish them all.",
+  "create_btn": "Create Collection",
+  "loading": "Loading collections...",
+  "empty": "No quiz collections yet",
+  "empty_hint": "Create your first collection to group quizzes and award certificates.",
+  "create_first_btn": "Create First Collection",
+  "delete_confirm": "Delete collection \"{{title}}\"? This will also remove its classroom assignments.",
+  "delete_success": "Collection deleted",
+  "delete_error": "Cannot delete collection",
+  "create_success": "Collection \"{{title}}\" created",
+  "update_success": "Collection updated",
+  "load_error": "Cannot load collection list",
+  "save_error": "Cannot save",
+  "library": {
+    "card_quiz_count": "{{count}} quizzes",
+    "card_class_count": "{{count}} classes",
+    "card_no_certificate": "No certificate"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "create_modal": {
+    "title": "Create Quiz Collection",
+    "name_label": "Collection name",
+    "name_placeholder": "e.g. JavaScript Fundamentals",
+    "description_label": "Description (optional)",
+    "description_placeholder": "Briefly describe what students will learn",
+    "certificate_label": "Assign a certificate (optional)",
+    "certificate_none": "No certificate yet",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "detail": {
+    "back": "Back to collections",
+    "info_section": "General information",
+    "items_section": "Quizzes in this collection",
+    "items_empty": "No quizzes yet. Add quizzes below.",
+    "add_quiz_btn": "Add quizzes",
+    "reorder_hint": "Drag the handle to reorder",
+    "certificate_section": "Certificate",
+    "assign_certificate_btn": "Assign certificate",
+    "change_certificate_btn": "Change",
+    "remove_certificate_btn": "Remove",
+    "no_certificate": "No certificate assigned yet",
+    "assignments_section": "Assigned to classes",
+    "no_assignments": "Not assigned to any class yet",
+    "assign_to_class_btn": "Assign to class",
+    "edit_title_btn": "Edit",
+    "save_title_btn": "Save",
+    "cancel_btn": "Cancel",
+    "save_error": "Cannot save",
+    "save_success": "Saved"
+  },
+  "add_quiz_modal": {
+    "title": "Add quizzes to collection",
+    "search_placeholder": "Search quizzes...",
+    "empty_library": "No quizzes available in your library",
+    "selected_count": "{{count}} selected",
+    "cancel": "Cancel",
+    "add": "Add"
+  },
+  "assign_modal": {
+    "title": "Assign to class",
+    "select_class_label": "Choose a class",
+    "select_class_placeholder": "Pick a class...",
+    "cancel": "Cancel",
+    "assign": "Assign",
+    "assign_success": "Assigned to class",
+    "no_classes": "You have no classes yet"
+  },
+  "certificate_modal": {
+    "title": "Assign certificate",
+    "select_label": "Choose a certificate",
+    "empty_library": "No certificates yet. Create one first.",
+    "create_new": "Create new certificate",
+    "cancel": "Cancel",
+    "save": "Save",
+    "save_success": "Certificate assigned"
+  },
+  "assignments": {
+    "title": "Classroom progress",
+    "unassigned": "Not assigned",
+    "completed_count": "{{done}}/{{total}} completed",
+    "view_class": "View class"
+  }
+}

@@ -17,6 +17,8 @@ import {
   Gamepad2,
   ChevronsLeft,
   ChevronsRight,
+  Layers,
+  Award,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
@@ -36,9 +38,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const brandColors = useSelector((state: RootState) => state.theme.brand);
   const spaceThemeColor = useSelector((state: RootState) => state.space.themeColor);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Sync space theme color → brand colors whenever it changes
   useEffect(() => {
@@ -56,11 +63,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const navItems = React.useMemo(
     () => [
-      { key: 'dashboard',  label: t('layout.nav.dashboard'),  href: '/space',              icon: LayoutDashboard },
-      { key: 'classrooms', label: t('layout.nav.classrooms'), href: '/space/classrooms',   icon: BookOpen },
-      { key: 'quizzes',    label: t('layout.nav.quizzes'),    href: '/space/quizzes',      icon: Gamepad2 },
-      { key: 'students',   label: t('layout.nav.students'),   href: '/space/student',      icon: Users },
-      { key: 'settings',   label: t('layout.nav.settings'),   href: '/space/settings',     icon: Settings },
+      { key: 'dashboard',       label: t('layout.nav.dashboard'),       href: '/space',                       icon: LayoutDashboard },
+      { key: 'classrooms',      label: t('layout.nav.classrooms'),      href: '/space/classrooms',            icon: BookOpen },
+      { key: 'quizzes',         label: t('layout.nav.quizzes'),         href: '/space/quizzes',               icon: Gamepad2 },
+      { key: 'quiz_collections',label: t('layout.nav.quiz_collections'),href: '/space/quiz-collections',      icon: Layers },
+      { key: 'certificates',    label: t('layout.nav.certificates'),    href: '/space/quiz-collections/certificates', icon: Award },
+      { key: 'students',        label: t('layout.nav.students'),        href: '/space/student',               icon: Users },
+      { key: 'settings',        label: t('layout.nav.settings'),        href: '/space/settings',              icon: Settings },
     ],
     [t]
   );
@@ -80,39 +89,39 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <aside className={`bg-card dark:bg-card border-r border-border flex flex-col shadow-sm transition-all duration-300 ${sidebarCollapsed ? 'w-[72px]' : 'w-72'}`}>
         {sidebarCollapsed ? (
           <div className="flex flex-col items-center gap-3 pt-5 pb-2 px-2">
-            <Link href="/space" className="hover:opacity-80 transition-opacity" title="LMS System">
+            <Link href="/space" className="hover:opacity-80 transition-opacity cursor-pointer" title="LMS System">
               <LmsLogo
                 width={40}
                 height={40}
-                primaryColor={brandColors.primaryColor}
-                accentColor={brandColors.accentColor}
-                goldColor={brandColors.goldColor}
+                primaryColor={mounted ? brandColors.primaryColor : '#4f46e5'}
+                accentColor={mounted ? brandColors.accentColor : '#00b4d8'}
+                goldColor={mounted ? brandColors.goldColor : '#d4a843'}
               />
             </Link>
             <button
               onClick={() => setSidebarCollapsed(false)}
               title={t('layout.actions.expand_menu')}
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
             >
               <ChevronsRight size={16} />
             </button>
           </div>
         ) : (
           <div className="p-5 pb-4 flex items-center justify-between">
-            <Link href="/space" className="hover:opacity-80 transition-opacity flex-1 min-w-0">
+            <Link href="/space" className="hover:opacity-80 transition-opacity flex-1 min-w-0 cursor-pointer">
               <LmsLogo
                 height={38}
                 width="auto"
-                primaryColor={brandColors.primaryColor}
-                accentColor={brandColors.accentColor}
-                goldColor={brandColors.goldColor}
+                primaryColor={mounted ? brandColors.primaryColor : '#4f46e5'}
+                accentColor={mounted ? brandColors.accentColor : '#00b4d8'}
+                goldColor={mounted ? brandColors.goldColor : '#d4a843'}
                 className="h-[38px] w-auto"
               />
             </Link>
             <button
               onClick={() => setSidebarCollapsed(true)}
               title={t('layout.actions.collapse_menu')}
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors ml-2 shrink-0"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors ml-2 shrink-0 cursor-pointer"
             >
               <ChevronsLeft size={16} />
             </button>
@@ -133,7 +142,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   isActive
                     ? 'bg-primary-brand-light text-primary-brand shadow-sm'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                }`}
+                } cursor-pointer`}
               >
                 {isActive && <div className="absolute left-0 w-1.5 h-6 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />}
                 <item.icon size={20} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-primary-brand/70'} />

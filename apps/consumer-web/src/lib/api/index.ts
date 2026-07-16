@@ -3,6 +3,7 @@ import { classroomApi } from './classroom';
 import { meetingRoomApi } from './meeting-room';
 import { faceApi } from './face';
 import { consumerQuizApi } from './quiz';
+import { consumerQuizCollectionApi } from './quiz-collection';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
@@ -13,6 +14,7 @@ import { SharingLink } from './types';
 export * from './types';
 export * from './exceptions';
 export { consumerQuizApi };
+export { consumerQuizCollectionApi };
 export { faceApi };
 export { examSessionApi };
 

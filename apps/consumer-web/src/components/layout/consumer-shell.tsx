@@ -16,7 +16,8 @@ import {
   BookOpen, 
   LayoutDashboard,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Award,
 } from 'lucide-react';
 import {
   Avatar,
@@ -39,6 +40,7 @@ interface ConsumerShellProps {
 const navItems = [
   { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
   { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
+  { name: 'My Certificates', href: '/consumer/certificate', icon: Award },
   { name: 'Calendar', href: '/consumer/calendar', icon: null },
   { name: 'Grades', href: '/consumer/grades', icon: null },
 ];
@@ -89,13 +91,13 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
       header={
         <MasterHeader>
           <div className="flex items-center gap-8">
-            <Link href="/consumer/dashboard" className="flex items-center shrink-0">
+            <Link href="/consumer/dashboard" className="flex items-center shrink-0 cursor-pointer">
               <LmsLogo
                 height={36}
                 width="auto"
-                primaryColor={brandColors.primaryColor}
-                accentColor={brandColors.accentColor}
-                goldColor={brandColors.goldColor}
+                primaryColor={mounted ? brandColors.primaryColor : '#4f46e5'}
+                accentColor={mounted ? brandColors.accentColor : '#00b4d8'}
+                goldColor={mounted ? brandColors.goldColor : '#d4a843'}
                 className="h-9 w-auto object-contain"
               />
             </Link>
@@ -113,7 +115,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                       isActive
                         ? 'text-[#1a3a7a] dark:text-[#93c5fd] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#1a3a7a] dark:after:bg-[#93c5fd]'
                         : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
-                    }`}
+                    } cursor-pointer`}
                   >
                     {item.name}
                   </Link>

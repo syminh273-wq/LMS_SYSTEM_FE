@@ -1,0 +1,39 @@
+{
+  "library_title": "Thư viện chứng chỉ",
+  "subtitle": "Mẫu chứng chỉ có thể tái sử dụng. Gán cho bất kỳ bộ Quiz nào.",
+  "create_btn": "Tạo chứng chỉ",
+  "loading": "Đang tải chứng chỉ...",
+  "empty": "Chưa có chứng chỉ nào",
+  "empty_hint": "Tạo mẫu chứng chỉ để cấp cho học viên khi hoàn thành bộ Quiz.",
+  "create_first_btn": "Tạo chứng chỉ đầu tiên",
+  "delete_confirm": "Xóa chứng chỉ \"{{name}}\"?",
+  "delete_success": "Đã xóa chứng chỉ",
+  "delete_error": "Không thể xóa chứng chỉ",
+  "create_success": "Đã tạo chứng chỉ",
+  "update_success": "Đã cập nhật chứng chỉ",
+  "load_error": "Không thể tải danh sách chứng chỉ",
+  "save_error": "Không thể lưu",
+  "create_modal": {
+    "title": "Tạo chứng chỉ",
+    "name_label": "Tên chứng chỉ",
+    "name_placeholder": "Ví dụ: Chứng nhận JavaScript",
+    "description_label": "Mô tả (tùy chọn)",
+    "description_placeholder": "Chứng chỉ này đại diện cho điều gì?",
+    "template_url_label": "URL ảnh mẫu (tùy chọn)",
+    "template_url_placeholder": "https://...",
+    "active_label": "Đang kích hoạt",
+    "cancel": "Hủy",
+    "create": "Tạo"
+  },
+  "detail": {
+    "back": "Quay lại thư viện",
+    "name_section": "Tên",
+    "description_section": "Mô tả",
+    "template_section": "Mẫu",
+    "template_none": "Chưa có ảnh mẫu",
+    "edit_btn": "Sửa",
+    "save_btn": "Lưu",
+    "cancel_btn": "Hủy",
+    "in_use": "Đang dùng trong {{count}} bộ Quiz"
+  }
+}

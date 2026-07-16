@@ -3,6 +3,7 @@ import { classroomApi } from './classroom';
 import { examApi } from './exam';
 import { meetingRoomApi } from './meeting-room';
 import { quizApi } from './quiz';
+import { quizCollectionApi, certificateApi } from './quiz-collection';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
@@ -12,7 +13,7 @@ import { studentApi } from './student';
 
 export * from './types';
 export * from './exceptions';
-export { quizApi, studentApi };
+export { quizApi, quizCollectionApi, certificateApi, studentApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -21,6 +22,8 @@ export const api = {
   exams: examApi,
   meetingRooms: meetingRoomApi,
   quizzes: quizApi,
+  quizCollections: quizCollectionApi,
+  certificates: certificateApi,
   spaces: spaceApiInstance,
   consumers: consumerApiInstance,
   account: accountService,
@@ -52,6 +55,8 @@ export const spaceApi = {
   exams: examApi,
   meetingRooms: meetingRoomApi,
   quizzes: quizApi,
+  quizCollections: quizCollectionApi,
+  certificates: certificateApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,
   },

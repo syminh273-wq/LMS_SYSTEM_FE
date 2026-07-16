@@ -20,6 +20,10 @@ import joinEn from '@/locales/join/en.json';
 import joinVi from '@/locales/join/vi.json';
 import quizEn from '@/locales/quiz/en.json';
 import quizVi from '@/locales/quiz/vi.json';
+import quizCollectionEn from '@/locales/quiz-collection/en.json';
+import quizCollectionVi from '@/locales/quiz-collection/vi.json';
+import certificateEn from '@/locales/certificate/en.json';
+import certificateVi from '@/locales/certificate/vi.json';
 import validationEn from '@/locales/validation/en.json';
 import validationVi from '@/locales/validation/vi.json';
 
@@ -50,6 +54,8 @@ export const consumerWebBundles: LocaleBundles = {
     grades: gradesEn,
     join: joinEn,
     quiz: quizEn,
+    quizCollection: quizCollectionEn,
+    certificate: certificateEn,
     validation: validationEn,
     layout: sharedLayoutEn,
     settings: sharedSettingsEn,
@@ -70,6 +76,8 @@ export const consumerWebBundles: LocaleBundles = {
     grades: gradesVi,
     join: joinVi,
     quiz: quizVi,
+    quizCollection: quizCollectionVi,
+    certificate: certificateVi,
     validation: validationVi,
     layout: sharedLayoutVi,
     settings: sharedSettingsVi,
