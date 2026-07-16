@@ -463,3 +463,54 @@ export type CreatePostRequest = {
   visibility: PostVisibility;
   classroom_tag?: string;
 };
+
+export type QuizCollectionItem = {
+  quiz_id: string;
+  order: number;
+  added_at: string;
+};
+
+export type QuizCollectionAssignment = {
+  collection_id: string;
+  classroom_id: string;
+  assigned_by: string;
+  assigned_at: string;
+};
+
+export type QuizCollection = {
+  uid: string;
+  created_by: string;
+  title: string;
+  description: string;
+  quiz_count: number;
+  certificate_id: string | null;
+  status: 'draft' | 'published' | 'archived';
+  created_at: string;
+  updated_at: string;
+};
+
+export type QuizCollectionDetail = QuizCollection & {
+  items: QuizCollectionItem[];
+  assignments: QuizCollectionAssignment[];
+};
+
+export type QuizCollectionProgress = {
+  total: number;
+  passed: number;
+  is_completed: boolean;
+  percent: number;
+  passed_quiz_ids: string[];
+  missing_quiz_ids: string[];
+};
+
+export type IssuedCertificate = {
+  uid: string;
+  student_id: string;
+  certificate_id: string;
+  collection_id: string;
+  classroom_id: string;
+  issued_by: string;
+  issued_at: string;
+  pdf_url: string | null;
+  verification_code: string;
+};

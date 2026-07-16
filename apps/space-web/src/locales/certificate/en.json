@@ -1,0 +1,39 @@
+{
+  "library_title": "Certificate Library",
+  "subtitle": "Reusable certificate templates. Assign them to any quiz collection.",
+  "create_btn": "Create Certificate",
+  "loading": "Loading certificates...",
+  "empty": "No certificates yet",
+  "empty_hint": "Create certificate templates to award students when they complete a quiz collection.",
+  "create_first_btn": "Create First Certificate",
+  "delete_confirm": "Delete certificate \"{{name}}\"?",
+  "delete_success": "Certificate deleted",
+  "delete_error": "Cannot delete certificate",
+  "create_success": "Certificate created",
+  "update_success": "Certificate updated",
+  "load_error": "Cannot load certificates",
+  "save_error": "Cannot save",
+  "create_modal": {
+    "title": "Create Certificate",
+    "name_label": "Certificate name",
+    "name_placeholder": "e.g. JavaScript Mastery",
+    "description_label": "Description (optional)",
+    "description_placeholder": "What does this certificate represent?",
+    "template_url_label": "Template image URL (optional)",
+    "template_url_placeholder": "https://...",
+    "active_label": "Active",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "detail": {
+    "back": "Back to library",
+    "name_section": "Name",
+    "description_section": "Description",
+    "template_section": "Template",
+    "template_none": "No template image",
+    "edit_btn": "Edit",
+    "save_btn": "Save",
+    "cancel_btn": "Cancel",
+    "in_use": "Used in {{count}} collection(s)"
+  }
+}

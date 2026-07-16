@@ -18,6 +18,10 @@ import studentEn from '@/locales/student/en.json';
 import studentVi from '@/locales/student/vi.json';
 import quizEn from '@/locales/quiz/en.json';
 import quizVi from '@/locales/quiz/vi.json';
+import quizCollectionEn from '@/locales/quiz-collection/en.json';
+import quizCollectionVi from '@/locales/quiz-collection/vi.json';
+import certificateEn from '@/locales/certificate/en.json';
+import certificateVi from '@/locales/certificate/vi.json';
 
 import sharedCommonEn from '@shared/locales/common/en.json';
 import sharedCommonVi from '@shared/locales/common/vi.json';
@@ -61,6 +65,8 @@ export const spaceWebBundles: LocaleBundles = {
     admin: adminEn,
     student: studentEn,
     quiz: quizEn,
+    quizCollection: quizCollectionEn,
+    certificate: certificateEn,
     sharedCommon: sharedCommonEn,
     sharedLayout: sharedLayoutEn,
     settings: sharedSettingsEn,
@@ -87,6 +93,8 @@ export const spaceWebBundles: LocaleBundles = {
     admin: adminVi,
     student: studentVi,
     quiz: quizVi,
+    quizCollection: quizCollectionVi,
+    certificate: certificateVi,
     sharedCommon: sharedCommonVi,
     sharedLayout: sharedLayoutVi,
     settings: sharedSettingsVi,

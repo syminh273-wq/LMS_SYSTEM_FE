@@ -30,6 +30,7 @@ import {
   ChevronRight,
   Bot,
   Sparkles,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -38,7 +39,7 @@ import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai';
+type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -49,7 +50,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
 
     if (type === "image") {
       return (
-        <a href={url} target="_blank" rel="noopener noreferrer">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={url} alt={name} className="max-w-[240px] rounded-xl mt-1 border border-slate-200 object-cover" />
         </a>
@@ -71,7 +72,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 mt-1 bg-white border border-slate-200 rounded-xl px-3 py-2 hover:bg-slate-50 transition max-w-[280px]"
+        className="flex items-center gap-2 mt-1 bg-white border border-slate-200 rounded-xl px-3 py-2 hover:bg-slate-50 transition max-w-[280px] cursor-pointer"
       >
         <Icon size={18} className="text-indigo-500 shrink-0" />
         <span className="text-xs font-medium text-slate-700 truncate">{name}</span>
@@ -400,16 +401,29 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'quiz' as const, icon: Trophy, label: 'Thi trắc nghiệm' },
                 { key: 'meeting' as const, icon: Video, label: 'Phòng họp' },
                 { key: 'ai' as const, icon: Bot, label: 'AI Trợ giảng' },
+                { key: 'collections' as const, icon: Layers, label: 'Bộ Quiz', href: `/consumer/classroom/${uid}/collection` },
               ].map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => setActiveTab(item.key)}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === item.key ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100' : 'text-slate-500 hover:bg-slate-50'}`}
-                >
-                  <item.icon size={18} />
-                  {item.label}
-                </button>
+                item.href ? (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => router.push(item.href!)}
+                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap text-slate-500 hover:bg-slate-50 cursor-pointer"
+                  >
+                    <item.icon size={18} />
+                    {item.label}
+                  </button>
+                ) : (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() => setActiveTab(item.key)}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === item.key ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100' : 'text-slate-500 hover:bg-slate-50'} cursor-pointer`}
+                  >
+                    <item.icon size={18} />
+                    {item.label}
+                  </button>
+                )
               ))}
             </div>
 
@@ -516,7 +530,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           key={quiz.uid}
                           type="button"
                           onClick={() => router.push(`/consumer/classroom/${uid}/quiz/${quiz.uid}`)}
-                          className="w-full flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200 focus:outline-none focus:ring-4 focus:ring-indigo-100"
+                          className="w-full flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 cursor-pointer"
                         >
                           <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-200">
                             <Trophy size={22} />
@@ -634,7 +648,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     <p className="text-[11px] text-slate-400 font-medium">Hỏi đáp từ tài liệu lớp học</p>
                   </div>
                   {aiMessages.length > 0 && (
-                    <button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 font-medium">Xoá</button>
+                    <button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 font-medium cursor-pointer">Xoá</button>
                   )}
                 </div>
                 {/* Messages */}
@@ -693,7 +707,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       download
-                                      className="truncate text-indigo-500 hover:text-indigo-700 hover:underline font-medium"
+                                      className="truncate text-indigo-500 hover:text-indigo-700 hover:underline font-medium cursor-pointer"
                                       title={`Xem / tải: ${docName}`}
                                     >
                                       {docName}
@@ -783,7 +797,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                             selectedExamGroup === group.key
                               ? 'border-indigo-200 bg-indigo-50 shadow-sm'
                               : 'border-slate-100 bg-slate-50/60'
-                          }`}
+                          } cursor-pointer`}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
@@ -880,7 +894,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                   <button
                                     type="button"
                                     onClick={() => router.push(`/consumer/classroom/${uid}/exams/${exam.uid}`)}
-                                    className="text-[10px] font-black uppercase text-indigo-500 hover:text-indigo-700"
+                                    className="text-[10px] font-black uppercase text-indigo-500 hover:text-indigo-700 cursor-pointer"
                                   >
                                     Xem chi tiết
                                   </button>

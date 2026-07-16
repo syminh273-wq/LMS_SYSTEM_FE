@@ -3,6 +3,8 @@
     "dashboard": "Dashboard",
     "classrooms": "Classrooms",
     "quizzes": "Quiz Library",
+    "quiz_collections": "Quiz Collections",
+    "certificates": "Certificates",
     "students": "Students",
     "settings": "Settings",
     "admin": "Admin"

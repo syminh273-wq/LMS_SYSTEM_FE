@@ -1,0 +1,90 @@
+{
+  "title": "Bộ Quiz",
+  "subtitle": "Gom nhiều Quiz thành một bộ. Cấp chứng chỉ khi học viên hoàn thành toàn bộ.",
+  "create_btn": "Tạo bộ Quiz",
+  "loading": "Đang tải danh sách bộ Quiz...",
+  "empty": "Chưa có bộ Quiz nào",
+  "empty_hint": "Tạo bộ Quiz đầu tiên để nhóm các Quiz và cấp chứng chỉ cho học viên.",
+  "create_first_btn": "Tạo bộ Quiz đầu tiên",
+  "delete_confirm": "Xóa bộ Quiz \"{{title}}\"? Toàn bộ lớp đã gán sẽ bị gỡ.",
+  "delete_success": "Đã xóa bộ Quiz",
+  "delete_error": "Không thể xóa bộ Quiz",
+  "create_success": "Đã tạo bộ Quiz \"{{title}}\"",
+  "update_success": "Đã cập nhật bộ Quiz",
+  "load_error": "Không thể tải danh sách bộ Quiz",
+  "save_error": "Không thể lưu",
+  "library": {
+    "card_quiz_count": "{{count}} Quiz",
+    "card_class_count": "{{count}} lớp",
+    "card_no_certificate": "Chưa gán chứng chỉ"
+  },
+  "status": {
+    "draft": "Nháp",
+    "published": "Đã xuất bản",
+    "archived": "Đã lưu trữ"
+  },
+  "create_modal": {
+    "title": "Tạo bộ Quiz mới",
+    "name_label": "Tên bộ Quiz",
+    "name_placeholder": "Ví dụ: Nền tảng JavaScript",
+    "description_label": "Mô tả (tùy chọn)",
+    "description_placeholder": "Mô tả ngắn về nội dung học viên sẽ học",
+    "certificate_label": "Gán chứng chỉ (tùy chọn)",
+    "certificate_none": "Chưa gán chứng chỉ",
+    "cancel": "Hủy",
+    "create": "Tạo"
+  },
+  "detail": {
+    "back": "Quay lại danh sách",
+    "info_section": "Thông tin chung",
+    "items_section": "Danh sách Quiz trong bộ",
+    "items_empty": "Chưa có Quiz. Thêm Quiz bên dưới.",
+    "add_quiz_btn": "Thêm Quiz",
+    "reorder_hint": "Kéo thả để sắp xếp lại",
+    "certificate_section": "Chứng chỉ",
+    "assign_certificate_btn": "Gán chứng chỉ",
+    "change_certificate_btn": "Thay đổi",
+    "remove_certificate_btn": "Gỡ",
+    "no_certificate": "Chưa gán chứng chỉ",
+    "assignments_section": "Đã gán cho lớp",
+    "no_assignments": "Chưa gán cho lớp nào",
+    "assign_to_class_btn": "Gán cho lớp",
+    "edit_title_btn": "Sửa",
+    "save_title_btn": "Lưu",
+    "cancel_btn": "Hủy",
+    "save_error": "Không thể lưu",
+    "save_success": "Đã lưu"
+  },
+  "add_quiz_modal": {
+    "title": "Thêm Quiz vào bộ",
+    "search_placeholder": "Tìm Quiz...",
+    "empty_library": "Chưa có Quiz nào trong thư viện",
+    "selected_count": "Đã chọn {{count}}",
+    "cancel": "Hủy",
+    "add": "Thêm"
+  },
+  "assign_modal": {
+    "title": "Gán cho lớp",
+    "select_class_label": "Chọn lớp",
+    "select_class_placeholder": "Chọn một lớp...",
+    "cancel": "Hủy",
+    "assign": "Gán",
+    "assign_success": "Đã gán cho lớp",
+    "no_classes": "Bạn chưa có lớp nào"
+  },
+  "certificate_modal": {
+    "title": "Gán chứng chỉ",
+    "select_label": "Chọn chứng chỉ",
+    "empty_library": "Chưa có chứng chỉ. Tạo mới trước.",
+    "create_new": "Tạo chứng chỉ mới",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "save_success": "Đã gán chứng chỉ"
+  },
+  "assignments": {
+    "title": "Tiến độ theo lớp",
+    "unassigned": "Chưa gán",
+    "completed_count": "{{done}}/{{total}} hoàn thành",
+    "view_class": "Xem lớp"
+  }
+}

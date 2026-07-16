@@ -1,5 +1,22 @@
 {
-  "totalOk": 68,
-  "totalMissing": 0,
-  "byNamespace": {}
+  "totalOk": 777,
+  "totalMissing": 10,
+  "byNamespace": {
+    "UNKNOWN": {
+      "count": 10,
+      "uniqueKeys": 9,
+      "files": 3,
+      "keys": [
+        "classroom.ui.block_classroom_label",
+        "classroom.ui.block_global_label",
+        "classroom.ui.camera_required_short",
+        "classroom.ui.exam_duration_label",
+        "classroom.ui.exam_status_closed",
+        "classroom.ui.exam_status_open",
+        "classroom.ui.late_threshold_label",
+        "classroom.ui.no_time_limit_hint",
+        "validation.required"
+      ]
+    }
+  }
 }

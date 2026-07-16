@@ -544,3 +544,83 @@ export type StudentPublicProfile = {
     avatar_url: string;
   } | null;
 };
+
+export type Certificate = {
+  uid: string;
+  created_by: string;
+  name: string;
+  description: string;
+  template_url: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateCertificateRequest = {
+  name: string;
+  description?: string;
+  template_url?: string;
+  is_active?: boolean;
+};
+
+export type UpdateCertificateRequest = {
+  name?: string;
+  description?: string;
+  template_url?: string | null;
+  is_active?: boolean;
+};
+
+export type QuizCollectionItem = {
+  quiz_id: string;
+  order: number;
+  added_at: string;
+};
+
+export type QuizCollectionAssignment = {
+  collection_id: string;
+  classroom_id: string;
+  assigned_by: string;
+  assigned_at: string;
+};
+
+export type QuizCollection = {
+  uid: string;
+  created_by: string;
+  title: string;
+  description: string;
+  quiz_count: number;
+  certificate_id: string | null;
+  status: 'draft' | 'published' | 'archived';
+  created_at: string;
+  updated_at: string;
+};
+
+export type QuizCollectionDetail = QuizCollection & {
+  items: QuizCollectionItem[];
+  assignments: QuizCollectionAssignment[];
+};
+
+export type CreateQuizCollectionRequest = {
+  title: string;
+  description?: string;
+  certificate_id?: string | null;
+};
+
+export type UpdateQuizCollectionRequest = {
+  title?: string;
+  description?: string;
+  status?: 'draft' | 'published' | 'archived';
+  certificate_id?: string | null;
+};
+
+export type AddQuizToCollectionRequest = {
+  quiz_ids: string[];
+};
+
+export type ReorderCollectionRequest = {
+  ordered_quiz_ids: string[];
+};
+
+export type AssignCollectionRequest = {
+  classroom_id: string;
+};
