@@ -48,17 +48,27 @@ export default function CertificateDetailPage({ params }: Props) {
 
   const handleSave = async () => {
     if (!cert) return;
+    const url = templateUrl.trim();
+    if (url) {
+      try {
+        const u = new URL(url);
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error();
+      } catch {
+        toast.error(t('certificate.create_modal.template_url_invalid'));
+        return;
+      }
+    }
     try {
       const updated = await certificateApi.update(cert.uid, {
         name: name.trim(),
         description: description.trim(),
-        template_url: templateUrl.trim() || null,
+        template_url: url || null,
       });
       setCert(updated);
       setEditing(false);
       toast.success(t('certificate.update_success'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('certificate.save_error', 'Cannot save'))
+      toast.error(err instanceof Error ? err.message : t('certificate.save_error'));
     }
   };
 
@@ -141,6 +151,8 @@ export default function CertificateDetailPage({ params }: Props) {
               type="url"
               value={templateUrl}
               onChange={(e) => setTemplateUrl(e.target.value)}
+              pattern="https?://.+"
+              title={t('certificate.create_modal.template_url_invalid')}
               className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
             />
           ) : cert.template_url ? (
