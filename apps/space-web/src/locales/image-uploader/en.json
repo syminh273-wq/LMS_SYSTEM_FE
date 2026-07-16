@@ -1,0 +1,11 @@
+{
+  "drop_or_click": "Drop an image here or click to upload",
+  "formats": "PNG, JPG, WEBP, SVG (max {{size}}MB)",
+  "uploading": "Uploading...",
+  "upload_success": "Image uploaded",
+  "upload_failed": "Upload failed",
+  "invalid_type": "Please select an image file (PNG, JPG, WEBP, SVG)",
+  "too_large": "File is larger than {{size}}MB",
+  "remove": "Remove",
+  "replace": "Replace image"
+}

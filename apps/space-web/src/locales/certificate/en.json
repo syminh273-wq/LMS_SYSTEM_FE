@@ -19,9 +19,7 @@
     "name_placeholder": "e.g. JavaScript Mastery",
     "description_label": "Description (optional)",
     "description_placeholder": "What does this certificate represent?",
-    "template_url_label": "Template image URL (optional)",
-    "template_url_placeholder": "https://...",
-    "template_url_invalid": "Please enter a valid URL (must start with http:// or https://)",
+    "template_image_label": "Template image (optional)",
     "active_label": "Active",
     "cancel": "Cancel",
     "create": "Create"

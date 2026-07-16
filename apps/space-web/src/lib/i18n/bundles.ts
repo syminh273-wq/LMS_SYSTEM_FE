@@ -22,6 +22,8 @@ import quizCollectionEn from '@/locales/quiz-collection/en.json';
 import quizCollectionVi from '@/locales/quiz-collection/vi.json';
 import certificateEn from '@/locales/certificate/en.json';
 import certificateVi from '@/locales/certificate/vi.json';
+import imageUploaderEn from '@/locales/image-uploader/en.json';
+import imageUploaderVi from '@/locales/image-uploader/vi.json';
 
 import sharedCommonEn from '@shared/locales/common/en.json';
 import sharedCommonVi from '@shared/locales/common/vi.json';
@@ -67,6 +69,7 @@ export const spaceWebBundles: LocaleBundles = {
     quiz: quizEn,
     quizCollection: quizCollectionEn,
     certificate: certificateEn,
+    imageUploader: imageUploaderEn,
     sharedCommon: sharedCommonEn,
     sharedLayout: sharedLayoutEn,
     settings: sharedSettingsEn,
@@ -95,6 +98,7 @@ export const spaceWebBundles: LocaleBundles = {
     quiz: quizVi,
     quizCollection: quizCollectionVi,
     certificate: certificateVi,
+    imageUploader: imageUploaderVi,
     sharedCommon: sharedCommonVi,
     sharedLayout: sharedLayoutVi,
     settings: sharedSettingsVi,

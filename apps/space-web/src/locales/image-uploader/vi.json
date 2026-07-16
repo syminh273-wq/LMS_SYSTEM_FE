@@ -1,0 +1,11 @@
+{
+  "drop_or_click": "Thả ảnh vào đây hoặc nhấn để tải lên",
+  "formats": "PNG, JPG, WEBP, SVG (tối đa {{size}}MB)",
+  "uploading": "Đang tải lên...",
+  "upload_success": "Đã tải ảnh lên",
+  "upload_failed": "Tải lên thất bại",
+  "invalid_type": "Vui lòng chọn file ảnh (PNG, JPG, WEBP, SVG)",
+  "too_large": "File lớn hơn {{size}}MB",
+  "remove": "Xóa",
+  "replace": "Thay ảnh khác"
+}

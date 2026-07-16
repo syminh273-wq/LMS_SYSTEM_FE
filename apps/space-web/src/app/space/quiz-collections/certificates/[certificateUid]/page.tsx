@@ -8,6 +8,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { certificateApi } from '@/lib/api/quiz-collection';
 import type { Certificate } from '@/lib/api/types';
+import { ImageUploader } from '@/components/quiz-collection/ImageUploader';
 
 interface Props {
   params: Promise<{ certificateUid: string }>;
@@ -48,21 +49,11 @@ export default function CertificateDetailPage({ params }: Props) {
 
   const handleSave = async () => {
     if (!cert) return;
-    const url = templateUrl.trim();
-    if (url) {
-      try {
-        const u = new URL(url);
-        if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error();
-      } catch {
-        toast.error(t('certificate.create_modal.template_url_invalid'));
-        return;
-      }
-    }
     try {
       const updated = await certificateApi.update(cert.uid, {
         name: name.trim(),
         description: description.trim(),
-        template_url: url || null,
+        template_url: templateUrl.trim() || null,
       });
       setCert(updated);
       setEditing(false);
@@ -147,18 +138,12 @@ export default function CertificateDetailPage({ params }: Props) {
             {t('certificate.detail.template_section')}
           </p>
           {editing ? (
-            <input
-              type="url"
-              value={templateUrl}
-              onChange={(e) => setTemplateUrl(e.target.value)}
-              pattern="https?://.+"
-              title={t('certificate.create_modal.template_url_invalid')}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
-            />
+            <ImageUploader value={templateUrl} onChange={setTemplateUrl} />
           ) : cert.template_url ? (
-            <a href={cert.template_url} target="_blank" rel="noreferrer" className="text-sm text-primary-brand underline break-all">
-              {cert.template_url}
-            </a>
+            <div className="rounded-xl overflow-hidden border border-border bg-muted/30">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={cert.template_url} alt="template" className="w-full h-48 object-contain bg-white" />
+            </div>
           ) : (
             <p className="text-sm text-muted-foreground italic">{t('certificate.detail.template_none')}</p>
           )}
