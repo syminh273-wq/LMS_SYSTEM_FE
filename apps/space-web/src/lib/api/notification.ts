@@ -15,17 +15,17 @@ export type Notification = {
 class NotificationApiClient extends BaseRestApiClient {
   async list(): Promise<Notification[]> {
     const res = await this.get<PaginatedResponse<Notification> | Notification[]>(
-      '/api/v1/notification/notifications/all/'
+      '/api/v1/notifications/'
     );
     return Array.isArray(res) ? res : res.results;
   }
 
   async markRead(uid: string): Promise<void> {
-    await this.post(`/api/v1/notification/notifications/${uid}/read/`);
+    await this.post(`/api/v1/notifications/${uid}/read/`);
   }
 
   async markAllRead(): Promise<void> {
-    await this.post('/api/v1/notification/notifications/read-all/');
+    await this.post('/api/v1/notifications/read-all/');
   }
 }
 

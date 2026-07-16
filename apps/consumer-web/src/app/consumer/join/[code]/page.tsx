@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { consumerApi, classroomApi, SharingLink } from '@/lib/api';
 import { Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
+import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/lib/redux/store';
 
 export default function JoinPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
@@ -14,6 +17,19 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const userId = useSelector((state: RootState) => state.user.profile?.uid);
+
+  const handleApproved = useCallback((event: { classroom_uid: string; classroom_name: string }) => {
+    toast.success(`Bạn đã được duyệt vào lớp "${event.classroom_name}"!`, {
+      duration: 8000,
+      action: {
+        label: 'Vào lớp',
+        onClick: () => router.push(`/consumer/classroom/${event.classroom_uid}`),
+      },
+    });
+  }, [router]);
+
+  useMembershipRealtime({ userId, onApproved: handleApproved });
 
   useEffect(() => {
     if (code) {

@@ -1,21 +1,16 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { socialApi } from '@/lib/api/social';
 import { accountService } from '@/lib/api/account';
-import type { Post, PostComment, PostEmotion, PostVisibility } from '@/lib/api/types';
-import {
-  Users, Loader2, ChevronDown,
-  Home, BookOpen, User,
-} from 'lucide-react';
+import type { Post } from '@/lib/api/types';
+import { Users, Loader2, ChevronDown, Sparkles, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { CreatePost } from './CreatePost';
 import { PostCard } from './PostCard';
-
-// ── Main Feed Page ────────────────────────────────────────────────────────────
+import { cn } from '@shared/lib/utils';
 
 export default function FeedPage() {
   const router = useRouter();
@@ -31,7 +26,7 @@ export default function FeedPage() {
   const fetchFeed = useCallback(async (tab: 'all' | 'following') => {
     setLoading(true);
     try {
-      const feed = tab === 'all' 
+      const feed = tab === 'all'
         ? await socialApi.getFeed(PAGE)
         : await socialApi.getFollowingFeed(PAGE);
       setPosts(feed);
@@ -51,7 +46,7 @@ export default function FeedPage() {
       } catch { toast.error('Lỗi khởi tạo'); }
     };
     init();
-  }, [router, fetchFeed]); // Removed feedTab from dependency to avoid double fetch if init handles it
+  }, [router, fetchFeed]);
 
   const handleTabChange = (tab: 'all' | 'following') => {
     if (tab === feedTab) return;
@@ -66,10 +61,10 @@ export default function FeedPage() {
       const before = posts[posts.length - 1].created_at;
       const more = feedTab === 'all'
         ? await socialApi.getFeed(PAGE, before)
-        : await socialApi.getFollowingFeed(PAGE); // Note: Following feed might not support 'before' yet but good for consistency
+        : await socialApi.getFollowingFeed(PAGE);
       setPosts(prev => [...prev, ...more]);
       setHasMore(more.length === PAGE);
-    } catch { }
+    } catch (err: unknown) { void err; }
     finally { setLoadingMore(false); }
   };
 
@@ -88,88 +83,84 @@ export default function FeedPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top nav */}
-      <header className="sticky top-0 z-30 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-2xl mx-auto flex items-center justify-between px-4 h-14">
-          <Image src="/logo.svg" alt="LMS" width={80} height={28} className="h-7 w-auto object-contain cursor-pointer" onClick={() => router.push('/consumer/dashboard')} />
-          <nav className="flex items-center gap-1">
-            <button onClick={() => router.push('/consumer/dashboard')}
-              className="flex flex-col items-center px-5 py-1 text-gray-400 hover:text-indigo-600 transition-colors">
-              <Home size={22} />
-            </button>
-            <button className="flex flex-col items-center px-5 py-1 text-indigo-600 border-b-2 border-indigo-600">
-              <Users size={22} />
-            </button>
-            <button onClick={() => router.push('/consumer/classroom')}
-              className="flex flex-col items-center px-5 py-1 text-gray-400 hover:text-indigo-600 transition-colors">
-              <BookOpen size={22} />
-            </button>
-            <button onClick={() => router.push('/consumer/profile')}
-              className="flex flex-col items-center px-5 py-1 text-gray-400 hover:text-indigo-600 transition-colors">
-              <User size={22} />
-            </button>
-          </nav>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="max-w-2xl mx-auto px-4 sm:px-0 py-6 sm:py-8 space-y-4 sm:space-y-5">
+        <div className="px-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
+            <Sparkles size={11} />
+            Cộng đồng
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight text-balance">Bảng tin</h1>
+          <p className="text-slate-600 text-[14px] mt-1">Cập nhật từ bạn bè và lớp học của bạn</p>
         </div>
-      </header>
 
-      {/* Feed */}
-      <main className="max-w-2xl mx-auto px-4 py-4 space-y-3">
-        {/* Tabs */}
-        <div className="flex bg-white rounded-2xl p-1 border border-gray-100 shadow-sm">
-          <button
-            onClick={() => handleTabChange('all')}
-            className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all ${
-              feedTab === 'all' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
-            }`}
-          >
-            Tất cả
-          </button>
-          <button
-            onClick={() => handleTabChange('following')}
-            className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all ${
-              feedTab === 'following' ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
-            }`}
-          >
-            Đang theo dõi
-          </button>
+        <div className="bg-white border border-slate-200 rounded-xl p-1 flex card-elevated">
+          {[
+            { key: 'all' as const, label: 'Tất cả', icon: TrendingUp },
+            { key: 'following' as const, label: 'Đang theo dõi', icon: Users },
+          ].map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => handleTabChange(key)}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1.5 py-2 text-[13px] font-semibold rounded-lg transition-colors",
+                feedTab === key
+                  ? "bg-indigo-600 text-white"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              )}
+            >
+              <Icon size={14} strokeWidth={2.2} />
+              {label}
+            </button>
+          ))}
         </div>
 
         <CreatePost profile={profile} onCreated={handleCreated} />
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 size={36} className="animate-spin text-indigo-400" />
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <Loader2 size={28} className="animate-spin text-indigo-600" />
+            <p className="text-[12.5px] text-slate-500">Đang tải bảng tin...</p>
           </div>
         ) : posts.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <div className="text-5xl mb-4">📭</div>
-            <p className="font-bold text-gray-900 text-lg">Chưa có bài đăng nào</p>
-            <p className="text-sm text-gray-500 mt-1">Hãy là người đầu tiên chia sẻ điều gì đó!</p>
+          <div className="text-center py-20 bg-white border-2 border-dashed border-slate-200 rounded-xl">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+              <Sparkles size={28} className="text-slate-400" />
+            </div>
+            <p className="font-semibold text-slate-900 text-[15px]">Chưa có bài đăng nào</p>
+            <p className="text-[13px] text-slate-500 mt-1">Hãy là người đầu tiên chia sẻ điều gì đó!</p>
           </div>
         ) : (
-          <>
-            {posts.map(post => (
-              <PostCard
+          <div className="space-y-3 sm:space-y-4">
+            {posts.map((post, idx) => (
+              <div
                 key={post.uid}
-                post={post}
-                currentUserId={profile?.uid ?? null}
-                onLike={handleLike}
-                onDelete={handleDelete}
-              />
+                style={{ animationDelay: `${Math.min(idx, 5) * 40}ms` }}
+                className="animate-fade-up"
+              >
+                <PostCard
+                  post={post}
+                  currentUserId={profile?.uid ?? null}
+                  onLike={handleLike}
+                  onDelete={handleDelete}
+                />
+              </div>
             ))}
             {hasMore && (
-              <div className="flex justify-center py-4">
-                <button onClick={loadMore} disabled={loadingMore}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-white border border-gray-200 rounded-full text-sm font-bold text-gray-600 hover:bg-gray-50 shadow-sm transition-all disabled:opacity-60">
-                  {loadingMore ? <Loader2 size={16} className="animate-spin" /> : <ChevronDown size={16} />}
+              <div className="flex justify-center pt-2">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="inline-flex items-center gap-1.5 px-5 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-60"
+                >
+                  {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
                   Xem thêm
                 </button>
               </div>
             )}
-          </>
+          </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

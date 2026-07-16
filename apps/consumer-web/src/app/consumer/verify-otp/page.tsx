@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
@@ -36,8 +36,8 @@ export default function VerifyOTPPage() {
       const result = await authApi.consumerVerifyOtp({ email, otp_code: data.otp_code });
       toast.success('Xác thực thành công!');
       router.push(`/consumer/reset-password?token=${encodeURIComponent(result.reset_token)}`);
-    } catch (err: any) {
-      toast.error(err.message || 'Mã OTP không chính xác hoặc đã hết hạn.');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Mã OTP không chính xác hoặc đã hết hạn.');
     } finally {
       setLoading(false);
     }
@@ -58,30 +58,33 @@ export default function VerifyOTPPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-8">
-      <div className="max-w-[440px] w-full">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
+      <div className="w-full max-w-[440px] animate-fade-up">
         <Link
           href="/consumer/forgot-password"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#4F46E5] font-medium mb-10 transition-colors"
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 hover:text-slate-900 font-semibold mb-8 transition-colors group"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
           Quay lại
         </Link>
 
-        <div className="mb-10">
-          <h1 className="text-4xl font-black text-[#1A1F2C] mb-3 tracking-tighter">
+        <div className="mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-md mb-5">
+            <KeyRound size={22} strokeWidth={2.2} />
+          </div>
+          <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 mb-1.5 tracking-tight text-balance">
             Nhập mã OTP
           </h1>
-          <p className="text-gray-500 text-base font-medium">
+          <p className="text-slate-500 text-[14px]">
             Mã 6 chữ số đã được gửi đến{' '}
-            <span className="text-[#4F46E5] font-bold">{email}</span>.
+            <span className="text-indigo-700 font-semibold">{email}</span>.
             Mã có hiệu lực trong 5 phút.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-[12px] font-semibold text-slate-700">
               Mã OTP
             </label>
             <Input
@@ -91,33 +94,40 @@ export default function VerifyOTPPage() {
               })}
               placeholder="000000"
               maxLength={6}
-              className="bg-[#F8F9FB] border-2 border-transparent focus:border-[#4F46E5]/20 focus:bg-white h-14 rounded-2xl transition-all text-center text-2xl font-black tracking-[0.4em] px-6"
+              className="h-14 text-center text-2xl font-bold tracking-[0.4em] bg-white border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors"
             />
             {errors.otp_code && (
-              <p className="text-red-500 text-xs font-bold ml-1">{errors.otp_code.message}</p>
+              <p className="text-rose-600 text-[12px] font-medium mt-1">{errors.otp_code.message}</p>
             )}
           </div>
 
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white h-14 rounded-2xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-2xl shadow-[#4F46E5]/30 active:scale-[0.98] disabled:opacity-50"
-            >
-              {loading ? 'Đang xác thực...' : 'Xác nhận'}
-              {!loading && <ArrowRight size={18} />}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 w-full h-11 rounded-lg font-semibold text-[14px] text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Đang xác thực...
+              </>
+            ) : (
+              <>
+                Xác nhận
+                <ArrowRight size={16} strokeWidth={2.5} />
+              </>
+            )}
+          </button>
         </form>
 
-        <div className="mt-8 text-center">
+        <div className="mt-6 text-center">
           <button
             type="button"
             onClick={handleResend}
             disabled={resending || countdown > 0}
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#4F46E5] font-medium transition-colors disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 hover:text-indigo-700 font-semibold transition-colors disabled:opacity-40 disabled:hover:text-slate-500"
           >
-            <RefreshCw size={14} className={resending ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={resending ? 'animate-spin' : ''} />
             {countdown > 0 ? `Gửi lại sau ${countdown}s` : 'Gửi lại mã OTP'}
           </button>
         </div>

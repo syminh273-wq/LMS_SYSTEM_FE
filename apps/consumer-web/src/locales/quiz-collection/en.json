@@ -30,5 +30,14 @@
   "completion_pending": "Your teacher has not assigned a certificate yet.",
   "completion_claim": "Claim your certificate",
   "no_certificate_assigned": "No certificate assigned",
-  "load_error": "Cannot load collection"
+  "load_error": "Cannot load collection",
+  "mode_game": "Quiz Game",
+  "mode_certificate": "Certificate",
+  "mode_certificate_locked": "Complete all quizzes to unlock",
+  "mode_certificate_empty_incomplete": "Finish every quiz in this collection to earn your certificate.",
+  "mode_certificate_empty_no_cert": "This collection has no certificate assigned.",
+  "certificate_card_title": "Your certificate",
+  "certificate_card_issued_at": "Issued {{date}}",
+  "certificate_card_verification": "Verification code",
+  "certificate_card_view_btn": "View certificate"
 }

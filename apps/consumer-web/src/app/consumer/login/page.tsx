@@ -7,12 +7,21 @@ import { setProfile } from '@/lib/redux/userSlice';
 import { consumerApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { Eye, EyeOff, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Zap,
+  ArrowRight,
+  Sparkles,
+  Mail,
+  Lock,
+} from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { MasterLayout, MasterHeader, MasterBody } from '@shared/components/layout/MasterLayout';
+import { MasterLayout, MasterBody } from '@shared/components/layout/MasterLayout';
+import { cn } from '@shared/lib/utils';
 
 type LoginFormValues = {
   email: string;
@@ -21,7 +30,7 @@ type LoginFormValues = {
 
 function GoogleIcon() {
   return (
-    <svg width='20' height='20' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <svg width='18' height='18' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
       <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
       <path d='M6.306 14.691l6.571 4.819C14.655 15.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z' fill='#FF3D00'/>
       <path d='M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.316 0-9.829-3.562-11.448-8.47l-6.522 5.025C9.505 39.556 16.227 44 24 44z' fill='#4CAF50'/>
@@ -64,15 +73,15 @@ export default function LoginPage() {
         dispatch(setProfile(userProfile));
       } catch {}
       router.push('/consumer/dashboard');
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (err instanceof ValidationException) {
         Object.entries(err.errors).forEach(([field, message]) => {
           const formField = field === 'username' ? 'email' : field;
-          setFormError(formField as any, { type: 'server', message });
+          setFormError(formField as keyof LoginFormValues, { type: 'server', message });
         });
         toast.error('Vui lòng kiểm tra lại thông tin đăng nhập.');
       } else {
-        const msg = err.message || 'Đăng nhập thất bại';
+        const msg = err instanceof Error ? err.message : 'Đăng nhập thất bại';
         setGlobalError(msg);
         toast.error(msg);
       }
@@ -82,149 +91,215 @@ export default function LoginPage() {
   return (
     <MasterLayout footer={null}>
       <MasterBody className="min-h-screen">
-        <div className="flex flex-col lg:flex-row min-h-screen bg-white">
-          
+        <div className="flex min-h-screen flex-col lg:flex-row bg-slate-50 dark:bg-slate-950">
+
           {/* Left Side - Hero */}
-          <div className='hidden lg:flex lg:w-1/2 relative bg-[#0F172A] text-white p-16 flex-col justify-between overflow-hidden'>
-            <div className='absolute inset-0 opacity-40'>
-              <Image 
-                src='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&q=80' 
-                alt='Library' 
-                fill 
-                className='object-cover grayscale transition-transform duration-1000 hover:scale-105'
-                priority
-              />
-              <div className='absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#0F172A]/90 to-[#4F46E5]/30' />
+          <div className="relative hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col justify-between overflow-hidden bg-indigo-600 p-10 xl:p-16">
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-500/40 blur-3xl" />
+            <div className="absolute -bottom-32 -left-10 w-72 h-72 rounded-full bg-sky-500/30 blur-3xl" />
+
+            <div className="relative">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-md">
+                  <Sparkles size={18} className="text-indigo-600" strokeWidth={2.5} />
+                </div>
+                <span className="text-xl font-bold text-white tracking-tight">EduSphere</span>
+              </div>
             </div>
 
-            <div className='relative z-10'>
-              <div className="flex items-center gap-3 mb-16">
-                <div className="bg-white p-2 rounded-xl">
-                   <Image src="/logo.svg" alt="EduSphere" width={28} height={28} />
-                </div>
-                <span className="text-2xl font-black tracking-tight">EduSphere</span>
+            <div className="relative space-y-7">
+              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide text-white">
+                <span className="w-1.5 h-1.5 bg-emerald-300 rounded-full" />
+                NỀN TẢNG HỌC TẬP 2026
               </div>
 
-              <div className='inline-flex items-center gap-2 bg-[#4F46E5] px-4 py-1.5 rounded-full text-[11px] font-bold tracking-widest uppercase mb-8'>
-                <span className='w-2 h-2 bg-white rounded-full animate-pulse' />
-                ELITE ENROLLMENT 2026
-              </div>
-              <h1 className='text-6xl font-black leading-tight mb-8 tracking-tighter'>
-                Nâng tầm<br />tri thức Việt.
+              <h1 className="text-5xl xl:text-6xl font-bold leading-[1.05] text-white tracking-tight text-balance">
+                Nâng tầm tri thức Việt.
               </h1>
-              <p className='text-gray-300 text-xl max-w-lg leading-relaxed font-medium opacity-90'>
-                Hệ thống quản lý học tập thông minh, kiến tạo tương lai số cho thế hệ trẻ.
+
+              <p className="text-indigo-100 text-base xl:text-lg max-w-md leading-relaxed font-normal">
+                Hệ thống quản lý học tập thông minh, kiến tạo tương lai số cho thế hệ trẻ Việt Nam.
               </p>
+
+              <div className="space-y-3 pt-2">
+                {[
+                  { icon: ShieldCheck, title: 'Bảo mật chuẩn quốc tế', desc: 'Mã hóa end-to-end' },
+                  { icon: Zap, title: 'Trải nghiệm mượt mà', desc: 'Tối ưu cho mọi thiết bị' },
+                  { icon: Sparkles, title: 'Cá nhân hoá lộ trình', desc: 'AI gợi ý bài học phù hợp' },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <div
+                    key={title}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                      <Icon className="text-white" size={17} strokeWidth={2.2} />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-white">{title}</p>
+                      <p className="text-xs text-indigo-100">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className='relative z-10 grid grid-cols-2 gap-6'>
-              <div className='bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-md'>
-                <div className='bg-[#4F46E5]/20 w-12 h-12 flex items-center justify-center rounded-xl mb-4'>
-                  <ShieldCheck className='text-[#4F46E5]' size={28} />
-                </div>
-                <h3 className='font-bold text-lg mb-1'>Bảo mật</h3>
-                <p className='text-gray-400 text-sm'>Dữ liệu mã hóa chuẩn quốc tế.</p>
-              </div>
-              <div className='bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-md'>
-                <div className='bg-[#4F46E5]/20 w-12 h-12 flex items-center justify-center rounded-xl mb-4'>
-                  <Zap className='text-[#4F46E5]' size={28} />
-                </div>
-                <h3 className='font-bold text-lg mb-1'>Tối ưu</h3>
-                <p className='text-gray-400 text-sm'>Trải nghiệm học tập mượt mà.</p>
-              </div>
+            <div className="relative flex items-center gap-6 text-xs text-indigo-100">
+              <span>© 2026 EduSphere</span>
+              <span>·</span>
+              <span>Điều khoản</span>
+              <span>·</span>
+              <span>Bảo mật</span>
             </div>
           </div>
 
           {/* Right Side - Form */}
-          <div className='flex-1 flex flex-col items-center justify-center p-8 md:p-16 bg-white relative'>
-            <div className="absolute top-8 right-8 text-sm text-gray-500 font-medium">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
+            <div className="absolute top-6 right-6 sm:top-8 sm:right-10 text-sm text-slate-600 dark:text-slate-400">
               Chưa có tài khoản?{' '}
-              <Link href="/consumer/register" className="text-[#4F46E5] font-bold hover:underline ml-1">
-                Đăng ký ngay
+              <Link href="/consumer/register" className="text-indigo-600 font-semibold hover:underline dark:text-indigo-400">
+                Đăng ký
               </Link>
             </div>
 
-            <div className='max-w-[440px] w-full'>
-              <div className='mb-12'>
-                <h2 className='text-5xl font-black text-[#1A1F2C] mb-4 tracking-tighter'>
-                  Đăng nhập
+            <div className="w-full max-w-[420px] animate-fade-up">
+              <div className="lg:hidden mb-8 flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
+                  <Sparkles size={18} className="text-white" strokeWidth={2.5} />
+                </div>
+                <span className="text-xl font-bold text-slate-900 tracking-tight dark:text-white">EduSphere</span>
+              </div>
+
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
+                  Chào mừng trở lại
                 </h2>
-                <p className='text-gray-500 text-lg font-medium'>
-                  Chào mừng bạn quay trở lại với EduSphere.
+                <p className="text-slate-600 text-[15px] dark:text-slate-400">
+                  Đăng nhập để tiếp tục hành trình học tập của bạn.
                 </p>
               </div>
 
               {globalError && (
-                <div className='bg-red-50 text-red-600 p-5 rounded-2xl text-xs font-bold mb-8 border border-red-100 flex items-center gap-3'>
-                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full" />
-                  {globalError}
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-fade-down dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                  <span className="font-medium">{globalError}</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit(onLogin)} className='space-y-6'>
-                <div className='space-y-2'>
-                  <label className='text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1'>Địa chỉ Email</label>
-                  <Input
-                    {...register('email', { required: 'Vui lòng nhập email' })}
-                    placeholder='name@company.com'
-                    className='bg-[#F8F9FB] border-2 border-transparent focus:border-[#4F46E5]/20 focus:bg-white h-14 rounded-2xl transition-all text-base font-medium px-6'
-                  />
-                  {errors.email && <p className='text-red-500 text-xs font-bold ml-1'>{errors.email.message}</p>}
+              <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <Input
+                      {...register('email', { required: 'Vui lòng nhập email' })}
+                      type="email"
+                      autoComplete="email"
+                      placeholder="name@company.com"
+                      className="h-11 pl-10 pr-4 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
+                    />
+                  </div>
+                  {errors.email && (
+                    <p className="text-rose-600 text-xs font-medium mt-1">{errors.email.message}</p>
+                  )}
                 </div>
 
-                <div className='space-y-2'>
-                  <div className="flex justify-between items-end px-1">
-                    <label className='text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]'>Mật khẩu</label>
-                    <Link href='/consumer/forgot-password' className='text-[10px] font-black text-[#4F46E5] hover:underline uppercase tracking-widest'>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Mật khẩu
+                    </label>
+                    <Link
+                      href="/consumer/forgot-password"
+                      className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    >
                       Quên mật khẩu?
                     </Link>
                   </div>
-                  <div className='relative'>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
                     <Input
                       type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
                       {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
-                      placeholder='••••••••'
-                      className='bg-[#F8F9FB] border-2 border-transparent focus:border-[#4F46E5]/20 focus:bg-white h-14 rounded-2xl pr-14 transition-all text-base font-medium px-6'
+                      placeholder="••••••••"
+                      className="h-11 pl-10 pr-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
                     />
-                    <button 
-                      type='button' 
+                    <button
+                      type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className='absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#4F46E5] transition-colors'
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors dark:hover:text-slate-200"
+                      aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                     >
-                      {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                  {errors.password && <p className='text-red-500 text-xs font-bold ml-1'>{errors.password.message}</p>}
+                  {errors.password && (
+                    <p className="text-rose-600 text-xs font-medium mt-1">{errors.password.message}</p>
+                  )}
                 </div>
 
-                <div className='pt-4'>
-                  <button
-                    type='submit'
-                    disabled={loading}
-                    className='w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white h-15 rounded-2xl font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all shadow-2xl shadow-[#4F46E5]/30 active:scale-[0.98] disabled:opacity-50'
-                  >
-                    {loading ? 'Đang xác thực...' : 'Đăng nhập ngay'}
-                    {!loading && <ArrowRight size={20} />}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={cn(
+                    "w-full h-11 rounded-lg font-semibold text-sm text-white",
+                    "bg-indigo-600 hover:bg-indigo-700",
+                    "shadow-sm transition-colors",
+                    "flex items-center justify-center gap-2",
+                    "disabled:opacity-60 disabled:cursor-not-allowed"
+                  )}
+                >
+                  {loading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Đang xác thực...
+                    </>
+                  ) : (
+                    <>
+                      Đăng nhập
+                      <ArrowRight size={16} strokeWidth={2.5} />
+                    </>
+                  )}
+                </button>
               </form>
 
-              <div className='relative my-10'>
-                <div className='absolute inset-0 flex items-center'><div className='w-full border-t border-gray-100'></div></div>
-                <div className='relative flex justify-center text-[10px] uppercase font-black tracking-[0.4em]'><span className='bg-white px-6 text-gray-400'>Hoặc</span></div>
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold dark:bg-slate-950">
+                    Hoặc tiếp tục với
+                  </span>
+                </div>
               </div>
 
               <button
-                type='button'
+                type="button"
                 onClick={() => {
-                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-                   window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
+                  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                  window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
                 }}
-                className='w-full flex items-center justify-center gap-4 border-2 border-gray-100 h-15 rounded-2xl text-sm font-black text-[#1A1F2C] bg-white hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98] uppercase tracking-wider'
+                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 <GoogleIcon />
                 Tiếp tục với Google
               </button>
+
+              <p className="mt-8 text-center text-xs text-slate-500 leading-relaxed dark:text-slate-400">
+                Bằng việc đăng nhập, bạn đồng ý với{' '}
+                <Link href="#" className="text-slate-700 hover:text-slate-900 underline dark:text-slate-300 dark:hover:text-white">
+                  Điều khoản
+                </Link>{' '}
+                và{' '}
+                <Link href="#" className="text-slate-700 hover:text-slate-900 underline dark:text-slate-300 dark:hover:text-white">
+                  Chính sách bảo mật
+                </Link>
+                .
+              </p>
             </div>
           </div>
         </div>

@@ -11,7 +11,7 @@ interface MasterLayoutProps {
 
 export function MasterLayout({ header, children, footer }: MasterLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFF] dark:bg-background transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
       {header}
       <main className="flex-1 flex flex-col">
         {children}
@@ -23,7 +23,7 @@ export function MasterLayout({ header, children, footer }: MasterLayoutProps) {
 
 export function MasterHeader({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <header className={`sticky top-0 z-50 h-16 bg-white dark:bg-card border-b border-gray-100 dark:border-border px-6 flex items-center justify-between transition-colors duration-300 ${className}`}>
+    <header className={`sticky top-0 z-50 h-16 glass border-b border-border/60 px-4 sm:px-6 flex items-center justify-between transition-colors duration-300 ${className}`}>
       {children}
     </header>
   );

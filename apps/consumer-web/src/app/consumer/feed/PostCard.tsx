@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import parse from 'html-react-parser';
+import { cn } from '@shared/lib/utils';
 
 const EMOTIONS = [
   { key: 'happy',       emoji: '😊', label: 'Đang vui' },
@@ -22,7 +23,7 @@ const EMOTIONS = [
   { key: 'celebrating', emoji: '🎉', label: 'Ăn mừng' },
   { key: 'stressed',    emoji: '😤', label: 'Căng thẳng' },
   { key: 'loved',       emoji: '❤️', label: 'Yêu thương' },
-];
+] as const;
 
 const EMOTION_MAP = Object.fromEntries(EMOTIONS.map(e => [e.key, e]));
 
@@ -30,7 +31,7 @@ const VISIBILITY_OPTIONS = [
   { key: 'public',  icon: Globe,  label: 'Công khai' },
   { key: 'friends', icon: Users,  label: 'Bạn bè' },
   { key: 'private', icon: Lock,   label: 'Chỉ mình tôi' },
-];
+] as const;
 
 function timeAgo(iso: string) {
   const d = Date.now() - new Date(iso).getTime();
@@ -60,7 +61,7 @@ export function PostCard({
   const [submitting, setSubmitting] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const isMe = currentUserId === post.consumer_uid;
-  const emotion = post.emotion ? EMOTION_MAP[post.emotion] : null;
+  const emotion = post.emotion ? EMOTION_MAP[post.emotion as keyof typeof EMOTION_MAP] : null;
   const VisIcon = VISIBILITY_OPTIONS.find(v => v.key === post.visibility)?.icon ?? Globe;
 
   const loadComments = async () => {
@@ -109,135 +110,165 @@ export function PostCard({
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-      <div className="flex items-start justify-between p-4 pb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-black text-sm shrink-0 overflow-hidden">
-            {post.author_avatar
-              ? <img src={post.author_avatar} alt="" className="w-full h-full object-cover" />
-              : post.author_name.slice(0, 2).toUpperCase()
-            }
+    <article className="bg-white border border-slate-200 rounded-xl overflow-hidden card-elevated">
+      <div className="flex items-start justify-between p-4 sm:p-5 pb-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative shrink-0">
+            <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-[12px] overflow-hidden">
+              {post.author_avatar
+                ? <img src={post.author_avatar} alt="" className="w-full h-full object-cover" />
+                : (post.author_name || '??').slice(0, 2).toUpperCase()
+              }
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className="text-sm font-bold text-foreground leading-none">{post.author_name || 'Ẩn danh'}</p>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <p className="text-[13.5px] font-semibold text-slate-900 leading-none truncate">{post.author_name || 'Ẩn danh'}</p>
               {emotion && (
-                <span className="text-xs text-muted-foreground">đang {emotion.label} {emotion.emoji}</span>
+                <span className="text-[11.5px] text-slate-500 inline-flex items-center gap-0.5">
+                  đang {emotion.label.toLowerCase()} <span>{emotion.emoji}</span>
+                </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[11px] text-muted-foreground">{timeAgo(post.created_at)}</span>
-              <span className="text-border">·</span>
-              <VisIcon size={11} className="text-muted-foreground" />
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[11px] text-slate-500">{timeAgo(post.created_at)}</span>
+              <span className="text-slate-300">·</span>
+              <VisIcon size={11} className="text-slate-500" />
             </div>
           </div>
         </div>
 
         {isMe && (
-          <div className="relative">
-            <button onClick={() => setMenuOpen(p => !p)} className="p-1.5 rounded-full hover:bg-accent transition-colors">
-              <MoreHorizontal size={18} className="text-muted-foreground" />
+          <div className="relative shrink-0">
+            <button
+              onClick={() => setMenuOpen(p => !p)}
+              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+              aria-label="Tùy chọn"
+            >
+              <MoreHorizontal size={16} />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-8 bg-card border border-border rounded-xl shadow-lg p-1 z-10 w-36">
-                <button onClick={() => { setMenuOpen(false); handleDelete(); }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-500/10 rounded-lg">
-                  <Trash2 size={14} /> Xóa bài
-                </button>
-              </div>
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
+                  <button
+                    onClick={() => { setMenuOpen(false); handleDelete(); }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
+                  >
+                    <Trash2 size={13} /> Xóa bài
+                  </button>
+                </div>
+              </>
             )}
           </div>
         )}
       </div>
 
       {post.content && (
-        <div className="px-4 pb-3 text-sm text-foreground leading-relaxed prose dark:prose-invert max-w-none">
+        <div className="px-4 sm:px-5 pb-3 text-[14px] text-slate-800 leading-relaxed prose prose-sm max-w-none">
           {parse(post.content)}
         </div>
       )}
 
       {post.image_url && (
-        <div className="mx-4 mb-3 rounded-xl overflow-hidden bg-accent/20">
-          <img src={post.image_url} alt="" className="w-full max-h-96 object-cover" />
+        <div className="px-4 sm:px-5 pb-3">
+          <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
+            <img src={post.image_url} alt="" className="w-full max-h-96 object-cover" loading="lazy" />
+          </div>
         </div>
       )}
 
       {(post.likes_count > 0 || post.comments_count > 0) && (
-        <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground border-t border-border/50">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-2 text-xs text-slate-500 border-t border-slate-100">
           {post.likes_count > 0 && (
-            <span className="flex items-center gap-1">
-              <span className="w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[8px]">♥</span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[9px]">
+                <Heart size={9} fill="currentColor" strokeWidth={0} />
+              </span>
               {post.likes_count}
             </span>
           )}
           {post.comments_count > 0 && (
-            <button onClick={toggleComments} className="hover:underline ml-auto">
+            <button onClick={toggleComments} className="hover:text-slate-900 hover:underline ml-auto transition-colors">
               {post.comments_count} bình luận
             </button>
           )}
         </div>
       )}
 
-      <div className="flex border-t border-border mx-4">
-        <button
-          onClick={handleLike}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-            post.liked_by_me ? 'text-rose-500' : 'text-muted-foreground hover:bg-accent'
-          }`}
-        >
-          <Heart size={18} fill={post.liked_by_me ? 'currentColor' : 'none'} />
-          Thích
-        </button>
-        <button
-          onClick={toggleComments}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent transition-colors"
-        >
-          <MessageCircle size={18} />
-          Bình luận
-        </button>
-        <button className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent transition-colors">
-          <Share2 size={18} />
-          Chia sẻ
-        </button>
+      <div className="grid grid-cols-3 border-t border-slate-200">
+        {[
+          { key: 'like', icon: Heart, label: 'Thích', onClick: handleLike, active: post.liked_by_me, activeColor: 'text-rose-600' },
+          { key: 'comment', icon: MessageCircle, label: 'Bình luận', onClick: toggleComments, active: false, activeColor: '' },
+          { key: 'share', icon: Share2, label: 'Chia sẻ', onClick: () => {}, active: false, activeColor: '' },
+        ].map(({ key, icon: Icon, label, onClick, active, activeColor }) => (
+          <button
+            key={key}
+            onClick={onClick}
+            className={cn(
+              "flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-medium transition-colors",
+              active
+                ? activeColor
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+            )}
+          >
+            <Icon size={16} strokeWidth={2} fill={active ? 'currentColor' : 'none'} />
+            <span className="hidden sm:inline">{label}</span>
+          </button>
+        ))}
       </div>
 
       {showComments && (
-        <div className="border-t border-border p-4 space-y-3">
+        <div className="border-t border-slate-200 bg-slate-50 p-4 sm:p-5 space-y-3 animate-fade-down">
           {loadingComments ? (
-            <div className="flex justify-center py-4">
-              <Loader2 size={20} className="animate-spin text-primary" />
+            <div className="flex justify-center py-3">
+              <Loader2 size={18} className="animate-spin text-indigo-600" />
             </div>
+          ) : comments.length === 0 ? (
+            <p className="text-center text-xs text-slate-500 py-2">Chưa có bình luận nào.</p>
           ) : (
             comments.map(c => (
               <div key={c.uid} className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold text-xs shrink-0 overflow-hidden">
+                <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
                   {c.author_avatar
                     ? <img src={c.author_avatar} alt="" className="w-full h-full object-cover" />
-                    : c.author_name.slice(0, 2).toUpperCase()
+                    : (c.author_name || '??').slice(0, 2).toUpperCase()
                   }
                 </div>
-                <div className="bg-accent/50 rounded-2xl px-3 py-2 flex-1">
-                  <p className="text-xs font-bold text-foreground">{c.author_name}</p>
-                  <p className="text-sm text-foreground/90 mt-0.5">{c.content}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 inline-block max-w-full">
+                    <p className="text-xs font-semibold text-slate-900 leading-none mb-1">{c.author_name}</p>
+                    <p className="text-[13px] text-slate-800 break-words">{c.content}</p>
+                  </div>
                 </div>
               </div>
             ))
           )}
 
-          <form onSubmit={handleComment} className="flex items-center gap-2 mt-2">
-            <input
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-              placeholder="Viết bình luận..."
-              className="flex-1 text-sm bg-accent/30 border border-border rounded-full px-4 py-2 outline-none focus:border-primary focus:bg-accent/50 transition-all text-foreground"
-            />
-            <button type="submit" disabled={!newComment.trim() || submitting}
-              className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground disabled:opacity-40 hover:bg-primary/90 transition-colors">
-              {submitting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
-            </button>
+          <form onSubmit={handleComment} className="flex items-center gap-2 pt-1">
+            <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0">
+              {currentUserId ? 'U' : '?'}
+            </div>
+            <div className="flex-1 relative">
+              <input
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                placeholder="Viết bình luận..."
+                className="w-full text-[13px] bg-white border border-slate-200 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 placeholder:text-slate-400"
+              />
+              <button
+                type="submit"
+                disabled={!newComment.trim() || submitting}
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center disabled:opacity-30 hover:bg-indigo-700 transition-colors"
+                aria-label="Gửi bình luận"
+              >
+                {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+              </button>
+            </div>
           </form>
         </div>
       )}
-    </div>
+    </article>
   );
 }

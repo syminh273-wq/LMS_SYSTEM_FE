@@ -1,113 +1,207 @@
 'use client';
 
 import * as React from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, Plus } from 'lucide-react';
-import { Button } from '@shared/components/ui/button';
-import { Card, CardContent } from '@shared/components/ui/card';
+import { useState } from 'react';
+import {
+  ChevronLeft, ChevronRight, Plus, Clock, Calendar as CalendarIcon,
+  Video, FileText, Users,
+} from 'lucide-react';
+import { cn } from '@shared/lib/utils';
+
+const VIEW_OPTIONS = ['Day', 'Week', 'Month'] as const;
+
+const TODAY = 15;
+const CURRENT_MONTH = 6;
+const CURRENT_YEAR = 2026;
+
+const MOCK_EVENTS = [
+  { day: TODAY, time: '09:00', title: 'React Workshop', type: 'live', color: 'bg-rose-500' },
+  { day: 17, time: '10:00', title: 'Database Quiz', type: 'deadline', color: 'bg-amber-500' },
+  { day: 20, time: '11:59', title: 'Project Submission', type: 'deadline', color: 'bg-orange-500' },
+  { day: 23, time: '14:00', title: 'Live Mentoring', type: 'meeting', color: 'bg-emerald-500' },
+  { day: 27, time: '09:00', title: 'Group Discussion', type: 'meeting', color: 'bg-sky-500' },
+];
+
+const UPCOMING = [
+  { title: 'Database Quiz', time: 'Ngày mai, 10:00', color: 'bg-rose-500', icon: FileText, type: 'Deadline' },
+  { title: 'Project Submission', time: '20/06, 23:59', color: 'bg-amber-500', icon: FileText, type: 'Deadline' },
+  { title: 'Live Mentoring', time: '23/06, 14:00', color: 'bg-emerald-500', icon: Video, type: 'Live' },
+  { title: 'React Workshop', time: '27/06, 09:00', color: 'bg-sky-500', icon: Users, type: 'Workshop' },
+];
 
 export default function CalendarPage() {
-  return (
-    <div className="p-6 animate-in fade-in duration-500">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <header className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Academic Calendar</h1>
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">Manage your schedule and upcoming deadlines.</p>
-          </div>
-          <div className="flex items-center gap-2.5">
-             <div className="flex items-center bg-white dark:bg-card border border-gray-100 dark:border-border rounded-lg overflow-hidden shadow-sm">
-                <button className="p-1.5 hover:bg-gray-50 dark:hover:bg-muted transition-colors cursor-pointer">
-                  <ChevronLeft size={14} className="text-gray-500" />
-                </button>
-                <div className="h-4 w-px bg-gray-100 dark:bg-border" />
-                <button className="p-1.5 hover:bg-gray-50 dark:hover:bg-muted transition-colors cursor-pointer">
-                  <ChevronRight size={14} className="text-gray-500" />
-                </button>
-             </div>
-             <button className="bg-[#4F46E5] hover:bg-[#4338CA] text-white px-3.5 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-lg shadow-[#4F46E5]/15 active:scale-[0.98] cursor-pointer">
-                <Plus size={12} />
-                New Event
-              </button>
-          </div>
-        </header>
+  const [view, setView] = useState<typeof VIEW_OPTIONS[number]>('Month');
 
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-          {/* Main Calendar View (Mock) */}
-          <Card className="lg:col-span-5 rounded-[20px] border-gray-100 dark:border-border shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-50 dark:border-border/50 flex items-center justify-between bg-gray-50/30">
-              <span className="text-sm font-bold text-gray-900 dark:text-white">June 2026</span>
-              <div className="flex gap-1">
-                {['Day', 'Week', 'Month'].map((view) => (
-                  <button key={view} className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer ${view === 'Month' ? 'bg-white dark:bg-muted shadow-sm text-[#4F46E5]' : 'text-gray-500 hover:text-gray-700'}`}>
-                    {view}
+  const daysInMonth = 30;
+  const firstDayOfWeek = new Date(CURRENT_YEAR, CURRENT_MONTH - 1, 1).getDay();
+  const totalCells = Math.ceil((firstDayOfWeek + daysInMonth) / 7) * 7;
+  const cells = Array.from({ length: totalCells }, (_, i) => {
+    const day = i - firstDayOfWeek + 1;
+    return day > 0 && day <= daysInMonth ? day : null;
+  });
+
+  const eventsByDay = new Map<number, typeof MOCK_EVENTS>();
+  MOCK_EVENTS.forEach(e => {
+    if (!eventsByDay.has(e.day)) eventsByDay.set(e.day, []);
+    eventsByDay.get(e.day)!.push(e);
+  });
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
+              <CalendarIcon size={11} />
+              Lịch học
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Lịch học tập</h1>
+            <p className="text-slate-600 text-[14px] mt-1">
+              Quản lý lịch học và các deadline sắp tới
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
+              <button className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors" aria-label="Tháng trước">
+                <ChevronLeft size={15} />
+              </button>
+              <div className="h-5 w-px bg-slate-200" />
+              <button className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors" aria-label="Tháng sau">
+                <ChevronRight size={15} />
+              </button>
+            </div>
+            <button className="inline-flex items-center gap-1.5 h-10 px-3.5 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 transition-colors">
+              <Plus size={14} strokeWidth={2.5} />
+              <span className="hidden sm:inline">Sự kiện mới</span>
+              <span className="sm:hidden">Mới</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl card-elevated overflow-hidden">
+            <div className="px-4 sm:px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <span className="text-[15px] font-bold text-slate-900">Tháng 6, 2026</span>
+              <div className="flex gap-1 bg-white border border-slate-200 rounded-lg p-0.5">
+                {VIEW_OPTIONS.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setView(v)}
+                    className={cn(
+                      "px-2.5 py-1 text-[11.5px] font-semibold rounded-md transition-colors",
+                      view === v
+                        ? "bg-slate-900 text-white"
+                        : "text-slate-500 hover:text-slate-900"
+                    )}
+                  >
+                    {v === 'Day' ? 'Ngày' : v === 'Week' ? 'Tuần' : 'Tháng'}
                   </button>
                 ))}
               </div>
             </div>
-            <CardContent className="p-0">
-              <div className="grid grid-cols-7 border-b border-gray-50 dark:border-border/50">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                  <div key={day} className="py-2 text-center text-[9px] font-black text-gray-400 uppercase tracking-widest bg-gray-50/10">
-                    {day}
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 auto-rows-[80px]">
-                {Array.from({ length: 35 }).map((_, i) => {
-                  const day = i - 0; // Simplified mock
-                  const isCurrentMonth = day > 0 && day <= 30;
-                  const isToday = day === 1;
-                  return (
-                    <div key={i} className={`p-2 border-r border-b border-gray-50 dark:border-border/50 transition-colors hover:bg-gray-50/50 dark:hover:bg-muted/10 ${!isCurrentMonth ? 'bg-gray-50/20 opacity-30' : ''}`}>
-                      <span className={`text-[10px] font-bold ${isToday ? 'w-5 h-5 flex items-center justify-center bg-[#4F46E5] text-white rounded-full' : 'text-gray-500'}`}>
-                        {isCurrentMonth ? day : ''}
-                      </span>
-                      {isToday && (
-                        <div className="mt-1 space-y-1">
-                          <div className="px-1.5 py-0.5 bg-indigo-50 dark:bg-indigo-900/20 text-[#4F46E5] text-[7px] font-bold rounded border-l-2 border-[#4F46E5] truncate">
-                            9:00 AM React Workshop
-                          </div>
+
+            <div className="grid grid-cols-7 border-b border-slate-200">
+              {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
+                <div key={day} className="py-2.5 text-center text-[10.5px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7">
+              {cells.map((day, i) => {
+                const isToday = day === TODAY;
+                const events = day ? eventsByDay.get(day) ?? [] : [];
+                return (
+                  <div
+                    key={i}
+                    className={cn(
+                      "min-h-[88px] sm:min-h-[100px] p-1.5 sm:p-2 border-r border-b border-slate-200 transition-colors",
+                      !day ? "bg-slate-50" : "hover:bg-slate-50",
+                      i % 7 === 6 && "border-r-0"
+                    )}
+                  >
+                    {day && (
+                      <>
+                        <div className="flex justify-end mb-1">
+                          <span className={cn(
+                            "inline-flex items-center justify-center text-[11.5px] font-semibold tabular-nums w-6 h-6 rounded-md",
+                            isToday
+                              ? "bg-indigo-600 text-white"
+                              : "text-slate-700"
+                          )}>
+                            {day}
+                          </span>
                         </div>
-                      )}
+                        <div className="space-y-1">
+                          {events.slice(0, 2).map((e, j) => (
+                            <div
+                              key={j}
+                              className={cn(
+                                "px-1.5 py-0.5 text-[9.5px] font-semibold text-white rounded truncate",
+                                e.color
+                              )}
+                              title={e.title}
+                            >
+                              {e.title}
+                            </div>
+                          ))}
+                          {events.length > 2 && (
+                            <div className="text-[9px] text-slate-500 font-semibold px-1">
+                              +{events.length - 2} khác
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 card-elevated">
+              <h3 className="text-[14px] font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Clock size={14} className="text-indigo-600" />
+                Sắp tới
+              </h3>
+              <div className="space-y-2">
+                {UPCOMING.map((event, i) => {
+                  const Icon = event.icon;
+                  return (
+                    <div
+                      key={i}
+                      className="group flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors cursor-pointer"
+                    >
+                      <div className={cn("w-1 h-10 rounded-full shrink-0", event.color)} />
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                        <Icon size={14} className="text-slate-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-slate-900 truncate group-hover:text-indigo-700 transition-colors">
+                          {event.title}
+                        </p>
+                        <p className="text-[11px] text-slate-500">{event.type} · {event.time}</p>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Upcoming Sidebar */}
-          <div className="lg:col-span-2 space-y-5">
-            <div>
-              <h3 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-widest mb-3 flex items-center gap-2">
-                <Clock size={12} className="text-[#4F46E5]" />
-                Upcoming
-              </h3>
-              <div className="space-y-3">
-                {[
-                  { title: 'Database Quiz', time: 'Tomorrow, 10:00 AM', color: 'bg-red-500' },
-                  { title: 'Project Submission', time: 'June 5, 11:59 PM', color: 'bg-amber-500' },
-                  { title: 'Live Mentoring', time: 'June 8, 2:00 PM', color: 'bg-blue-500' },
-                ].map((event, i) => (
-                  <div key={i} className="group p-3 rounded-xl bg-white dark:bg-card border border-gray-100 dark:border-border shadow-sm hover:shadow-md transition-all cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      <div className={`w-1 h-8 rounded-full ${event.color}`} />
-                      <div>
-                        <p className="text-[11px] font-bold text-gray-900 dark:text-white group-hover:text-[#4F46E5] transition-colors">{event.title}</p>
-                        <p className="text-[9px] text-gray-400 font-medium mt-0.5">{event.time}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            <div className="p-4 rounded-[20px] bg-[#EBF2FF] dark:bg-muted/30 border border-indigo-100 dark:border-indigo-900/20">
-              <CalendarIcon size={24} className="text-[#4F46E5] mb-2" />
-              <p className="text-[11px] font-bold text-gray-900 dark:text-white">Sync with Google</p>
-              <p className="text-[9px] text-gray-500 mt-1 mb-3">Connect your academic calendar with your personal devices.</p>
-              <button className="w-full py-1.5 bg-white dark:bg-muted rounded-lg text-[9px] font-bold text-gray-700 shadow-sm border border-gray-100 dark:border-border hover:bg-gray-50 cursor-pointer">
-                Connect Now
+            <div className="rounded-xl p-5 bg-indigo-600 text-white shadow-md">
+              <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center mb-3 border border-white/30">
+                <CalendarIcon size={18} />
+              </div>
+              <p className="text-[13.5px] font-bold">Đồng bộ Google</p>
+              <p className="text-[11.5px] text-indigo-100 mt-1 mb-3 leading-relaxed">
+                Kết nối lịch học với Google Calendar để không bỏ lỡ sự kiện nào.
+              </p>
+              <button className="w-full h-8 rounded-lg bg-white text-indigo-700 text-[12px] font-semibold hover:bg-indigo-50 transition-colors">
+                Kết nối ngay
               </button>
             </div>
           </div>

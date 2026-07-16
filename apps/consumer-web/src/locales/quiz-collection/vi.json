@@ -30,5 +30,14 @@
   "completion_pending": "Giáo viên chưa gán chứng chỉ cho bộ Quiz này.",
   "completion_claim": "Nhận chứng chỉ",
   "no_certificate_assigned": "Chưa gán chứng chỉ",
-  "load_error": "Không thể tải bộ Quiz"
+  "load_error": "Không thể tải bộ Quiz",
+  "mode_game": "Quiz Game",
+  "mode_certificate": "Chứng chỉ",
+  "mode_certificate_locked": "Hoàn thành tất cả quiz để mở khoá",
+  "mode_certificate_empty_incomplete": "Hoàn thành tất cả quiz trong bộ để nhận chứng chỉ.",
+  "mode_certificate_empty_no_cert": "Bộ Quiz này chưa được gán chứng chỉ.",
+  "certificate_card_title": "Chứng chỉ của bạn",
+  "certificate_card_issued_at": "Cấp ngày {{date}}",
+  "certificate_card_verification": "Mã xác minh",
+  "certificate_card_view_btn": "Xem chứng chỉ"
 }
