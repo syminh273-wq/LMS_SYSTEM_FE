@@ -4,7 +4,14 @@ import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, meetingRoomApi, examSessionApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
-import type { Message as ChatMessage, ExamSessionInfo, QuizSummary } from '@/lib/api/types';
+import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
+import { useTranslation } from '@shared/components/LocaleProvider';
+import { toast } from 'sonner';
+import type {
+  Message as ChatMessage, ExamSessionInfo, QuizSummary,
+  QuizCollection, QuizCollectionDetail, QuizCollectionProgress,
+  IssuedCertificate, QuizPublicDetail,
+} from '@/lib/api/types';
 import {
   Loader2,
   ArrowLeft,
@@ -31,6 +38,14 @@ import {
   Bot,
   Sparkles,
   Layers,
+  Award,
+  ChevronDown,
+  ChevronUp,
+  Gamepad2,
+  Lock,
+  CheckCircle2,
+  Circle,
+  ArrowRight,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -115,6 +130,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
   const [activeTab, setActiveTab] = useState<ClassroomTab>("discussion");
+  const { t } = useTranslation();
+  const [collections, setCollections] = useState<QuizCollection[]>([]);
+  const [collectionProgress, setCollectionProgress] = useState<Record<string, QuizCollectionProgress>>({});
+  const [loadingCollections, setLoadingCollections] = useState(false);
+  const [expandedCollectionUid, setExpandedCollectionUid] = useState<string | null>(null);
+  const [collectionDetailsByUid, setCollectionDetailsByUid] = useState<Record<string, QuizCollectionDetail | undefined>>({});
+  const [loadingCollectionDetailUid, setLoadingCollectionDetailUid] = useState<string | null>(null);
   const [activeRoom, setActiveRoom] = useState<any>(null);
   const [loadingRoom, setLoadingRoom] = useState(false);
 
@@ -196,6 +218,33 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   }, [activeTab, isAuthenticated, uid]);
 
   useEffect(() => {
+    if (!isAuthenticated || !uid || activeTab !== 'collections') return;
+
+    const fetchCollections = async () => {
+      setLoadingCollections(true);
+      try {
+        const list = await consumerQuizCollectionApi.listByClassroom(uid);
+        setCollections(list);
+        const pMap: Record<string, QuizCollectionProgress> = {};
+        for (const c of list) {
+          try {
+            pMap[c.uid] = await consumerQuizCollectionApi.getProgress(c.uid, uid);
+          } catch {
+            pMap[c.uid] = { total: c.quiz_count, passed: 0, is_completed: false, percent: 0, passed_quiz_ids: [], missing_quiz_ids: [] };
+          }
+        }
+        setCollectionProgress(pMap);
+      } catch {
+        setCollections([]);
+      } finally {
+        setLoadingCollections(false);
+      }
+    };
+
+    void fetchCollections();
+  }, [activeTab, isAuthenticated, uid]);
+
+  useEffect(() => {
     if (!loadingMore && scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
@@ -204,6 +253,24 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   useEffect(() => {
     if (aiScrollRef.current) aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
   }, [aiMessages]);
+
+  const handleToggleCollection = async (collection: QuizCollection) => {
+    if (expandedCollectionUid === collection.uid) {
+      setExpandedCollectionUid(null);
+      return;
+    }
+    setExpandedCollectionUid(collection.uid);
+    if (collectionDetailsByUid[collection.uid]) return;
+    setLoadingCollectionDetailUid(collection.uid);
+    try {
+      const data = await consumerQuizCollectionApi.retrieve(collection.uid, uid);
+      setCollectionDetailsByUid(prev => ({ ...prev, [collection.uid]: data }));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('quizCollection.load_error'));
+    } finally {
+      setLoadingCollectionDetailUid(null);
+    }
+  };
 
   const handleAiAsk = async () => {
     if (!aiQuestion.trim() || aiLoading) return;
@@ -254,6 +321,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
   useEffect(() => {
     if (!isAuthenticated || !uid || activeTab !== 'ai' || Object.keys(docUrlMap).length > 0) return;
+    let cancelled = false;
     const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     fetch(`${apiBase}/api/v1/consumer/course/classrooms/${uid}/docs/`, {
@@ -261,12 +329,14 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     })
       .then(r => r.ok ? r.json() : [])
       .then((docs: Array<{ uid: string; name: string; url: string }>) => {
+        if (cancelled) return;
         const map: Record<string, { name: string; url: string }> = {};
         for (const d of docs) map[d.uid] = { name: d.name, url: d.url };
         setDocUrlMap(map);
       })
       .catch(() => {});
-  }, [isAuthenticated, uid, activeTab, docUrlMap]);
+    return () => { cancelled = true; };
+  }, [isAuthenticated, uid, activeTab]);
 
   useEffect(() => {
     if (isAuthenticated && uid && activeTab === 'meeting') {
@@ -371,7 +441,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
           <div className="absolute bottom-[-20px] right-20 w-48 h-48 rounded-full bg-white" />
           <div className="absolute top-1/2 left-1/3 w-16 h-16 rounded-lg bg-white rotate-12" />
         </div>
-        <div className="max-w-6xl mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
+        <div className="max-w-[1600px] mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
           <div className="space-y-2">
             <div className="inline-flex items-center px-2 py-1 rounded bg-black/20 backdrop-blur-sm text-white text-[10px] font-black tracking-widest uppercase mb-2">
               MÃ LỚP: {classroom.pid}
@@ -387,12 +457,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       </div>
 
       {/* Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Quick Actions/Nav */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-2 flex overflow-x-auto gap-1 shadow-sm no-scrollbar">
+      <main className="flex-1 max-w-[1600px] w-full mx-auto py-6 pl-2 pr-6 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] xl:grid-cols-[220px_1fr_320px] gap-4">
+          {/* Left Sidebar - Nav */}
+          <aside className="lg:sticky lg:top-20 lg:self-start">
+            <div className="bg-white rounded-2xl border border-slate-200 lg:p-1.5 p-2 shadow-sm flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
               {[
                 { key: 'discussion' as const, icon: MessageSquare, label: 'Thảo luận' },
                 { key: 'lessons' as const, icon: BookOpen, label: 'Bài học' },
@@ -401,31 +470,30 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'quiz' as const, icon: Trophy, label: 'Thi trắc nghiệm' },
                 { key: 'meeting' as const, icon: Video, label: 'Phòng họp' },
                 { key: 'ai' as const, icon: Bot, label: 'AI Trợ giảng' },
-                { key: 'collections' as const, icon: Layers, label: 'Bộ Quiz', href: `/consumer/classroom/${uid}/collection` },
-              ].map((item) => (
-                item.href ? (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => router.push(item.href!)}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap text-slate-500 hover:bg-slate-50 cursor-pointer"
-                  >
-                    <item.icon size={18} />
-                    {item.label}
-                  </button>
-                ) : (
+                { key: 'collections' as const, icon: Layers, label: 'Bộ Nhiệm Vụ' },
+              ].map((item) => {
+                const isActive = activeTab === item.key;
+                return (
                   <button
                     key={item.key}
                     type="button"
                     onClick={() => setActiveTab(item.key)}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${activeTab === item.key ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100' : 'text-slate-500 hover:bg-slate-50'} cursor-pointer`}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap cursor-pointer text-left w-full ${
+                      isActive
+                        ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100'
+                        : 'text-slate-500 hover:bg-slate-50 border border-transparent'
+                    }`}
                   >
-                    <item.icon size={18} />
-                    {item.label}
+                    <item.icon size={18} className="shrink-0" />
+                    <span className="truncate">{item.label}</span>
                   </button>
-                )
-              ))}
+                );
+              })}
             </div>
+          </aside>
+
+          {/* Main Content */}
+          <div className="space-y-6 min-w-0">
 
             {/* Chat Feed */}
             {activeTab === 'discussion' && (
@@ -548,6 +616,99 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                         </button>
                       ))}
                     </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Mission Collections Tab */}
+            {activeTab === 'collections' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Layers size={17} className="text-indigo-600" />
+                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">{t('quizCollection.title')}</span>
+                  </div>
+                  <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black uppercase text-indigo-600">
+                    {collections.length} bộ
+                  </span>
+                </div>
+                <div className="p-5 space-y-3">
+                  {loadingCollections ? (
+                    <div className="flex items-center justify-center h-32 text-slate-400">
+                      <Loader2 size={26} className="animate-spin" />
+                    </div>
+                  ) : collections.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-40 text-center text-slate-400">
+                      <Layers size={38} className="mb-3 opacity-30" />
+                      <p className="text-sm font-medium">{t('quizCollection.empty')}</p>
+                      <p className="text-xs mt-1">{t('quizCollection.empty_hint')}</p>
+                    </div>
+                  ) : (
+                    collections.map(c => {
+                      const isExpanded = expandedCollectionUid === c.uid;
+                      const detail = collectionDetailsByUid[c.uid];
+                      const isLoadingDetail = loadingCollectionDetailUid === c.uid;
+                      const p = collectionProgress[c.uid];
+                      return (
+                        <div
+                          key={c.uid}
+                          className={`rounded-2xl border transition-all overflow-hidden ${
+                            isExpanded ? 'border-indigo-200 shadow-sm' : 'border-slate-100'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => void handleToggleCollection(c)}
+                            className="w-full text-left p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                          >
+                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                              p?.is_completed ? 'bg-amber-100 text-amber-600' : 'bg-indigo-100 text-indigo-600'
+                            }`}>
+                              {p?.is_completed ? <Trophy size={22} /> : <Layers size={22} />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-black text-slate-900 text-sm truncate">{c.title}</h4>
+                              {c.description && (
+                                <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{c.description}</p>
+                              )}
+                              {p && p.total > 0 && (
+                                <div className="mt-2 flex items-center gap-2">
+                                  <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full transition-all ${
+                                        p.is_completed ? 'bg-amber-500' : 'bg-indigo-600'
+                                      }`}
+                                      style={{ width: `${p.percent}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-[10px] font-black text-slate-500 shrink-0">
+                                    {t('quizCollection.card_progress', undefined, { done: p.passed, total: p.total })}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            {isExpanded ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
+                          </button>
+
+                          {isExpanded && (
+                            <div className="border-t border-slate-100 bg-slate-50/40 p-4 space-y-4">
+                              {isLoadingDetail ? (
+                                <div className="flex items-center justify-center py-8 text-slate-400">
+                                  <Loader2 size={22} className="animate-spin" />
+                                </div>
+                              ) : detail ? (
+                                <CollectionExpandedPanel
+                                  classroomUid={uid}
+                                  detail={detail}
+                                  progress={p ?? null}
+                                />
+                              ) : null}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -1129,4 +1290,353 @@ function formatDateTime(value: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString('vi-VN');
+}
+
+function CollectionExpandedPanel({
+  classroomUid, detail, progress,
+}: {
+  classroomUid: string;
+  detail: QuizCollectionDetail;
+  progress: QuizCollectionProgress | null;
+}) {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const [mode, setMode] = useState<'game' | 'certificate'>('game');
+  const [certificate, setCertificate] = useState<IssuedCertificate | null>(null);
+  const [loadingCert, setLoadingCert] = useState(false);
+
+  const passedSet = new Set(progress?.passed_quiz_ids ?? []);
+  const certUnlocked = !!progress?.is_completed && !!detail.certificate_id;
+  const hasCertificateConfig = !!detail.certificate_id;
+
+  React.useEffect(() => {
+    if (progress?.is_completed && detail.certificate_id) {
+      setMode('certificate');
+    }
+  }, [progress?.is_completed, detail.certificate_id]);
+
+  const handleSelectMode = (next: 'game' | 'certificate') => {
+    if (next === 'certificate' && !certUnlocked) return;
+    setMode(next);
+    if (next === 'certificate' && !certificate && detail.certificate_id) {
+      void loadCertificate();
+    }
+  };
+
+  const loadCertificate = async () => {
+    try {
+      setLoadingCert(true);
+      const cert = await consumerQuizCollectionApi.getCertificate(detail.uid, classroomUid);
+      setCertificate(cert);
+    } catch { /* not yet issued */ }
+    finally {
+      setLoadingCert(false);
+    }
+  };
+
+  return (
+    <>
+      <div>
+        <h4 className="text-sm font-black text-slate-900">{detail.title}</h4>
+        {detail.description && (
+          <p className="text-[11px] text-slate-500 mt-0.5">{detail.description}</p>
+        )}
+      </div>
+
+      {progress && progress.total > 0 && (
+        <section className="bg-white border border-slate-100 rounded-xl p-3 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+              {t('quizCollection.progress_label')}
+            </h5>
+            <span className="text-[11px] font-black text-slate-700">
+              {t('quizCollection.progress_percent', undefined, { percent: Math.round(progress.percent) })}
+            </span>
+          </div>
+          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full transition-all ${
+                progress.is_completed ? 'bg-amber-500' : 'bg-indigo-600'
+              }`}
+              style={{ width: `${progress.percent}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-slate-500 text-center">
+            {t('quizCollection.card_progress', undefined, { done: progress.passed, total: progress.total })}
+          </p>
+        </section>
+      )}
+
+      <div className="bg-white border border-slate-100 rounded-xl p-1 flex gap-1">
+        <button
+          type="button"
+          onClick={() => handleSelectMode('game')}
+          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all ${
+            mode === 'game'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-slate-500 hover:bg-slate-50'
+          }`}
+        >
+          <Gamepad2 size={12} />
+          {t('quizCollection.mode_game')}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSelectMode('certificate')}
+          disabled={!certUnlocked}
+          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all ${
+            mode === 'certificate'
+              ? 'bg-amber-500 text-white shadow-sm'
+              : certUnlocked
+              ? 'text-slate-500 hover:bg-slate-50'
+              : 'text-slate-400/60 cursor-not-allowed'
+          }`}
+        >
+          {certUnlocked ? <Award size={12} /> : <Lock size={10} />}
+          {t('quizCollection.mode_certificate')}
+        </button>
+      </div>
+
+      {mode === 'game' && (
+        <section className="space-y-2">
+          <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+            {t('quizCollection.items_section')}
+          </h5>
+          {detail.items.length === 0 ? (
+            <p className="text-[11px] text-slate-500 py-4 text-center">{t('quizCollection.items_empty')}</p>
+          ) : (
+            <div className="space-y-2">
+              {detail.items.map((item, idx) => {
+                const passed = passedSet.has(item.quiz_id);
+                return (
+                  <MissionAccordion
+                    key={item.quiz_id}
+                    classroomUid={classroomUid}
+                    quizId={item.quiz_id}
+                    index={idx + 1}
+                    passed={passed}
+                    onStart={() => router.push(`/consumer/classroom/${classroomUid}/quiz/${item.quiz_id}`)}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
+
+      {mode === 'certificate' && (
+        <section className="space-y-2">
+          <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Award size={11} className="text-amber-500" />
+            {t('quizCollection.completion_section')}
+          </h5>
+          {loadingCert ? (
+            <div className="flex items-center justify-center py-6 text-slate-400">
+              <Loader2 size={18} className="animate-spin" />
+            </div>
+          ) : !hasCertificateConfig ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center text-slate-400">
+              <Award size={26} className="mb-2 opacity-30" />
+              <p className="text-[11px] font-medium">{t('quizCollection.mode_certificate_empty_no_cert')}</p>
+            </div>
+          ) : certificate ? (
+            <div className="rounded-xl p-3 bg-gradient-to-r from-amber-50 to-amber-100/50 border border-amber-200 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-200 text-amber-700 flex items-center justify-center shrink-0">
+                <Trophy size={20} />
+              </div>
+              <div className="flex-1 min-w-0 space-y-0.5">
+                <p className="font-black text-slate-900 text-[12px]">{t('quizCollection.certificate_card_title')}</p>
+                <p className="text-[10px] text-slate-500">
+                  {t('quizCollection.certificate_card_issued_at', undefined, {
+                    date: new Date(certificate.issued_at).toLocaleDateString('vi-VN'),
+                  })}
+                </p>
+                <div className="flex items-center gap-1 text-[9px] text-amber-700 font-mono font-bold">
+                  <ShieldCheck size={9} />
+                  <span className="truncate">{t('quizCollection.certificate_card_verification')}: {certificate.verification_code}</span>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => router.push(`/consumer/certificate/${certificate.uid}`)}
+                className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-[10px] gap-1 shrink-0 h-7 px-2.5"
+              >
+                {t('quizCollection.certificate_card_view_btn')}
+                <ArrowRight size={11} />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-6 text-center text-slate-400">
+              <Award size={26} className="mb-2 opacity-30" />
+              <p className="text-[11px] font-medium">{t('quizCollection.completion_pending')}</p>
+            </div>
+          )}
+        </section>
+      )}
+    </>
+  );
+}
+
+function MissionAccordion({
+  classroomUid, quizId, index, passed, onStart,
+}: {
+  classroomUid: string;
+  quizId: string;
+  index: number;
+  passed: boolean;
+  onStart: () => void;
+}) {
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const [detail, setDetail] = useState<QuizPublicDetail | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<'not_started' | 'in_progress' | 'passed'>(
+    passed ? 'passed' : 'not_started'
+  );
+
+  React.useEffect(() => {
+    if (passed) {
+      setStatus('passed');
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const attempts = await consumerQuizApi.listAttempts(quizId, classroomUid);
+        if (cancelled) return;
+        if (attempts.length === 0) {
+          setStatus('not_started');
+        } else {
+          setStatus('in_progress');
+        }
+      } catch {
+        if (!cancelled) setStatus('not_started');
+      }
+    };
+    void load();
+    return () => { cancelled = true; };
+  }, [quizId, classroomUid, passed]);
+
+  const handleToggle = async () => {
+    if (status === 'not_started') return;
+    const next = !isOpen;
+    setIsOpen(next);
+    if (next && !detail) {
+      setLoading(true);
+      try {
+        const data = await consumerQuizApi.retrieve(quizId, classroomUid);
+        setDetail(data);
+      } catch {
+        /* keep silent */
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const statusLabelKey =
+    status === 'passed'
+      ? 'quizCollection.quiz_status_passed'
+      : status === 'in_progress'
+      ? 'quizCollection.quiz_status_in_progress'
+      : 'quizCollection.quiz_status_not_started';
+
+  const isLocked = status === 'not_started';
+
+  return (
+    <div className={`rounded-xl border transition-colors ${isOpen ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 bg-white'}`}>
+      <div className="flex items-center gap-2 px-3 py-2.5">
+        <button
+          type="button"
+          onClick={handleToggle}
+          disabled={isLocked}
+          className={`flex items-center gap-2.5 flex-1 min-w-0 text-left ${
+            isLocked ? 'cursor-not-allowed' : 'cursor-pointer'
+          }`}
+        >
+          <div className={`w-6 h-6 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 ${
+            isLocked ? 'bg-slate-100 text-slate-400' : 'bg-indigo-100 text-indigo-600'
+          }`}>
+            {index}
+          </div>
+          {status === 'passed' ? (
+            <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+          ) : isLocked ? (
+            <Lock size={13} className="text-slate-400 shrink-0" />
+          ) : (
+            <Circle size={15} className="text-amber-500 shrink-0" />
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-bold text-slate-900 truncate">
+              {detail?.title ?? `Nhiệm vụ #${index}`}
+            </p>
+            <p className="text-[9px] text-slate-500 mt-0.5">{t(statusLabelKey)}</p>
+          </div>
+          {!isLocked && (
+            isOpen
+              ? <ChevronUp size={13} className="text-slate-400" />
+              : <ChevronDown size={13} className="text-slate-400" />
+          )}
+        </button>
+        <Button
+          size="sm"
+          onClick={onStart}
+          className="h-6 px-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-bold text-[10px] gap-1 shrink-0"
+        >
+          <Gamepad2 size={11} />
+          {status === 'passed'
+            ? t('quizCollection.redo_quiz_btn')
+            : status === 'in_progress'
+            ? t('quizCollection.resume_quiz_btn')
+            : t('quizCollection.start_quiz_btn')}
+        </Button>
+      </div>
+
+      {isOpen && !isLocked && (
+        <div className="border-t border-slate-100 bg-slate-50/30 px-3 py-2.5 space-y-1.5">
+          {loading ? (
+            <div className="flex items-center justify-center py-3 text-slate-400">
+              <Loader2 size={14} className="animate-spin" />
+            </div>
+          ) : (
+            <>
+              <div className="text-[9px] font-black uppercase tracking-wider text-slate-500">
+                {t('quizCollection.questions_list_title')} · {detail?.questions_count ?? 0}
+              </div>
+              {(detail?.questions ?? []).length === 0 ? (
+                <p className="text-[10px] text-slate-500 py-2 text-center">
+                  {t('quizCollection.questions_list_empty')}
+                </p>
+              ) : (
+                <ol className="space-y-1">
+                  {(detail?.questions ?? []).map((q, idx) => (
+                    <li key={q.uid} className="flex items-start gap-2 bg-white border border-slate-100 rounded-md px-2.5 py-1.5">
+                      <span className="w-4 h-4 rounded bg-indigo-100 text-indigo-600 text-[8px] font-black flex items-center justify-center shrink-0">
+                        {idx + 1}
+                      </span>
+                      <p className="text-[10px] font-bold text-slate-700 leading-relaxed line-clamp-2">{q.question_text}</p>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {isLocked && (
+        <div className="border-t border-slate-100 bg-slate-50/30 px-3 py-2.5 flex items-start gap-2">
+          <Lock size={12} className="text-slate-400 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black text-slate-700">
+              {t('quizCollection.questions_locked_title')}
+            </p>
+            <p className="text-[9px] text-slate-500 leading-relaxed">
+              {t('quizCollection.questions_locked_hint')}
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

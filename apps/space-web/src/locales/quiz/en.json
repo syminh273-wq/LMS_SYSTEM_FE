@@ -14,9 +14,13 @@
   "delete_error": "Cannot delete quiz",
   "create_success": "Quiz \"{{title}}\" created",
   "load_error": "Cannot load quiz list",
+  "progress_label": "Progress",
+  "progress_done": "{{done}}/{{total}} done",
+  "questions_list_title": "Question list",
+  "questions_list_empty": "No questions in this quiz yet",
   "generate_modal": {
     "title": "Create Quiz with AI",
-    "subtitle": "Choose the quiz type and upload a document",
+    "subtitle": "Choose the question type and upload a document",
     "retry": "Try again",
     "error_title": "An error occurred",
     "done_title": "Created {{count}} questions successfully",
@@ -69,7 +73,7 @@
     "assign_success": "Quiz assigned successfully"
   },
   "settings_modal": {
-    "title": "Quiz settings",
+    "title": "Mission settings",
     "time_label": "Duration (minutes)",
     "max_attempts_label": "Maximum attempts",
     "passing_score_label": "Passing score: {{score}}%",

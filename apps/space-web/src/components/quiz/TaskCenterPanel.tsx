@@ -90,7 +90,16 @@ export default function TaskCenterPanel({ onClose }: Props) {
     return () => clearTimeout(id);
   }, [lastFetchedAt, now]);
 
-  const visible = useMemo(() => filterTasks(tasks, tab), [tasks, tab]);
+  const visible = useMemo(() => {
+    const seen = new Set<string>();
+    const out: QuizTask[] = [];
+    for (const task of filterTasks(tasks, tab)) {
+      if (seen.has(task.id)) continue;
+      seen.add(task.id);
+      out.push(task);
+    }
+    return out;
+  }, [tasks, tab]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

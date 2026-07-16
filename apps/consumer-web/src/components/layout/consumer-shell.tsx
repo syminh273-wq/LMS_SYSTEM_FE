@@ -42,6 +42,51 @@ import { useNotifications } from '@/lib/hooks/use-notifications';
 import type { NotificationItem, NotificationMetadata } from '@/lib/api';
 import { Popover, PopoverContent, PopoverTrigger } from '@shared/components/ui/popover';
 import { Button } from '@shared/components/ui/button';
+import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
+
+const SEEN_CERT_KEY = 'seen_cert_uids';
+
+function useUnseenCertificateCount(userId: string | null | undefined): number {
+  const [count, setCount] = React.useState(0);
+  const pathname = usePathname();
+
+  React.useEffect(() => {
+    if (!userId) {
+      setCount(0);
+      return;
+    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const list = await consumerQuizCollectionApi.myCertificates();
+        if (cancelled) return;
+        const stored = (() => {
+          try {
+            return JSON.parse(localStorage.getItem(SEEN_CERT_KEY) || '[]') as string[];
+          } catch {
+            return [];
+          }
+        })();
+        const seen = new Set(stored);
+        setCount(list.filter(c => !seen.has(c.uid)).length);
+      } catch {
+        if (!cancelled) setCount(0);
+      }
+    };
+    void load();
+
+    const handler = () => void load();
+    window.addEventListener('storage', handler);
+    window.addEventListener('lms:certs-seen', handler);
+    return () => {
+      cancelled = true;
+      window.removeEventListener('storage', handler);
+      window.removeEventListener('lms:certs-seen', handler);
+    };
+  }, [userId, pathname]);
+
+  return count;
+}
 
 interface ConsumerShellProps {
   children: React.ReactNode;
@@ -227,10 +272,29 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
   const dispatch = useDispatch();
   const [mounted, setMounted] = React.useState(false);
   const userProfile = useSelector((state: RootState) => state.user.profile);
+  const unseenCertCount = useUnseenCertificateCount(mounted ? userProfile?.uid : null);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  React.useEffect(() => {
+    if (pathname === '/consumer/certificate' && userProfile?.uid) {
+      consumerQuizCollectionApi.myCertificates()
+        .then(list => {
+          if (list.length === 0) return;
+          try {
+            const stored = JSON.parse(localStorage.getItem(SEEN_CERT_KEY) || '[]') as string[];
+            const merged = Array.from(new Set([...stored, ...list.map(c => c.uid)]));
+            localStorage.setItem(SEEN_CERT_KEY, JSON.stringify(merged));
+            window.dispatchEvent(new Event('lms:certs-seen'));
+          } catch {
+            /* ignore */
+          }
+        })
+        .catch(() => {});
+    }
+  }, [pathname, userProfile?.uid]);
 
   const handleLogout = () => {
     dispatch(clearProfile());
@@ -286,13 +350,14 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
               {navItems.map((item) => {
                 const active = isActive(item.href);
                 const Icon = item.icon;
+                const showCertDot = item.href === '/consumer/certificate' && unseenCertCount > 0;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                      "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                       active
                         ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
@@ -300,6 +365,14 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                   >
                     <Icon size={15} strokeWidth={2.2} />
                     <span className="whitespace-nowrap">{item.name}</span>
+                    {showCertDot && (
+                      <span
+                        className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900"
+                        aria-label={`${unseenCertCount} new certificate(s)`}
+                      >
+                        {unseenCertCount > 9 ? '9+' : unseenCertCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

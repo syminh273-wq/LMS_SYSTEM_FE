@@ -3,11 +3,15 @@
     "dashboard": "Bảng điều khiển",
     "classrooms": "Lớp học",
     "quizzes": "Thư viện Quiz",
-    "quiz_collections": "Bộ Quiz",
+    "quiz_collections": "Nhiệm vụ",
     "certificates": "Chứng chỉ",
     "students": "Học sinh",
     "settings": "Cài đặt",
-    "admin": "Quản trị"
+    "admin": "Quản trị",
+    "submenu": {
+      "collections": "Nhiệm vụ",
+      "certificates": "Trang chứng chỉ"
+    }
   },
   "page_title": {
     "space_admin": "Quản trị Space"

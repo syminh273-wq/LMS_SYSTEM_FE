@@ -68,7 +68,7 @@
     "tab_ai": "AI Trợ giảng",
     "tab_chat": "Thảo luận lớp học",
     "tab_meeting": "Phòng họp",
-    "tab_exams": "Bài tập",
+    "tab_exams": "Đề Kiểm Tra",
     "tab_final_exams": "Kì Thi",
     "tab_quiz": "Quizz Game",
     "tab_students": "Danh sách sinh viên",
@@ -349,6 +349,8 @@
     "settings_updated_toast": "Đã cập nhật cài đặt"
   },
   "ui": {
+    "exam_duration_label": "Thời gian làm bài (phút)",
+    "late_threshold_label": "Vào trễ tối đa (phút)",
     "page_subtitle": "PHÒNG HỌC",
     "settings_btn": "THIẾT LẬP",
     "approve_btn": "PHÊ DUYỆT",
@@ -374,7 +376,7 @@
     "tab_ai": "AI Trợ giảng",
     "tab_chat": "Thảo luận lớp học",
     "tab_meeting": "Phòng họp",
-    "tab_exams": "Bài tập",
+    "tab_exams": "Đề Kiểm Tra",
     "tab_final_exams": "Kì Thi",
     "tab_quiz": "Quizz Game",
     "tab_students": "Danh sách sinh viên",

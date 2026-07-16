@@ -23,7 +23,7 @@ export function MasterLayout({ header, children, footer }: MasterLayoutProps) {
 
 export function MasterHeader({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <header className={`sticky top-0 z-50 h-16 glass border-b border-border/60 px-4 sm:px-6 flex items-center justify-between transition-colors duration-300 ${className}`}>
+    <header className={`sticky top-0 z-[60] h-16 bg-white dark:bg-slate-900 border-b border-border/60 px-4 sm:px-6 flex items-center justify-between transition-colors duration-300 ${className}`}>
       {children}
     </header>
   );

@@ -301,6 +301,8 @@ export type QuizResult = {
   total: number;
   correct: number;
   score: number;
+  is_passed?: boolean;
+  passing_score?: number;
   attempt_number: number;
   attempts_used: number;
   attempts_remaining: number | null;
@@ -312,6 +314,8 @@ export type QuizResult = {
     is_correct: boolean;
     explanation: string;
   }>;
+  show_explanation?: boolean;
+  certificate_issued?: IssuedCertificate[];
 };
 
 export type FaceClassroomSessionResponse = {
@@ -509,10 +513,25 @@ export type IssuedCertificate = {
   certificate_id: string;
   collection_id: string;
   classroom_id: string;
-  issued_by: string;
-  issued_at: string;
+  issued_by: string | null;
+  issued_at: string | null;
+  issued_at_display?: string;
   pdf_url: string | null;
   verification_code: string;
+
+  // Resolved human-friendly fields (filled by the backend)
+  title?: string;
+  description?: string;
+  template_url?: string | null;
+
+  collection_title?: string;
+  collection_description?: string;
+
+  student_name?: string;
+  student_pid?: string;
+  student_avatar_url?: string;
+
+  classroom_name?: string;
 };
 
 export type NotificationMetadata = {

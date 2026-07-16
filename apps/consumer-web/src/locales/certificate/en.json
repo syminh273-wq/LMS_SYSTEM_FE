@@ -1,9 +1,9 @@
 {
   "wall_title": "My Certificates",
-  "wall_subtitle": "All certificates you have earned from completing quiz collections.",
+  "wall_subtitle": "All certificates you have earned from completing mission collections.",
   "loading": "Loading certificates...",
   "empty": "No certificates yet",
-  "empty_hint": "Complete a quiz collection in any class to earn a certificate.",
+  "empty_hint": "Complete a mission collection in any class to earn a certificate.",
   "view_btn": "View",
   "for_collection": "For: {{title}}",
   "issued_on": "Issued on {{date}}",
@@ -15,10 +15,13 @@
   "presented_to": "Presented to",
   "for_completing": "For successfully completing",
   "collection_label": "Collection",
+  "classroom_label": "Class: {{name}}",
   "teacher_label": "Issued by",
   "date_label": "Date",
   "download_btn": "Print / Download",
   "share_btn": "Copy verification link",
   "back_btn": "Back",
-  "cert_not_found": "Certificate not found"
+  "cert_not_found": "Certificate not found",
+  "collection_fallback": "Mission collection",
+  "recipient_label": "Recipient"
 }

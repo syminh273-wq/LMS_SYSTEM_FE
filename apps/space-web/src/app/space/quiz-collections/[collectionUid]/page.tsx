@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, Plus, Trash2, GripVertical, Award, BookOpen, Users, Edit3, Check, X, Send, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Loader2, Plus, Trash2, GripVertical, Award, BookOpen, Users, Edit3, Check, X, Send, ChevronDown, AlertTriangle } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import {
   DndContext,
@@ -350,12 +350,20 @@ export default function CollectionDetailPage({ params }: Props) {
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between p-3 rounded-xl border border-dashed border-border">
-            <p className="text-sm text-muted-foreground">{t('quizCollection.detail.no_certificate')}</p>
-            <Button size="sm" onClick={() => setShowAssignCert(true)} className="bg-primary-brand hover:bg-primary-brand-dark text-white gap-2 font-bold text-xs">
-              <Plus size={14} />
-              {t('quizCollection.detail.assign_certificate_btn')}
-            </Button>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2.5 text-amber-800">
+              <AlertTriangle size={16} className="shrink-0" />
+              <p className="text-[12px] font-bold leading-snug flex-1">
+                {t('quizCollection.detail.no_certificate_warning')}
+              </p>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-xl border border-dashed border-border">
+              <p className="text-sm text-muted-foreground">{t('quizCollection.detail.no_certificate')}</p>
+              <Button size="sm" onClick={() => setShowAssignCert(true)} className="bg-primary-brand hover:bg-primary-brand-dark text-white gap-2 font-bold text-xs">
+                <Plus size={14} />
+                {t('quizCollection.detail.assign_certificate_btn')}
+              </Button>
+            </div>
           </div>
         )}
       </section>

@@ -98,16 +98,32 @@ export default function CertificateWallPage() {
                 </div>
 
                 <p className="text-[14px] font-semibold text-slate-900 line-clamp-2 leading-snug">
-                  {t('certificate.for_collection', undefined, { title: c.collection_id })}
+                  {c.title || c.collection_title
+                    || t('certificate.for_collection', undefined, { title: c.collection_id })}
                 </p>
+
+                {(c.collection_description || c.description) && (
+                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                    {c.description || c.collection_description}
+                  </p>
+                )}
 
                 <div className="mt-3 pt-3 border-t border-slate-200 flex items-center justify-between">
                   <div className="min-w-0">
                     <p className="text-[11px] text-slate-500">
                       {t('certificate.issued_on', undefined, {
-                        date: new Date(c.issued_at).toLocaleDateString(),
+                        date:
+                          c.issued_at_display ||
+                          (c.issued_at
+                            ? new Date(c.issued_at).toLocaleDateString()
+                            : '—'),
                       })}
                     </p>
+                    {c.classroom_name && (
+                      <p className="text-[10px] text-slate-500 mt-0.5 truncate">
+                        {c.classroom_name}
+                      </p>
+                    )}
                     <p className="text-[10px] text-slate-500 mt-0.5 font-mono tracking-wider truncate">
                       {c.verification_code}
                     </p>

@@ -70,16 +70,16 @@ const quizTasksSlice = createSlice({
       const t = action.payload;
       const existing = state.byId[t.id];
       state.byId[t.id] = t;
-      if (!existing) {
+      if (!existing && !state.ids.includes(t.id)) {
         state.ids = [t.id, ...state.ids];
-      } else {
+      } else if (existing) {
         const isTerminalNew = TERMINAL.includes(t.status);
         const wasActive = !TERMINAL.includes(existing.status);
         if (isTerminalNew && wasActive) {
           state.ids = [t.id, ...state.ids.filter(id => id !== t.id)];
         }
       }
-      state.ids = sortTasks(Object.values(state.byId)).map(x => x.id);
+      state.ids = Array.from(new Set(sortTasks(Object.values(state.byId)).map(x => x.id)));
     },
     removeTask: (state, action: PayloadAction<string>) => {
       const id = action.payload;

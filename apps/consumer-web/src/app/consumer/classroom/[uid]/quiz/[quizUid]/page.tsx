@@ -5,7 +5,9 @@ import { useState, useEffect, use, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { consumerQuizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
-import type { QuizPublicDetail, QuizQuestionPublic, QuizResult, QuizAttemptRecord } from '@/lib/api/types';
+import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
+import { CertificateCelebration } from '@/components/quiz/certificate-celebration';
+import type { QuizPublicDetail, QuizQuestionPublic, QuizResult, QuizAttemptRecord, IssuedCertificate } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, CheckCircle2, XCircle, Trophy,
   RotateCcw, ChevronRight, Clock, Lock,
@@ -40,6 +42,7 @@ export default function QuizGamePage({ params }: Props) {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [celebrateCerts, setCelebrateCerts] = useState<IssuedCertificate[] | null>(null);
 
   // timer
   const [timeLeft, setTimeLeft] = useState(0);
@@ -143,6 +146,32 @@ export default function QuizGamePage({ params }: Props) {
         setResult(res);
         const updated = await consumerQuizApi.listAttempts(quizUid, classroomUid);
         setPastAttempts(updated);
+
+        if (res.certificate_issued && res.certificate_issued.length > 0) {
+          setCelebrateCerts(res.certificate_issued);
+        } else {
+          try {
+            const all = await consumerQuizCollectionApi.myCertificates();
+            const seen = new Set<string>(
+              (() => {
+                try {
+                  return JSON.parse(localStorage.getItem('seen_cert_uids') || '[]') as string[];
+                } catch {
+                  return [];
+                }
+              })()
+            );
+            const fresh = all.filter(c => !seen.has(c.uid));
+            const matchesHere = fresh.filter(
+              c => c.classroom_id === classroomUid && new Date(c.issued_at).getTime() > Date.now() - 5 * 60 * 1000
+            );
+            if (matchesHere.length > 0) {
+              setCelebrateCerts(matchesHere);
+            }
+          } catch {
+            /* ignore */
+          }
+        }
       }
 
       setPhase('result');
@@ -419,6 +448,12 @@ export default function QuizGamePage({ params }: Props) {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 flex flex-col items-center py-10 px-4">
+        {celebrateCerts && celebrateCerts.length > 0 && (
+          <CertificateCelebration
+            certificates={celebrateCerts}
+            onClose={() => setCelebrateCerts(null)}
+          />
+        )}
         <div className="max-w-2xl w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
           {/* Score card */}
           <div className={`bg-gradient-to-br ${scoreBg} rounded-3xl p-8 text-white text-center shadow-2xl`}>
@@ -452,6 +487,27 @@ export default function QuizGamePage({ params }: Props) {
             <div className="flex items-center gap-2 rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-700">
               <CheckCircle2 size={16} className="shrink-0 text-indigo-500" />
               Kết quả đã được ghi nhận vào bài kiểm tra
+            </div>
+          )}
+
+          {/* Certificate celebration card (persists after modal closes) */}
+          {celebrateCerts && celebrateCerts.length > 0 && (
+            <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-center gap-3 shadow-md">
+              <div className="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center shrink-0">
+                <Trophy size={22} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-amber-900">Bạn vừa nhận chứng chỉ mới!</p>
+                <p className="text-[11px] text-amber-700 font-mono font-bold truncate">
+                  {celebrateCerts[0].verification_code}
+                </p>
+              </div>
+              <Button
+                onClick={() => router.push(`/consumer/certificate/${celebrateCerts[0].uid}`)}
+                className="bg-amber-500 hover:bg-amber-600 text-white font-bold h-9 px-3 text-[11px] rounded-xl shrink-0"
+              >
+                Xem
+              </Button>
             </div>
           )}
 

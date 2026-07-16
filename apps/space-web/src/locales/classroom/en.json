@@ -345,6 +345,8 @@
     "settings_updated_toast": "Settings updated"
   },
   "ui": {
+    "exam_duration_label": "Exam duration (minutes)",
+    "late_threshold_label": "Maximum late entry (minutes)",
     "page_subtitle": "CLASSROOM",
     "settings_btn": "SETTINGS",
     "approve_btn": "APPROVE",

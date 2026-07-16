@@ -2,12 +2,16 @@
   "nav": {
     "dashboard": "Dashboard",
     "classrooms": "Classrooms",
-    "quizzes": "Quiz Library",
-    "quiz_collections": "Quiz Collections",
+    "quizzes": "Quizzes",
+    "quiz_collections": "Missions",
     "certificates": "Certificates",
     "students": "Students",
     "settings": "Settings",
-    "admin": "Admin"
+    "admin": "Admin",
+    "submenu": {
+      "collections": "Missions",
+      "certificates": "Certificate Library"
+    }
   },
   "page_title": {
     "space_admin": "Space Admin"

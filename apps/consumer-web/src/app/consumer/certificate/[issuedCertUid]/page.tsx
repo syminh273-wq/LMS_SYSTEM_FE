@@ -60,11 +60,24 @@ export default function IssuedCertificateViewPage({ params }: Props) {
     );
   }
 
-  const studentName = profile?.full_name || profile?.username || 'Student';
-  const issuedDate = new Date(cert.issued_at).toLocaleDateString(
-    locale === 'vi' ? 'vi-VN' : 'en-US',
-    { year: 'numeric', month: 'long', day: 'numeric' }
-  );
+  const studentName =
+    cert.student_name ||
+    profile?.full_name ||
+    profile?.username ||
+    'Student';
+  const collectionTitle =
+    cert.collection_title || cert.title || t('certificate.collection_fallback');
+  const certTitle = cert.title || collectionTitle;
+  const certDescription = cert.description || cert.collection_description || '';
+  const classroomName = cert.classroom_name || '';
+
+  const issuedDate = cert.issued_at_display
+    || (cert.issued_at
+      ? new Date(cert.issued_at).toLocaleDateString(
+          locale === 'vi' ? 'vi-VN' : 'en-US',
+          { year: 'numeric', month: 'long', day: 'numeric' }
+        )
+      : '');
 
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 space-y-4 print:p-0 print:max-w-none">
@@ -110,19 +123,41 @@ export default function IssuedCertificateViewPage({ params }: Props) {
             <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-700">
               {t('certificate.view_title')}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">{t('certificate.presented_to')}</p>
+            {certTitle && (
+              <p className="text-base sm:text-lg font-bold text-amber-700 mt-2">
+                {certTitle}
+              </p>
+            )}
+            {certDescription && (
+              <p className="text-xs text-muted-foreground mt-1 italic max-w-xl mx-auto">
+                {certDescription}
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground mt-3">{t('certificate.presented_to')}</p>
             <h1 className="text-3xl sm:text-4xl font-black text-foreground mt-2 break-words" style={{ fontFamily: 'serif' }}>
               {studentName}
             </h1>
+            {cert.student_pid && (
+              <p className="text-[11px] font-mono text-muted-foreground mt-1">
+                ID: {cert.student_pid}
+              </p>
+            )}
           </div>
 
           <p className="text-sm text-muted-foreground italic">
             {t('certificate.for_completing')}
           </p>
 
-          <p className="text-lg font-bold text-amber-700">
-            {t('certificate.for_collection', undefined, { title: cert.collection_id })}
-          </p>
+          <div>
+            <p className="text-lg font-bold text-amber-700">
+              {collectionTitle}
+            </p>
+            {classroomName && (
+              <p className="text-[11px] font-bold text-muted-foreground mt-1">
+                {t('certificate.classroom_label', undefined, { name: classroomName })}
+              </p>
+            )}
+          </div>
 
           <div className="grid grid-cols-2 gap-4 pt-6 border-t border-amber-500/20 max-w-md mx-auto">
             <div>
@@ -135,7 +170,7 @@ export default function IssuedCertificateViewPage({ params }: Props) {
               <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                 {t('certificate.teacher_label')}
               </p>
-              <p className="text-sm font-bold text-foreground mt-1 break-all">{cert.issued_by.slice(0, 8)}</p>
+              <p className="text-sm font-bold text-foreground mt-1 break-all">{cert.issued_by?.slice(0, 8) || '—'}</p>
             </div>
           </div>
 

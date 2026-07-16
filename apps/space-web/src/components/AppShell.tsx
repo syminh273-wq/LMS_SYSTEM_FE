@@ -19,6 +19,7 @@ import {
   ChevronsRight,
   Layers,
   Award,
+  ChevronDown,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
@@ -34,6 +35,20 @@ function matchesNavPath(pathname: string, href: string) {
   return href === '/space' ? pathname === href : pathname.startsWith(href);
 }
 
+type SubNavItem = {
+  key: string;
+  label: string;
+  href: string;
+};
+
+type NavItem = {
+  key: string;
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  children?: SubNavItem[];
+};
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -41,6 +56,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
 
   const brandColors = useSelector((state: RootState) => state.theme.brand);
   const spaceThemeColor = useSelector((state: RootState) => state.space.themeColor);
@@ -66,18 +83,42 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     pathname.includes('/space/verify-otp') ||
     pathname.includes('/space/reset-password');
 
-  const navItems = React.useMemo(
+  const navItems = React.useMemo<NavItem[]>(
     () => [
-      { key: 'dashboard',       label: t('layout.nav.dashboard'),       href: '/space',                       icon: LayoutDashboard },
-      { key: 'classrooms',      label: t('layout.nav.classrooms'),      href: '/space/classrooms',            icon: BookOpen },
-      { key: 'quizzes',         label: t('layout.nav.quizzes'),         href: '/space/quizzes',               icon: Gamepad2 },
-      { key: 'quiz_collections',label: t('layout.nav.quiz_collections'),href: '/space/quiz-collections',      icon: Layers },
-      { key: 'certificates',    label: t('layout.nav.certificates'),    href: '/space/quiz-collections/certificates', icon: Award },
-      { key: 'students',        label: t('layout.nav.students'),        href: '/space/student',               icon: Users },
-      { key: 'settings',        label: t('layout.nav.settings'),        href: '/space/settings',              icon: Settings },
+      { key: 'dashboard',       label: t('layout.nav.dashboard'),       href: '/space',                  icon: LayoutDashboard },
+      { key: 'classrooms',      label: t('layout.nav.classrooms'),      href: '/space/classrooms',       icon: BookOpen },
+      { key: 'quizzes',         label: t('layout.nav.quizzes'),         href: '/space/quizzes',          icon: Gamepad2 },
+      {
+        key: 'certificates',
+        label: t('layout.nav.certificates'),
+        href: '/space/quiz-collections',
+        icon: Award,
+        children: [
+          { key: 'cert_collections', label: t('layout.nav.submenu.collections'),   href: '/space/quiz-collections' },
+          { key: 'cert_library',     label: t('layout.nav.submenu.certificates'), href: '/space/quiz-collections/certificates' },
+        ],
+      },
+      { key: 'students',        label: t('layout.nav.students'),        href: '/space/student',          icon: Users },
+      { key: 'settings',        label: t('layout.nav.settings'),        href: '/space/settings',         icon: Settings },
     ],
     [t]
   );
+
+  // Auto-expand any group that contains the active route
+  React.useEffect(() => {
+    const next: Record<string, boolean> = { ...expandedGroups };
+    let changed = false;
+    for (const item of navItems) {
+      if (!item.children) continue;
+      const hasActiveChild = item.children.some(c => matchesNavPath(pathname, c.href));
+      if (hasActiveChild && !next[item.key]) {
+        next[item.key] = true;
+        changed = true;
+      }
+    }
+    if (changed) setExpandedGroups(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, navItems]);
 
   const handleLogout = () => {
     dispatch(clearProfile());
@@ -135,6 +176,99 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         <nav className={`flex-1 space-y-1.5 mt-2 ${sidebarCollapsed ? 'px-2' : 'px-4'}`}>
           {navItems.map((item) => {
+            if (item.children) {
+              const isExpanded = !sidebarCollapsed && !!expandedGroups[item.key];
+              const isGroupActive = item.children.some(c => matchesNavPath(pathname, c.href));
+
+              if (sidebarCollapsed) {
+                return (
+                  <div
+                    key={item.key}
+                    className="relative"
+                    onMouseEnter={() => setHoveredGroup(item.key)}
+                    onMouseLeave={() => setHoveredGroup(null)}
+                  >
+                    <button
+                      type="button"
+                      title={item.label}
+                      className={`w-full flex items-center justify-center py-3 px-2 rounded-xl transition-all duration-200 cursor-pointer ${
+                        isGroupActive
+                          ? 'bg-primary-brand-light text-primary-brand shadow-sm'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      }`}
+                    >
+                      <item.icon size={20} className={isGroupActive ? 'text-primary-brand' : 'text-muted-foreground'} />
+                    </button>
+                    {hoveredGroup === item.key && (
+                      <div className="absolute left-full top-0 ml-2 z-50 min-w-[200px] rounded-xl border border-border bg-card shadow-xl py-2">
+                        <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                          {item.label}
+                        </div>
+                        {item.children.map(child => {
+                          const childActive = matchesNavPath(pathname, child.href);
+                          return (
+                            <Link
+                              key={child.key}
+                              href={child.href}
+                              className={`flex items-center px-4 py-2 text-sm font-bold transition-colors ${
+                                childActive
+                                  ? 'bg-primary-brand-light text-primary-brand'
+                                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                              }`}
+                            >
+                              {child.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div key={item.key}>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedGroups(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
+                      isGroupActive
+                        ? 'bg-primary-brand-light text-primary-brand shadow-sm'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    {isGroupActive && <div className="absolute left-0 w-1.5 h-6 bg-primary-brand rounded-r-full" />}
+                    <item.icon size={20} className={isGroupActive ? 'text-primary-brand' : 'text-muted-foreground'} />
+                    <span className="flex-1 text-left text-sm font-bold tracking-wide">{item.label}</span>
+                    <ChevronDown
+                      size={14}
+                      className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  {isExpanded && (
+                    <div className="mt-1 ml-4 pl-4 border-l border-border space-y-1">
+                      {item.children.map(child => {
+                        const childActive = matchesNavPath(pathname, child.href);
+                        return (
+                          <Link
+                            key={child.key}
+                            href={child.href}
+                            className={`flex items-center px-3 py-2 rounded-lg text-xs font-bold transition-colors ${
+                              childActive
+                                ? 'bg-primary-brand-light text-primary-brand'
+                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            }`}
+                          >
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const isActive = matchesNavPath(pathname, item.href);
             return (
               <Link
@@ -176,7 +310,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <header className="h-20 bg-card dark:bg-card border-b border-border dark:border-border flex items-center justify-between px-10">
           <div className="flex items-center gap-6 flex-1">
             <h2 className="text-lg font-bold text-foreground uppercase tracking-widest">
-              {navItems.find(i => matchesNavPath(pathname, i.href))?.label || t('layout.page_title.space_admin')}
+              {(() => {
+                for (const item of navItems) {
+                  if (item.children) {
+                    const child = item.children.find(c => matchesNavPath(pathname, c.href));
+                    if (child) return child.label;
+                    if (matchesNavPath(pathname, item.href)) return item.label;
+                  } else if (matchesNavPath(pathname, item.href)) {
+                    return item.label;
+                  }
+                }
+                return t('layout.page_title.space_admin');
+              })()}
             </h2>
           </div>
 
