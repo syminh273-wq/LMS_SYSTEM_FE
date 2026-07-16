@@ -64,6 +64,17 @@ export class QuizCollectionApiClient extends BaseRestApiClient {
 
 export const quizCollectionApi = new QuizCollectionApiClient();
 
+export type CreateCertificatePayload = Omit<CreateCertificateRequest, 'template_url'> & {
+  templateImage?: File | null;
+  template_url?: string | null;
+};
+
+export type UpdateCertificatePayload = Omit<UpdateCertificateRequest, 'template_url'> & {
+  templateImage?: File | null;
+  template_url?: string | null;
+  clearTemplateImage?: boolean;
+};
+
 export class CertificateApiClient extends BaseRestApiClient {
   public async list(): Promise<Certificate[]> {
     const response = await this.get<Certificate[] | { results: Certificate[] }>(
@@ -76,16 +87,30 @@ export class CertificateApiClient extends BaseRestApiClient {
     return this.get<Certificate>(`/api/v1/space/certificate/${uid}/`);
   }
 
-  public async create(data: CreateCertificateRequest): Promise<Certificate> {
-    return this.post<Certificate>('/api/v1/space/certificate/', data);
+  public async create(data: CreateCertificatePayload): Promise<Certificate> {
+    return this.post<Certificate>('/api/v1/space/certificate/', this._buildPayload(data));
   }
 
-  public async update(uid: string, data: UpdateCertificateRequest): Promise<Certificate> {
-    return this.patch<Certificate>(`/api/v1/space/certificate/${uid}/`, data);
+  public async update(uid: string, data: UpdateCertificatePayload): Promise<Certificate> {
+    return this.patch<Certificate>(`/api/v1/space/certificate/${uid}/`, this._buildPayload(data));
   }
 
   public async deleteCertificate(uid: string): Promise<void> {
     await super.delete(`/api/v1/space/certificate/${uid}/`);
+  }
+
+  private _buildPayload(data: CreateCertificatePayload | UpdateCertificatePayload): FormData {
+    const fd = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'templateImage') {
+        if (value instanceof File) fd.append('template_image', value);
+        return;
+      }
+      if (key === 'clearTemplateImage') return;
+      if (value === undefined) return;
+      fd.append(key, value === null ? '' : String(value));
+    });
+    return fd;
   }
 }
 

@@ -1,81 +1,66 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 
 interface Props {
   value: string;
-  onChange: (url: string) => void;
+  file: File | null;
+  onChange: (value: string, file: File | null) => void;
+  onClear?: () => void;
   maxSizeMB?: number;
   className?: string;
 }
 
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/svg+xml'];
 
-export function ImageUploader({ value, onChange, maxSizeMB = 4, className = '' }: Props) {
+export function ImageUploader({ value, file, onChange, onClear, maxSizeMB = 4, className = '' }: Props) {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const upload = async (file: File) => {
-    if (!ACCEPTED_TYPES.includes(file.type)) {
+  const applyFile = (f: File) => {
+    if (!ACCEPTED_TYPES.includes(f.type)) {
       toast.error(t('imageUploader.invalid_type'));
       return;
     }
-    if (file.size > maxSizeMB * 1024 * 1024) {
+    if (f.size > maxSizeMB * 1024 * 1024) {
       toast.error(t('imageUploader.too_large', undefined, { size: maxSizeMB }));
       return;
     }
-
-    setUploading(true);
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('owner_type', 'certificate');
-
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const res = await fetch(`${apiBase}/api/v1/resource/upload/`, {
-        method: 'POST',
-        headers,
-        body: formData,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({})) as Record<string, unknown>;
-        throw new Error((err.message as string) || (err.detail as string) || t('imageUploader.upload_failed'));
-      }
-      const data = await res.json() as { url: string; uid: string; name: string };
-      onChange(data.url);
-      toast.success(t('imageUploader.upload_success'));
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('imageUploader.upload_failed'));
-    } finally {
-      setUploading(false);
-    }
+    const objectUrl = URL.createObjectURL(f);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(objectUrl);
+    onChange('', f);
   };
 
   const onPick = () => inputRef.current?.click();
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) void upload(file);
+    const f = e.target.files?.[0];
+    if (f) applyFile(f);
     e.target.value = '';
   };
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) void upload(file);
+    const f = e.dataTransfer.files?.[0];
+    if (f) applyFile(f);
   };
 
-  const clear = () => onChange('');
+  const clear = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    onChange('', null);
+    onClear?.();
+  };
+
+  const displayedUrl = previewUrl ?? value;
 
   return (
     <div className={className}>
@@ -87,10 +72,15 @@ export function ImageUploader({ value, onChange, maxSizeMB = 4, className = '' }
         onChange={onFileChange}
       />
 
-      {value ? (
+      {displayedUrl ? (
         <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="template" className="w-full h-40 object-contain bg-white" />
+          <img src={displayedUrl} alt="template" className="w-full h-40 object-contain bg-white" />
+          {file && (
+            <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase">
+              {t('imageUploader.new_file')}
+            </span>
+          )}
           <button
             type="button"
             onClick={clear}
@@ -131,7 +121,7 @@ export function ImageUploader({ value, onChange, maxSizeMB = 4, className = '' }
         </button>
       )}
 
-      {value && (
+      {displayedUrl && (
         <button
           type="button"
           onClick={onPick}

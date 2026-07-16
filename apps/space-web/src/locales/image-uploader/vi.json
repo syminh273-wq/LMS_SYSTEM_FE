@@ -7,5 +7,6 @@
   "invalid_type": "Vui lòng chọn file ảnh (PNG, JPG, WEBP, SVG)",
   "too_large": "File lớn hơn {{size}}MB",
   "remove": "Xóa",
-  "replace": "Thay ảnh khác"
+  "replace": "Thay ảnh khác",
+  "new_file": "Mới"
 }

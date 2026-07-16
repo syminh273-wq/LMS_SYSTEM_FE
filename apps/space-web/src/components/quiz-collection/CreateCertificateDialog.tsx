@@ -26,13 +26,15 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [templateUrl, setTemplateUrl] = useState('');
+  const [existingUrl, setExistingUrl] = useState('');
+  const [templateFile, setTemplateFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const reset = () => {
     setName('');
     setDescription('');
-    setTemplateUrl('');
+    setExistingUrl('');
+    setTemplateFile(null);
   };
 
   const handleCreate = async () => {
@@ -45,7 +47,8 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
       const c = await certificateApi.create({
         name: name.trim(),
         description: description.trim(),
-        template_url: templateUrl.trim() || undefined,
+        templateImage: templateFile,
+        template_url: existingUrl.trim() || undefined,
       });
       reset();
       onCreated(c);
@@ -92,7 +95,14 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
             <label className="text-xs font-bold text-foreground block mb-1.5">
               {t('certificate.create_modal.template_image_label')}
             </label>
-            <ImageUploader value={templateUrl} onChange={setTemplateUrl} />
+            <ImageUploader
+              value={existingUrl}
+              file={templateFile}
+              onChange={(url, file) => {
+                setExistingUrl(url);
+                setTemplateFile(file);
+              }}
+            />
           </div>
         </div>
         <DialogFooter>

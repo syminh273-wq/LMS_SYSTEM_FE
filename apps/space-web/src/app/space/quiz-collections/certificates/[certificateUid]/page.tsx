@@ -24,6 +24,8 @@ export default function CertificateDetailPage({ params }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [templateUrl, setTemplateUrl] = useState('');
+  const [templateFile, setTemplateFile] = useState<File | null>(null);
+  const [clearImage, setClearImage] = useState(false);
 
   useEffect(() => {
     params.then(p => setUid(p.certificateUid));
@@ -53,14 +55,25 @@ export default function CertificateDetailPage({ params }: Props) {
       const updated = await certificateApi.update(cert.uid, {
         name: name.trim(),
         description: description.trim(),
-        template_url: templateUrl.trim() || null,
+        templateImage: templateFile,
+        template_url: clearImage ? null : (templateUrl.trim() || null),
+        clearTemplateImage: clearImage,
       });
       setCert(updated);
       setEditing(false);
+      setTemplateFile(null);
+      setClearImage(false);
       toast.success(t('certificate.update_success'));
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : t('certificate.save_error'));
     }
+  };
+
+  const cancelEdit = () => {
+    setEditing(false);
+    setTemplateFile(null);
+    setClearImage(false);
+    setTemplateUrl(cert?.template_url ?? '');
   };
 
   if (loading || !cert) {
@@ -106,7 +119,7 @@ export default function CertificateDetailPage({ params }: Props) {
               <Button size="icon" onClick={handleSave} className="bg-emerald-500 hover:bg-emerald-600 text-white">
                 <Check size={16} />
               </Button>
-              <Button size="icon" variant="outline" onClick={() => setEditing(false)}>
+              <Button size="icon" variant="outline" onClick={cancelEdit}>
                 <X size={16} />
               </Button>
             </div>
@@ -138,7 +151,19 @@ export default function CertificateDetailPage({ params }: Props) {
             {t('certificate.detail.template_section')}
           </p>
           {editing ? (
-            <ImageUploader value={templateUrl} onChange={setTemplateUrl} />
+            <ImageUploader
+              value={templateUrl}
+              file={templateFile}
+              onChange={(url, file) => {
+                setTemplateUrl(url);
+                setTemplateFile(file);
+                if (file) setClearImage(false);
+              }}
+              onClear={() => {
+                setTemplateFile(null);
+                setClearImage(true);
+              }}
+            />
           ) : cert.template_url ? (
             <div className="rounded-xl overflow-hidden border border-border bg-muted/30">
               {/* eslint-disable-next-line @next/next/no-img-element */}
