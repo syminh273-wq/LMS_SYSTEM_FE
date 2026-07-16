@@ -21,6 +21,7 @@
     "description_placeholder": "Chứng chỉ này đại diện cho điều gì?",
     "template_url_label": "URL ảnh mẫu (tùy chọn)",
     "template_url_placeholder": "https://...",
+    "template_url_invalid": "Vui lòng nhập URL hợp lệ (phải bắt đầu bằng http:// hoặc https://)",
     "active_label": "Đang kích hoạt",
     "cancel": "Hủy",
     "create": "Tạo"

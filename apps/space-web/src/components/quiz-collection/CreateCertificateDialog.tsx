@@ -15,6 +15,16 @@ import { toast } from 'sonner';
 import { certificateApi } from '@/lib/api/quiz-collection';
 import type { Certificate } from '@/lib/api/types';
 
+function isValidUrl(value: string): boolean {
+  if (!value) return true;
+  try {
+    const u = new URL(value);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -37,6 +47,10 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
   const handleCreate = async () => {
     if (!name.trim()) {
       toast.error(t('validation.required', undefined, { field: t('certificate.create_modal.name_label') }));
+      return;
+    }
+    if (!isValidUrl(templateUrl)) {
+      toast.error(t('certificate.create_modal.template_url_invalid'));
       return;
     }
     try {
@@ -95,7 +109,14 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
               type="url"
               value={templateUrl}
               onChange={(e) => setTemplateUrl(e.target.value)}
+              onBlur={() => {
+                if (templateUrl && !isValidUrl(templateUrl)) {
+                  toast.error(t('certificate.create_modal.template_url_invalid'));
+                }
+              }}
               placeholder={t('certificate.create_modal.template_url_placeholder')}
+              pattern="https?://.+"
+              title={t('certificate.create_modal.template_url_invalid')}
               className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
             />
           </div>
