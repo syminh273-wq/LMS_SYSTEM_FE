@@ -7,5 +7,6 @@
   "invalid_type": "Please select an image file (PNG, JPG, WEBP, SVG)",
   "too_large": "File is larger than {{size}}MB",
   "remove": "Remove",
-  "replace": "Replace image"
+  "replace": "Replace image",
+  "new_file": "New"
 }
