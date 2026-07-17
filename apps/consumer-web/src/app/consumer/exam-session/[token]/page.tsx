@@ -3,10 +3,13 @@
 import { use, useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import {
+  Activity,
   AlertCircle,
+  AlertTriangle,
   Camera,
   CheckCircle2,
   Clock,
+  Eye,
   File,
   FileText,
   Loader2,
@@ -14,11 +17,12 @@ import {
   Monitor,
   Timer,
   UploadCloud,
+  X,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { examSessionApi } from '@/lib/api/exam-session';
+import { examSessionApi, type ProctoringEventType } from '@/lib/api/exam-session';
 import { classroomApi } from '@/lib/api/classroom';
-import { FaceMonitorWidget, type MonitorResult } from '@/components/face/face-monitor-widget';
+import { FaceMonitorWidget, type FaceEventType, type MonitorResult } from '@/components/face/face-monitor-widget';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import type { Exam, ExamSessionInfo } from '@/lib/api/types';
 
@@ -60,28 +64,187 @@ export default function ExamSessionPage({ params }: Props) {
   // Camera enforcement
   const [cameraStatus, setCameraStatus] = useState<MonitorResult | null>(null);
 
+  // Proctoring warnings (visibility break / face warning)
+  const [warning, setWarning] = useState<{
+    message: string;
+    severity: 'info' | 'warning' | 'danger';
+    rule: 'visibility_breaks' | 'face_warnings' | null;
+    count: number;
+    max: number;
+    remaining: number | null;
+  } | null>(null);
+  const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const submittingFromProctorRef = useRef(false);
+  const loadAbortRef = useRef<AbortController | null>(null);
+  const submitAbortRef = useRef<AbortController | null>(null);
+  const proctorAbortRef = useRef<AbortController | null>(null);
+
+  // Result + audit log (post-submit view)
+  const [resultSubmission, setResultSubmission] = useState<Record<string, unknown> | null>(null);
+  const [resultLoading, setResultLoading] = useState(false);
+  const [resultAuditEvents, setResultAuditEvents] = useState<Array<{
+    uid: string;
+    event_type: string;
+    event_data: Record<string, unknown>;
+    created_at: string;
+  }>>([]);
+  const [resultCounters, setResultCounters] = useState<{
+    visibility_breaks: { count: number; max: number };
+    face_warnings: { count: number; max: number };
+  } | null>(null);
+  const [resultView, setResultView] = useState<'overview' | 'audit' | 'answers'>('overview');
+
+  // Audit log (self-view) for student
+  const [auditOpen, setAuditOpen] = useState(false);
+  const [auditEvents, setAuditEvents] = useState<Array<{
+    uid: string;
+    event_type: string;
+    event_data: Record<string, unknown>;
+    created_at: string;
+  }>>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditCounters, setAuditCounters] = useState<{
+    visibility_breaks: { count: number; max: number };
+    face_warnings: { count: number; max: number };
+  } | null>(null);
+
+  const FACE_EVENT_MAP: Record<FaceEventType, { type: ProctoringEventType; skipIfNotChanged?: boolean }> = {
+    camera_lost:           { type: 'camera_lost' },
+    camera_restored:       { type: 'face_recognized' },
+    face_not_recognized:   { type: 'face_not_recognized' },
+    face_recognized:       { type: 'face_recognized' },
+    no_face:               { type: 'no_face' },
+    multiple_faces:        { type: 'multiple_faces' },
+    single_face_restored:  { type: 'face_recognized' },
+  };
+
+  const handleFaceEvent = (eventType: FaceEventType, data: Record<string, unknown>) => {
+    const mapped = FACE_EVENT_MAP[eventType];
+    if (!mapped) return;
+    // Skip "restored" events — they don't add to counter but we may still log
+    sendProctoringEvent(mapped.type, { ...data, face_transition: eventType });
+  };
+
+  const fetchAuditLog = async () => {
+    if (!session?.uid) return;
+    setAuditLoading(true);
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const accessToken = localStorage.getItem('accessToken');
+      const res = await fetch(
+        `${apiBase}/api/v1/consumer/course/exam-sessions/${session.uid}/audit-log/me/`,
+        { headers: { 'Authorization': `Bearer ${accessToken}` } },
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      setAuditEvents(data.events || []);
+      setAuditCounters(data.counters || null);
+    } catch {
+      // ignore
+    } finally {
+      setAuditLoading(false);
+    }
+  };
+
+  const showWarning = (
+    next: {
+      message: string;
+      severity: 'info' | 'warning' | 'danger';
+      rule: 'visibility_breaks' | 'face_warnings' | null;
+      count: number;
+      max: number;
+      remaining: number | null;
+    },
+    persistent: boolean = false,
+  ) => {
+    setWarning(next);
+    if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+    if (persistent) {
+      // Caller is responsible for clearing the timer (e.g. after navigation)
+      return;
+    }
+    const ttl = next.severity === 'danger' ? 8000 : 5000;
+    warningTimerRef.current = setTimeout(() => setWarning(null), ttl);
+  };
+
+  const sendProctoringEvent = (eventType: ProctoringEventType, eventData?: Record<string, unknown>) => {
+    if (!session?.uid) return;
+    if (submitted || timeExpired) return;
+    if (submittingFromProctorRef.current) return;
+    const controller = new AbortController();
+    proctorAbortRef.current = controller;
+    void examSessionApi
+      .recordEvent(session.uid, { event_type: eventType, event_data: eventData }, { signal: controller.signal })
+      .then((res) => {
+        if (controller.signal.aborted) return;
+        if (res.warning) {
+          showWarning({
+            message: res.message,
+            severity: res.severity,
+            rule: res.rule,
+            count: res.count,
+            max: res.max,
+            remaining: res.remaining,
+          });
+        }
+        if (res.force_submitted) {
+          submittingFromProctorRef.current = true;
+          // Persistent toast: don't auto-dismiss, navigation will replace screen
+          showWarning(
+            {
+              message: res.message || 'Bạn đã vi phạm quy chế thi. Hệ thống sẽ nộp bài bắt buộc và báo cáo giáo viên nhé.',
+              severity: 'danger',
+              rule: res.rule,
+              count: res.count,
+              max: res.max,
+              remaining: res.remaining,
+            },
+            true,
+          );
+          // Delay navigation so student sees the warning before the screen changes
+          setTimeout(() => {
+            if (!controller.signal.aborted) {
+              setSubmitted(true);
+            }
+          }, 1800);
+        }
+      })
+      .catch((err: unknown) => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        // silently ignore other proctoring errors - best-effort
+      });
+  };
+
   useEffect(() => {
     if (!mounted || !isAuthenticated) return;
+    const controller = new AbortController();
+    loadAbortRef.current?.abort();
+    loadAbortRef.current = controller;
     const load = async () => {
       try {
         setLoading(true);
-        const result = await examSessionApi.join(token);
+        const result = await examSessionApi.join(token, { signal: controller.signal });
+        if (controller.signal.aborted) return;
         setExam(result.exam);
         setSession(result.session);
         if (result.session.time_remaining_seconds !== null) {
           setTimeLeft(result.session.time_remaining_seconds);
         }
         if (result.exam.content_type === 'quiz') {
-          const quizData = await classroomApi.examQuestions(result.exam.uid);
+          const quizData = await classroomApi.examQuestions(result.exam.uid, { signal: controller.signal });
+          if (controller.signal.aborted) return;
           setQuizQuestions([...quizData.questions].sort((a, b) => a.order - b.order));
         }
       } catch (err: unknown) {
+        if (controller.signal.aborted) return;
+        if (err instanceof DOMException && err.name === 'AbortError') return;
         setError(err instanceof Error ? err.message : 'Link thi không hợp lệ hoặc đã hết hạn');
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     void load();
+    return () => controller.abort();
   }, [token, mounted, isAuthenticated]);
 
   useEffect(() => {
@@ -130,6 +293,10 @@ export default function ExamSessionPage({ params }: Props) {
       if (needsFile && !answerFile) { setSubmitError('Vui lòng chọn file đính kèm'); return; }
     }
 
+    submitAbortRef.current?.abort();
+    const controller = new AbortController();
+    submitAbortRef.current = controller;
+
     setSubmitting(true);
     setSubmitError('');
     try {
@@ -147,8 +314,9 @@ export default function ExamSessionPage({ params }: Props) {
         formData.append('owner_id', exam.classroom_id);
         formData.append('owner_type', 'classroom');
         const uploadRes = await fetch(`${apiBase}/api/v1/resource/upload/`, {
-          method: 'POST', headers, body: formData,
+          method: 'POST', headers, body: formData, signal: controller.signal,
         });
+        if (controller.signal.aborted) return;
         if (!uploadRes.ok) throw new Error('Upload thất bại');
         const uploaded = await uploadRes.json() as { uid: string };
         resourceUid = uploaded.uid;
@@ -171,17 +339,20 @@ export default function ExamSessionPage({ params }: Props) {
           });
 
       const res = await fetch(`${apiBase}/api/v1/consumer/course/exams/${exam.uid}/submissions/`, {
-        method: 'POST', headers, body,
+        method: 'POST', headers, body, signal: controller.signal,
       });
+      if (controller.signal.aborted) return;
       if (!res.ok) {
         const data = await res.json() as { error?: string };
         throw new Error(data.error || 'Nộp bài thất bại');
       }
       setSubmitted(true);
     } catch (err: unknown) {
+      if (controller.signal.aborted) return;
+      if (err instanceof DOMException && err.name === 'AbortError') return;
       setSubmitError(err instanceof Error ? err.message : 'Không thể nộp bài');
     } finally {
-      setSubmitting(false);
+      if (!controller.signal.aborted) setSubmitting(false);
     }
   };
 
@@ -197,6 +368,81 @@ export default function ExamSessionPage({ params }: Props) {
     void doSubmit(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeExpired]);
+
+  // Fetch submission + audit log when submitted
+  useEffect(() => {
+    if (!submitted || !exam) return;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const accessToken = localStorage.getItem('accessToken');
+    setResultLoading(true);
+    const headers = { 'Authorization': `Bearer ${accessToken}` };
+    Promise.all([
+      fetch(`${apiBase}/api/v1/consumer/course/exams/${exam.uid}/submissions/me/`, { headers })
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null),
+      session?.uid
+        ? fetch(`${apiBase}/api/v1/consumer/course/exam-sessions/${session.uid}/audit-log/me/`, { headers })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null),
+    ]).then(([sub, audit]) => {
+      if (sub) setResultSubmission(sub);
+      if (audit) {
+        setResultAuditEvents(audit.events || []);
+        setResultCounters(audit.counters || null);
+      }
+    }).finally(() => setResultLoading(false));
+  }, [submitted, exam?.uid, session?.uid]);
+
+  // ── Proctoring: detect tab/window/fullscreen/visibility changes ──────────
+  useEffect(() => {
+    if (!exam || !session) return;
+    if (exam.exam_mode !== 'online') return;
+    if (submitted || timeExpired) return;
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        sendProctoringEvent('visibility_lost', { visibility_state: document.visibilityState });
+        sendProctoringEvent('tab_leave');
+      } else {
+        sendProctoringEvent('visibility_restored');
+        sendProctoringEvent('tab_return');
+      }
+    };
+    const onBlur = () => {
+      sendProctoringEvent('window_blur');
+      sendProctoringEvent('app_blur');
+    };
+    const onFocus = () => {
+      sendProctoringEvent('app_focus');
+    };
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        sendProctoringEvent('fullscreen_exit');
+      }
+    };
+    const onPageHide = () => {
+      sendProctoringEvent('window_out', { reason: 'pagehide' });
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('blur', onBlur);
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    window.addEventListener('pagehide', onPageHide);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      window.removeEventListener('pagehide', onPageHide);
+      if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+      proctorAbortRef.current?.abort();
+      submitAbortRef.current?.abort();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exam?.uid, session?.uid, submitted, timeExpired]);
 
   if (!mounted) return null;
 
@@ -226,15 +472,320 @@ export default function ExamSessionPage({ params }: Props) {
     );
   }
 
-  if (submitted) {
+  if (submitted && exam) {
+    const forced = submittingFromProctorRef.current;
+    const sub = resultSubmission as (Record<string, unknown> & {
+      uid?: string;
+      grade?: number;
+      max_grade?: number;
+      passed?: boolean;
+      feedback?: string;
+      status?: string;
+      is_effective?: boolean;
+      force_submitted?: boolean;
+      force_submit_reason?: string;
+      force_submitted_at?: string;
+      submitted_at?: string;
+      submission_type?: string;
+      quiz_result?: { correct_count: number; total: number; score_pct: number; results: Array<Record<string, unknown>> };
+      resource_url?: string;
+      resource_name?: string;
+      content?: string;
+    }) | null;
+
+    const stType = sub?.submission_type ?? 'file';
+    const isEffective = sub?.is_effective === true;
+    const isForceSub = sub?.force_submitted === true || forced;
+
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-        <div className="w-full max-w-md rounded-2xl border border-emerald-100 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
-            <CheckCircle2 size={28} className="text-emerald-500" />
+      <div className="min-h-screen bg-slate-50">
+        <div className="mx-auto max-w-3xl space-y-4 p-6">
+          {/* Header card */}
+          <div className={`rounded-2xl border p-6 shadow-sm ${
+            isForceSub ? 'border-rose-200 bg-white' : 'border-emerald-200 bg-white'
+          }`}>
+            <div className="flex items-start gap-4">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${
+                isForceSub ? 'bg-rose-50' : 'bg-emerald-50'
+              }`}>
+                {isForceSub ? (
+                  <AlertCircle size={24} className="text-rose-500" />
+                ) : (
+                  <CheckCircle2 size={24} className="text-emerald-500" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h1 className="text-xl font-black text-slate-900">
+                  {isForceSub ? 'Bài đã bị nộp bắt buộc' : 'Nộp bài thành công!'}
+                </h1>
+                <p className="mt-1 text-sm font-bold text-slate-500">
+                  {isForceSub
+                    ? 'Bạn đã vi phạm quy chế thi quá số lần cho phép. Bài làm đã được hệ thống ghi nhận và chờ giáo viên xét duyệt.'
+                    : 'Bài làm của bạn đã được ghi nhận. Chờ giáo viên chấm điểm.'}
+                </p>
+                {isForceSub && sub?.force_submit_reason && (
+                  <p className="mt-2 text-xs font-bold text-rose-600">
+                    Lý do: {humanizeAuditEvent(sub.force_submit_reason)}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {resultLoading ? (
+              <div className="mt-6 flex items-center justify-center py-8">
+                <Loader2 size={24} className="animate-spin text-indigo-500" />
+              </div>
+            ) : sub ? (
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="rounded-xl bg-slate-50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Điểm</p>
+                  <p className="mt-1 text-2xl font-black text-slate-900 tabular-nums">
+                    {sub.grade != null ? sub.grade : '—'}
+                    <span className="text-sm font-bold text-slate-500">/{sub.max_grade ?? exam.max_grade}</span>
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Trạng thái</p>
+                  <p className={`mt-1 text-sm font-black ${
+                    sub.status === 'graded' ? 'text-emerald-600'
+                    : sub.status === 'late' ? 'text-amber-600'
+                    : 'text-slate-600'
+                  }`}>
+                    {sub.status === 'graded' ? 'Đã chấm' : sub.status === 'late' ? 'Trễ hạn' : 'Đã nộp'}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Hiệu lực</p>
+                  <p className={`mt-1 text-sm font-black ${isEffective ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    {isEffective ? 'Có hiệu lực' : 'Chờ duyệt'}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Loại</p>
+                  <p className="mt-1 text-sm font-black text-slate-700">
+                    {stType === 'online_quiz' || stType === 'multiple_choice' ? 'Trắc nghiệm'
+                      : stType === 'essay' ? 'Tự luận'
+                      : 'File'}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+
+            {sub?.feedback && (
+              <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Nhận xét từ giáo viên</p>
+                <p className="mt-1 text-sm font-bold text-slate-800">{sub.feedback}</p>
+              </div>
+            )}
           </div>
-          <h1 className="text-xl font-black text-slate-900">Nộp bài thành công!</h1>
-          <p className="mt-2 text-sm font-bold text-slate-500">Bài làm của bạn đã được ghi nhận. Chờ giáo viên chấm điểm.</p>
+
+          {/* Counters card */}
+          {resultCounters && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-sm font-black text-slate-900">Tổng quan vi phạm</h2>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Rời màn hình</p>
+                  <p className="mt-1 text-2xl font-black text-amber-900 tabular-nums">
+                    {resultCounters.visibility_breaks.count}/{resultCounters.visibility_breaks.max}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-violet-100 bg-violet-50 px-4 py-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-700">Cảnh báo khuôn mặt</p>
+                  <p className="mt-1 text-2xl font-black text-violet-900 tabular-nums">
+                    {resultCounters.face_warnings.count}/{resultCounters.face_warnings.max}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tabs */}
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex border-b border-slate-200">
+              <button
+                type="button"
+                onClick={() => setResultView('overview')}
+                className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
+                  resultView === 'overview'
+                    ? 'border-b-2 border-indigo-500 text-indigo-600'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Tổng quan
+              </button>
+              <button
+                type="button"
+                onClick={() => setResultView('answers')}
+                className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
+                  resultView === 'answers'
+                    ? 'border-b-2 border-indigo-500 text-indigo-600'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Bài làm của tôi
+              </button>
+              <button
+                type="button"
+                onClick={() => setResultView('audit')}
+                className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
+                  resultView === 'audit'
+                    ? 'border-b-2 border-indigo-500 text-indigo-600'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Lịch sử ({resultAuditEvents.length})
+              </button>
+            </div>
+
+            <div className="p-5">
+              {resultView === 'overview' && (
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+                    <span className="font-bold text-slate-600">Thời gian nộp</span>
+                    <span className="font-black text-slate-900">{sub?.submitted_at ? new Date(sub.submitted_at).toLocaleString('vi-VN') : '—'}</span>
+                  </div>
+                  {sub?.force_submitted_at && (
+                    <div className="flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
+                      <span className="font-bold text-rose-600">Bị nộp bắt buộc lúc</span>
+                      <span className="font-black text-rose-700">{new Date(sub.force_submitted_at).toLocaleString('vi-VN')}</span>
+                    </div>
+                  )}
+                  {sub?.quiz_result && (
+                    <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-indigo-700">Kết quả trắc nghiệm</p>
+                      <p className="mt-1 text-lg font-black text-indigo-900 tabular-nums">
+                        {sub.quiz_result.correct_count}/{sub.quiz_result.total} đúng ({sub.quiz_result.score_pct}%)
+                      </p>
+                    </div>
+                  )}
+                  {resultAuditEvents.length > 0 && (
+                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sự kiện ghi nhận</p>
+                      <p className="mt-1 text-sm font-bold text-slate-800">
+                        Tổng cộng <span className="font-black text-slate-900">{resultAuditEvents.length}</span> sự kiện đã được ghi lại trong phiên thi này.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setResultView('audit')}
+                        className="mt-2 text-xs font-black text-indigo-600 hover:text-indigo-700"
+                      >
+                        Xem chi tiết →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {resultView === 'answers' && (
+                <div className="space-y-3">
+                  {stType === 'online_quiz' || stType === 'multiple_choice' ? (
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Đáp án đã chọn</p>
+                      {sub?.quiz_result?.results && sub.quiz_result.results.length > 0 ? (
+                        <ol className="space-y-2">
+                          {sub.quiz_result.results.map((r, i) => (
+                            <li key={String(r.question_uid ?? i)} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                              <div className="flex items-start gap-3">
+                                <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black ${
+                                  r.is_correct ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                                }`}>
+                                  {r.is_correct ? '✓' : '✗'}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-black text-slate-900">{String(r.question_text ?? `Câu ${i + 1}`)}</p>
+                                  <p className="mt-1 text-xs text-slate-600">
+                                    Bạn chọn: <span className="font-black text-slate-800">{String(r.chosen ?? '(bỏ trống)').toUpperCase()}</span>
+                                    {' · '}
+                                    Đáp án đúng: <span className="font-black text-emerald-700">{String(r.correct_answer ?? '').toUpperCase()}</span>
+                                  </p>
+                                  {r.explanation && (
+                                    <p className="mt-1 text-xs italic text-slate-500">{String(r.explanation)}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <p className="text-sm text-slate-400">Không có dữ liệu đáp án.</p>
+                      )}
+                    </div>
+                  ) : stType === 'file' ? (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">File đã nộp</p>
+                      {sub?.resource_url ? (
+                        <a
+                          href={String(sub.resource_url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1 inline-flex items-center gap-2 text-sm font-black text-indigo-600 hover:text-indigo-700"
+                        >
+                          <File size={14} />
+                          {String(sub.resource_name ?? 'Mở file đã nộp')}
+                        </a>
+                      ) : (
+                        <p className="mt-1 text-sm text-slate-400">Không có file.</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bài làm tự luận</p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm font-bold text-slate-800">{sub?.content || '(trống)'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {resultView === 'audit' && (
+                <div>
+                  {resultAuditEvents.length === 0 ? (
+                    <p className="py-6 text-center text-sm text-slate-400">Chưa có sự kiện nào được ghi nhận.</p>
+                  ) : (
+                    <ol className="relative space-y-2 border-l-2 border-slate-200 pl-5">
+                      {resultAuditEvents.map((ev) => {
+                        const isViolation = [
+                          'tab_leave', 'window_out', 'window_blur', 'app_blur',
+                          'fullscreen_exit', 'visibility_lost',
+                          'camera_lost', 'face_not_recognized', 'multiple_faces',
+                          'no_face',
+                        ].includes(ev.event_type);
+                        const isLimit = ev.event_type === 'visibility_breaks_exceeded' || ev.event_type === 'face_warnings_exceeded';
+                        const isForce = ev.event_type === 'force_submitted';
+                        const dotColor = isForce || isLimit
+                          ? 'bg-rose-500 ring-rose-200'
+                          : isViolation
+                            ? 'bg-amber-500 ring-amber-200'
+                            : 'bg-indigo-400 ring-indigo-200';
+                        return (
+                          <li key={ev.uid} className="relative">
+                            <span className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dotColor}`} />
+                            <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                              <div className="min-w-0 flex-1">
+                                <p className={`text-sm font-black ${
+                                  isForce || isLimit ? 'text-rose-700' : isViolation ? 'text-amber-700' : 'text-slate-800'
+                                }`}>
+                                  {humanizeAuditEvent(ev.event_type)}
+                                </p>
+                                {ev.event_data && Object.keys(ev.event_data).length > 0 && (
+                                  <p className="mt-0.5 text-[11px] font-bold text-slate-500">
+                                    {formatAuditEventData(ev.event_type, ev.event_data)}
+                                  </p>
+                                )}
+                              </div>
+                              <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
+                                {formatAuditTime(ev.created_at)}
+                              </time>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -255,7 +806,132 @@ export default function ExamSessionPage({ params }: Props) {
         <FaceMonitorWidget
           examUid={exam.uid}
           onStatusChange={setCameraStatus}
+          onFaceEvent={handleFaceEvent}
         />
+      )}
+
+      {/* Proctoring warning toast (fixed top-right, auto-dismiss) */}
+      {warning && (
+        <div
+          key={`${warning.severity}-${warning.count}-${warning.rule ?? 'none'}-${warning.message}`}
+          className={`fixed right-4 top-4 z-[200] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border bg-white shadow-2xl animate-in slide-in-from-top-2 fade-in duration-300 ${
+            warning.severity === 'danger'
+              ? 'border-rose-300'
+              : warning.severity === 'warning'
+                ? 'border-amber-300'
+                : 'border-indigo-300'
+          }`}
+          role="alert"
+          aria-live="assertive"
+        >
+          <div
+            className={`flex items-start gap-3 border-b px-4 py-3 ${
+              warning.severity === 'danger'
+                ? 'border-rose-200 bg-rose-50'
+                : warning.severity === 'warning'
+                  ? 'border-amber-200 bg-amber-50'
+                  : 'border-indigo-200 bg-indigo-50'
+            }`}
+          >
+            <div
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+                warning.severity === 'danger'
+                  ? 'bg-rose-100'
+                  : warning.severity === 'warning'
+                    ? 'bg-amber-100'
+                    : 'bg-indigo-100'
+              }`}
+            >
+              <AlertTriangle
+                size={18}
+                className={
+                  warning.severity === 'danger'
+                    ? 'text-rose-600'
+                    : warning.severity === 'warning'
+                      ? 'text-amber-600'
+                      : 'text-indigo-600'
+                }
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p
+                className={`text-sm font-black ${
+                  warning.severity === 'danger'
+                    ? 'text-rose-700'
+                    : warning.severity === 'warning'
+                      ? 'text-amber-700'
+                      : 'text-indigo-700'
+                }`}
+              >
+                {warning.severity === 'danger'
+                  ? 'Cảnh báo nghiêm trọng'
+                  : warning.severity === 'warning'
+                    ? 'Cảnh báo'
+                    : 'Thông báo'}
+              </p>
+              <p className="mt-0.5 text-sm font-bold text-slate-800">{warning.message}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setWarning(null)}
+              className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+              aria-label="Đóng"
+            >
+              ×
+            </button>
+          </div>
+          {warning.rule && warning.max > 0 && (
+            <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+              <div className="flex-1">
+                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                  <span>
+                    {warning.rule === 'visibility_breaks'
+                      ? 'Rời tab/cửa sổ'
+                      : 'Cảnh báo khuôn mặt'}
+                  </span>
+                  <span className="tabular-nums">
+                    {warning.count}/{warning.max}
+                  </span>
+                </div>
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      warning.remaining !== null && warning.remaining <= 0
+                        ? 'bg-rose-500'
+                        : warning.remaining !== null && warning.remaining === 1
+                          ? 'bg-amber-500'
+                          : 'bg-indigo-500'
+                    }`}
+                    style={{
+                      width: `${Math.min(100, (warning.count / warning.max) * 100)}%`,
+                    }}
+                  />
+                </div>
+                {warning.remaining !== null && (
+                  <p
+                    className={`mt-1 text-[11px] font-bold ${
+                      warning.remaining <= 0
+                        ? 'text-rose-600'
+                        : warning.remaining === 1
+                          ? 'text-amber-600'
+                          : 'text-slate-500'
+                    }`}
+                  >
+                    {warning.remaining <= 0
+                      ? 'Hết lượt cho phép — bài sẽ bị nộp bắt buộc'
+                      : `Còn ${warning.remaining} lần`}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+          <div
+            className={`h-1 origin-left animate-toast-progress ${
+              warning.severity === 'danger' ? 'bg-rose-500' : warning.severity === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
+            }`}
+            style={{ ['--toast-duration' as string]: `${warning.severity === 'danger' ? 8 : 5}s` }}
+          />
+        </div>
       )}
 
       {/* Sticky header with timer */}
@@ -292,6 +968,21 @@ export default function ExamSessionPage({ params }: Props) {
                 <span className="text-xs font-black text-slate-400">Camera không bắt buộc</span>
               </div>
             )
+          )}
+
+          {isOnline && session?.uid && (
+            <button
+              type="button"
+              onClick={() => {
+                setAuditOpen(true);
+                void fetchAuditLog();
+              }}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-700 transition-all hover:bg-slate-100"
+              title="Xem lịch sử giám sát"
+            >
+              <Activity size={14} className="text-slate-500" />
+              <span className="hidden sm:inline">Lịch sử</span>
+            </button>
           )}
         </div>
       </header>
@@ -522,6 +1213,213 @@ export default function ExamSessionPage({ params }: Props) {
           </div>
         </form>
       </main>
+
+      {/* Audit log modal (self-view) */}
+      {auditOpen && (
+        <div
+          className="fixed inset-0 z-[300] flex items-end justify-center bg-slate-900/60 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+          onClick={() => setAuditOpen(false)}
+        >
+          <div
+            className="flex h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:h-[80vh] sm:rounded-3xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-slate-200 bg-gradient-to-br from-indigo-50 to-white px-6 py-4">
+              <div>
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
+                  <Activity size={12} />
+                  Lịch sử giám sát
+                </div>
+                <h2 className="mt-1 text-lg font-black text-slate-900">
+                  {auditCounters && (
+                    <>
+                      {auditCounters.visibility_breaks.count}/{auditCounters.visibility_breaks.max}
+                      <span className="ml-1 text-xs font-bold text-slate-500">rời màn hình</span>
+                      <span className="mx-2 text-slate-300">·</span>
+                      {auditCounters.face_warnings.count}/{auditCounters.face_warnings.max}
+                      <span className="ml-1 text-xs font-bold text-slate-500">cảnh báo khuôn mặt</span>
+                    </>
+                  )}
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAuditOpen(false)}
+                className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                aria-label="Đóng"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {auditLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 size={28} className="animate-spin text-indigo-500" />
+                </div>
+              ) : auditEvents.length === 0 ? (
+                <div className="py-16 text-center">
+                  <p className="text-sm font-bold text-slate-400">Chưa có sự kiện nào.</p>
+                </div>
+              ) : (
+                <ol className="relative space-y-3 border-l-2 border-slate-200 pl-5">
+                  {auditEvents.map((ev) => {
+                    const isViolation = [
+                      'tab_leave', 'window_out', 'window_blur', 'app_blur',
+                      'fullscreen_exit', 'visibility_lost',
+                      'camera_lost', 'face_not_recognized', 'multiple_faces',
+                    ].includes(ev.event_type);
+                    const isLimit = ev.event_type === 'visibility_breaks_exceeded' || ev.event_type === 'face_warnings_exceeded';
+                    const isForce = ev.event_type === 'force_submitted';
+                    const dotColor = isForce
+                      ? 'bg-rose-500 ring-rose-200'
+                      : isLimit
+                        ? 'bg-rose-500 ring-rose-200'
+                        : isViolation
+                          ? 'bg-amber-500 ring-amber-200'
+                          : 'bg-indigo-400 ring-indigo-200';
+                    return (
+                      <li key={ev.uid} className="relative">
+                        <span
+                          className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dotColor}`}
+                        />
+                        <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                          <div className="min-w-0 flex-1">
+                            <p className={`text-sm font-black ${
+                              isForce ? 'text-rose-700' : isLimit ? 'text-rose-700' : isViolation ? 'text-amber-700' : 'text-slate-800'
+                            }`}>
+                              {humanizeAuditEvent(ev.event_type)}
+                            </p>
+                            {ev.event_data && Object.keys(ev.event_data).length > 0 && (
+                              <p className="mt-0.5 text-[11px] font-bold text-slate-500">
+                                {formatAuditEventData(ev.event_type, ev.event_data)}
+                              </p>
+                            )}
+                          </div>
+                          <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
+                            {formatAuditTime(ev.created_at)}
+                          </time>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function humanizeAuditEvent(eventType: string): string {
+  const map: Record<string, string> = {
+    joined: 'Bắt đầu làm bài',
+    submitted: 'Bạn đã nộp bài',
+    timeout_submit: 'Hết giờ — hệ thống đã tự nộp giúp bạn',
+    force_submitted: 'Bài thi đã được nộp bắt buộc do vi phạm quy chế',
+    tab_leave: 'Bạn vừa rời khỏi tab bài thi',
+    tab_return: 'Bạn đã quay lại tab bài thi',
+    window_out: 'Bạn vừa chuyển sang cửa sổ khác',
+    window_back: 'Bạn đã quay lại cửa sổ bài thi',
+    window_blur: 'Cửa sổ bài thi vừa mất tiêu điểm',
+    app_blur: 'Ứng dụng vừa chuyển sang nền',
+    app_focus: 'Bạn đã quay lại ứng dụng',
+    fullscreen_exit: 'Bạn vừa thoát chế độ toàn màn hình',
+    visibility_lost: 'Trang bài thi vừa bị ẩn',
+    visibility_restored: 'Trang bài thi đã hiển thị lại',
+    camera_lost: 'Không nhận tín hiệu camera — bạn kiểm tra lại nhé',
+    no_face: 'Chưa thấy bạn trong khung hình',
+    face_not_recognized: 'Chưa nhận diện được khuôn mặt — bạn ngồi thẳng và nhìn thẳng camera nhé',
+    face_recognized: 'Đã nhận diện khuôn mặt thành công',
+    multiple_faces: 'Có nhiều người trong khung hình — bạn đảm bảo chỉ mình bạn nhé',
+    visibility_breaks_exceeded: 'Bạn đã rời màn hình quá nhiều lần — hệ thống đã nộp bài bắt buộc',
+    face_warnings_exceeded: 'Bạn đã vi phạm quy chế camera quá nhiều lần — hệ thống đã nộp bài bắt buộc',
+  };
+  return map[eventType] ?? eventType;
+}
+
+function formatAuditEventData(eventType: string, raw: unknown): string {
+  if (!raw || typeof raw !== 'object') return '';
+  const data = raw as Record<string, unknown>;
+  const num = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  if (eventType === 'joined') {
+    const start = typeof data.started_at === 'string' ? data.started_at : null;
+    const end = typeof data.ends_at === 'string' ? data.ends_at : null;
+    if (start && end) return `Bắt đầu lúc ${formatIsoTime(start)} · Kết thúc lúc ${formatIsoTime(end)}`;
+  }
+
+  if (eventType === 'submitted' || eventType === 'timeout_submit') {
+    const ts = typeof data.submitted_at === 'string' ? data.submitted_at : null;
+    if (ts) return `Đã nộp lúc ${formatIsoTime(ts)}`;
+  }
+
+  if (eventType === 'force_submitted') {
+    const reason = typeof data.reason === 'string' ? data.reason : '';
+    const count = num(data.count);
+    const max = num(data.max);
+    const reasonText = reason === 'face_warnings_exceeded'
+      ? 'vi phạm quy chế camera'
+      : reason === 'visibility_breaks_exceeded'
+        ? 'rời màn hình quá nhiều lần'
+        : 'vi phạm quy chế thi';
+    if (count != null && max != null) return `Lý do: ${reasonText} (${count}/${max})`;
+    return `Lý do: ${reasonText}`;
+  }
+
+  if (eventType === 'visibility_breaks_exceeded' || eventType === 'face_warnings_exceeded') {
+    const count = num(data.count);
+    const max = num(data.max);
+    if (count != null && max != null) return `Bạn đã vi phạm ${count}/${max} lần cho phép`;
+  }
+
+  if (eventType === 'face_not_recognized') {
+    const sim = num(data.similarity);
+    if (sim != null) return `Mức độ khớp: ${Math.round(sim * 100)}%`;
+  }
+
+  if (eventType === 'multiple_faces') {
+    const fc = num(data.face_count);
+    if (fc != null) return `Phát hiện ${fc} người trong khung hình`;
+  }
+
+  if (eventType === 'camera_lost' || eventType === 'no_face') {
+    const fc = num(data.face_count);
+    if (fc != null) return `Số khuôn mặt phát hiện: ${fc}`;
+  }
+
+  if (eventType === 'tab_leave' || eventType === 'window_out' || eventType === 'window_blur'
+      || eventType === 'app_blur' || eventType === 'fullscreen_exit' || eventType === 'visibility_lost') {
+    const total = num(data.visibility_breaks_count);
+    if (total != null) return `Tổng số lần rời màn hình: ${total}`;
+  }
+
+  return '';
+}
+
+function formatIsoTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const ss = String(d.getSeconds()).padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+function formatAuditTime(iso: string): string {
+  if (!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString('vi-VN', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      day: '2-digit', month: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
 }

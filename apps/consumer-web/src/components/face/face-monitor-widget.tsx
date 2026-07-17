@@ -12,20 +12,43 @@ export type MonitorResult = {
   similarity: number;
 };
 
+export type FaceEventType =
+  | 'camera_lost'
+  | 'camera_restored'
+  | 'face_not_recognized'
+  | 'face_recognized'
+  | 'no_face'
+  | 'multiple_faces'
+  | 'single_face_restored';
+
 type Props = {
   examUid?: string;
   roomUid?: string;
   onStatusChange?: (status: MonitorResult | null) => void;
+  onFaceEvent?: (eventType: FaceEventType, data: Record<string, unknown>) => void;
 };
 
 const MIN_INTERVAL_MS = 500;
+const FACE_DEBOUNCE_MS = 3000; // Emit face warning at most once per 3s per rule
 
-export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
+export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEvent }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const sendingRef = useRef(false);
   const destroyedRef = useRef(false);
+  // Stable refs for callbacks to avoid useEffect re-mount on every parent render
+  const onStatusChangeRef = useRef(onStatusChange);
+  const onFaceEventRef = useRef(onFaceEvent);
+  onStatusChangeRef.current = onStatusChange;
+  onFaceEventRef.current = onFaceEvent;
+  const prevStateRef = useRef<{ camera_open: boolean; recognized: boolean; multiple_faces: boolean }>({
+    camera_open: false,
+    recognized: false,
+    multiple_faces: false,
+  });
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastEmittedAtRef = useRef<Record<string, number>>({});
   const [result, setResult] = useState<MonitorResult | null>(null);
   useEffect(() => {
     destroyedRef.current = false;
@@ -40,6 +63,57 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
       ws.send(JSON.stringify({ type: 'frame', image: canvas.toDataURL('image/jpeg', 0.7) }));
     };
 
+    const emitIfBad = (next: MonitorResult) => {
+      if (!onFaceEventRef.current) return;
+      const now = Date.now();
+      const debounce = (key: string, intervalMs: number) => {
+        const last = lastEmittedAtRef.current[key] || 0;
+        if (now - last < intervalMs) return false;
+        lastEmittedAtRef.current[key] = now;
+        return true;
+      };
+      const clearKey = (key: string) => {
+        delete lastEmittedAtRef.current[key];
+      };
+
+      // Camera off (always emit when sustained)
+      if (!next.camera_open) {
+        if (debounce('camera_lost', FACE_DEBOUNCE_MS)) {
+          onFaceEventRef.current('camera_lost', { face_count: next.face_count, similarity: next.similarity });
+        }
+        return;
+      }
+      // Camera on — clear camera_lost key
+      clearKey('camera_lost');
+
+      // Multiple faces (always emit when sustained)
+      if (next.multiple_faces) {
+        if (debounce('multiple_faces', FACE_DEBOUNCE_MS)) {
+          onFaceEventRef.current('multiple_faces', { face_count: next.face_count });
+        }
+        return;
+      }
+      clearKey('multiple_faces');
+
+      // No face in frame (camera open, no multiple faces, but face_count=0)
+      if ((next.face_count ?? 0) === 0) {
+        if (debounce('no_face', FACE_DEBOUNCE_MS)) {
+          onFaceEventRef.current('no_face', { face_count: 0, similarity: next.similarity });
+        }
+        return;
+      }
+      clearKey('no_face');
+
+      // Face present but not recognized (covers "che camera", wrong person, etc.)
+      if (!next.recognized) {
+        if (debounce('face_not_recognized', FACE_DEBOUNCE_MS)) {
+          onFaceEventRef.current('face_not_recognized', { similarity: next.similarity });
+        }
+        return;
+      }
+      clearKey('face_not_recognized');
+    };
+
     const start = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -48,7 +122,11 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          await videoRef.current.play();
+          try {
+            await videoRef.current.play();
+          } catch (playErr) {
+            if (!destroyedRef.current) throw playErr;
+          }
         }
 
         const token = localStorage.getItem('accessToken');
@@ -61,8 +139,12 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
         const resetStatus = () => {
           if (destroyedRef.current) return;
           const off: MonitorResult = { camera_open: false, recognized: false, multiple_faces: false, face_count: 0, similarity: 0 };
+          if (prevStateRef.current.camera_open) {
+            onFaceEventRef.current?.('camera_lost', { reason: 'ws_close' });
+          }
+          prevStateRef.current = { camera_open: false, recognized: false, multiple_faces: false };
           setResult(null);
-          onStatusChange?.(off);
+          onStatusChangeRef.current?.(off);
         };
 
         ws.onopen = () => captureAndSend(ws);
@@ -71,7 +153,9 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
           const data = JSON.parse(e.data) as { type: string } & MonitorResult;
           if (data.type === 'verification_result') {
             setResult(data);
-            onStatusChange?.(data);
+            onStatusChangeRef.current?.(data);
+            // Always check; emitIfBad internally debounces per rule key
+            emitIfBad(data);
           }
           sendingRef.current = false;
           setTimeout(() => captureAndSend(ws), MIN_INTERVAL_MS);
@@ -80,20 +164,25 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange }: Props) {
         ws.onclose = () => resetStatus();
         ws.onerror = () => resetStatus();
       } catch (err) {
+        if (destroyedRef.current) return;
         console.error('Camera access denied:', err);
-        if (!destroyedRef.current) {
-          onStatusChange?.({ camera_open: false, recognized: false, multiple_faces: false, face_count: 0, similarity: 0 });
+        const off: MonitorResult = { camera_open: false, recognized: false, multiple_faces: false, face_count: 0, similarity: 0 };
+        if (prevStateRef.current.camera_open) {
+          onFaceEventRef.current?.('camera_lost', { reason: 'permission_denied' });
         }
+        prevStateRef.current = { camera_open: false, recognized: false, multiple_faces: false };
+        onStatusChangeRef.current?.(off);
       }
     };
 
     void start();
     return () => {
       destroyedRef.current = true;
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       wsRef.current?.close();
       streamRef.current?.getTracks().forEach(t => t.stop());
     };
-  }, [examUid, roomUid, onStatusChange]);
+  }, [examUid, roomUid]);
 
   const recognized = result?.recognized ?? null;
   const hasWarning = result !== null && result.camera_open && !result.recognized;

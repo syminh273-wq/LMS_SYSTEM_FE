@@ -60,7 +60,7 @@ export class ExamApiClient extends BaseRestApiClient {
 
   public async openOnline(
     examUid: string,
-    settings: { late_threshold_seconds: number; duration_seconds: number; camera_required: boolean }
+    settings: { late_threshold_seconds: number; duration_seconds: number; camera_required: boolean; max_face_warnings: number }
   ): Promise<OpenOnlineResponse> {
     return this.post<OpenOnlineResponse>(`/api/v1/space/course/exams/${examUid}/open-online/`, settings);
   }

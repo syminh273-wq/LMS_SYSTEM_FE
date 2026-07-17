@@ -140,6 +140,8 @@ export type Exam = {
   due_date: string;
   exam_type?: 'assignment' | 'quiz';
   max_grade?: number;
+  max_visibility_breaks?: number;
+  max_face_warnings?: number;
   created_at?: string;
   updated_at?: string;
 };

@@ -13,6 +13,7 @@ import {
   Palette,
   Camera,
   Lock,
+  ShieldAlert,
   Users,
   Check,
   Eye,
@@ -347,6 +348,31 @@ export default function SettingsPage() {
                       className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors ${settings.security_config?.domain_restriction ? 'bg-primary-brand' : 'bg-muted'}`}
                     >
                       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${settings.security_config?.domain_restriction ? 'right-1' : 'left-1'}`} />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 p-4 bg-muted/30 rounded-2xl border border-border">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-rose-500 border border-border shadow-sm">
+                        <ShieldAlert size={20} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm">Số lần nhận diện khuôn mặt tối đa</p>
+                        <p className="text-xs text-muted-foreground font-medium">
+                          Mặc định áp dụng cho bài thi online có bật camera. Vượt → hệ thống tự nộp bài (0 = không giới hạn).
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <input
+                        type="number"
+                        min={0}
+                        max={20}
+                        value={typeof settings.security_config?.max_face_warnings === 'number' ? settings.security_config.max_face_warnings : 3}
+                        onChange={(e) => updateSetting('security_config', 'max_face_warnings', Math.max(0, Number(e.target.value)))}
+                        className="h-10 w-20 rounded-xl border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
+                      />
+                      <span className="text-xs font-bold text-muted-foreground">lần</span>
                     </div>
                   </div>
 

@@ -13,6 +13,7 @@ import {
   Loader2,
   Monitor,
   Search,
+  ShieldAlert,
   Timer,
   Users,
   Wifi,
@@ -28,6 +29,7 @@ interface OpenExamSettings {
   camera_required: boolean;
   duration_minutes: number;
   late_threshold_minutes: number;
+  max_face_warnings: number;
 }
 
 export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid: string; examUid: string }> }) {
@@ -50,6 +52,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
     camera_required: false,
     duration_minutes: 60,
     late_threshold_minutes: 5,
+    max_face_warnings: 3,
   });
   const activeTab = (searchParams.get('tab') as ExamDetailTab) || 'submissions';
 
@@ -85,6 +88,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
       camera_required: exam.camera_required ?? false,
       duration_minutes: exam.duration_seconds ? Math.round(exam.duration_seconds / 60) : 60,
       late_threshold_minutes: exam.late_threshold_seconds ? Math.round(exam.late_threshold_seconds / 60) : 5,
+      max_face_warnings: typeof exam.max_face_warnings === 'number' ? exam.max_face_warnings : 3,
     });
   }, [exam]);
 
@@ -113,6 +117,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         camera_required: openSettings.camera_required,
         duration_seconds: openSettings.duration_minutes * 60,
         late_threshold_seconds: openSettings.late_threshold_minutes * 60,
+        max_face_warnings: openSettings.max_face_warnings,
       });
       setSessions(result.sessions);
     } catch (err: unknown) {
@@ -272,7 +277,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                       <span className="ml-auto text-[10px] font-bold text-muted-foreground">Áp dụng khi nhấn "Mở phiên thi"</span>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-0 divide-y divide-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+                    <div className="grid grid-cols-1 gap-0 divide-y divide-slate-200 sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0">
                       {/* Duration */}
                       <div className="flex flex-col gap-2 px-5 py-4">
                         <div className="flex items-center gap-1.5">
@@ -330,6 +335,26 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                         <p className="text-[10px] text-muted-foreground">
                           {openSettings.camera_required ? 'Bắt buộc nhận diện khuôn mặt' : 'Không bắt buộc camera'}
                         </p>
+                      </div>
+
+                      {/* Max face warnings */}
+                      <div className="flex flex-col gap-2 px-5 py-4">
+                        <div className="flex items-center gap-1.5">
+                          <ShieldAlert size={13} className="text-rose-500" />
+                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Số lần nhận diện</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            max={20}
+                            value={openSettings.max_face_warnings}
+                            onChange={e => setOpenSettings(s => ({ ...s, max_face_warnings: Math.max(0, Number(e.target.value)) }))}
+                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
+                          />
+                          <span className="text-xs font-bold text-muted-foreground">lần</span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">0 = không giới hạn · Vượt → nộp bài bắt buộc</p>
                       </div>
                     </div>
 

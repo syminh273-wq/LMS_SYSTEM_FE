@@ -58,7 +58,7 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/me/`);
   }
 
-  public async examQuestions(examUid: string): Promise<{
+  public async examQuestions(examUid: string, options?: RequestInit): Promise<{
     exam_uid: string;
     title: string;
     total_questions: number;
@@ -74,7 +74,7 @@ export class ClassroomApiClient extends BaseRestApiClient {
       order: number;
     }>;
   }> {
-    return this.get<any>(`/api/v1/consumer/course/exams/${examUid}/questions/`);
+    return this.get<any>(`/api/v1/consumer/course/exams/${examUid}/questions/`, options);
   }
 
   public async submitExam(examUid: string, data: SubmitExamRequest): Promise<ExamSubmission> {
