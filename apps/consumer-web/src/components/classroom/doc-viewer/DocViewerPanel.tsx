@@ -58,19 +58,29 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   const imageable = isImageFile(doc.file_type);
   const pdfable = isPdfFile(doc.file_type);
 
+  const onProgressChangeRef = useRef(onProgressChange);
+  const ctxRef = useRef(ctx);
+  const docUidRef = useRef(doc.uid);
+
+  useEffect(() => {
+    onProgressChangeRef.current = onProgressChange;
+    ctxRef.current = ctx;
+    docUidRef.current = doc.uid;
+  });
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [p, ns] = await Promise.all([fetchMyProgress(ctx, doc.uid), listNotes(ctx, doc.uid, true)]);
+      const [p, ns] = await Promise.all([fetchMyProgress(ctxRef.current, docUidRef.current, true), listNotes(ctxRef.current, docUidRef.current, true)]);
       setProgress(p);
       setNotes(ns);
-      onProgressChange?.(p);
+      onProgressChangeRef.current?.(p);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi tải tiến trình');
     } finally {
       setLoading(false);
     }
-  }, [ctx, doc.uid, onProgressChange]);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -80,14 +90,14 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     setPendingNote(null);
     setEditingNote(null);
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [open, load]);
+  }, [open, doc.uid, load]);
 
   const handleComplete = async () => {
     try {
       const newVal = !progress?.is_completed;
-      const p = await markCompleted(ctx, doc.uid, newVal);
+      const p = await markCompleted(ctxRef.current, docUidRef.current, newVal);
       setProgress(p);
-      onProgressChange?.(p);
+      onProgressChangeRef.current?.(p);
       toast.success(newVal ? t('doc_viewer.completed', 'Đã đánh dấu hoàn thành') : t('doc_viewer.uncompleted', 'Đã bỏ hoàn thành'));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi');
@@ -180,7 +190,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         completed_at: prev?.completed_at ?? null,
         last_opened_at: prev?.last_opened_at ?? null,
       };
-      onProgressChange?.(next);
+      onProgressChangeRef.current?.(next);
       return next;
     });
   };
