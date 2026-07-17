@@ -54,7 +54,7 @@ import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
-import { ClassroomDocsTab } from '@/components/classroom/ClassroomDocsTab';
+import { ClassroomDocsViewer } from '@/components/classroom/docs-viewer/ClassroomDocsViewer';
 
 type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections';
 
@@ -729,10 +729,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Docs Tab */}
             {activeTab === 'docs' && (
-              <ClassroomDocsTab
+              <ClassroomDocsViewer
                 classroomUid={uid}
                 accessToken={typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null}
                 apiBase={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
+                t={t}
               />
             )}
 
