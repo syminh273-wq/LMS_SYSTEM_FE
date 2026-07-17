@@ -11,7 +11,7 @@ import {
   Download,
   ChevronLeft,
   ChevronRight,
-  MessageSquare,
+  MapPin,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
@@ -53,6 +53,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   const [imageSize, setImageSize] = useState<{ w: number; h: number } | null>(null);
   const [pdfPage, setPdfPage] = useState(1);
   const imageRef = useRef<HTMLImageElement>(null);
+  const pdfWrapperRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const imageable = isImageFile(doc.file_type);
@@ -111,6 +112,24 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     const y = (e.clientY - rect.top) / rect.height;
     if (x < 0 || x > 1 || y < 0 || y > 1) return;
     setPendingNote({ x_pct: x, y_pct: y, page: null });
+  };
+
+  const handlePdfWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!noteMode || !pdfWrapperRef.current) return;
+    const rect = pdfWrapperRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    if (x < 0 || x > 1 || y < 0 || y > 1) return;
+    if ((e.target as HTMLElement).closest('button')) return;
+    setPendingNote({ x_pct: x, y_pct: y, page: pdfPage });
+  };
+
+  const jumpToNote = (note: DocNote) => {
+    if (note.page != null) {
+      setPdfPage(note.page);
+    }
+    setEditingNote(note);
+    setPendingNote(null);
   };
 
   const handleCreateNote = async (data: { content: string; progress_at: number; color: string }) => {
@@ -259,26 +278,18 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
           {pdfable && (
             <Button
               size="sm"
-              variant="outline"
+              variant={noteMode ? 'default' : 'outline'}
               className="h-8 text-xs"
-              onClick={async () => {
-                const content = window.prompt(t('doc_viewer.pdf_note_prompt', 'Ghi chú cho trang này:'));
-                if (!content || !content.trim()) return;
-                try {
-                  await createNote(ctx, doc.uid, {
-                    content: content.trim(),
-                    page: pdfPage,
-                    progress_at: 0.5,
-                  });
-                  await load();
-                  toast.success(t('doc_viewer.note_saved', 'Đã lưu note'));
-                } catch (err) {
-                  toast.error(err instanceof Error ? err.message : 'Lỗi');
-                }
+              onClick={() => {
+                setNoteMode((v) => !v);
+                setPendingNote(null);
+                setEditingNote(null);
               }}
             >
-              <MessageSquare size={13} className="mr-1" />
-              Take Note
+              <StickyNote size={13} className="mr-1" />
+              {noteMode
+                ? t('doc_viewer.cancel_note', 'Huỷ Note')
+                : t('doc_viewer.take_note', 'Take Note')}
             </Button>
           )}
 
@@ -423,7 +434,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
             )}
 
             {pdfable && (
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col h-full min-h-0">
                 <div className="flex items-center gap-2 mb-2 text-xs text-slate-600">
                   <Button
                     size="sm"
@@ -437,29 +448,91 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                   <Button size="sm" variant="ghost" onClick={() => setPdfPage((p) => p + 1)}>
                     <ChevronRight size={14} />
                   </Button>
+                  {notes.length > 0 && (
+                    <span className="ml-2 text-[10px] text-slate-500 font-bold">
+                      {notes.length} note trên tài liệu
+                    </span>
+                  )}
                 </div>
-                <iframe
-                  src={`${doc.url}#page=${pdfPage}&toolbar=1`}
-                  className="w-full flex-1 bg-white rounded-md shadow"
-                  title={doc.name}
-                />
-                {notesForView.length > 0 && (
-                  <div className="mt-2 p-2 bg-white rounded-md border border-slate-200 space-y-1">
-                    {notesForView.map((n) => (
-                      <div key={n.uid} className="text-xs flex items-center gap-2">
-                        <span className="font-black text-indigo-600">N{n.page ?? 1}</span>
-                        <span className="truncate">{n.content}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteNote(n)}
-                          className="ml-auto text-rose-500 hover:underline text-[10px]"
-                        >
-                          Xóa
-                        </button>
+                <div
+                  ref={pdfWrapperRef}
+                  onClick={handlePdfWrapperClick}
+                  className={`relative flex-1 min-h-0 bg-slate-200 rounded-md overflow-hidden ${
+                    noteMode ? 'cursor-crosshair' : 'cursor-default'
+                  }`}
+                >
+                  <iframe
+                    key={pdfPage}
+                    src={`${doc.url}#page=${pdfPage}&toolbar=0&navpanes=0`}
+                    className="w-full h-full pointer-events-none"
+                    title={doc.name}
+                  />
+
+                  {notesForView.map((n) => {
+                    if (n.x_pct == null || n.y_pct == null) return null;
+                    const left = `${n.x_pct * 100}%`;
+                    const top = `${n.y_pct * 100}%`;
+                    const colorCls = NOTE_COLORS[n.color] || NOTE_COLORS.yellow;
+                    return (
+                      <button
+                        key={n.uid}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          jumpToNote(n);
+                        }}
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full ${colorCls} text-[10px] font-black shadow-lg ring-2 ring-white pointer-events-auto cursor-pointer hover:scale-110 transition z-10`}
+                        style={{ left, top }}
+                        title={`Trang ${n.page ?? 1} — ${n.content}`}
+                      >
+                        N{n.page ?? 1}
+                      </button>
+                    );
+                  })}
+
+                  {pendingNote && pendingNote.page === pdfPage && (
+                    <div
+                      className="absolute z-20"
+                      style={{
+                        left: `${pendingNote.x_pct * 100}%`,
+                        top: `${pendingNote.y_pct * 100}%`,
+                        transform: 'translate(-50%, -100%)',
+                      }}
+                    >
+                      <div className="mb-1 -translate-x-1/2 ml-3.5">
+                        <NoteEditor
+                          mode="create"
+                          onSubmit={handleCreateNote}
+                          onCancel={() => setPendingNote(null)}
+                        />
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  )}
+
+                  {editingNote && editingNote.page === pdfPage && (
+                    <div
+                      className="absolute z-20"
+                      style={{
+                        left: `${(editingNote.x_pct ?? 0) * 100}%`,
+                        top: `${(editingNote.y_pct ?? 0) * 100}%`,
+                        transform: 'translate(-50%, -100%)',
+                      }}
+                    >
+                      <div className="mb-1 -translate-x-1/2 ml-3.5">
+                        <NoteEditor
+                          mode="edit"
+                          existingNote={editingNote}
+                          initialContent={editingNote.content}
+                          initialProgressAt={editingNote.progress_at}
+                          initialColor={editingNote.color}
+                          onSubmit={handleEditNote}
+                          onDelete={() => handleDeleteNote(editingNote)}
+                          onCancel={() => setEditingNote(null)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -473,13 +546,18 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
             )}
           </div>
 
-          {/* Notes side panel (image only) */}
-          {imageable && (
+          {/* Notes side panel (image + pdf) */}
+          {(imageable || pdfable) && (
             <div className="w-full md:w-72 border-t md:border-t-0 md:border-l border-slate-200 bg-white flex flex-col max-h-[40vh] md:max-h-none">
-              <div className="px-4 py-3 border-b border-slate-200">
+              <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   {t('doc_viewer.notes_title', 'Ghi chú của tôi')} ({notes.length})
                 </span>
+                {pdfable && notes.length > 0 && (
+                  <span className="text-[10px] text-slate-400">
+                    {new Set(notes.map((n) => n.page ?? 1)).size} trang có note
+                  </span>
+                )}
               </div>
               <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {notes.length === 0 ? (
@@ -489,16 +567,27 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                 ) : (
                   notes.map((n) => {
                     const colorCls = NOTE_COLORS[n.color] || NOTE_COLORS.yellow;
+                    const isCurrentPage = pdfable && (n.page ?? 1) === pdfPage;
                     return (
                       <button
                         key={n.uid}
                         type="button"
-                        onClick={() => setEditingNote(n)}
-                        className="w-full text-left p-2 rounded-lg border border-slate-200 hover:border-indigo-300 transition group"
+                        onClick={() => jumpToNote(n)}
+                        className={`w-full text-left p-2 rounded-lg border transition group ${
+                          isCurrentPage
+                            ? 'border-indigo-300 bg-indigo-50/40'
+                            : 'border-slate-200 hover:border-indigo-300'
+                        }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className={`w-4 h-4 rounded-full ${colorCls}`} />
-                          <span className="text-[10px] font-black text-slate-500">
+                          {pdfable && n.page != null && (
+                            <span className="text-[10px] font-black text-indigo-600 flex items-center gap-0.5">
+                              <MapPin size={9} />
+                              Trang {n.page}
+                            </span>
+                          )}
+                          <span className="text-[10px] font-bold text-slate-500">
                             {Math.round((n.progress_at ?? 0) * 100)}%
                           </span>
                           <span className="ml-auto text-[10px] text-slate-400">
