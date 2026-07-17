@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   CheckCircle2,
@@ -55,6 +56,15 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   const imageRef = useRef<HTMLImageElement>(null);
   const pdfWrapperRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  const [editorPortal, setEditorPortal] = useState<{
+    mode: 'create' | 'edit';
+    x_pct: number;
+    y_pct: number;
+    left: number;
+    top: number;
+    note?: DocNote;
+  } | null>(null);
 
   const imageable = isImageFile(doc.file_type);
   const pdfable = isPdfFile(doc.file_type);
@@ -112,6 +122,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     const y = (e.clientY - rect.top) / rect.height;
     if (x < 0 || x > 1 || y < 0 || y > 1) return;
     setPendingNote({ x_pct: x, y_pct: y, page: null });
+    openEditorPortal('create', x, y, imageRef.current);
   };
 
   const handlePdfWrapperClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -122,6 +133,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     if (x < 0 || x > 1 || y < 0 || y > 1) return;
     if ((e.target as HTMLElement).closest('button')) return;
     setPendingNote({ x_pct: x, y_pct: y, page: pdfPage });
+    openEditorPortal('create', x, y, pdfWrapperRef.current);
   };
 
   const jumpToNote = (note: DocNote) => {
@@ -130,16 +142,39 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     }
     setEditingNote(note);
     setPendingNote(null);
+    const anchor = pdfable ? pdfWrapperRef.current : imageRef.current;
+    openEditorPortal('edit', note.x_pct ?? 0, note.y_pct ?? 0, anchor, note);
   };
 
+  const openEditorPortal = (
+    mode: 'create' | 'edit',
+    x_pct: number,
+    y_pct: number,
+    anchor: HTMLElement | null,
+    note?: DocNote,
+  ) => {
+    if (!anchor) return;
+    const rect = anchor.getBoundingClientRect();
+    const EDITOR_W = 288;
+    const EDITOR_H = 230;
+    const GAP = 8;
+    const rawLeft = rect.left + x_pct * rect.width;
+    const rawTop = rect.top + y_pct * rect.height;
+    const left = Math.max(8, Math.min(window.innerWidth - EDITOR_W - 8, rawLeft));
+    const top = Math.max(8, rawTop - EDITOR_H - GAP);
+    setEditorPortal({ mode, x_pct, y_pct, left, top, note });
+  };
+
+  const closeEditorPortal = () => setEditorPortal(null);
+
   const handleCreateNote = async (data: { content: string; progress_at: number; color: string }) => {
-    if (!pendingNote) return;
+    if (!editorPortal || editorPortal.mode !== 'create') return;
     try {
-      const note = await createNote(ctx, doc.uid, {
+      const note = await createNote(ctxRef.current, docUidRef.current, {
         content: data.content,
-        x_pct: pendingNote.x_pct,
-        y_pct: pendingNote.y_pct,
-        page: pendingNote.page,
+        x_pct: editorPortal.x_pct,
+        y_pct: editorPortal.y_pct,
+        page: pendingNote?.page ?? null,
         progress_at: data.progress_at,
         color: data.color,
       });
@@ -149,6 +184,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         return next;
       });
       setPendingNote(null);
+      setEditorPortal(null);
       setNoteMode(false);
       toast.success(t('doc_viewer.note_saved', 'Đã lưu note'));
     } catch (err) {
@@ -157,15 +193,16 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   };
 
   const handleEditNote = async (data: { content: string; progress_at: number; color: string }) => {
-    if (!editingNote) return;
+    if (!editorPortal || editorPortal.mode !== 'edit' || !editorPortal.note) return;
+    const note = editorPortal.note;
     try {
-      const updated = await updateNote(ctx, doc.uid, editingNote.uid, {
+      const updated = await updateNote(ctxRef.current, docUidRef.current, note.uid, {
         content: data.content,
         progress_at: data.progress_at,
         color: data.color,
-        x_pct: editingNote.x_pct,
-        y_pct: editingNote.y_pct,
-        page: editingNote.page,
+        x_pct: note.x_pct,
+        y_pct: note.y_pct,
+        page: note.page,
       });
       setNotes((prev) => {
         const next = prev.map((n) => (n.uid === updated.uid ? updated : n));
@@ -173,6 +210,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         return next;
       });
       setEditingNote(null);
+      setEditorPortal(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi cập nhật note');
     }
@@ -181,13 +219,14 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   const handleDeleteNote = async (note: DocNote) => {
     if (!window.confirm(t('doc_viewer.confirm_delete_note', 'Xóa note này?'))) return;
     try {
-      await deleteNote(ctx, doc.uid, note.uid);
+      await deleteNote(ctxRef.current, docUidRef.current, note.uid);
       setNotes((prev) => {
         const next = prev.filter((n) => n.uid !== note.uid);
         syncLocalProgress(next);
         return next;
       });
       setEditingNote(null);
+      setEditorPortal(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi xóa note');
     }
@@ -392,50 +431,11 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                       );
                     })}
 
-                    {pendingNote && (
-                      <div
-                        className="absolute z-20"
-                        style={{
-                          left: `${pendingNote.x_pct * 100}%`,
-                          top: `${pendingNote.y_pct * 100}%`,
-                          transform: 'translate(-50%, -100%)',
-                        }}
-                      >
-                        <div className="mb-1 -translate-x-1/2 ml-3.5">
-                          <NoteEditor
-                            mode="create"
-                            onSubmit={handleCreateNote}
-                            onCancel={() => setPendingNote(null)}
-                          />
-                        </div>
-                      </div>
-                    )}
+                    {pendingNote && null}
                   </div>
                 )}
 
-                {editingNote && (editingNote.x_pct != null) && (
-                  <div
-                    className="absolute z-20"
-                    style={{
-                      left: `${(editingNote.x_pct ?? 0) * 100}%`,
-                      top: `${(editingNote.y_pct ?? 0) * 100}%`,
-                      transform: 'translate(-50%, -100%)',
-                    }}
-                  >
-                    <div className="mb-1 -translate-x-1/2 ml-3.5">
-                      <NoteEditor
-                        mode="edit"
-                        existingNote={editingNote}
-                        initialContent={editingNote.content}
-                        initialProgressAt={editingNote.progress_at}
-                        initialColor={editingNote.color}
-                        onSubmit={handleEditNote}
-                        onDelete={() => handleDeleteNote(editingNote)}
-                        onCancel={() => setEditingNote(null)}
-                      />
-                    </div>
-                  </div>
-                )}
+                {editingNote && (editingNote.x_pct != null) && null}
               </div>
             )}
 
@@ -496,48 +496,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                     );
                   })}
 
-                  {pendingNote && pendingNote.page === pdfPage && (
-                    <div
-                      className="absolute z-20"
-                      style={{
-                        left: `${pendingNote.x_pct * 100}%`,
-                        top: `${pendingNote.y_pct * 100}%`,
-                        transform: 'translate(-50%, -100%)',
-                      }}
-                    >
-                      <div className="mb-1 -translate-x-1/2 ml-3.5">
-                        <NoteEditor
-                          mode="create"
-                          onSubmit={handleCreateNote}
-                          onCancel={() => setPendingNote(null)}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {editingNote && editingNote.page === pdfPage && (
-                    <div
-                      className="absolute z-20"
-                      style={{
-                        left: `${(editingNote.x_pct ?? 0) * 100}%`,
-                        top: `${(editingNote.y_pct ?? 0) * 100}%`,
-                        transform: 'translate(-50%, -100%)',
-                      }}
-                    >
-                      <div className="mb-1 -translate-x-1/2 ml-3.5">
-                        <NoteEditor
-                          mode="edit"
-                          existingNote={editingNote}
-                          initialContent={editingNote.content}
-                          initialProgressAt={editingNote.progress_at}
-                          initialColor={editingNote.color}
-                          onSubmit={handleEditNote}
-                          onDelete={() => handleDeleteNote(editingNote)}
-                          onCancel={() => setEditingNote(null)}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  {null}
                 </div>
               </div>
             )}
@@ -610,6 +569,34 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
           )}
         </div>
       </div>
+
+      {editorPortal && createPortal(
+        <div
+          className="fixed z-[60]"
+          style={{ left: editorPortal.left, top: editorPortal.top, width: 288 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {editorPortal.mode === 'create' ? (
+            <NoteEditor
+              mode="create"
+              onSubmit={handleCreateNote}
+              onCancel={closeEditorPortal}
+            />
+          ) : (
+            <NoteEditor
+              mode="edit"
+              existingNote={editorPortal.note}
+              initialContent={editorPortal.note?.content}
+              initialProgressAt={editorPortal.note?.progress_at ?? 0}
+              initialColor={editorPortal.note?.color ?? 'yellow'}
+              onSubmit={handleEditNote}
+              onDelete={() => editorPortal.note && handleDeleteNote(editorPortal.note)}
+              onCancel={closeEditorPortal}
+            />
+          )}
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }
