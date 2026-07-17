@@ -114,10 +114,13 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         progress_at: data.progress_at,
         color: data.color,
       });
-      setNotes((prev) => [note, ...prev]);
+      setNotes((prev) => {
+        const next = [note, ...prev];
+        syncLocalProgress(next);
+        return next;
+      });
       setPendingNote(null);
       setNoteMode(false);
-      await refreshProgress();
       toast.success(t('doc_viewer.note_saved', 'Đã lưu note'));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi lưu note');
@@ -135,9 +138,12 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         y_pct: editingNote.y_pct,
         page: editingNote.page,
       });
-      setNotes((prev) => prev.map((n) => (n.uid === updated.uid ? updated : n)));
+      setNotes((prev) => {
+        const next = prev.map((n) => (n.uid === updated.uid ? updated : n));
+        syncLocalProgress(next);
+        return next;
+      });
       setEditingNote(null);
-      await refreshProgress();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi cập nhật note');
     }
@@ -147,22 +153,36 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     if (!window.confirm(t('doc_viewer.confirm_delete_note', 'Xóa note này?'))) return;
     try {
       await deleteNote(ctx, doc.uid, note.uid);
-      setNotes((prev) => prev.filter((n) => n.uid !== note.uid));
+      setNotes((prev) => {
+        const next = prev.filter((n) => n.uid !== note.uid);
+        syncLocalProgress(next);
+        return next;
+      });
       setEditingNote(null);
-      await refreshProgress();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi xóa note');
     }
   };
 
-  const refreshProgress = async () => {
-    try {
-      const p = await fetchMyProgress(ctx, doc.uid);
-      setProgress(p);
-      onProgressChange?.(p);
-    } catch {
-      /* ignore */
-    }
+  const syncLocalProgress = (nextNotes: DocNote[]) => {
+    setProgress((prev) => {
+      const isCompleted = prev?.is_completed ?? false;
+      const maxAt = nextNotes.reduce((m, n) => Math.max(m, n.progress_at ?? 0), 0);
+      const derivedPct = Math.min(99, Math.round(maxAt * 100));
+      const finalPct = isCompleted ? 100 : derivedPct;
+      const next: DocProgress = {
+        classroom_id: doc.uid,
+        student_id: prev?.student_id ?? '',
+        resource_uid: doc.uid,
+        read_progress: finalPct,
+        is_completed: isCompleted,
+        note_count: nextNotes.length,
+        completed_at: prev?.completed_at ?? null,
+        last_opened_at: prev?.last_opened_at ?? null,
+      };
+      onProgressChange?.(next);
+      return next;
+    });
   };
 
   const progressPct = progress?.read_progress ?? 0;
