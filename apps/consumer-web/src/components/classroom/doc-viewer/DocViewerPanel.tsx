@@ -209,8 +209,14 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         completed_at: prev?.completed_at ?? null,
         last_opened_at: prev?.last_opened_at ?? null,
       };
-      onProgressChangeRef.current?.(next);
       return next;
+    });
+    /* Defer parent notification outside of the render cycle. */
+    queueMicrotask(() => {
+      setProgress((current) => {
+        if (current) onProgressChangeRef.current?.(current);
+        return current;
+      });
     });
   };
 
