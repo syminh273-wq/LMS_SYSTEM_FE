@@ -283,6 +283,10 @@ export type QuizQuestion = {
   created_at?: string;
 };
 
+export type UpdateQuestionRequest = {
+  correct_answer: 'a' | 'b' | 'c' | 'd';
+};
+
 export type QuizAssignment = {
   quiz_id: string;
   classroom_id: string;

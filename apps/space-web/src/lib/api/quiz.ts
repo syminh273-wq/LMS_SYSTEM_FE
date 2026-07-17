@@ -1,8 +1,8 @@
 import BaseRestApiClient from './client';
 import type {
   Quiz, QuizDetail, QuizTypeOption, GenerateQuizRequest,
-  UpdateQuizRequest, UpdateAssignmentRequest,
-  QuizStreamEvent, QuizAttemptRecord, QuizAssignment,
+  UpdateQuizRequest, UpdateAssignmentRequest, UpdateQuestionRequest,
+  QuizQuestion, QuizStreamEvent, QuizAttemptRecord, QuizAssignment,
 } from './types';
 
 export class QuizApiClient extends BaseRestApiClient {
@@ -104,6 +104,17 @@ export class QuizApiClient extends BaseRestApiClient {
   public async getAttempts(uid: string, classroomId: string): Promise<QuizAttemptRecord[]> {
     return this.get<QuizAttemptRecord[]>(
       `/api/v1/space/quiz/${uid}/attempts/?classroom_id=${encodeURIComponent(classroomId)}`
+    );
+  }
+
+  public async updateQuestion(
+    quizUid: string,
+    questionUid: string,
+    data: UpdateQuestionRequest,
+  ): Promise<QuizQuestion> {
+    return this.patch<QuizQuestion>(
+      `/api/v1/space/quiz/${quizUid}/questions/${questionUid}/`,
+      data,
     );
   }
 }

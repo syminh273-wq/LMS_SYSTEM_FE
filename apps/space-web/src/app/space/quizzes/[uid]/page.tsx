@@ -5,7 +5,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
-import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment } from '@/lib/api/types';
+import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, BookOpen, CheckCircle2,
   Plus, X, Link2, BarChart2, Clock, RotateCcw, Settings,
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
+import EditQuestionModal from '@/components/quiz/EditQuestionModal';
 
 interface Props {
   params: Promise<{ uid: string }>;
@@ -38,6 +39,7 @@ export default function QuizDetailPage({ params }: Props) {
   const [loading, setLoading] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<QuizAssignment | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('questions');
 
   // attempts tab state
@@ -92,6 +94,15 @@ export default function QuizDetailPage({ params }: Props) {
       ...prev,
       assigned_classrooms: (prev.assigned_classrooms ?? []).map(a =>
         a.classroom_id === updated.classroom_id ? updated : a
+      ),
+    } : prev);
+  };
+
+  const handleQuestionUpdated = (updated: QuizQuestion) => {
+    setQuiz(prev => prev ? {
+      ...prev,
+      questions: (prev.questions ?? []).map(q =>
+        q.uid === updated.uid ? updated : q
       ),
     } : prev);
   };
@@ -189,7 +200,14 @@ export default function QuizDetailPage({ params }: Props) {
                 <span className="w-7 h-7 rounded-lg bg-primary-brand text-white text-xs font-black flex items-center justify-center shrink-0">
                   {idx + 1}
                 </span>
-                <p className="text-sm font-bold text-foreground leading-relaxed">{q.question_text}</p>
+                <p className="text-sm font-bold text-foreground leading-relaxed flex-1">{q.question_text}</p>
+                <button
+                  type="button"
+                  onClick={() => setEditingQuestion(q)}
+                  className="shrink-0 text-[10px] font-black text-primary-brand bg-primary-brand-light hover:bg-primary-brand hover:text-white rounded-lg px-3 py-1.5 transition-colors uppercase tracking-wider"
+                >
+                  Sửa đáp án
+                </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-10">
                 {(['a', 'b', 'c', 'd'] as const).map(opt => {
@@ -302,6 +320,15 @@ export default function QuizDetailPage({ params }: Props) {
           assignment={editingAssignment}
           onClose={() => setEditingAssignment(null)}
           onUpdated={handleAssignmentUpdated}
+        />
+      )}
+
+      {editingQuestion && (
+        <EditQuestionModal
+          quizUid={quiz.uid}
+          question={editingQuestion}
+          onClose={() => setEditingQuestion(null)}
+          onUpdated={handleQuestionUpdated}
         />
       )}
     </div>

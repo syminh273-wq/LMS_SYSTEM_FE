@@ -6,7 +6,7 @@ import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
 import type { Quiz, QuizDetail, Classroom, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
-  Loader2, Plus, Trash2, BookOpen, Wand2,
+  Loader2, Plus, Trash2, BookOpen, Wand2, Pencil,
   ChevronDown, ChevronUp, Link2, Clock, RotateCcw, Settings,
   Shuffle, HelpCircle, Target, X, CheckCircle2,
 } from 'lucide-react';
@@ -16,6 +16,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/lib/redux/store';
 import GenerateQuizModal from '@/components/quiz/GenerateQuizModal';
+import EditQuestionModal from '@/components/quiz/EditQuestionModal';
 
 export default function QuizLibraryPage() {
   const { t } = useTranslation();
@@ -228,6 +229,21 @@ export default function QuizLibraryPage() {
                             };
                           });
                         }}
+                        onQuestionUpdated={(updated) => {
+                          setDetailsByUid(prev => {
+                            const cur = prev[quiz.uid];
+                            if (!cur) return prev;
+                            return {
+                              ...prev,
+                              [quiz.uid]: {
+                                ...cur,
+                                questions: (cur.questions ?? []).map(q =>
+                                  q.uid === updated.uid ? updated : q
+                                ),
+                              },
+                            };
+                          });
+                        }}
                       />
                     ) : null}
                   </div>
@@ -246,15 +262,17 @@ export default function QuizLibraryPage() {
 }
 
 function QuizExpandedPanel({
-  detail, onAssignedUpdate, onUnassigned,
+  detail, onAssignedUpdate, onUnassigned, onQuestionUpdated,
 }: {
   detail: QuizDetail;
   onAssignedUpdate: (a: QuizAssignment) => void;
   onUnassigned: (classroomId: string) => void;
+  onQuestionUpdated: (q: QuizQuestion) => void;
 }) {
   const { t } = useTranslation();
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<QuizAssignment | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
 
   const questions = (detail.questions ?? []).slice().sort((a, b) => a.order - b.order);
   const assignments = detail.assigned_classrooms ?? [];
@@ -302,7 +320,12 @@ function QuizExpandedPanel({
       ) : (
         <ol className="space-y-1.5">
           {questions.map((q, idx) => (
-            <QuestionRow key={q.uid} index={idx + 1} question={q} />
+            <QuestionRow
+              key={q.uid}
+              index={idx + 1}
+              question={q}
+              onEdit={() => setEditingQuestion(q)}
+            />
           ))}
         </ol>
       )}
@@ -358,6 +381,18 @@ function QuizExpandedPanel({
           }}
         />
       )}
+
+      {editingQuestion && (
+        <EditQuestionModal
+          quizUid={detail.uid}
+          question={editingQuestion}
+          onClose={() => setEditingQuestion(null)}
+          onUpdated={(updated) => {
+            onQuestionUpdated(updated);
+            setEditingQuestion(null);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -372,7 +407,7 @@ async function handleUnassignInline(classroomId: string, quizUid: string, onUnas
   }
 }
 
-function QuestionRow({ index, question }: { index: number; question: QuizQuestion }) {
+function QuestionRow({ index, question, onEdit }: { index: number; question: QuizQuestion; onEdit: () => void }) {
   const { t } = useTranslation();
   return (
     <li className="flex items-start gap-3 bg-card border border-border rounded-xl px-4 py-3">
@@ -388,6 +423,14 @@ function QuestionRow({ index, question }: { index: number; question: QuizQuestio
           </span>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={onEdit}
+        title="Sửa đáp án"
+        className="shrink-0 w-7 h-7 rounded-lg text-muted-foreground hover:text-primary-brand hover:bg-primary-brand/10 flex items-center justify-center transition-colors"
+      >
+        <Pencil size={13} />
+      </button>
     </li>
   );
 }
