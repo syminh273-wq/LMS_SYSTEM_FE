@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { classroomApi, examApi, Classroom, ClassroomMember, Exam, ExamSession, ExamSubmission } from '@/lib/api';
+import { formatDateTime } from '@shared/lib/datetime';
 
 type SubmissionFilter = 'submitted' | 'missing';
 type ExamDetailTab = 'submissions' | 'online';
@@ -684,11 +685,4 @@ function getSubmissionStatusLabel(status: string) {
   if (normalized === 'graded') return 'Đã chấm';
   if (normalized === 'late') return 'Nộp trễ';
   return 'Đã nộp';
-}
-
-function formatDateTime(value: string | null) {
-  if (!value) return '--';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString('vi-VN');
 }

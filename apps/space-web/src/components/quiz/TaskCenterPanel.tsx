@@ -8,6 +8,7 @@ import { Loader2, CheckCircle2, XCircle, Clock, RotateCw, ExternalLink, X, Trash
 import { toast } from 'sonner';
 import { quizTasksApi } from '@/lib/api/quiz-tasks';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { parseDate } from '@shared/lib/datetime';
 import type { QuizTask, QuizTaskStatus } from '@/lib/api/types';
 import {
   removeTask,
@@ -46,7 +47,7 @@ function filterTasks(tasks: QuizTask[], tab: TaskCenterTab): QuizTask[] {
 }
 
 function formatRelative(iso: string, t: (k: string, f?: string, v?: Record<string, string | number>) => string): string {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  const diff = Math.floor((Date.now() - parseDate(iso).getTime()) / 1000);
   if (diff < 60) return t('quizTasks.progress.just_now');
   if (diff < 3600) return t('quizTasks.progress.minutes_ago', undefined, { count: Math.floor(diff / 60) });
   if (diff < 86400) return t('quizTasks.progress.hours_ago', undefined, { count: Math.floor(diff / 3600) });

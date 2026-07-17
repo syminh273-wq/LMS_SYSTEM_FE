@@ -99,12 +99,12 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
-  { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
-  { name: 'Feed', href: '/consumer/feed', icon: Sparkles },
-  { name: 'Calendar', href: '/consumer/calendar', icon: CalendarIcon },
-  { name: 'Grades', href: '/consumer/grades', icon: GraduationCap },
-  { name: 'Certificates', href: '/consumer/certificate', icon: Award },
+  { name: 'Bảng điều khiển', href: '/consumer/dashboard', icon: LayoutDashboard },
+  { name: 'Lớp học', href: '/consumer/classroom', icon: BookOpen },
+  { name: 'Bảng tin', href: '/consumer/feed', icon: Sparkles },
+  { name: 'Lịch', href: '/consumer/calendar', icon: CalendarIcon },
+  { name: 'Điểm', href: '/consumer/grades', icon: GraduationCap },
+  { name: 'Chứng chỉ', href: '/consumer/certificate', icon: Award },
 ];
 
 function parseNotificationMetadata(raw: string | NotificationMetadata | undefined | null): NotificationMetadata {
@@ -117,19 +117,7 @@ function parseNotificationMetadata(raw: string | NotificationMetadata | undefine
   }
 }
 
-function relativeTime(iso: string): string {
-  const t = new Date(iso).getTime();
-  if (Number.isNaN(t)) return '';
-  const diff = Date.now() - t;
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return 'Vừa xong';
-  if (min < 60) return `${min} phút trước`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} giờ trước`;
-  const day = Math.floor(hr / 24);
-  if (day < 7) return `${day} ngày trước`;
-  return new Date(iso).toLocaleDateString('vi-VN');
-}
+import { formatRelative } from '@shared/lib/datetime';
 
 function NotificationBell({ userId }: { userId: string | null | undefined }) {
   const router = useRouter();
@@ -248,7 +236,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
                           {item.content}
                         </p>
                         <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-1 font-medium">
-                          {relativeTime(item.created_at)}
+                          {formatRelative(item.created_at)}
                           {hasLink && (
                             <span className="ml-2 text-indigo-600 dark:text-indigo-400 font-semibold">· Xem lớp →</span>
                           )}
@@ -458,7 +446,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                 <div className="space-y-0.5">
                   {[
                     { label: 'Trang cá nhân', Icon: User, path: '/consumer/profile' },
-                    { label: 'Dashboard', Icon: LayoutDashboard, path: '/consumer/dashboard' },
+                    { label: 'Bảng điều khiển', Icon: LayoutDashboard, path: '/consumer/dashboard' },
                     { label: 'Lớp học của tôi', Icon: BookOpen, path: '/consumer/classroom' },
                     { label: 'Cài đặt', Icon: Settings, path: '/consumer/settings' },
                   ].map(({ label, Icon, path }) => (

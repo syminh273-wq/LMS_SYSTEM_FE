@@ -4,38 +4,46 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { Lock, Mail, GraduationCap, ArrowRight, ShieldCheck, TrendingUp } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Mail,
+  Lock,
+  CheckCircle2,
+} from 'lucide-react';
 import Link from 'next/link';
-import { MasterLayout, MasterHeader, MasterBody } from '@shared/components/layout/MasterLayout';
+import { toast } from 'sonner';
+import { MasterLayout, MasterBody } from '@shared/components/layout/MasterLayout';
+import { LmsLogo } from '@shared/components/LmsLogo';
+import { cn } from '@shared/lib/utils';
 
 type RegisterFormValues = {
   email: string;
   password: string;
 };
 
+function GoogleIcon() {
+  return (
+    <svg width='18' height='18' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
+      <path d='M6.306 14.691l6.571 4.819C14.655 15.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z' fill='#FF3D00'/>
+      <path d='M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.316 0-9.829-3.562-11.448-8.47l-6.522 5.025C9.505 39.556 16.227 44 24 44z' fill='#4CAF50'/>
+      <path d='M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z' fill='#1976D2'/>
+    </svg>
+  );
+}
+
 export default function SpaceRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<RegisterFormValues>({
-    defaultValues: { email: '', password: '' }
-  });
-
-  const handleApiError = (err: any) => {
-    if (err instanceof ValidationException) {
-      Object.entries(err.errors).forEach(([field, message]) => {
-        setFormError(field as any, { type: 'server', message });
-      });
-    } else {
-      setGlobalError(err.message || 'Đăng ký thất bại');
-    }
-  };
+  const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<RegisterFormValues>();
 
   const onRegister = async (data: RegisterFormValues) => {
-    setGlobalError('');
-    setLoading(true);
+    setGlobalError(''); setLoading(true);
     try {
       const name = data.email.split('@')[0];
       const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.random().toString(36).substring(2, 7);
@@ -46,121 +54,153 @@ export default function SpaceRegisterPage() {
         slug: slug,
         full_name: name
       });
-      router.push('/space/login?registered=true');
-    } catch (err: any) {
-      handleApiError(err);
+      toast.success('Tạo Space thành công!', {
+        description: 'Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.',
+        icon: <CheckCircle2 className="text-emerald-500" size={20} />,
+        duration: 4000,
+      });
+      setTimeout(() => router.push('/space/login'), 1800);
+    } catch (err: unknown) {
+      if (err instanceof ValidationException) {
+        Object.entries(err.errors).forEach(([field, message]) => {
+          setFormError(field as keyof RegisterFormValues, { type: 'server', message });
+        });
+        toast.error('Vui lòng kiểm tra lại thông tin.');
+      } else {
+        const msg = err instanceof Error ? err.message : 'Đăng ký thất bại';
+        setGlobalError(msg);
+        toast.error(msg);
+      }
     } finally { setLoading(false); }
   };
 
   return (
-    <MasterLayout
-      header={
-        <MasterHeader className="px-12 py-8 h-auto bg-transparent border-none">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#1A1F2C] p-2 rounded-xl shadow-lg">
-               <Image src="/logo.jpg" alt="EduSphere" width={28} height={28} className="brightness-0 invert" />
-            </div>
-            <span className="text-2xl font-black text-[#1A1F2C] tracking-tight">EduSphere</span>
-          </div>
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-            Professional Academy Network
-          </div>
-        </MasterHeader>
-      }
-    >
-      <MasterBody className="items-center justify-center p-6 relative z-10">
-        {/* Floating Stat Card */}
-        <div className='absolute bottom-12 left-12 bg-white/80 backdrop-blur-xl p-5 rounded-3xl shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/50 animate-bounce' style={{ animationDuration: '4s' }}>
-          <div className='flex items-center gap-3 mb-3'>
-             <div className='p-2 bg-indigo-50 rounded-lg'>
-                <TrendingUp size={16} className='text-[#4F46E5]' />
-             </div>
-             <span className='text-[10px] font-black text-[#1A1F2C] uppercase tracking-wider'>Hiệu suất học tập</span>
-          </div>
-          <div className='w-40 h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2'>
-             <div className='w-2/3 h-full bg-[#4F46E5] rounded-full' />
-          </div>
-          <span className='text-[10px] font-bold text-green-500'>+24% tương tác trong tháng qua</span>
-        </div>
+    <MasterLayout footer={null}>
+      <MasterBody className="min-h-screen">
+        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
 
-        {/* Main Card */}
-        <div className='w-full max-w-lg bg-white rounded-[40px] shadow-[0_40px_100px_rgba(0,0,0,0.08)] overflow-hidden relative group'>
-          {/* Top Gradient Border */}
-          <div className='h-1.5 w-full bg-gradient-to-r from-transparent via-[#4F46E5] to-transparent opacity-80' />
-          
-          <div className='p-12 md:p-16'>
-            <div className='flex flex-col items-center text-center mb-10'>
-              <div className='w-20 h-20 bg-[#EEF2FF] rounded-[28px] flex items-center justify-center mb-6 shadow-inner'>
-                <GraduationCap size={40} className='text-[#4F46E5]' />
+          {/* Form */}
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
+
+            <div className="w-full max-w-[420px] animate-fade-up">
+              <div className="mb-8 flex justify-center">
+                <LmsLogo height={48} width="auto" className="h-12 w-auto object-contain" />
               </div>
-              <h1 className='text-3xl font-black text-[#1A1F2C] mb-4 tracking-tight'>
-                Khởi tạo Space của bạn
-              </h1>
-              <p className='text-gray-500 text-sm leading-relaxed max-w-[280px]'>
-                Thiết lập không gian đào tạo chuyên nghiệp cho đội ngũ và học viên của bạn chỉ trong vài bước.
-              </p>
-            </div>
 
-            {globalError && (
-              <div className='bg-red-50 text-red-600 p-4 rounded-2xl text-xs font-bold mb-6 border border-red-100'>
-                {globalError}
+              <div className="mb-7 text-center">
+                <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
+                  Tạo Space mới
+                </h2>
+                <p className="text-slate-600 text-[15px] dark:text-slate-400">
+                  Thiết lập không gian đào tạo chuyên nghiệp cho tổ chức của bạn.
+                </p>
               </div>
-            )}
 
-            <form onSubmit={handleSubmit(onRegister)} className='space-y-6'>
-              <div className='space-y-2'>
-                <label className='text-[11px] font-black text-[#1A1F2C] uppercase tracking-widest ml-1'>Admin Email</label>
-                <div className='relative'>
-                  <Mail className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' size={18} />
-                  <input 
-                    {...register('email', { required: 'Bắt buộc' })}
-                    placeholder='name@organization.com'
-                    className='w-full bg-[#F3F4F9] border-none h-14 rounded-2xl pl-12 pr-4 text-sm font-medium focus:ring-2 focus:ring-[#4F46E5]/20 focus:bg-white transition-all outline-none'
-                  />
+              {globalError && (
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-fade-down dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                  <span className="font-medium">{globalError}</span>
                 </div>
-                {errors.email && <p className='text-red-500 text-[10px] font-bold ml-1'>{errors.email.message}</p>}
-              </div>
+              )}
 
-              <div className='space-y-2'>
-                <label className='text-[11px] font-black text-[#1A1F2C] uppercase tracking-widest ml-1'>Mật khẩu hệ thống</label>
-                <div className='relative'>
-                  <Lock className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400' size={18} />
-                  <input 
-                    type='password'
-                    {...register('password', { required: 'Bắt buộc' })}
-                    placeholder='••••••••••••'
-                    className='w-full bg-[#F3F4F9] border-none h-14 rounded-2xl pl-12 pr-12 text-sm font-medium focus:ring-2 focus:ring-[#4F46E5]/20 focus:bg-white transition-all outline-none'
-                  />
-                  <button type='button' className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500'>
-                    <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>
-                  </button>
+              <form onSubmit={handleSubmit(onRegister)} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <input
+                      {...register('email', { required: 'Vui lòng nhập email' })}
+                      type="email"
+                      autoComplete="email"
+                      placeholder="name@company.com"
+                      className="w-full h-11 pl-10 pr-4 text-sm bg-white border border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400 outline-none"
+                    />
+                  </div>
+                  {errors.email && <p className="text-rose-600 text-xs font-medium mt-1">{errors.email.message}</p>}
                 </div>
-                {errors.password && <p className='text-red-500 text-[10px] font-bold ml-1'>{errors.password.message}</p>}
-                <p className='text-[10px] text-gray-400 font-medium ml-1'>Mật khẩu cần ít nhất 8 ký tự bao gồm chữ cái và số.</p>
+
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Mật khẩu</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      {...register('password', { required: 'Vui lòng nhập mật khẩu', minLength: { value: 8, message: 'Tối thiểu 8 ký tự' } })}
+                      placeholder="••••••••"
+                      className="w-full h-11 pl-10 pr-11 text-sm bg-white border border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors dark:hover:text-slate-200"
+                      aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-rose-600 text-xs font-medium mt-1">{errors.password.message}</p>}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={cn(
+                    "w-full h-11 rounded-lg font-semibold text-sm text-white",
+                    "bg-indigo-600 hover:bg-indigo-700",
+                    "shadow-sm transition-colors",
+                    "flex items-center justify-center gap-2",
+                    "disabled:opacity-60 disabled:cursor-not-allowed"
+                  )}
+                >
+                  {loading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Đang khởi tạo...
+                    </>
+                  ) : (
+                    <>
+                      Tạo Space
+                      <ArrowRight size={16} strokeWidth={2.5} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="relative my-5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold dark:bg-slate-950">
+                    Hoặc
+                  </span>
+                </div>
               </div>
 
-              <button 
-                type='submit' 
-                disabled={loading}
-                className='w-full bg-[#4F46E5] hover:bg-[#4338CA] text-white h-16 rounded-2xl font-black text-sm flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#4F46E5]/20 active:scale-[0.98] disabled:opacity-50 mt-4'
+              <button
+                type="button"
+                onClick={() => {
+                  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                  window.location.href = `${backendUrl}/api/v1/space/account/auth/google/login/`;
+                }}
+                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
-                {loading ? 'Đang khởi tạo...' : 'Bắt đầu quản lý ngay'}
-                {!loading && <ArrowRight size={20} />}
+                <GoogleIcon />
+                Tiếp tục với Google
               </button>
-            </form>
 
-            <div className='mt-12 pt-8 border-t border-gray-50 flex items-center justify-between'>
-              <div className='flex items-center gap-2'>
-                 <ShieldCheck className='text-indigo-600' size={16} />
-                 <span className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>Bảo mật cấp doanh nghiệp</span>
-              </div>
-              <div className='flex -space-x-2'>
-                 {[1,2,3].map(i => (
-                   <div key={i} className='w-7 h-7 rounded-full border-2 border-white bg-gray-100 overflow-hidden relative'>
-                      <Image src={`https://i.pravatar.cc/100?u=${i}`} alt='user' fill className='object-cover' />
-                   </div>
-                 ))}
-                 <div className='w-7 h-7 rounded-full border-2 border-white bg-gray-50 flex items-center justify-center text-[8px] font-bold text-gray-400'>+2k</div>
+              <Link
+                href="/space/login"
+                className="w-full h-11 rounded-lg text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center justify-center gap-2 mt-3 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30 dark:hover:bg-indigo-500/20"
+              >
+                Đã có Space? Đăng nhập
+              </Link>
+
+              <div className="mt-6 text-center">
+                <Link href='http://localhost:3000/login' className='text-slate-500 text-xs hover:text-slate-700 font-medium transition-colors dark:text-slate-400 dark:hover:text-slate-200'>
+                  &larr; Quay lại trang người dùng
+                </Link>
               </div>
             </div>
           </div>

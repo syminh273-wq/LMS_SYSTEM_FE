@@ -16,6 +16,7 @@ import { socialApi } from '@/lib/api/social';
 import { PostCard } from '../../feed/PostCard';
 import { cn } from '@shared/lib/utils';
 import { useRouter } from 'next/navigation';
+import { formatDate } from '@shared/lib/datetime';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '@/lib/redux/store';
@@ -378,7 +379,7 @@ export default function PublicProfilePage() {
                 <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-blue-50 text-blue-600 dark:bg-blue-950/30">
                   <Calendar size={16} />
                 </span>
-                <span>Tham gia {new Date(consumer.created_at).toLocaleDateString('vi-VN')}</span>
+                <span>Tham gia {formatDate(consumer.created_at)}</span>
               </div>
             </div>
           </div>

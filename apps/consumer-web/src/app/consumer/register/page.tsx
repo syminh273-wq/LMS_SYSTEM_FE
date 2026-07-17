@@ -7,8 +7,6 @@ import { useRouter } from 'next/navigation';
 import {
   Eye,
   EyeOff,
-  ShieldCheck,
-  Zap,
   ArrowRight,
   PartyPopper,
   Sparkles,
@@ -21,6 +19,7 @@ import { Input } from '@shared/components/ui/input';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MasterLayout, MasterBody } from '@shared/components/layout/MasterLayout';
+import { LmsLogo } from '@shared/components/LmsLogo';
 import { cn } from '@shared/lib/utils';
 
 type RegisterFormValues = {
@@ -87,86 +86,17 @@ export default function RegisterPage() {
   return (
     <MasterLayout footer={null}>
       <MasterBody className="min-h-screen">
-        <div className="flex min-h-screen flex-col lg:flex-row bg-slate-50 dark:bg-slate-950">
+        <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
 
-          {/* Left Side - Hero */}
-          <div className="relative hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col justify-between overflow-hidden bg-indigo-600 p-10 xl:p-16">
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-500/40 blur-3xl" />
-            <div className="absolute -bottom-32 -left-10 w-72 h-72 rounded-full bg-sky-500/30 blur-3xl" />
-
-            <div className="relative">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-md">
-                  <Sparkles size={18} className="text-indigo-600" strokeWidth={2.5} />
-                </div>
-                <span className="text-xl font-bold text-white tracking-tight">EduSphere</span>
-              </div>
-            </div>
-
-            <div className="relative space-y-7">
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide text-white">
-                <Sparkles size={12} />
-                GIA NHẬP 10.000+ HỌC VIÊN
-              </div>
-
-              <h1 className="text-5xl xl:text-6xl font-bold leading-[1.05] text-white tracking-tight text-balance">
-                Bắt đầu hành trình vươn tầm.
-              </h1>
-
-              <p className="text-indigo-100 text-base xl:text-lg max-w-md leading-relaxed">
-                Gia nhập cộng đồng người học tinh hoa và trải nghiệm nền tảng giáo dục chuẩn quốc tế.
-              </p>
-
-              <div className="space-y-3 pt-2">
-                {[
-                  { icon: ShieldCheck, title: 'Bảo mật chuẩn quốc tế', desc: 'Mã hóa end-to-end' },
-                  { icon: Zap, title: 'Trải nghiệm mượt mà', desc: 'Tối ưu cho mọi thiết bị' },
-                  { icon: Sparkles, title: 'Cá nhân hoá lộ trình', desc: 'AI gợi ý bài học phù hợp' },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div
-                    key={title}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                      <Icon className="text-white" size={17} strokeWidth={2.2} />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm text-white">{title}</p>
-                      <p className="text-xs text-indigo-100">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative flex items-center gap-6 text-xs text-indigo-100">
-              <span>© 2026 EduSphere</span>
-              <span>·</span>
-              <span>Điều khoản</span>
-              <span>·</span>
-              <span>Bảo mật</span>
-            </div>
-          </div>
-
-          {/* Right Side - Form */}
+          {/* Form */}
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
-            <div className="absolute top-6 right-6 sm:top-8 sm:right-10 text-sm text-slate-600 dark:text-slate-400">
-              Đã có tài khoản?{' '}
-              <Link href="/consumer/login" className="text-indigo-600 font-semibold hover:underline dark:text-indigo-400">
-                Đăng nhập
-              </Link>
-            </div>
 
             <div className="w-full max-w-[480px] animate-fade-up">
-              <div className="lg:hidden mb-8 flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
-                  <Sparkles size={18} className="text-white" strokeWidth={2.5} />
-                </div>
-                <span className="text-xl font-bold text-slate-900 tracking-tight dark:text-white">EduSphere</span>
+              <div className="mb-8 flex justify-center">
+                <LmsLogo height={48} width="auto" className="h-12 w-auto object-contain" />
               </div>
 
-              <div className="mb-7">
+              <div className="mb-7 text-center">
                 <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
                   Tạo tài khoản
                 </h2>
@@ -299,25 +229,6 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                <label className="flex items-start gap-2.5 pt-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    required
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-2 focus:ring-indigo-100 cursor-pointer"
-                  />
-                  <span className="text-xs text-slate-600 leading-relaxed dark:text-slate-400">
-                    Tôi đồng ý với{' '}
-                    <Link href="#" className="text-slate-900 hover:underline font-medium dark:text-slate-200">
-                      Điều khoản dịch vụ
-                    </Link>{' '}
-                    và{' '}
-                    <Link href="#" className="text-slate-900 hover:underline font-medium dark:text-slate-200">
-                      Chính sách bảo mật
-                    </Link>
-                    .
-                  </span>
-                </label>
-
                 <button
                   type="submit"
                   disabled={loading}
@@ -330,7 +241,7 @@ export default function RegisterPage() {
                     </>
                   ) : (
                     <>
-                      Tạo tài khoản
+                  Đăng kí tài khoản
                       <ArrowRight size={16} strokeWidth={2.5} />
                     </>
                   )}
@@ -359,6 +270,13 @@ export default function RegisterPage() {
                 <GoogleIcon />
                 Tiếp tục với Google
               </button>
+
+              <Link
+                href="/consumer/login"
+                className="w-full h-11 rounded-lg text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors flex items-center justify-center gap-2 mt-3 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30 dark:hover:bg-indigo-500/20"
+              >
+                Đã có tài khoản? Đăng nhập
+              </Link>
             </div>
           </div>
         </div>

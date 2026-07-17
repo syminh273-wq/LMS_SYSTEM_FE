@@ -21,6 +21,7 @@ import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { chatApi } from '@/lib/api/chat';
 import { useChatWebSocket } from '@/lib/hooks/use-chat-websocket';
+import { formatTime } from '@shared/lib/datetime';
 import type { ChatMessage, ChatAttachment, MsgType } from '@/lib/api/types';
 
 interface Props {
@@ -176,12 +177,7 @@ function MessageBubble({
   currentUserId: string | null;
 }) {
   const isMe = !!currentUserId && msg.sender_id === currentUserId;
-  const timeStr = msg.created_at
-    ? new Date(msg.created_at).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '';
+  const timeStr = msg.created_at ? formatTime(msg.created_at) : '';
 
   const initials = msg.sender_name
     ? msg.sender_name.slice(0, 2).toUpperCase()

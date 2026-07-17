@@ -4,34 +4,27 @@ interface LmsLogoProps {
   className?: string;
   width?: number | string;
   height?: number | string;
-  /** Deep navy – default #1a3a7a */
   primaryColor?: string;
-  /** Cyan/teal accent – default #00b4d8 */
   accentColor?: string;
-  /** Gold accent – default #d4a843 */
   goldColor?: string;
 }
 
 export function LmsLogo({
   className,
-  width = 330,
+  width = 380,
   height = 120,
-  primaryColor = '#1a3a7a',
-  accentColor = '#00b4d8',
-  goldColor = '#d4a843',
+  primaryColor = '#0d4a8a',
+  accentColor = '#4db8e8',
+  goldColor: _goldColor,
 }: LmsLogoProps) {
   const id = React.useId().replace(/:/g, '');
 
-  const bgGradId    = `bg-${id}`;
-  const lmsGradId   = `lms-${id}`;
-  const goldGradId  = `gold-${id}`;
-  const shineGradId = `shine-${id}`;
-  const shadowId    = `shadow-${id}`;
+  const bookGradId = `book-${id}`;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 330 120"
+      viewBox="0 0 380 120"
       width={width}
       height={height}
       className={className}
@@ -39,108 +32,96 @@ export function LmsLogo({
       role="img"
     >
       <defs>
-        {/* Badge gradient: accent → primary */}
-        <linearGradient id={bgGradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   style={{ stopColor: accentColor,  stopOpacity: 1 }} />
+        <linearGradient id={bookGradId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: accentColor, stopOpacity: 1 }} />
           <stop offset="100%" style={{ stopColor: primaryColor, stopOpacity: 1 }} />
         </linearGradient>
-
-        {/* LMS text gradient: accent top → primary bottom */}
-        <linearGradient id={lmsGradId} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%"   style={{ stopColor: accentColor,  stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: primaryColor, stopOpacity: 1 }} />
-        </linearGradient>
-
-        {/* Gold for spark / accent */}
-        <linearGradient id={goldGradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   style={{ stopColor: '#ffe066', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: goldColor,  stopOpacity: 1 }} />
-        </linearGradient>
-
-        {/* Inner radial shine on badge */}
-        <radialGradient id={shineGradId} cx="32%" cy="26%" r="58%">
-          <stop offset="0%"   style={{ stopColor: '#fff', stopOpacity: 0.3 }} />
-          <stop offset="100%" style={{ stopColor: '#fff', stopOpacity: 0   }} />
-        </radialGradient>
-
-        {/* Soft drop-shadow for badge */}
-        <filter id={shadowId} x="-12%" y="-12%" width="124%" height="124%">
-          <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor={primaryColor} floodOpacity="0.28" />
-        </filter>
       </defs>
 
-      {/* ── ICON BADGE ── */}
-      <rect x="8" y="8" width="104" height="104" rx="26"
-            fill={`url(#${bgGradId})`} filter={`url(#${shadowId})`} />
-      <rect x="8" y="8" width="104" height="104" rx="26"
-            fill={`url(#${shineGradId})`} />
-      <rect x="8" y="8" width="104" height="104" rx="26"
-            fill="none" stroke="white" strokeWidth="1.5" opacity="0.22" />
+      {/* Book outline - left cover */}
+      <path
+        d="M 15,15 L 15,95 Q 15,100 20,100 L 70,100 L 70,20 Q 70,15 65,15 Z"
+        fill="none"
+        stroke={primaryColor}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
 
-      {/* ── OPEN BOOK ── */}
-      {/* Left page */}
-      <path d="M 60,28 L 17,35 L 17,96 L 60,90 Z"
-            fill="white" opacity="0.9" />
-      {/* Right page */}
-      <path d="M 60,28 L 103,35 L 103,96 L 60,90 Z"
-            fill="white" opacity="0.9" />
-      {/* Subtle bottom shadow on pages for depth */}
-      <path d="M 17,90 L 60,84 L 103,90 L 103,96 L 60,90 L 17,96 Z"
-            fill="white" opacity="0.12" />
-      {/* Top arch of pages */}
-      <path d="M 17,35 Q 60,26 103,35"
-            fill="none" stroke="white" strokeWidth="2" opacity="0.45" />
-      {/* Center spine */}
-      <line x1="60" y1="27" x2="60" y2="90"
-            stroke="white" strokeWidth="2.2" opacity="0.6" />
+      {/* Book outline - right cover */}
+      <path
+        d="M 125,15 L 125,95 Q 125,100 120,100 L 70,100 L 70,20 Q 70,15 75,15 Z"
+        fill="none"
+        stroke={primaryColor}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
 
-      {/* Ruled lines – left page (4 lines) */}
-      <line x1="22" y1="49" x2="55" y2="47" stroke="white" strokeWidth="1.5" opacity="0.32" />
-      <line x1="22" y1="60" x2="55" y2="58" stroke="white" strokeWidth="1.5" opacity="0.32" />
-      <line x1="22" y1="71" x2="55" y2="69" stroke="white" strokeWidth="1.5" opacity="0.32" />
-      <line x1="22" y1="81" x2="55" y2="79" stroke="white" strokeWidth="1.5" opacity="0.32" />
+      {/* Book pages - left */}
+      <path
+        d="M 22,22 L 22,92 Q 22,95 25,95 L 68,95 L 68,25 Q 68,22 65,22 Z"
+        fill="none"
+        stroke={accentColor}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
 
-      {/* Ruled lines – right page (4 lines) */}
-      <line x1="65" y1="47" x2="98" y2="49" stroke="white" strokeWidth="1.5" opacity="0.32" />
-      <line x1="65" y1="58" x2="98" y2="60" stroke="white" strokeWidth="1.5" opacity="0.32" />
-      <line x1="65" y1="69" x2="98" y2="71" stroke="white" strokeWidth="1.5" opacity="0.32" />
-      <line x1="65" y1="79" x2="98" y2="81" stroke="white" strokeWidth="1.5" opacity="0.32" />
+      {/* Book pages - right */}
+      <path
+        d="M 118,22 L 118,92 Q 118,95 115,95 L 72,95 L 72,25 Q 72,22 75,22 Z"
+        fill="none"
+        stroke={accentColor}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
 
-      {/* ── GOLD SPARK at top of spine ── */}
-      <circle cx="60" cy="24" r="5.5" fill={`url(#${goldGradId})`} opacity="0.95" />
-      {/* 5-point ray lines */}
-      <line x1="60" y1="13" x2="60" y2="17" stroke={`url(#${goldGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <line x1="51" y1="16" x2="54" y2="19" stroke={`url(#${goldGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <line x1="69" y1="16" x2="66" y2="19" stroke={`url(#${goldGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <line x1="47" y1="24" x2="51" y2="24" stroke={`url(#${goldGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <line x1="73" y1="24" x2="69" y2="24" stroke={`url(#${goldGradId})`} strokeWidth="2" strokeLinecap="round" />
+      {/* Circuit lines - left page */}
+      <line x1="35" y1="75" x2="35" y2="55" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="35" cy="52" r="3" fill={accentColor} />
 
-      {/* ── VERTICAL DIVIDER ── */}
-      <rect x="128" y="18" width="2" height="84" rx="1"
-            fill={accentColor} opacity="0.3" />
+      <line x1="50" y1="80" x2="50" y2="50" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="50" cy="47" r="3" fill={accentColor} />
 
-      {/* ── TEXT: LMS ── */}
+      <line x1="60" y1="85" x2="60" y2="60" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="60" cy="57" r="3" fill={accentColor} />
+
+      {/* Circuit lines - right page */}
+      <line x1="80" y1="85" x2="80" y2="65" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="80" cy="62" r="3" fill={accentColor} />
+
+      <line x1="95" y1="80" x2="95" y2="55" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="95" cy="52" r="3" fill={accentColor} />
+
+      <line x1="105" y1="75" x2="105" y2="60" stroke={accentColor} strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="105" cy="57" r="3" fill={accentColor} />
+
+      {/* Upward arrow */}
+      <path
+        d="M 40,85 L 100,30 L 100,50 L 115,50 L 115,20 L 85,20 L 85,35 L 30,85 Z"
+        fill={accentColor}
+        opacity="0.85"
+      />
+
+      {/* LMS Text */}
       <text
-        x="148"
-        y="87"
+        x="145"
+        y="75"
         fontFamily="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
-        fontSize="74"
+        fontSize="72"
         fontWeight="900"
-        fill={`url(#${lmsGradId})`}
-        letterSpacing="-2"
+        fill={primaryColor}
+        letterSpacing="-1"
       >LMS</text>
 
-      {/* ── TEXT: SYSTEM ── */}
+      {/* System Text */}
       <text
-        x="151"
-        y="110"
+        x="148"
+        y="108"
         fontFamily="'Arial', 'Helvetica Neue', Arial, sans-serif"
-        fontSize="21"
-        fontWeight="500"
-        fill={accentColor}
-        letterSpacing="8"
-        opacity="0.88"
-      >SYSTEM</text>
+        fontSize="36"
+        fontWeight="400"
+        fill={primaryColor}
+        opacity="0.85"
+      >System</text>
     </svg>
   );
 }

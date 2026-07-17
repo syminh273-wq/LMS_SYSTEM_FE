@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { formatDate as _fd, formatTime as _ft, formatDateTime as _fdt } from '@shared/lib/datetime';
 
 export type Locale = 'en' | 'vi';
 export const SUPPORTED_LOCALES: Locale[] = ['en', 'vi'];
@@ -126,34 +127,21 @@ export function LocaleProvider({ bundles, children }: LocaleProviderProps) {
 
   const formatDate = React.useCallback(
     (value: string | number | Date, options?: Intl.DateTimeFormatOptions) => {
-      const d = value instanceof Date ? value : new Date(value);
-      const defaultOptions: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
-      return new Intl.DateTimeFormat(resolveLocale(locale), options ?? defaultOptions).format(d);
+      return _fd(value, locale, options);
     },
     [locale]
   );
 
   const formatTime = React.useCallback(
     (value: string | number | Date, options?: Intl.DateTimeFormatOptions) => {
-      const d = value instanceof Date ? value : new Date(value);
-      const defaultOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      return new Intl.DateTimeFormat(resolveLocale(locale), options ?? defaultOptions).format(d);
+      return _ft(value, locale, options);
     },
     [locale]
   );
 
   const formatDateTime = React.useCallback(
     (value: string | number | Date, options?: Intl.DateTimeFormatOptions) => {
-      const d = value instanceof Date ? value : new Date(value);
-      const defaultOptions: Intl.DateTimeFormatOptions = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      };
-      return new Intl.DateTimeFormat(resolveLocale(locale), options ?? defaultOptions).format(d);
+      return _fdt(value, locale, options);
     },
     [locale]
   );

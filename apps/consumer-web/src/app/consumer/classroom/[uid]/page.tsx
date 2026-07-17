@@ -53,11 +53,12 @@ import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
+import { formatTime, formatDate, formatDateTime } from '@shared/lib/datetime';
 
 type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
-  const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+  const time = formatTime(msg.created_at);
 
   const renderAttachment = () => {
     if (!msg.attachment) return null;
@@ -1102,7 +1103,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   </div>
                   <div>
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ngày khởi tạo</div>
-                    <div className="text-sm font-bold text-slate-700">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</div>
+                    <div className="text-sm font-bold text-slate-700">{formatDate(classroom.created_at)}</div>
                   </div>
                 </div>
 
@@ -1285,13 +1286,6 @@ function normalizeText(value: string) {
     .trim();
 }
 
-function formatDateTime(value: string | null) {
-  if (!value) return '--';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString('vi-VN');
-}
-
 function CollectionExpandedPanel({
   classroomUid, detail, progress,
 }: {
@@ -1448,7 +1442,7 @@ function CollectionExpandedPanel({
                 <p className="font-black text-slate-900 text-[12px]">{t('quizCollection.certificate_card_title')}</p>
                 <p className="text-[10px] text-slate-500">
                   {t('quizCollection.certificate_card_issued_at', undefined, {
-                    date: new Date(certificate.issued_at).toLocaleDateString('vi-VN'),
+                    date: certificate.issued_at ? new Date(certificate.issued_at).toLocaleDateString('vi-VN') : '',
                   })}
                 </p>
                 <div className="flex items-center gap-1 text-[9px] text-amber-700 font-mono font-bold">

@@ -6,6 +6,7 @@ import { getDatabase, ref, onValue, off } from 'firebase/database';
 import firebaseApp from '@/lib/firebase';
 import { notificationApi } from '@/lib/api/notification';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { parseDate } from '@shared/lib/datetime';
 
 type FbNotification = {
   uid: string;
@@ -185,7 +186,7 @@ function formatTime(
   t: (key: string, fallback?: string, values?: Record<string, string | number>) => string,
   formatDate: (value: string | number | Date) => string,
 ) {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  const diff = Math.floor((Date.now() - parseDate(iso).getTime()) / 1000);
   if (diff < 60) return t('layout.notifications.just_now');
   if (diff < 3600) return t('layout.notifications.minutes_ago', undefined, { count: Math.floor(diff / 60) });
   if (diff < 86400) return t('layout.notifications.hours_ago', undefined, { count: Math.floor(diff / 3600) });

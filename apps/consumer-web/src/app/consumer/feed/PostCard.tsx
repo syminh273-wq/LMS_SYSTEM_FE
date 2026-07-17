@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import parse from 'html-react-parser';
 import { cn } from '@shared/lib/utils';
+import { formatRelative } from '@shared/lib/datetime';
 
 const EMOTIONS = [
   { key: 'happy',       emoji: '😊', label: 'Đang vui' },
@@ -32,16 +33,6 @@ const VISIBILITY_OPTIONS = [
   { key: 'friends', icon: Users,  label: 'Bạn bè' },
   { key: 'private', icon: Lock,   label: 'Chỉ mình tôi' },
 ] as const;
-
-function timeAgo(iso: string) {
-  const d = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(d / 60000);
-  if (m < 1) return 'Vừa xong';
-  if (m < 60) return `${m} phút trước`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} giờ trước`;
-  return `${Math.floor(h / 24)} ngày trước`;
-}
 
 export function PostCard({
   post,
@@ -132,7 +123,7 @@ export function PostCard({
               )}
             </div>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[11px] text-slate-500">{timeAgo(post.created_at)}</span>
+              <span className="text-[11px] text-slate-500">{formatRelative(post.created_at)}</span>
               <span className="text-slate-300">·</span>
               <VisIcon size={11} className="text-slate-500" />
             </div>

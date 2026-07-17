@@ -20,6 +20,7 @@ import { examSessionApi } from '@/lib/api/exam-session';
 import { classroomApi } from '@/lib/api/classroom';
 import { FaceMonitorWidget, type MonitorResult } from '@/components/face/face-monitor-widget';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { formatDateTime } from '@shared/lib/datetime';
 import type { Exam, ExamSessionInfo } from '@/lib/api/types';
 
 interface Props {
@@ -351,7 +352,7 @@ export default function ExamSessionPage({ params }: Props) {
             {exam.due_date && (
               <span className="flex items-center gap-1.5">
                 <Clock size={13} className="text-indigo-500" />
-                Hạn nộp: {new Date(exam.due_date).toLocaleString('vi-VN')}
+                Hạn nộp: {formatDateTime(exam.due_date)}
               </span>
             )}
             {exam.duration_seconds && exam.duration_seconds > 0 && (
