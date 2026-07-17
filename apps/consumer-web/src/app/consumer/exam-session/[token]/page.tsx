@@ -20,6 +20,14 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import {
+  formatAuditClockTime,
+  formatAuditEventData,
+  humanizeAuditEvent as humanizeAuditEventShared,
+  isAuditForce,
+  isAuditLimit,
+  isAuditViolation,
+} from '@shared/lib/exam';
 import { examSessionApi, type ProctoringEventType } from '@/lib/api/exam-session';
 import { classroomApi } from '@/lib/api/classroom';
 import { FaceMonitorWidget, type FaceEventType, type MonitorResult } from '@/components/face/face-monitor-widget';
@@ -744,17 +752,12 @@ export default function ExamSessionPage({ params }: Props) {
                   ) : (
                     <ol className="relative space-y-2 border-l-2 border-slate-200 pl-5">
                       {resultAuditEvents.map((ev) => {
-                        const isViolation = [
-                          'tab_leave', 'window_out', 'window_blur', 'app_blur',
-                          'fullscreen_exit', 'visibility_lost',
-                          'camera_lost', 'face_not_recognized', 'multiple_faces',
-                          'no_face',
-                        ].includes(ev.event_type);
-                        const isLimit = ev.event_type === 'visibility_breaks_exceeded' || ev.event_type === 'face_warnings_exceeded';
-                        const isForce = ev.event_type === 'force_submitted';
-                        const dotColor = isForce || isLimit
+                        const violation = isAuditViolation(ev.event_type);
+                        const limit = isAuditLimit(ev.event_type);
+                        const force = isAuditForce(ev.event_type);
+                        const dotColor = force || limit
                           ? 'bg-rose-500 ring-rose-200'
-                          : isViolation
+                          : violation
                             ? 'bg-amber-500 ring-amber-200'
                             : 'bg-indigo-400 ring-indigo-200';
                         return (
@@ -763,7 +766,7 @@ export default function ExamSessionPage({ params }: Props) {
                             <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
                               <div className="min-w-0 flex-1">
                                 <p className={`text-sm font-black ${
-                                  isForce || isLimit ? 'text-rose-700' : isViolation ? 'text-amber-700' : 'text-slate-800'
+                                  force || limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800'
                                 }`}>
                                   {humanizeAuditEvent(ev.event_type)}
                                 </p>
@@ -774,7 +777,7 @@ export default function ExamSessionPage({ params }: Props) {
                                 )}
                               </div>
                               <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
-                                {formatAuditTime(ev.created_at)}
+                                {formatAuditClockTime(ev.created_at)}
                               </time>
                             </div>
                           </li>
@@ -1264,18 +1267,14 @@ export default function ExamSessionPage({ params }: Props) {
               ) : (
                 <ol className="relative space-y-3 border-l-2 border-slate-200 pl-5">
                   {auditEvents.map((ev) => {
-                    const isViolation = [
-                      'tab_leave', 'window_out', 'window_blur', 'app_blur',
-                      'fullscreen_exit', 'visibility_lost',
-                      'camera_lost', 'face_not_recognized', 'multiple_faces',
-                    ].includes(ev.event_type);
-                    const isLimit = ev.event_type === 'visibility_breaks_exceeded' || ev.event_type === 'face_warnings_exceeded';
-                    const isForce = ev.event_type === 'force_submitted';
-                    const dotColor = isForce
+                    const violation = isAuditViolation(ev.event_type);
+                    const limit = isAuditLimit(ev.event_type);
+                    const force = isAuditForce(ev.event_type);
+                    const dotColor = force
                       ? 'bg-rose-500 ring-rose-200'
-                      : isLimit
+                      : limit
                         ? 'bg-rose-500 ring-rose-200'
-                        : isViolation
+                        : violation
                           ? 'bg-amber-500 ring-amber-200'
                           : 'bg-indigo-400 ring-indigo-200';
                     return (
@@ -1286,7 +1285,7 @@ export default function ExamSessionPage({ params }: Props) {
                         <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
                           <div className="min-w-0 flex-1">
                             <p className={`text-sm font-black ${
-                              isForce ? 'text-rose-700' : isLimit ? 'text-rose-700' : isViolation ? 'text-amber-700' : 'text-slate-800'
+                              force ? 'text-rose-700' : limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800'
                             }`}>
                               {humanizeAuditEvent(ev.event_type)}
                             </p>
@@ -1297,7 +1296,7 @@ export default function ExamSessionPage({ params }: Props) {
                             )}
                           </div>
                           <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
-                            {formatAuditTime(ev.created_at)}
+                            {formatAuditClockTime(ev.created_at)}
                           </time>
                         </div>
                       </li>
@@ -1314,112 +1313,5 @@ export default function ExamSessionPage({ params }: Props) {
 }
 
 function humanizeAuditEvent(eventType: string): string {
-  const map: Record<string, string> = {
-    joined: 'Bắt đầu làm bài',
-    submitted: 'Bạn đã nộp bài',
-    timeout_submit: 'Hết giờ — hệ thống đã tự nộp giúp bạn',
-    force_submitted: 'Bài thi đã được nộp bắt buộc do vi phạm quy chế',
-    tab_leave: 'Bạn vừa rời khỏi tab bài thi',
-    tab_return: 'Bạn đã quay lại tab bài thi',
-    window_out: 'Bạn vừa chuyển sang cửa sổ khác',
-    window_back: 'Bạn đã quay lại cửa sổ bài thi',
-    window_blur: 'Cửa sổ bài thi vừa mất tiêu điểm',
-    app_blur: 'Ứng dụng vừa chuyển sang nền',
-    app_focus: 'Bạn đã quay lại ứng dụng',
-    fullscreen_exit: 'Bạn vừa thoát chế độ toàn màn hình',
-    visibility_lost: 'Trang bài thi vừa bị ẩn',
-    visibility_restored: 'Trang bài thi đã hiển thị lại',
-    camera_lost: 'Không nhận tín hiệu camera — bạn kiểm tra lại nhé',
-    no_face: 'Chưa thấy bạn trong khung hình',
-    face_not_recognized: 'Chưa nhận diện được khuôn mặt — bạn ngồi thẳng và nhìn thẳng camera nhé',
-    face_recognized: 'Đã nhận diện khuôn mặt thành công',
-    multiple_faces: 'Có nhiều người trong khung hình — bạn đảm bảo chỉ mình bạn nhé',
-    visibility_breaks_exceeded: 'Bạn đã rời màn hình quá nhiều lần — hệ thống đã nộp bài bắt buộc',
-    face_warnings_exceeded: 'Bạn đã vi phạm quy chế camera quá nhiều lần — hệ thống đã nộp bài bắt buộc',
-  };
-  return map[eventType] ?? eventType;
-}
-
-function formatAuditEventData(eventType: string, raw: unknown): string {
-  if (!raw || typeof raw !== 'object') return '';
-  const data = raw as Record<string, unknown>;
-  const num = (v: unknown) => {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : null;
-  };
-
-  if (eventType === 'joined') {
-    const start = typeof data.started_at === 'string' ? data.started_at : null;
-    const end = typeof data.ends_at === 'string' ? data.ends_at : null;
-    if (start && end) return `Bắt đầu lúc ${formatIsoTime(start)} · Kết thúc lúc ${formatIsoTime(end)}`;
-  }
-
-  if (eventType === 'submitted' || eventType === 'timeout_submit') {
-    const ts = typeof data.submitted_at === 'string' ? data.submitted_at : null;
-    if (ts) return `Đã nộp lúc ${formatIsoTime(ts)}`;
-  }
-
-  if (eventType === 'force_submitted') {
-    const reason = typeof data.reason === 'string' ? data.reason : '';
-    const count = num(data.count);
-    const max = num(data.max);
-    const reasonText = reason === 'face_warnings_exceeded'
-      ? 'vi phạm quy chế camera'
-      : reason === 'visibility_breaks_exceeded'
-        ? 'rời màn hình quá nhiều lần'
-        : 'vi phạm quy chế thi';
-    if (count != null && max != null) return `Lý do: ${reasonText} (${count}/${max})`;
-    return `Lý do: ${reasonText}`;
-  }
-
-  if (eventType === 'visibility_breaks_exceeded' || eventType === 'face_warnings_exceeded') {
-    const count = num(data.count);
-    const max = num(data.max);
-    if (count != null && max != null) return `Bạn đã vi phạm ${count}/${max} lần cho phép`;
-  }
-
-  if (eventType === 'face_not_recognized') {
-    const sim = num(data.similarity);
-    if (sim != null) return `Mức độ khớp: ${Math.round(sim * 100)}%`;
-  }
-
-  if (eventType === 'multiple_faces') {
-    const fc = num(data.face_count);
-    if (fc != null) return `Phát hiện ${fc} người trong khung hình`;
-  }
-
-  if (eventType === 'camera_lost' || eventType === 'no_face') {
-    const fc = num(data.face_count);
-    if (fc != null) return `Số khuôn mặt phát hiện: ${fc}`;
-  }
-
-  if (eventType === 'tab_leave' || eventType === 'window_out' || eventType === 'window_blur'
-      || eventType === 'app_blur' || eventType === 'fullscreen_exit' || eventType === 'visibility_lost') {
-    const total = num(data.visibility_breaks_count);
-    if (total != null) return `Tổng số lần rời màn hình: ${total}`;
-  }
-
-  return '';
-}
-
-function formatIsoTime(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  const ss = String(d.getSeconds()).padStart(2, '0');
-  return `${hh}:${mm}:${ss}`;
-}
-
-function formatAuditTime(iso: string): string {
-  if (!iso) return '';
-  try {
-    const d = new Date(iso);
-    return d.toLocaleString('vi-VN', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      day: '2-digit', month: '2-digit',
-    });
-  } catch {
-    return iso;
-  }
+  return humanizeAuditEventShared(eventType);
 }

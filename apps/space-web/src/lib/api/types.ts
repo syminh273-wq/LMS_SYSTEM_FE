@@ -660,3 +660,104 @@ export type CreateQuizTaskResponse = {
   status: QuizTaskStatus;
   title: string;
 };
+
+// ── Audit log (teacher) ───────────────────────────────────────────────────
+
+export type AuditEventType =
+  | 'tab_leave'
+  | 'tab_return'
+  | 'window_out'
+  | 'window_back'
+  | 'window_blur'
+  | 'app_blur'
+  | 'app_focus'
+  | 'fullscreen_exit'
+  | 'visibility_lost'
+  | 'visibility_restored'
+  | 'camera_lost'
+  | 'face_not_recognized'
+  | 'no_face'
+  | 'multiple_faces'
+  | 'face_recognized'
+  | 'joined'
+  | 'submitted'
+  | 'timeout_submit'
+  | 'force_submitted'
+  | 'visibility_breaks_exceeded'
+  | 'face_warnings_exceeded';
+
+export type AuditLogEntry = {
+  uid: string;
+  event_type: AuditEventType | string;
+  event_data?: Record<string, unknown> | null;
+  created_at: string;
+};
+
+export type AuditOverviewCounters = {
+  visibility_breaks: { count: number; max: number; rule: 'visibility_breaks' };
+  face_warnings: { count: number; max: number; rule: 'face_warnings' };
+};
+
+export type AuditOverviewResponse = {
+  submission: ExamSubmission;
+  exam: {
+    uid: string;
+    title: string;
+    max_visibility_breaks: number;
+    max_face_warnings: number;
+  };
+  counters: AuditOverviewCounters;
+  force_submitted: boolean;
+  force_submit_reason: string;
+  force_submitted_at: string | null;
+  is_effective: boolean;
+  totals: Record<string, number>;
+};
+
+export type AuditDetailsResponse = {
+  submission_uid: string;
+  student_id: string;
+  events: AuditLogEntry[];
+};
+
+export type AuditQuizAnswer = {
+  question_uid: string;
+  question_text: string;
+  chosen: string | null;
+  correct_answer: string | null;
+  is_correct: boolean;
+  explanation?: string;
+};
+
+export type AuditAnswersResponse =
+  | {
+      submission_type: 'multiple_choice' | 'online_quiz';
+      answers: AuditQuizAnswer[];
+      score: {
+        grade: number | null;
+        max_grade: number | null;
+        correct_count: number | null;
+        total: number | null;
+        score_pct: number | null;
+      };
+    }
+  | {
+      submission_type: 'file';
+      file: { url: string | null; name: string | null; size: number | null };
+      ref_id: string | null;
+    }
+  | {
+      submission_type: 'essay';
+      essay_content: string;
+    };
+
+export type FaceLogEntry = {
+  uid: string;
+  student_id: string;
+  camera_open: boolean;
+  recognized: boolean;
+  multiple_faces: boolean;
+  face_count: number;
+  similarity: number;
+  verified_at: string | null;
+};

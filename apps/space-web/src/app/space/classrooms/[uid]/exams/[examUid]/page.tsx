@@ -9,6 +9,7 @@ import {
   Camera,
   Clock,
   Download,
+  Eye,
   FileText,
   Loader2,
   Monitor,
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { classroomApi, examApi, Classroom, ClassroomMember, Exam, ExamSession, ExamSubmission } from '@/lib/api';
+import { SubmissionAuditModal } from '@/components/exam/submission-audit-modal';
 
 type SubmissionFilter = 'submitted' | 'missing';
 type ExamDetailTab = 'submissions' | 'online';
@@ -45,6 +47,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
   const [filter, setFilter] = useState<SubmissionFilter>('submitted');
   const [query, setQuery] = useState('');
   const [sessions, setSessions] = useState<ExamSession[]>([]);
+  const [auditSubmission, setAuditSubmission] = useState<ExamSubmission | null>(null);
   const [sessionLoading, setSessionLoading] = useState(false);
   const [sessionError, setSessionError] = useState('');
   const [sessionAction, setSessionAction] = useState(false);
@@ -451,8 +454,8 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
               </label>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-border">
-              <table className="w-full min-w-[780px] text-left">
+            <div className="overflow-x-auto rounded-2xl border border-border">
+              <table className="w-full min-w-[640px] text-left">
                 <thead className="bg-muted/50">
                   <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                     <th className="px-4 py-3">Học sinh</th>
@@ -461,7 +464,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                     <th className="px-4 py-3">Kết quả</th>
                     <th className="px-4 py-3">Điểm</th>
                     <th className="px-4 py-3">Đạt/Không</th>
-                    <th className="px-4 py-3 text-right">File</th>
+                    <th className="px-4 py-3 text-right">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -523,16 +526,29 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                           )}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          {row.kind === 'submitted' && row.submission.resource_url ? (
-                            <a href={row.submission.resource_url} download target="_blank" rel="noopener noreferrer">
-                              <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-lg text-xs font-bold">
-                                <Download size={14} />
-                                Download
+                          <div className="flex items-center justify-end gap-2">
+                            {row.kind === 'submitted' && row.submission.resource_url ? (
+                              <a href={row.submission.resource_url} download target="_blank" rel="noopener noreferrer">
+                                <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-lg text-xs font-bold">
+                                  <Download size={14} />
+                                  Tải file
+                                </Button>
+                              </a>
+                            ) : null}
+                            {row.kind === 'submitted' ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setAuditSubmission(row.submission)}
+                                className="h-8 gap-1.5 rounded-lg text-xs font-bold"
+                              >
+                                <Eye size={14} />
+                                Xem chi tiết
                               </Button>
-                            </a>
-                          ) : (
-                            <span className="text-xs font-bold text-muted-foreground/60">--</span>
-                          )}
+                            ) : (
+                              <span className="text-xs font-bold text-muted-foreground/60">--</span>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -603,6 +619,15 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
           </div>
         </aside>
       </main>
+
+      {auditSubmission && exam && (
+        <SubmissionAuditModal
+          open={!!auditSubmission}
+          onOpenChange={(open) => !open && setAuditSubmission(null)}
+          submission={auditSubmission}
+          exam={{ uid: exam.uid, title: exam.title }}
+        />
+      )}
 
     </div>
   );

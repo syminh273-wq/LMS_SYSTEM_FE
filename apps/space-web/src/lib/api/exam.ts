@@ -72,6 +72,32 @@ export class ExamApiClient extends BaseRestApiClient {
   public async listOnlineSessions(examUid: string): Promise<ExamSession[]> {
     return this.get<ExamSession[]>(`/api/v1/space/course/exams/${examUid}/online-sessions/`);
   }
+
+  // ── Audit log (teacher view) ──────────────────────────────────────────────
+
+  public async getAuditOverview(submissionUid: string): Promise<AuditOverviewResponse> {
+    return this.get<AuditOverviewResponse>(
+      `/api/v1/space/course/exams/submissions/${submissionUid}/audit-log/overview/`,
+    );
+  }
+
+  public async getAuditDetails(submissionUid: string): Promise<AuditDetailsResponse> {
+    return this.get<AuditDetailsResponse>(
+      `/api/v1/space/course/exams/submissions/${submissionUid}/audit-log/details/`,
+    );
+  }
+
+  public async getAuditAnswers(submissionUid: string): Promise<AuditAnswersResponse> {
+    return this.get<AuditAnswersResponse>(
+      `/api/v1/space/course/exams/submissions/${submissionUid}/audit-log/answers/`,
+    );
+  }
+
+  public async getStudentFaceLogs(examUid: string, studentUid: string): Promise<FaceLogEntry[]> {
+    return this.get<FaceLogEntry[]>(
+      `/api/v1/space/face/exams/${examUid}/students/${studentUid}/logs/`,
+    );
+  }
 }
 
 export const examApi = new ExamApiClient();
