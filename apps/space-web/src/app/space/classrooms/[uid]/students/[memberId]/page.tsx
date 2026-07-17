@@ -12,6 +12,7 @@ import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
 import type { ClassroomMember, StudentExamRecord, StudentPublicProfile } from '@/lib/api/types';
 import { toast } from 'sonner';
+import { formatDate } from '@shared/lib/datetime';
 
 const THEME_GRADIENT: Record<string, string> = {
   indigo:  'from-primary-brand via-primary-brand to-violet-600',
@@ -231,7 +232,7 @@ export default function StudentDetailsPage({
 
           {/* Info row */}
           <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-border text-xs text-muted-foreground">
-            <span>Tham gia: <b className="text-foreground">{member.joined_at ? new Date(member.joined_at).toLocaleDateString('vi-VN') : '—'}</b></span>
+            <span>Tham gia: <b className="text-foreground">{member.joined_at ? formatDate(member.joined_at) : '—'}</b></span>
             <span>Loại: <b className="text-foreground">{member.member_type === 'consumer' ? 'Học sinh' : 'Space'}</b></span>
             <span>Trạng thái: <b className={member.status === 'approved' ? 'text-emerald-600' : 'text-amber-500'}>
               {member.status === 'approved' ? '✅ Đã duyệt' : '⏳ Chờ duyệt'}
@@ -381,11 +382,4 @@ export default function StudentDetailsPage({
       </div>
     </div>
   );
-}
-
-function formatDate(value: string) {
-  if (!value) return '—';
-  const d = new Date(value);
-  if (isNaN(d.getTime())) return value;
-  return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }

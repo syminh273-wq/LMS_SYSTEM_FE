@@ -10,14 +10,10 @@ import {
 import { studentApi } from '@/lib/api/student';
 import type { StudentDetail, StudentClassroomStat } from '@/lib/api/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import { formatDate } from '@shared/lib/datetime';
 
 function initials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function GradeBadge({ avg }: { avg: number | null }) {

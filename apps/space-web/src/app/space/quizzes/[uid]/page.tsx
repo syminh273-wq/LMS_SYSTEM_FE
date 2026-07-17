@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
+import { formatDateTime } from '@shared/lib/datetime';
 
 interface Props {
   params: Promise<{ uid: string }>;
@@ -28,7 +29,7 @@ function fmtSeconds(s: number): string {
 }
 
 function fmtTime(iso: string): string {
-  return new Date(iso).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+  return formatDateTime(iso);
 }
 
 export default function QuizDetailPage({ params }: Props) {

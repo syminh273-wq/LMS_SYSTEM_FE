@@ -11,7 +11,7 @@ import { accountService } from '@/lib/api/account';
 import { classroomApi } from '@/lib/api';
 import type {
   StudentProfileSettings, ThemeColor, CoverStyle, ProfileVisibility,
-  SocialLink, Certificate, CustomField, Classroom,
+  SocialLink, Certificate, CustomField, Classroom, Follower,
 } from '@/lib/api/types';
 import { socialApi } from '@/lib/api/social';
 import type { Post } from '@/lib/api/types';
@@ -102,7 +102,7 @@ export default function ProfilePage() {
   const [myPosts, setMyPosts] = useState<Post[]>([]);
 
   const [modalMode, setModalMode] = useState<'none' | 'followers' | 'following'>('none');
-  const [modalUsers, setModalUsers] = useState<unknown[]>([]);
+  const [modalUsers, setModalUsers] = useState<Follower[]>([]);
   const [, setModalLoading] = useState(false);
 
   const form = useForm({

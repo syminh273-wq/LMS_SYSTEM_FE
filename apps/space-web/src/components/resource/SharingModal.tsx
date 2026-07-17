@@ -32,6 +32,7 @@ import {
 import Image from 'next/image';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
+import { formatDate, formatTime } from '@shared/lib/datetime';
 
 interface ClassroomDetailsModalProps {
   isOpen: boolean;
@@ -96,7 +97,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
       id: Date.now(),
       sender: "Bạn",
       text: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: formatTime(new Date()),
       isMe: true
     };
     setMessages([...messages, msg]);
@@ -243,7 +244,7 @@ export function SharingModal({ isOpen, onClose, classroom: initialClassroom }: C
                     <Info size={16} />
                   </div>
                   <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Ngày tạo</div>
-                  <div className="text-sm font-bold text-foreground">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</div>
+                  <div className="text-sm font-bold text-foreground">{formatDate(classroom.created_at)}</div>
                 </div>
               </div>
 

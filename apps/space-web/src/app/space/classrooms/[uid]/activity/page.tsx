@@ -28,6 +28,7 @@ import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
 import type { ActivityLog, ActivityLogEventType, ActivityLogLevel, Classroom } from '@/lib/api/types';
 import { toast } from 'sonner';
+import { formatDate, formatTime } from '@shared/lib/datetime';
 
 // ── Meta helpers ──────────────────────────────────────────────────────────────
 
@@ -71,7 +72,7 @@ const EVENT_GROUPS: { label: string; events: ActivityLogEventType[] }[] = [
 function groupByDate(logs: ActivityLog[]): { date: string; items: ActivityLog[] }[] {
   const map = new Map<string, ActivityLog[]>();
   for (const log of logs) {
-    const key = new Date(log.created_at).toLocaleDateString('vi-VN', {
+    const key = formatDate(log.created_at, 'vi', {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     });
     if (!map.has(key)) map.set(key, []);
@@ -305,7 +306,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
                           {/* Timestamp */}
                           <div className="text-right shrink-0">
                             <p className="text-xs font-bold text-muted-foreground">
-                              {new Date(log.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                              {formatTime(log.created_at)}
                             </p>
                             <span className={`inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${bg} ${color} border ${border}`}>
                               {log.log_level === 'major' ? 'Chính' : 'Chi tiết'}

@@ -163,7 +163,7 @@ export default function QuizGamePage({ params }: Props) {
             );
             const fresh = all.filter(c => !seen.has(c.uid));
             const matchesHere = fresh.filter(
-              c => c.classroom_id === classroomUid && new Date(c.issued_at).getTime() > Date.now() - 5 * 60 * 1000
+              c => c.classroom_id === classroomUid && c.issued_at && new Date(c.issued_at).getTime() > Date.now() - 5 * 60 * 1000
             );
             if (matchesHere.length > 0) {
               setCelebrateCerts(matchesHere);

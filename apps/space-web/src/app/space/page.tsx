@@ -27,6 +27,7 @@ import { accountService } from '@/lib/api/account';
 import { spaceApi } from '@/lib/api';
 import type { ActivityLog, ActivityLogEventType } from '@/lib/api/types';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { parseDate } from '@shared/lib/datetime';
 
 type DashboardStats = {
   totalClassrooms: number;
@@ -78,7 +79,7 @@ function getActivityMeta(eventType: ActivityLogEventType, t: (key: string) => st
 }
 
 function timeAgo(isoString: string, t: (key: string, fb?: string, values?: Record<string, string | number>) => string): string {
-  const diff = Date.now() - new Date(isoString).getTime();
+  const diff = Date.now() - parseDate(isoString).getTime();
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return t('dashboard.time_ago.just_now');
   if (minutes < 60) return t('dashboard.time_ago.minutes_ago', undefined, { count: minutes });

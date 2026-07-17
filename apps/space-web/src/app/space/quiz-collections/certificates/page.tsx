@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Award, Plus, Loader2, Trash2, ChevronRight } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { formatDate } from '@shared/lib/datetime';
 import { toast } from 'sonner';
 import { certificateApi } from '@/lib/api/quiz-collection';
 import type { Certificate } from '@/lib/api/types';
@@ -98,7 +99,7 @@ export default function CertificatesPage() {
               </div>
               <div className="flex items-center justify-between pt-3 border-t border-border">
                 <span className="text-[10px] text-muted-foreground">
-                  {new Date(c.created_at).toLocaleDateString()}
+                  {formatDate(c.created_at)}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
