@@ -181,7 +181,7 @@ export function ClassroomDocsTab({ classroomUid, accessToken, apiBase, showFilte
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 min-w-0">
           {filtered.map((d) => {
             const Icon = pickIcon(d.file_type);
             const section = d.metadata?.section?.trim();
@@ -191,17 +191,17 @@ export function ClassroomDocsTab({ classroomUid, accessToken, apiBase, showFilte
                 href={d.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-3 p-3 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all"
+                className="group flex items-start gap-3 p-3 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
               >
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-100">
                   <Icon size={20} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-bold text-slate-800 truncate" title={d.name}>{d.name}</p>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <p className="text-sm font-bold text-slate-800 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
                     <Download size={12} className="text-slate-400 opacity-0 group-hover:opacity-100 transition shrink-0" />
                   </div>
-                  <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex-wrap">
                     {d.file_type && <span className="px-1.5 py-0.5 bg-slate-100 rounded">{d.file_type}</span>}
                     {d.size ? <span>{formatSize(d.size)}</span> : null}
                     {d.created_at ? <span>{formatDate(d.created_at)}</span> : null}

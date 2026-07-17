@@ -10,7 +10,6 @@ import {
   FileArchive,
   FileSpreadsheet,
   File as FileIcon,
-  Download,
   Folder as FolderIcon,
   FolderOpen,
   ChevronRight,
@@ -19,6 +18,7 @@ import {
   Loader2,
   Search,
   ArrowUpDown,
+  CheckCircle2,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { toast } from 'sonner';
@@ -29,6 +29,7 @@ import {
 } from './api';
 import { buildFolderTree, findPathToFolder } from './tree-utils';
 import type { ClassroomDoc, ClassroomFolder, SortField, SortDir, FolderNode } from './types';
+import { DocViewerPanel } from '../doc-viewer/DocViewerPanel';
 
 const ICON_BY_TYPE: Record<string, typeof FileText> = {
   pdf: FileText, doc: FileText, docx: FileText, txt: FileText, md: FileText,
@@ -63,6 +64,8 @@ function formatDate(iso?: string) {
     return '';
   }
 }
+
+type ProgressByDoc = Record<string, { read_progress: number; is_completed: boolean; note_count: number }>;
 
 type Props = {
   classroomUid: string;
@@ -137,6 +140,9 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
+  const [openDoc, setOpenDoc] = useState<ClassroomDoc | null>(null);
+  const [progressByDoc, setProgressByDoc] = useState<ProgressByDoc>({});
+
   const ctx = useMemo(() => ({ apiBase, accessToken, classroomUid }), [apiBase, accessToken, classroomUid]);
 
   useEffect(() => {
@@ -178,6 +184,53 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
       cancelled = true;
     };
   }, [ctx, selectedFolderId]);
+
+  // Fetch progress for each doc (lightweight, only fields we need)
+  const allVisibleDocs = useMemo(() => {
+    const map = new Map<string, ClassroomDoc>();
+    for (const d of rootDocs) map.set(d.uid, d);
+    for (const d of folderDocs) map.set(d.uid, d);
+    return Array.from(map.values());
+  }, [rootDocs, folderDocs]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const docsToFetch = allVisibleDocs.filter((d) => !(d.uid in progressByDoc));
+    if (docsToFetch.length === 0) return;
+    Promise.all(
+      docsToFetch.map((d) =>
+        fetch(`${ctx.apiBase}/api/v1/consumer/course/classrooms/${ctx.classroomUid}/docs/${d.uid}/progress/`, {
+          headers: ctx.accessToken ? { Authorization: `Bearer ${ctx.accessToken}` } : {},
+        })
+          .then((r) => (r.ok ? r.json() : null))
+          .catch(() => null),
+      ),
+    )
+      .then((results) => {
+        if (cancelled) return;
+        setProgressByDoc((prev) => {
+          const next = { ...prev };
+          docsToFetch.forEach((d, i) => {
+            const r = results[i] as { read_progress?: number; is_completed?: boolean; note_count?: number } | null;
+            if (r) {
+              next[d.uid] = {
+                read_progress: r.read_progress ?? 0,
+                is_completed: r.is_completed ?? false,
+                note_count: r.note_count ?? 0,
+              };
+            }
+          });
+          return next;
+        });
+      })
+      .catch(() => {
+        /* ignore */
+      });
+    return () => {
+      cancelled = true;
+    };
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [allVisibleDocs, ctx]);
 
   const currentDocs = selectedFolderId === null ? rootDocs : folderDocs;
   const currentBreadcrumb = useMemo(() => {
@@ -305,38 +358,72 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 min-w-0">
               {filtered.map((d) => {
                 const Icon = pickIcon(d.file_type);
+                const prog = progressByDoc[d.uid];
+                const completed = prog?.is_completed ?? false;
+                const pct = prog?.read_progress ?? 0;
                 return (
-                  <a
+                  <button
+                    type="button"
                     key={d.uid}
-                    href={d.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-start gap-3 p-3 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all"
+                    onClick={() => setOpenDoc(d)}
+                    className="group text-left flex items-start gap-3 p-3 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
                   >
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-100">
                       {React.createElement(Icon, { size: 20 })}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-bold text-slate-800 truncate" title={d.name}>{d.name}</p>
-                        <Download size={12} className="text-slate-400 opacity-0 group-hover:opacity-100 transition shrink-0" />
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
+                        {completed && (
+                          <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex-wrap">
                         {d.file_type && <span className="px-1.5 py-0.5 bg-slate-100 rounded">{d.file_type}</span>}
                         {d.size ? <span>{formatSize(d.size)}</span> : null}
                         {d.created_at ? <span>{formatDate(d.created_at)}</span> : null}
+                        {pct > 0 && (
+                          <span className={`px-1.5 py-0.5 rounded ${completed ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                            {pct}%
+                          </span>
+                        )}
                       </div>
+                      {pct > 0 && !completed && (
+                        <div className="mt-1 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-indigo-500" style={{ width: `${pct}%` }} />
+                        </div>
+                      )}
                     </div>
-                  </a>
+                  </button>
                 );
               })}
             </div>
           )}
         </div>
       </div>
+
+      {openDoc && (
+        <DocViewerPanel
+          doc={openDoc}
+          ctx={ctx}
+          open
+          onClose={() => setOpenDoc(null)}
+          onProgressChange={(p) => {
+            setProgressByDoc((prev) => ({
+              ...prev,
+              [p.resource_uid]: {
+                read_progress: p.read_progress,
+                is_completed: p.is_completed,
+                note_count: p.note_count,
+              },
+            }));
+          }}
+          t={t}
+        />
+      )}
     </div>
   );
 }

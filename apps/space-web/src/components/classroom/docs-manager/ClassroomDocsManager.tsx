@@ -21,6 +21,7 @@ import {
 } from './api';
 import { buildFolderTree, findPathToFolder } from './tree-utils';
 import type { ClassroomDoc, ClassroomFolder, SortField, SortDir } from './types';
+import { StudentProgressModal } from './StudentProgressModal';
 
 type Props = {
   classroomUid: string;
@@ -52,6 +53,7 @@ export function ClassroomDocsManager({
   const [createOpen, setCreateOpen] = useState(false);
   const [createParentId, setCreateParentId] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<ClassroomFolder | null>(null);
+  const [progressDoc, setProgressDoc] = useState<ClassroomDoc | null>(null);
 
   const ctx = useMemo(
     () => ({ apiBase, accessToken, classroomUid }),
@@ -310,6 +312,7 @@ export function ClassroomDocsManager({
               canManage={canManage}
               onReorder={handleReorder}
               onDelete={handleDeleteDoc}
+              onShowProgress={(d) => setProgressDoc(d)}
               search={search}
               onSearchChange={setSearch}
               sortField={sortField}
@@ -351,6 +354,20 @@ export function ClassroomDocsManager({
         onSubmit={handleRename}
         t={t}
       />
+
+      {progressDoc && (
+        <StudentProgressModal
+          open={progressDoc !== null}
+          onOpenChange={(v) => {
+            if (!v) setProgressDoc(null);
+          }}
+          classroomUid={classroomUid}
+          resourceUid={progressDoc.uid}
+          resourceName={progressDoc.name}
+          apiBase={apiBase}
+          accessToken={accessToken}
+        />
+      )}
     </div>
   );
 }

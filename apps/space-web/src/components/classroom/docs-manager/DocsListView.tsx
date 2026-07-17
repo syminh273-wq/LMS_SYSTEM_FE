@@ -13,6 +13,7 @@ import {
   Trash2,
   GripVertical,
   ArrowUpDown,
+  Users,
 } from 'lucide-react';
 import {
   DndContext,
@@ -62,10 +63,12 @@ function formatSize(bytes?: number) {
 function SortableRow({
   doc,
   onDelete,
+  onShowProgress,
   canManage,
 }: {
   doc: ClassroomDoc;
   onDelete: (uid: string) => void;
+  onShowProgress: (doc: ClassroomDoc) => void;
   canManage: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -81,7 +84,7 @@ function SortableRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="grid grid-cols-[24px_36px_1fr_120px_100px_120px_100px] items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-200 transition group"
+      className="grid grid-cols-[24px_36px_minmax(0,1fr)_120px_100px_120px_100px] items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-200 transition group min-w-0"
     >
       {canManage ? (
         <button
@@ -103,7 +106,7 @@ function SortableRow({
         href={doc.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm font-bold text-slate-800 hover:text-indigo-600 truncate"
+        className="text-sm font-bold text-slate-800 hover:text-indigo-600 truncate min-w-0"
         title={doc.name}
       >
         {doc.name}
@@ -122,6 +125,14 @@ function SortableRow({
           : ''}
       </span>
       <div className="flex items-center justify-end gap-1">
+        <button
+          type="button"
+          onClick={() => onShowProgress(doc)}
+          className="p-1.5 rounded-md hover:bg-indigo-50 text-slate-500 hover:text-indigo-600"
+          title="Xem tiến độ học sinh"
+        >
+          <Users size={14} />
+        </button>
         <a
           href={doc.url}
           target="_blank"
@@ -151,6 +162,7 @@ type Props = {
   canManage: boolean;
   onReorder: (orderedUids: string[]) => void;
   onDelete: (uid: string) => void;
+  onShowProgress: (doc: ClassroomDoc) => void;
   search: string;
   onSearchChange: (s: string) => void;
   sortField: SortField;
@@ -171,6 +183,7 @@ export function DocsListView({
   canManage,
   onReorder,
   onDelete,
+  onShowProgress,
   search,
   onSearchChange,
   sortField,
@@ -244,7 +257,7 @@ export function DocsListView({
           >
             <div className="space-y-1.5">
               {filtered.map((d) => (
-                <SortableRow key={d.uid} doc={d} onDelete={onDelete} canManage={canManage} />
+                <SortableRow key={d.uid} doc={d} onDelete={onDelete} onShowProgress={onShowProgress} canManage={canManage} />
               ))}
             </div>
           </SortableContext>
