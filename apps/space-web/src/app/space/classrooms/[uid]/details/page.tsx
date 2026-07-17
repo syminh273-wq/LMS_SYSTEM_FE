@@ -68,6 +68,7 @@ import {
   Clock as ClockIcon,
   ShieldBan,
   ShieldOff,
+  ShieldAlert,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
@@ -98,6 +99,7 @@ import ClassroomChatPanel from '@/components/chat/ClassroomChatPanel';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { ClassroomDocsManager } from '@/components/classroom/docs-manager/ClassroomDocsManager';
 import {
   CartesianGrid,
   Line,
@@ -191,14 +193,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [activityLevel, setActivityLevel] = useState<'major' | 'detail'>('major');
   const [loadingActivity, setLoadingActivity] = useState(false);
 
-  type DocItem = { uid: string; name: string; size: string; date: string; url: string; file_type: string; section: string };
-  const [documents, setDocuments] = useState<DocItem[]>([]);
-  const [uploadingDoc, setUploadingDoc] = useState(false);
-  const [loadingDocs, setLoadingDocs] = useState(false);
-  const [uploadSection, setUploadSection] = useState('');
-  const [filterSection, setFilterSection] = useState('');
-  const docInputRef = useRef<HTMLInputElement>(null);
-
   // AI Bot state
   type AiMode = 'doc' | 'manage' | 'free';
   type AiToolCall = { tool: string; args: Record<string, unknown>; result: string };
@@ -278,6 +272,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       setSelectedExamKind(kind);
     }
   }, []);
+
+  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const isTeacher = typeof window !== 'undefined' && (localStorage.getItem('userType') === 'space' || localStorage.getItem('role') === 'teacher');
 
   // Load or create conversation when chat tab is opened
   useEffect(() => {
@@ -499,6 +496,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         late_threshold_seconds: 15 * 60,
         duration_seconds: (exam.duration_seconds || 45 * 60),
         camera_required: exam.camera_required ?? false,
+        max_tab_leaves: exam.max_tab_leaves ?? 3,
+        max_face_warnings: exam.max_face_warnings ?? 0,
       });
       setExams(prev => prev.map(e => e.uid === exam.uid ? opened.exam : e));
       toast.success(t('classroom.ui.exams_open_success', undefined, { count: opened.sessions.length }));
@@ -537,46 +536,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       void fetchExams();
     }
   }, [activeTab, fetchExams]);
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
-
-  const fetchDocs = React.useCallback(async (section?: string) => {
-    setLoadingDocs(true);
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      const query = section ? `?section=${encodeURIComponent(section)}` : '';
-      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/${query}`, { headers });
-      if (!res.ok) throw new Error(t('classroom.ui.docs_load_error'));
-      const data = await res.json() as Array<{ uid: string; name: string; file_type: string; url: string; size: number; metadata: Record<string, string>; created_at: string }>;
-      setDocuments(data.map(d => ({
-        uid: d.uid,
-        name: d.name,
-        size: formatFileSize(d.size ?? 0),
-        date: localeFormatDate(d.created_at),
-        url: d.url,
-        file_type: d.file_type,
-        section: d.metadata?.section ?? '',
-      })));
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('classroom.ui.docs_load_error_generic'));
-    } finally {
-      setLoadingDocs(false);
-    }
-  }, [uid]);
-
-  useEffect(() => {
-    if (activeTab === 'docs') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
-      void fetchDocs(filterSection || undefined);
-    }
-  }, [activeTab, fetchDocs, filterSection]);
 
   const fetchAiSessions = useCallback(async () => {
     try {
@@ -824,65 +783,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       });
     } finally {
       setAiLoading(false);
-    }
-  };
-
-  const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = '';
-    setUploadingDoc(true);
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const formData = new FormData();
-      formData.append('file', file);
-      if (uploadSection) formData.append('section', uploadSection);
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/`, {
-        method: 'POST',
-        headers,
-        body: formData,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({})) as Record<string, unknown>;
-        throw new Error((err.message as string) || (err.detail as string) || t('classroom.ui.upload_failed_label'));
-      }
-      const data = await res.json() as { uid: string; name: string; file_type: string; url: string; size: number; metadata: Record<string, string>; created_at: string };
-      setDocuments(prev => [{
-        uid: data.uid,
-        name: data.name,
-        size: formatFileSize(data.size ?? file.size),
-        date: localeFormatDate(data.created_at),
-        url: data.url,
-        file_type: data.file_type,
-        section: data.metadata?.section ?? uploadSection,
-      }, ...prev]);
-      toast.success(t('classroom.ui.docs_uploaded_toast'));
-    } catch (err: unknown) {
-      toast.error(`${t('classroom.ui.docs_upload_error')}: ${err instanceof Error ? err.message : t('classroom.ui.docs_upload_error')}`);
-    } finally {
-      setUploadingDoc(false);
-    }
-  };
-
-  const handleDeleteDoc = async (docUid: string) => {
-    if (!window.confirm(t('classroom.ui.docs_delete_confirm'))) return;
-    try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-      const headers: Record<string, string> = {};
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch(`${apiBase}/api/v1/space/course/classrooms/${uid}/docs/${docUid}/`, {
-        method: 'DELETE',
-        headers,
-      });
-      if (!res.ok && res.status !== 204) throw new Error(t('classroom.ui.docs_delete_error'));
-      setDocuments(prev => prev.filter(d => d.uid !== docUid));
-      toast.success(t('classroom.ui.docs_deleted_toast'));
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : t('classroom.ui.docs_delete_error'));
     }
   };
 
@@ -1426,123 +1326,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'docs' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              {/* Header */}
-              <div className="p-8 border-b border-border bg-muted/50">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.docs_title')}</h3>
-                    <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.docs_subtitle')}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {/* Section input for upload */}
-                    <div className="relative flex items-center">
-                      <Tag size={14} className="absolute left-3 text-muted-foreground pointer-events-none" />
-                      <input
-                        type="text"
-                        value={uploadSection}
-                        onChange={e => setUploadSection(e.target.value)}
-                        placeholder={t('classroom.ui.docs_section_placeholder')}
-                        className="pl-8 pr-3 h-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 w-40"
-                      />
-                    </div>
-                    <input ref={docInputRef} type="file" className="hidden" onChange={handleDocUpload}
-                      accept="application/pdf,.txt,.md,.doc,.docx,.xls,.xlsx,.ppt,.pptx,image/*,video/*,.zip" />
-                    <Button
-                      onClick={() => docInputRef.current?.click()}
-                      disabled={uploadingDoc}
-                      className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-2xl h-10 px-6 gap-2 shadow-lg shadow-primary-brand/20 disabled:opacity-70 uppercase tracking-widest transition-all hover:scale-105"
-                    >
-                      {uploadingDoc ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={18} />}
-                      {uploadingDoc ? t('classroom.ui.docs_uploading') : t('classroom.ui.docs_upload')}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Section filter pills */}
-                {documents.length > 0 && (() => {
-                  const sections = [...new Set(documents.map(d => d.section).filter(Boolean))];
-                  return sections.length > 0 ? (
-                    <div className="flex items-center gap-2 mt-4 flex-wrap">
-                      <FolderOpen size={14} className="text-muted-foreground" />
-                      <button
-                        onClick={() => setFilterSection('')}
-                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === '' ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'}`}
-                      >
-                        {t('classroom.ui.docs_filter_all')}
-                      </button>
-                      {sections.map(s => (
-                        <button
-                          key={s}
-                          onClick={() => setFilterSection(s === filterSection ? '' : s)}
-                          className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${filterSection === s ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'}`}
-                        >
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null;
-                })()}
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm p-6">
+              <div className="mb-4">
+                <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.docs_title')}</h3>
+                <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.docs_subtitle')}</p>
               </div>
-
-              <div className="flex-1 overflow-y-auto p-8 space-y-4">
-                {loadingDocs && (
-                  <div className="flex items-center justify-center py-16">
-                    <Loader2 size={32} className="animate-spin text-primary-brand" />
-                  </div>
-                )}
-                {!loadingDocs && documents.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50">
-                    <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4 border border-border">
-                      <File size={32} className="opacity-40" />
-                    </div>
-                    <p className="text-base font-bold text-foreground">{t('classroom.ui.docs_empty')}</p>
-                    <p className="text-sm font-medium mt-1">{t('classroom.ui.docs_empty_hint')}</p>
-                  </div>
-                )}
-                {!loadingDocs && documents
-                  .filter(d => !filterSection || d.section === filterSection)
-                  .map(doc => (
-                    <div key={doc.uid} className="bg-card p-5 rounded-2xl border border-border shadow-sm flex items-center gap-5 group hover:border-primary-brand-muted transition-all hover:shadow-lg">
-                      <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary-brand group-hover:text-white transition-all shadow-sm">
-                        {doc.file_type.match(/^(jpg|jpeg|png|gif|webp|svg)$/) ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={doc.url} alt={doc.name} className="w-14 h-14 rounded-xl object-cover" />
-                        ) : (
-                          <File size={28} />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-base font-bold text-foreground truncate group-hover:text-primary-brand transition-colors">{doc.name}</div>
-                        <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mt-1 flex items-center gap-3 flex-wrap">
-                          <span className="bg-muted px-2 py-0.5 rounded text-muted-foreground">{doc.file_type.toUpperCase()}</span>
-                          {doc.section && (
-                            <span className="bg-primary-brand-light text-primary-brand px-2 py-0.5 rounded flex items-center gap-1">
-                              <Tag size={10} />{doc.section}
-                            </span>
-                          )}
-                          <span>{doc.size}</span>
-                          <span>{t('classroom.ui.docs_uploaded_at', undefined, { date: doc.date })}</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                          <Button variant="ghost" size="icon" className="h-11 w-11 text-muted-foreground hover:text-primary-brand rounded-xl hover:bg-primary-brand-light border border-transparent hover:border-primary-brand-muted">
-                            <Download size={20} />
-                          </Button>
-                        </a>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-11 w-11 text-muted-foreground hover:text-rose-500 rounded-xl hover:bg-rose-50 border border-transparent hover:border-rose-100"
-                          onClick={() => void handleDeleteDoc(doc.uid)}
-                        >
-                          <X size={20} />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
+              <ClassroomDocsManager
+                classroomUid={uid}
+                apiBase={apiBase}
+                accessToken={typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null}
+                canManage={isTeacher}
+                t={t}
+              />
             </div>
           )}
 
@@ -3035,6 +2830,8 @@ function OpenOnlineExamModal({
   const [durationMin, setDurationMin] = useState(45);
   const [lateThresholdMin, setLateThresholdMin] = useState(15);
   const [cameraRequired, setCameraRequired] = useState(false);
+  const [maxTabLeaves, setMaxTabLeaves] = useState(3);
+  const [maxFaceWarnings, setMaxFaceWarnings] = useState(0);
   const [opening, setOpening] = useState(false);
 
   useEffect(() => {
@@ -3051,6 +2848,8 @@ function OpenOnlineExamModal({
         setDurationMin(Math.round((valid[0].duration_seconds || 2700) / 60));
         setLateThresholdMin(Math.round((valid[0].late_threshold_seconds || 900) / 60));
         setCameraRequired(valid[0].camera_required ?? false);
+        setMaxTabLeaves(valid[0].max_tab_leaves ?? 3);
+        setMaxFaceWarnings(valid[0].max_face_warnings ?? 0);
       }
       setLoading(false);
     }).catch(() => {
@@ -3066,6 +2865,8 @@ function OpenOnlineExamModal({
     setDurationMin(Math.round((exam.duration_seconds || 2700) / 60));
     setLateThresholdMin(Math.round((exam.late_threshold_seconds || 900) / 60));
     setCameraRequired(exam.camera_required ?? false);
+    setMaxTabLeaves(exam.max_tab_leaves ?? 3);
+    setMaxFaceWarnings(exam.max_face_warnings ?? 0);
   };
 
   const handleOpenExam = async () => {
@@ -3080,6 +2881,8 @@ function OpenOnlineExamModal({
         late_threshold_seconds: lateThresholdMin * 60,
         duration_seconds: durationMin * 60,
         camera_required: cameraRequired,
+        max_tab_leaves: maxTabLeaves,
+        max_face_warnings: maxFaceWarnings,
       });
       onOpened(opened.exam, opened.sessions.length);
     } catch (err: unknown) {
@@ -3201,6 +3004,55 @@ function OpenOnlineExamModal({
                 >
                   <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
                 </button>
+              </div>
+
+              {/* Proctoring rules */}
+              <div className="rounded-2xl border-2 border-border bg-rose-50/40 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <ShieldAlert size={16} className="text-rose-600" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-rose-700">Giám sát & chống gian lận</span>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-foreground">Số lần rời tab tối đa</span>
+                      <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-black uppercase text-rose-700">Quan trọng</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        max={20}
+                        value={maxTabLeaves}
+                        onChange={e => setMaxTabLeaves(Math.max(0, Number(e.target.value)))}
+                        disabled={opening}
+                        className="h-12 w-24 rounded-2xl border border-border bg-card px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-60"
+                      />
+                      <span className="text-xs font-bold text-muted-foreground">lần (0 = không giới hạn)</span>
+                    </div>
+                    <p className="text-[10px] font-medium text-muted-foreground">Vượt quá sẽ tự động nộp bài với phần SV đã làm</p>
+                  </label>
+
+                  <label className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold text-foreground">Cảnh báo camera tối đa</span>
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black uppercase text-amber-700">Nâng cao</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        max={50}
+                        value={maxFaceWarnings}
+                        onChange={e => setMaxFaceWarnings(Math.max(0, Number(e.target.value)))}
+                        disabled={opening}
+                        className="h-12 w-24 rounded-2xl border border-border bg-card px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-amber-300 disabled:opacity-60"
+                      />
+                      <span className="text-xs font-bold text-muted-foreground">lần (0 = chỉ log)</span>
+                    </div>
+                    <p className="text-[10px] font-medium text-muted-foreground">Số lần mất khuôn mặt trước khi dừng thi</p>
+                  </label>
+                </div>
               </div>
             </div>
           )}

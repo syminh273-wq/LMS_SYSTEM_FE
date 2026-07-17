@@ -42,6 +42,7 @@
     "default_class_desc": "Welcome to the online classroom. Start your learning journey today.",
     "tab_discussion": "Discussion",
     "tab_lessons": "Lessons",
+    "tab_docs": "Documents",
     "tab_assignments": "Assignments",
     "tab_exams": "Exams",
     "tab_quiz": "Missions",
@@ -119,7 +120,14 @@
     "deadline_hours_left": "{{count}} hours left",
     "deadline_days_left": "{{count}} days left",
     "deadline_none": "No deadline",
-    "deadline_invalid": "Invalid deadline"
+    "deadline_invalid": "Invalid deadline",
+    "docs_title": "Learning Materials",
+    "docs_loading": "Loading...",
+    "docs_empty": "The teacher has not uploaded any documents to this class yet.",
+    "docs_no_match": "No documents match the current filter.",
+    "docs_search_placeholder": "Search documents...",
+    "docs_filter_all": "All sections",
+    "docs_load_error": "Failed to load documents."
   },
   "messages": {
     "joined_success": "You have joined the class successfully.",
