@@ -42,6 +42,7 @@
     "default_class_desc": "Chào mừng bạn đến với lớp học trực tuyến. Hãy bắt đầu hành trình học tập của mình ngay hôm nay.",
     "tab_discussion": "Thảo luận",
     "tab_lessons": "Bài học",
+    "tab_docs": "Tài liệu",
     "tab_assignments": "Bài tập",
     "tab_exams": "Bài kiểm tra",
     "tab_quiz": "Nhiệm Vụ",
@@ -119,7 +120,14 @@
     "deadline_hours_left": "Còn {{count}} giờ",
     "deadline_days_left": "Còn {{count}} ngày",
     "deadline_none": "Chưa có hạn nộp",
-    "deadline_invalid": "Hạn nộp không hợp lệ"
+    "deadline_invalid": "Hạn nộp không hợp lệ",
+    "docs_title": "Tài liệu học tập",
+    "docs_loading": "Đang tải...",
+    "docs_empty": "Giáo viên chưa đăng tài liệu nào cho lớp này.",
+    "docs_no_match": "Không có tài liệu nào khớp bộ lọc.",
+    "docs_search_placeholder": "Tìm tài liệu...",
+    "docs_filter_all": "Tất cả mục",
+    "docs_load_error": "Không thể tải danh sách tài liệu."
   },
   "messages": {
     "joined_success": "Bạn đã tham gia lớp học thành công.",

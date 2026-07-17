@@ -46,6 +46,7 @@ import {
   CheckCircle2,
   Circle,
   ArrowRight,
+  FolderOpen,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -53,8 +54,9 @@ import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
+import { ClassroomDocsTab } from '@/components/classroom/ClassroomDocsTab';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections';
+type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -73,7 +75,17 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
     }
     if (type === "video") {
       return (
-        <video controls src={url} className="max-w-[280px] rounded-xl mt-1 border border-slate-200">
+        <video
+          key={url}
+          controls
+          src={url}
+          className="max-w-[280px] rounded-xl mt-1 border border-slate-200"
+          onError={(e) => {
+            const err = (e.currentTarget.error as MediaError | null)?.message ?? "unknown";
+            if (err.toLowerCase().includes("aborted")) return;
+            console.warn("Video load error", { url, err });
+          }}
+        >
           <track kind="captions" />
         </video>
       );
@@ -465,6 +477,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               {[
                 { key: 'discussion' as const, icon: MessageSquare, label: 'Thảo luận' },
                 { key: 'lessons' as const, icon: BookOpen, label: 'Bài học' },
+                { key: 'docs' as const, icon: FolderOpen, label: 'Tài liệu' },
                 { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
                 { key: 'quiz' as const, icon: Trophy, label: 'Thi trắc nghiệm' },
@@ -712,6 +725,15 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   )}
                 </div>
               </div>
+            )}
+
+            {/* Docs Tab */}
+            {activeTab === 'docs' && (
+              <ClassroomDocsTab
+                classroomUid={uid}
+                accessToken={typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null}
+                apiBase={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
+              />
             )}
 
             {/* Meeting Tab */}
