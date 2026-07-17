@@ -167,7 +167,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
 
   const closeEditorPortal = () => setEditorPortal(null);
 
-  const handleCreateNote = async (data: { content: string; progress_at: number; color: string }) => {
+  const handleCreateNote = async (data: { content: string; color: string }) => {
     if (!editorPortal || editorPortal.mode !== 'create') return;
     try {
       const note = await createNote(ctxRef.current, docUidRef.current, {
@@ -175,7 +175,6 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
         x_pct: editorPortal.x_pct,
         y_pct: editorPortal.y_pct,
         page: pendingNote?.page ?? null,
-        progress_at: data.progress_at,
         color: data.color,
       });
       setNotes((prev) => {
@@ -192,13 +191,12 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     }
   };
 
-  const handleEditNote = async (data: { content: string; progress_at: number; color: string }) => {
+  const handleEditNote = async (data: { content: string; color: string }) => {
     if (!editorPortal || editorPortal.mode !== 'edit' || !editorPortal.note) return;
     const note = editorPortal.note;
     try {
       const updated = await updateNote(ctxRef.current, docUidRef.current, note.uid, {
         content: data.content,
-        progress_at: data.progress_at,
         color: data.color,
         x_pct: note.x_pct,
         y_pct: note.y_pct,
@@ -235,8 +233,19 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   const syncLocalProgress = (nextNotes: DocNote[]) => {
     setProgress((prev) => {
       const isCompleted = prev?.is_completed ?? false;
-      const maxAt = nextNotes.reduce((m, n) => Math.max(m, n.progress_at ?? 0), 0);
-      const derivedPct = Math.min(99, Math.round(maxAt * 100));
+      let maxOffset = 0;
+      let maxPage = 1;
+      for (const n of nextNotes) {
+        const y = typeof n.y_pct === 'number' ? n.y_pct : null;
+        if (y == null) continue;
+        const clamped = Math.max(0, Math.min(1, y));
+        const page = n.page ?? 1;
+        if (page > maxPage) maxPage = page;
+        const offset = (page - 1) + clamped;
+        if (offset > maxOffset) maxOffset = offset;
+      }
+      const ratio = maxPage > 0 ? maxOffset / maxPage : 0;
+      const derivedPct = Math.min(99, Math.round(ratio * 100));
       const finalPct = isCompleted ? 100 : derivedPct;
       const next: DocProgress = {
         classroom_id: doc.uid,
@@ -579,6 +588,11 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
           {editorPortal.mode === 'create' ? (
             <NoteEditor
               mode="create"
+              positionHint={{
+                x_pct: editorPortal.x_pct,
+                y_pct: editorPortal.y_pct,
+                page: pendingNote?.page ?? null,
+              }}
               onSubmit={handleCreateNote}
               onCancel={closeEditorPortal}
             />
@@ -587,8 +601,16 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
               mode="edit"
               existingNote={editorPortal.note}
               initialContent={editorPortal.note?.content}
-              initialProgressAt={editorPortal.note?.progress_at ?? 0}
               initialColor={editorPortal.note?.color ?? 'yellow'}
+              positionHint={
+                editorPortal.note
+                  ? {
+                      x_pct: editorPortal.note.x_pct ?? 0,
+                      y_pct: editorPortal.note.y_pct ?? 0,
+                      page: editorPortal.note.page ?? null,
+                    }
+                  : undefined
+              }
               onSubmit={handleEditNote}
               onDelete={() => editorPortal.note && handleDeleteNote(editorPortal.note)}
               onCancel={closeEditorPortal}

@@ -13,10 +13,10 @@ type Mode = 'create' | 'edit';
 type Props = {
   mode: Mode;
   initialContent?: string;
-  initialProgressAt?: number;
   initialColor?: string;
+  positionHint?: { x_pct: number; y_pct: number; page?: number | null };
   existingNote?: DocNote;
-  onSubmit: (data: { content: string; progress_at: number; color: string }) => void;
+  onSubmit: (data: { content: string; color: string }) => void;
   onDelete?: () => void;
   onCancel: () => void;
 };
@@ -24,21 +24,20 @@ type Props = {
 export function NoteEditor({
   mode,
   initialContent = '',
-  initialProgressAt = 0,
   initialColor = 'yellow',
+  positionHint,
   existingNote,
   onSubmit,
   onDelete,
   onCancel,
 }: Props) {
   const [content, setContent] = useState(initialContent);
-  const [progressAt, setProgressAt] = useState(initialProgressAt);
   const [color, setColor] = useState(initialColor);
 
   const handleSubmit = () => {
     const trimmed = content.trim();
     if (!trimmed) return;
-    onSubmit({ content: trimmed, progress_at: progressAt, color });
+    onSubmit({ content: trimmed, color });
   };
 
   return (
@@ -68,20 +67,13 @@ export function NoteEditor({
         className="h-8 text-xs"
         autoFocus
       />
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
-          <span>Đã đọc tới</span>
-          <span className="text-indigo-600 font-black">{Math.round(progressAt * 100)}%</span>
-        </div>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={Math.round(progressAt * 100)}
-          onChange={(e) => setProgressAt(Number(e.target.value) / 100)}
-          className="w-full h-1 accent-indigo-600"
-        />
-      </div>
+      {positionHint && (
+        <p className="text-[10px] text-slate-500 font-medium">
+          Vị trí: x={Math.round(positionHint.x_pct * 100)}% · y=
+          {Math.round(positionHint.y_pct * 100)}%
+          {positionHint.page != null ? ` · trang ${positionHint.page}` : ''}
+        </p>
+      )}
       <div className="flex items-center gap-1">
         {Object.entries(NOTE_COLORS).map(([key, cls]) => (
           <button
