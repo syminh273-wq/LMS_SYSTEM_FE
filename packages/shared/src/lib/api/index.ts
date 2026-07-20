@@ -1,6 +1,19 @@
 import BaseRestApiClient from './client';
 export { ApiException, UnauthorizedException, ValidationException } from './exceptions';
 
+export {
+  leaveRequestApiService,
+  LeaveRequestApiService,
+} from './leaveRequestApi';
+export type {
+  LeaveRequest,
+  LeaveRequestStatus,
+  LeaveRequestEventOption,
+  CreateLeaveRequestInput,
+  ProcessLeaveRequestInput,
+  ListLeaveRequestsParams,
+} from './leaveRequest';
+
 export const apiClient = new BaseRestApiClient();
 
 export type LoginRequest = {

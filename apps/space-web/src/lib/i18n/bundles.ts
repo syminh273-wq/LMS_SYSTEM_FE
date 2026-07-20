@@ -45,6 +45,8 @@ import sharedAdminEn from '@shared/locales/admin/en.json';
 import sharedAdminVi from '@shared/locales/admin/vi.json';
 import sharedCalendarEn from '@shared/locales/calendar/en.json';
 import sharedCalendarVi from '@shared/locales/calendar/vi.json';
+import sharedLeaveRequestEn from '@shared/locales/leave-request/en.json';
+import sharedLeaveRequestVi from '@shared/locales/leave-request/vi.json';
 import sharedEditorEn from '@shared/locales/editor/en.json';
 import sharedEditorVi from '@shared/locales/editor/vi.json';
 import sharedFaceEn from '@shared/locales/face/en.json';
@@ -82,6 +84,7 @@ export const spaceWebBundles: LocaleBundles = {
     sharedAuth: sharedAuthEn,
     sharedAdmin: sharedAdminEn,
     calendar: sharedCalendarEn,
+    leave_request: sharedLeaveRequestEn,
     editor: sharedEditorEn,
     face: sharedFaceEn,
     grades: sharedGradesEn,
@@ -112,6 +115,7 @@ export const spaceWebBundles: LocaleBundles = {
     sharedAuth: sharedAuthVi,
     sharedAdmin: sharedAdminVi,
     calendar: sharedCalendarVi,
+    leave_request: sharedLeaveRequestVi,
     editor: sharedEditorVi,
     face: sharedFaceVi,
     grades: sharedGradesVi,

@@ -1,0 +1,87 @@
+{
+  "status": {
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối",
+    "cancelled": "Đã huỷ"
+  },
+  "form": {
+    "title": "Tạo đơn nghỉ phép",
+    "mode_event": "Theo sự kiện",
+    "mode_range": "Theo khoảng ngày",
+    "field_event": "Sự kiện",
+    "field_start": "Bắt đầu",
+    "field_end": "Kết thúc",
+    "field_reason": "Lý do",
+    "field_evidence": "Minh chứng (tuỳ chọn)",
+    "select_event": "-- Chọn sự kiện --",
+    "no_events": "Bạn chưa có sự kiện nào để tạo đơn.",
+    "reason_placeholder": "Vui lòng mô tả lý do nghỉ...",
+    "upload_hint": "Chọn ảnh hoặc tài liệu...",
+    "cancel": "Huỷ",
+    "submit": "Gửi đơn"
+  },
+  "list": {
+    "loading": "Đang tải...",
+    "empty": "Chưa có đơn nào.",
+    "empty_student": "Bạn chưa gửi đơn nghỉ phép nào.",
+    "empty_teacher": "Chưa có đơn nghỉ phép nào từ học sinh.",
+    "view_evidence": "Minh chứng",
+    "event": "Sự kiện",
+    "range": "Khoảng thời gian",
+    "submitted_at": "Gửi lúc",
+    "rejection_reason": "Lý do từ chức",
+    "group_no_classroom": "Không thuộc lớp nào",
+    "group_count": "{{count}} đơn"
+  },
+  "process": {
+    "title": "Xử lý đơn nghỉ phép",
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+    "rejection_label": "Lý do từ chối",
+    "reason_required": "Vui lòng nhập lý do từ chối.",
+    "cancel": "Huỷ",
+    "close": "Đóng",
+    "submit_approve": "Duyệt đơn",
+    "submit_reject": "Từ chối đơn"
+  },
+  "page": {
+    "title_student": "Đơn nghỉ phép của tôi",
+    "title_teacher": "Đơn nghỉ phép",
+    "subtitle_student": "Gửi đơn mới và theo dõi trạng thái duyệt.",
+    "subtitle_teacher": "Xem và xử lý đơn nghỉ phép từ học sinh.",
+    "new_request": "Tạo đơn mới",
+    "filter_all": "Tất cả",
+    "filter_pending": "Chờ duyệt",
+    "filter_approved": "Đã duyệt",
+    "filter_rejected": "Từ chối",
+    "filter_cancelled": "Đã huỷ",
+    "filter_all_classrooms": "Tất cả lớp",
+    "view": "Xem",
+    "cancel_request": "Huỷ đơn",
+    "cancel_confirm": "Huỷ đơn nghỉ phép này?",
+    "view_details": "Xem chi tiết",
+    "stats": {
+      "total": "Tổng",
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối"
+    }
+  },
+  "actions": {
+    "create_success": "Đã gửi đơn nghỉ phép.",
+    "create_error": "Gửi đơn thất bại.",
+    "process_success": "Đã cập nhật đơn.",
+    "process_error": "Cập nhật đơn thất bại.",
+    "cancel_success": "Đã huỷ đơn.",
+    "cancel_error": "Huỷ đơn thất bại."
+  },
+  "errors": {
+    "reason_required": "Vui lòng nhập lý do.",
+    "event_required": "Vui lòng chọn sự kiện.",
+    "event_not_found": "Sự kiện không tồn tại.",
+    "range_required": "Vui lòng chọn khoảng thời gian.",
+    "end_before_start": "Thời gian kết thúc phải sau thời gian bắt đầu.",
+    "generic": "Đã có lỗi xảy ra."
+  }
+}

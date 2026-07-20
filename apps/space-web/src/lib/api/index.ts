@@ -11,10 +11,14 @@ import { accountService } from './account';
 import { userSettingsApi } from './user-settings';
 import { notificationApi } from './notification';
 import { studentApi } from './student';
+import { calendarApi } from './calendar';
+import { spaceLeaveRequestApi } from './leaveRequest';
 
 export * from './types';
 export * from './exceptions';
-export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi };
+export * from './calendar';
+export * from './leaveRequest';
+export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -30,6 +34,8 @@ export const api = {
   consumers: consumerApiInstance,
   account: accountService,
   notifications: notificationApi,
+  calendar: calendarApi,
+  leaveRequests: spaceLeaveRequestApi,
 };
 
 // Re-export specific instances
@@ -59,6 +65,8 @@ export const spaceApi = {
   quizzes: quizApi,
   quizCollections: quizCollectionApi,
   certificates: certificateApi,
+  calendar: calendarApi,
+  leaveRequests: spaceLeaveRequestApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,
   },

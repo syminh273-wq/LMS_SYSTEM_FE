@@ -9,15 +9,21 @@ import { consumerApi as consumerApiInstance } from './consumer';
 import { accountService } from './account';
 import { userSettingsApi } from './user-settings';
 import { examSessionApi } from './exam-session';
+import { consumerCalendarApi } from './calendar';
+import { consumerLeaveRequestApi } from './leaveRequest';
 import { ApiException } from './exceptions';
 import { SharingLink, NotificationItem, PaginatedResponse } from './types';
 
 export * from './types';
 export * from './exceptions';
+export * from './calendar';
+export * from './leaveRequest';
 export { consumerQuizApi };
 export { consumerQuizCollectionApi };
 export { faceApi };
 export { examSessionApi };
+export { consumerCalendarApi };
+export { consumerLeaveRequestApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -26,6 +32,8 @@ export const api = {
   spaces: spaceApiInstance,
   consumers: consumerApiInstance,
   account: accountService,
+  calendar: consumerCalendarApi,
+  leaveRequests: consumerLeaveRequestApi,
 };
 
 // Re-export specific instances
@@ -60,6 +68,8 @@ export const sharingApi = {
 export const consumerApi = {
   ...consumerApiCompat,
   sharing: sharingApi,
+  calendar: consumerCalendarApi,
+  leaveRequests: consumerLeaveRequestApi,
 };
 
 export const notificationApi = {
