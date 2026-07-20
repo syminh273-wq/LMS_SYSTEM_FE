@@ -18,6 +18,7 @@ function buildQuery(params: ListLeaveRequestsParams = {}): string {
 function toFormData(input: CreateLeaveRequestInput): FormData {
   const fd = new FormData();
   if (input.event_id) fd.set('event_id', input.event_id);
+  if (input.classroom_id) fd.set('classroom_id', input.classroom_id);
   if (input.start_date) fd.set('start_date', input.start_date);
   if (input.end_date) fd.set('end_date', input.end_date);
   fd.set('reason', input.reason);

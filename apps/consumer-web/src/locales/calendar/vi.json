@@ -19,13 +19,24 @@
     "load_error": "Không thể tải lịch",
     "all_classrooms": "Tất cả lớp",
     "filter_type": "Loại sự kiện",
-    "more": "+{{count}} khác"
+    "more": "+{{count}} khác",
+    "shift_col": "Ca",
+    "outside_shift": "Ngoài ca",
+    "outside_shift_hint": "Giờ tự do"
   },
   "types": {
     "class": "Buổi học",
     "exam": "Kiểm tra",
     "deadline": "Hạn nộp",
     "study_session": "Tự học"
+  },
+  "shifts": {
+    "ca_1": "Ca 1",
+    "ca_2": "Ca 2",
+    "ca_3": "Ca 3",
+    "ca_4": "Ca 4",
+    "none": "Không chọn ca",
+    "none_hint": "Giờ tự do"
   },
   "actions": {
     "create_success": "Tạo sự kiện thành công",
@@ -45,11 +56,29 @@
     "field_end": "Kết thúc",
     "field_classroom": "Lớp học",
     "field_description": "Mô tả",
+    "field_shift": "Ca học",
     "save": "Lưu",
     "cancel": "Huỷ",
     "close": "Đóng",
     "select_classroom": "Chọn lớp học",
-    "no_classroom": "Không thuộc lớp nào (sự kiện cá nhân)"
+    "no_classroom": "Không thuộc lớp nào (sự kiện cá nhân)",
+    "error_end_before_start": "Thời gian kết thúc phải sau thời gian bắt đầu.",
+    "error_title_required": "Vui lòng nhập tiêu đề.",
+    "error_time_required": "Vui lòng chọn thời gian.",
+    "error_generic": "Đã xảy ra lỗi."
+  },
+  "recurring": {
+    "title": "Thời khóa biểu hàng tuần",
+    "title_placeholder": "vd. Toán cao cấp - Lớp A",
+    "field_start_date": "Ngày bắt đầu",
+    "field_end_date": "Ngày kết thúc",
+    "field_matrix": "Thứ × Ca",
+    "slot_count": "Sẽ tạo {{count}} sự kiện",
+    "create_button": "Tạo thời khóa biểu",
+    "error_dates_required": "Vui lòng chọn ngày bắt đầu và kết thúc.",
+    "error_end_before_start": "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.",
+    "error_no_slots": "Vui lòng chọn ít nhất một thứ/ca.",
+    "error_generic": "Không thể tạo bất kỳ sự kiện nào."
   },
   "days": {
     "sun": "CN",

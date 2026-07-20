@@ -9,8 +9,13 @@ import {
   CreateCalendarEventRequest,
   UpdateCalendarEventRequest,
 } from '@shared/lib/api/calendar';
-import { cn } from '@shared/lib/utils';
+import {
+  applyShiftToDate,
+  getShiftForDate,
+  getShiftById,
+} from '@shared/lib/calendar/shifts';
 import { X, Loader2 } from 'lucide-react';
+import { ShiftPicker } from './ShiftPicker';
 
 export interface ClassroomOption {
   uid: string;
@@ -66,17 +71,47 @@ export function EventDialog({
   const [endTime, setEndTime] = useState('');
   const [classroomId, setClassroomId] = useState<string>('');
   const [error, setError] = useState('');
+  const [shiftId, setShiftId] = useState<1 | 2 | 3 | 4 | ''>('');
+  const [userPickedShift, setUserPickedShift] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setType((initial?.type as CalendarEventType) ?? 'class');
     setTitle(initial?.title ?? '');
     setDescription(initial?.description ?? '');
-    setStartTime(toLocalInput(initial?.start_time));
-    setEndTime(toLocalInput(initial?.end_time));
+    const initialStart = toLocalInput(initial?.start_time);
+    const initialEnd = toLocalInput(initial?.end_time);
+    setStartTime(initialStart);
+    setEndTime(initialEnd);
     setClassroomId(initial?.classroom_id ?? '');
     setError('');
+    if (initial?.start_time) {
+      const matched = getShiftForDate(new Date(initial.start_time));
+      setShiftId(matched?.id ?? '');
+    } else {
+      setShiftId('');
+    }
+    setUserPickedShift(false);
   }, [open, initial]);
+
+  const handleShiftChange = (id: 1 | 2 | 3 | 4 | '') => {
+    setShiftId(id);
+    setUserPickedShift(true);
+    if (id === '') return;
+    const shift = getShiftById(id);
+    if (!shift) return;
+    const baseDate = startTime ? new Date(startTime) : new Date();
+    setStartTime(toLocalInput(applyShiftToDate(baseDate, shift, 'start').toISOString()));
+    setEndTime(toLocalInput(applyShiftToDate(baseDate, shift, 'end').toISOString()));
+  };
+
+  const handleStartTimeChange = (value: string) => {
+    setStartTime(value);
+    if (!userPickedShift && value) {
+      const matched = getShiftForDate(new Date(value));
+      setShiftId(matched?.id ?? '');
+    }
+  };
 
   const effectiveClassroomId = lockedClassroom?.uid ?? classroomId;
   const showClassroomSelect = !lockedClassroom && allowClassroomSelect;
@@ -208,6 +243,13 @@ export function EventDialog({
             ) : null}
           </div>
 
+          <div>
+            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              {t('calendar.dialog.field_shift', 'Ca học')}
+            </label>
+            <ShiftPicker value={shiftId} onChange={handleShiftChange} optional />
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
@@ -216,7 +258,7 @@ export function EventDialog({
               <input
                 type="datetime-local"
                 value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
+                onChange={(e) => handleStartTimeChange(e.target.value)}
                 className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
               />
             </div>

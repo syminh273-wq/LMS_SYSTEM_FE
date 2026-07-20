@@ -19,13 +19,24 @@
     "load_error": "Unable to load calendar",
     "all_classrooms": "All classrooms",
     "filter_type": "Event type",
-    "more": "+{{count}} more"
+    "more": "+{{count}} more",
+    "shift_col": "Shift",
+    "outside_shift": "Outside shift",
+    "outside_shift_hint": "Custom time"
   },
   "types": {
     "class": "Class",
     "exam": "Exam",
     "deadline": "Deadline",
     "study_session": "Study session"
+  },
+  "shifts": {
+    "ca_1": "Shift 1",
+    "ca_2": "Shift 2",
+    "ca_3": "Shift 3",
+    "ca_4": "Shift 4",
+    "none": "No shift",
+    "none_hint": "Custom time"
   },
   "actions": {
     "create_success": "Event created",
@@ -45,11 +56,29 @@
     "field_end": "End",
     "field_classroom": "Classroom",
     "field_description": "Description",
+    "field_shift": "Shift",
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
     "select_classroom": "Select a classroom",
-    "no_classroom": "No classroom (personal event)"
+    "no_classroom": "No classroom (personal event)",
+    "error_end_before_start": "End time must be after start time.",
+    "error_title_required": "Please enter a title.",
+    "error_time_required": "Please pick a time.",
+    "error_generic": "Something went wrong."
+  },
+  "recurring": {
+    "title": "Weekly schedule",
+    "title_placeholder": "e.g. Advanced Math - Class A",
+    "field_start_date": "Start date",
+    "field_end_date": "End date",
+    "field_matrix": "Days × Shifts",
+    "slot_count": "Will create {{count}} event(s)",
+    "create_button": "Create schedule",
+    "error_dates_required": "Please pick start and end dates.",
+    "error_end_before_start": "End date must be on or after start date.",
+    "error_no_slots": "Please select at least one day/shift.",
+    "error_generic": "Could not create any events."
   },
   "days": {
     "sun": "Sun",

@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { setProfile } from '@/lib/redux/userSlice';
 import { consumerApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Eye,
   EyeOff,
@@ -46,9 +46,9 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
   const [globalError, setGlobalError] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get('error');
+    const err = searchParams.get('error');
     return err ? (ERROR_MESSAGES[err] || 'Đăng nhập thất bại.') : '';
   });
   const [showPassword, setShowPassword] = useState(false);

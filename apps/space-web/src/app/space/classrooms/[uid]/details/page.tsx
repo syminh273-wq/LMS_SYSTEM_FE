@@ -101,6 +101,8 @@ import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { ClassroomDocsManager } from '@/components/classroom/docs-manager/ClassroomDocsManager';
 import { ClassroomCalendarTab } from '@/components/calendar/ClassroomCalendarTab';
+import { LeaveRequestTab } from '@shared/components/leave-request';
+import { spaceLeaveRequestApi, calendarApi as spaceCalendarApi } from '@/lib/api';
 import {
   CartesianGrid,
   Line,
@@ -163,7 +165,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [blacklist, setBlacklist] = useState<BlacklistEntry[]>([]);
   const [loadingBlacklist, setLoadingBlacklist] = useState(false);
@@ -265,7 +267,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai' || tab === 'blacklist' || tab === 'calendar') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai' || tab === 'blacklist' || tab === 'calendar' || tab === 'leave_request') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
       setActiveTab(tab);
     }
@@ -995,6 +997,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
                 { id: 'quiz',     label: t('classroom.ui.tab_quiz'),     icon: Gamepad2 },
                 { id: 'students',  label: t('classroom.ui.tab_students'),  icon: Users },
+                { id: 'leave_request', label: t('classroom.ui.tab_leave_request', 'Xin nghỉ'), icon: ClipboardList },
                 { id: 'blacklist', label: t('classroom.ui.tab_blacklist'), icon: ShieldBan },
               ] as const).map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === id;
@@ -1730,6 +1733,40 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {activeTab === 'calendar' && (
             <div className="animate-in fade-in duration-300 bg-card rounded-3xl border border-border shadow-sm p-6 sm:p-8">
               <ClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
+            </div>
+          )}
+
+          {activeTab === 'leave_request' && (
+            <div className="animate-in fade-in duration-300 bg-card rounded-3xl border border-border shadow-sm p-6 sm:p-8">
+              <LeaveRequestTab
+                role="teacher"
+                classroomId={uid}
+                classroomName={classroom?.name}
+                api={{
+                  list: (params) => spaceLeaveRequestApi.list({ classroom_id: params.classroom_id, status: params.status }),
+                  process: (lrUid, input) => spaceLeaveRequestApi.process(lrUid, input),
+                }}
+                listEvents={async () => {
+                  const now = new Date();
+                  const start = new Date(now);
+                  start.setDate(start.getDate() - 7);
+                  const end = new Date(now);
+                  end.setDate(end.getDate() + 60);
+                  const data = await spaceCalendarApi.list({
+                    startDate: start.toISOString(),
+                    endDate: end.toISOString(),
+                    classroomId: uid,
+                  });
+                  return (data || []).map((e) => ({
+                    uid: e.uid,
+                    title: e.title,
+                    start_time: e.start_time,
+                    end_time: e.end_time,
+                    classroom_name: e.classroom_name ?? null,
+                  }));
+                }}
+                canCreate={false}
+              />
             </div>
           )}
 

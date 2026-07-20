@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { cn } from '@shared/lib/utils';
-import { Clock, MapPin, X, Loader2 } from 'lucide-react';
+import { Clock, MapPin, X, CalendarOff } from 'lucide-react';
 import { EventTypeBadge } from './EventTypeBadge';
 
 interface EventDetailsDialogProps {
@@ -12,6 +12,8 @@ interface EventDetailsDialogProps {
   event: CalendarEvent | null;
   onOpenChange: (open: boolean) => void;
   locale?: 'vi' | 'en';
+  onRequestLeave?: (event: CalendarEvent) => void;
+  showLeaveRequest?: boolean;
 }
 
 function formatDateTime(iso: string, locale: 'vi' | 'en') {
@@ -26,7 +28,14 @@ function formatDateTime(iso: string, locale: 'vi' | 'en') {
   }).format(d);
 }
 
-export function EventDetailsDialog({ open, event, onOpenChange, locale = 'vi' }: EventDetailsDialogProps) {
+export function EventDetailsDialog({
+  open,
+  event,
+  onOpenChange,
+  locale = 'vi',
+  onRequestLeave,
+  showLeaveRequest = false,
+}: EventDetailsDialogProps) {
   const { t } = useTranslation();
   if (!open || !event) return null;
 
@@ -91,13 +100,28 @@ export function EventDetailsDialog({ open, event, onOpenChange, locale = 'vi' }:
             </div>
           )}
 
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-semibold"
-          >
-            {t('calendar.dialog.close', 'Close')}
-          </button>
+          <div className="flex flex-col gap-2">
+            {showLeaveRequest && onRequestLeave && event.classroom_id && (
+              <button
+                type="button"
+                onClick={() => {
+                  onRequestLeave(event);
+                  onOpenChange(false);
+                }}
+                className="w-full h-10 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 text-[13px] font-semibold inline-flex items-center justify-center gap-1.5"
+              >
+                <CalendarOff size={15} />
+                {t('calendar.event.request_leave', 'Xin nghỉ buổi này')}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-semibold"
+            >
+              {t('calendar.dialog.close', 'Close')}
+            </button>
+          </div>
         </div>
       </div>
     </div>

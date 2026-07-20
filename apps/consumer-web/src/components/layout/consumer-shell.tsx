@@ -23,7 +23,6 @@ import {
   GraduationCap,
   Sparkles,
   Inbox,
-  ClipboardList,
 } from 'lucide-react';
 import {
   Avatar,
@@ -104,7 +103,6 @@ const navItems: NavItem[] = [
   { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
   { name: 'Feed', href: '/consumer/feed', icon: Sparkles },
   { name: 'Calendar', href: '/consumer/calendar', icon: CalendarIcon },
-  { name: 'Leave Requests', href: '/consumer/leave-requests', icon: ClipboardList },
   { name: 'Grades', href: '/consumer/grades', icon: GraduationCap },
   { name: 'Certificates', href: '/consumer/certificate', icon: Award },
 ];

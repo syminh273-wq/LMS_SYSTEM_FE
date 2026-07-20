@@ -3,24 +3,32 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { ChevronLeft, ChevronRight, Plus, Loader2, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Loader2, Calendar as CalendarIcon, Repeat, CalendarPlus } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { calendarApi, type Classroom } from '@/lib/api';
+import { calendarApi, classroomApi, type Classroom } from '@/lib/api';
 import {
   CalendarEvent,
   CalendarEventType,
   CreateCalendarEventRequest,
 } from '@shared/lib/api/calendar';
+import { getShiftById } from '@shared/lib/calendar/shifts';
 import {
   EventDialog,
   EventDetailsDialog,
   MonthGrid,
+  RecurringScheduleDialog,
+  ShiftWeekGrid,
   UpcomingList,
   ViewSwitcher,
-  WeekGrid,
   useCalendarState,
 } from '@shared/components/calendar';
 import { Button } from '@shared/components/ui/button';
+
+const EMPTY_EVENT: Partial<CalendarEvent> = {
+  type: 'class',
+  title: '',
+  description: '',
+};
 
 const TYPE_FILTERS: Array<{ key: CalendarEventType | 'all'; labelKey: string }> = [
   { key: 'all', labelKey: 'calendar.labels.all_classrooms' },
@@ -40,33 +48,21 @@ export default function SpaceCalendarPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [recurringOpen, setRecurringOpen] = useState(false);
+  const [createMenuOpen, setCreateMenuOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    calendarApi
+    classroomApi
       .list()
-      .then((all) => {
+      .then((data) => {
         if (cancelled) return;
-        const map = new Map<string, Classroom>();
-        for (const e of all) {
-          if (e.classroom_id && e.classroom_name && !map.has(e.classroom_id)) {
-            map.set(e.classroom_id, {
-              uid: e.classroom_id,
-              pid: '',
-              name: e.classroom_name,
-              description: '',
-              max_students: 0,
-              status: 'active',
-              teacher_id: e.owner_id,
-              created_at: e.created_at ?? '',
-              updated_at: e.updated_at ?? '',
-            });
-          }
-        }
-        setClassrooms(Array.from(map.values()));
+        const list = Array.isArray(data) ? data : data.results;
+        setClassrooms(list);
       })
       .catch(() => {
-        // best effort — empty list is acceptable
+        if (cancelled) return;
+        setClassrooms([]);
       });
     return () => {
       cancelled = true;
@@ -106,6 +102,24 @@ export default function SpaceCalendarPage() {
     setDialogOpen(true);
   }, []);
 
+  const handleShiftCellClick = useCallback(
+    (date: Date, shiftId: 1 | 2 | 3 | 4) => {
+      const shift = getShiftById(shiftId);
+      if (!shift) return;
+      const start = new Date(date);
+      start.setHours(shift.startHour, shift.startMinute, 0, 0);
+      const end = new Date(date);
+      end.setHours(shift.endHour, shift.endMinute, 0, 0);
+      setEditing({
+        ...EMPTY_EVENT,
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+      } as CalendarEvent);
+      setDialogOpen(true);
+    },
+    []
+  );
+
   const handleEdit = useCallback((event: CalendarEvent) => {
     setEditing(event);
     setDialogOpen(true);
@@ -138,6 +152,32 @@ export default function SpaceCalendarPage() {
     },
     [editing, refetch, t]
   );
+
+  const [recurringResult, setRecurringResult] = useState<{ created: number; failed: number } | null>(null);
+
+  const handleRecurringSubmit = useCallback(
+    async (payload: Parameters<typeof calendarApi.createRecurring>[0]) => {
+      const result = await calendarApi.createRecurring(payload);
+      setRecurringResult({ created: result.created, failed: result.failed });
+    },
+    []
+  );
+
+  const handleRecurringClose = useCallback(async () => {
+    setRecurringOpen(false);
+    if (recurringResult && recurringResult.created > 0) {
+      toast.success(
+        t(
+          'calendar.recurring.success',
+          `Created ${recurringResult.created} event(s) and emailed ${recurringResult.created} student(s)`
+        )
+      );
+      setRecurringResult(null);
+      await refetch();
+    } else {
+      setRecurringResult(null);
+    }
+  }, [recurringResult, refetch, t]);
 
   const handleDelete = useCallback(async () => {
     if (!editing) return;
@@ -224,14 +264,45 @@ export default function SpaceCalendarPage() {
               </option>
             ))}
           </select>
-          <Button
-            onClick={handleCreate}
-            className="h-10 px-3.5 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 gap-1.5"
-          >
-            <Plus size={15} strokeWidth={2.5} />
-            <span className="hidden sm:inline">{t('calendar.labels.new_event', 'New event')}</span>
-            <span className="sm:hidden">{t('calendar.labels.new_event', 'New')}</span>
-          </Button>
+          <div className="relative">
+            <Button
+              onClick={() => setCreateMenuOpen((o) => !o)}
+              className="h-10 px-3.5 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 gap-1.5"
+            >
+              <Plus size={15} strokeWidth={2.5} />
+              <span className="hidden sm:inline">{t('calendar.labels.new_event', 'New event')}</span>
+              <span className="sm:hidden">{t('calendar.labels.new_event', 'New')}</span>
+            </Button>
+            {createMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setCreateMenuOpen(false)} />
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-40 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCreateMenuOpen(false);
+                      handleCreate();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <CalendarPlus size={14} className="text-indigo-600" />
+                    {t('calendar.recurring.menu_one_day', 'Sự kiện 1 ngày')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCreateMenuOpen(false);
+                      setRecurringOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] font-semibold text-slate-700 hover:bg-slate-50 border-t border-slate-100"
+                  >
+                    <Repeat size={14} className="text-indigo-600" />
+                    {t('calendar.recurring.menu_recurring', 'Thời khóa biểu')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -295,10 +366,11 @@ export default function SpaceCalendarPage() {
               />
             )}
             {view === 'week' && (
-              <WeekGrid
+              <ShiftWeekGrid
                 weekDate={currentDate}
                 events={events}
                 onSelectEvent={handleEdit}
+                onShiftCellClick={handleShiftCellClick}
                 locale={locale}
               />
             )}
@@ -336,6 +408,20 @@ export default function SpaceCalendarPage() {
         event={viewing}
         onOpenChange={(o) => !o && setViewing(null)}
         locale={locale}
+      />
+
+      <RecurringScheduleDialog
+        open={recurringOpen}
+        onOpenChange={(o) => {
+          if (o) {
+            setRecurringOpen(true);
+          } else {
+            void handleRecurringClose();
+          }
+        }}
+        classroomOptions={classrooms}
+        onSubmit={handleRecurringSubmit}
+        saving={saving}
       />
     </div>
   );

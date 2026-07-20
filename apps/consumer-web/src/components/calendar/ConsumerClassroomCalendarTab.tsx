@@ -3,17 +3,20 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { consumerCalendarApi } from '@/lib/api';
+import { consumerCalendarApi, consumerLeaveRequestApi } from '@/lib/api';
 import { CalendarEvent, CalendarEventType } from '@shared/lib/api/calendar';
+import { CreateLeaveRequestInput, LeaveRequestEventOption } from '@shared/lib/api/leaveRequest';
 import {
   EventDetailsDialog,
   MonthGrid,
+  ShiftWeekGrid,
   UpcomingList,
   ViewSwitcher,
-  WeekGrid,
   useCalendarState,
 } from '@shared/components/calendar';
+import { LeaveRequestForm } from '@shared/components/leave-request';
 import { CalendarDays, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Props {
   classroomUid: string;
@@ -32,6 +35,9 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
   const { t, locale } = useTranslation();
   const [typeFilter, setTypeFilter] = useState<CalendarEventType | 'all'>('all');
   const [viewing, setViewing] = useState<CalendarEvent | null>(null);
+  const [leaveEvent, setLeaveEvent] = useState<CalendarEvent | null>(null);
+  const [leaveEvents, setLeaveEvents] = useState<LeaveRequestEventOption[]>([]);
+  const [leaveSaving, setLeaveSaving] = useState(false);
 
   const fetchEvents = useCallback(
     async (params: { startDate?: string; endDate?: string }) => {
@@ -58,6 +64,37 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
     goNext,
     goToday,
   } = useCalendarState({ fetchEvents, classroomId: classroomUid });
+
+  const openLeaveForEvent = useCallback((ev: CalendarEvent) => {
+    setLeaveEvents([
+      {
+        uid: ev.uid,
+        title: ev.title,
+        start_time: ev.start_time,
+        end_time: ev.end_time,
+        classroom_name: ev.classroom_name ?? null,
+      },
+    ]);
+    setLeaveEvent(ev);
+  }, []);
+
+  const handleLeaveSubmit = useCallback(
+    async (input: CreateLeaveRequestInput) => {
+      setLeaveSaving(true);
+      try {
+        await consumerLeaveRequestApi.create({ ...input, classroom_id: classroomUid });
+        toast.success(t('leave_request.actions.create_success', 'Đã gửi đơn nghỉ phép.'));
+        setLeaveEvent(null);
+        setLeaveEvents([]);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : t('leave_request.actions.create_error', 'Gửi đơn thất bại.'));
+        throw err;
+      } finally {
+        setLeaveSaving(false);
+      }
+    },
+    [classroomUid, t]
+  );
 
   const headerLabel = React.useMemo(() => {
     const d = currentDate;
@@ -174,7 +211,7 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
             />
           )}
           {view === 'week' && (
-            <WeekGrid
+            <ShiftWeekGrid
               weekDate={currentDate}
               events={events}
               onSelectEvent={setViewing}
@@ -197,6 +234,22 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
         event={viewing}
         onOpenChange={(o) => !o && setViewing(null)}
         locale={locale}
+        showLeaveRequest
+        onRequestLeave={openLeaveForEvent}
+      />
+
+      <LeaveRequestForm
+        open={Boolean(leaveEvent)}
+        onOpenChange={(o) => {
+          if (!o) {
+            setLeaveEvent(null);
+            setLeaveEvents([]);
+          }
+        }}
+        events={leaveEvents}
+        classroomId={classroomUid}
+        onSubmit={handleLeaveSubmit}
+        saving={leaveSaving}
       />
     </div>
   );

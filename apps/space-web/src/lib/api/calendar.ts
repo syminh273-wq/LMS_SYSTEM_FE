@@ -5,6 +5,13 @@ import {
   ListCalendarEventsParams,
   UpdateCalendarEventRequest,
 } from '@shared/lib/api/calendar';
+import type { RecurringSchedulePayload } from '@shared/components/calendar/RecurringScheduleDialog';
+
+export interface RecurringScheduleResult {
+  created: number;
+  failed: number;
+  event_uids: string[];
+}
 
 function buildQuery(params: ListCalendarEventsParams = {}): string {
   const search = new URLSearchParams();
@@ -27,6 +34,10 @@ export class CalendarApiClient extends BaseRestApiClient {
 
   public async create(payload: CreateCalendarEventRequest): Promise<CalendarEvent> {
     return this.post<CalendarEvent>('/api/v1/space/calendar/events/', payload);
+  }
+
+  public async createRecurring(payload: RecurringSchedulePayload): Promise<RecurringScheduleResult> {
+    return this.post<RecurringScheduleResult>('/api/v1/space/calendar/recurring-schedules/', payload);
   }
 
   public async update(uid: string, payload: UpdateCalendarEventRequest): Promise<CalendarEvent> {

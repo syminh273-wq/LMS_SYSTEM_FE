@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Users,
   Info,
+  CalendarOff,
   Calendar,
   BookOpen,
   MessageSquare,
@@ -56,8 +57,10 @@ import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { ClassroomDocsViewer } from '@/components/classroom/docs-viewer/ClassroomDocsViewer';
 import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClassroomCalendarTab';
+import { LeaveRequestTab } from '@shared/components/leave-request';
+import { consumerCalendarApi, consumerLeaveRequestApi } from '@/lib/api';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar';
+type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -484,6 +487,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'quiz' as const, icon: Trophy, label: 'Thi trắc nghiệm' },
                 { key: 'meeting' as const, icon: Video, label: 'Phòng họp' },
                 { key: 'calendar' as const, icon: Calendar, label: 'Lịch' },
+                { key: 'leave_request' as const, icon: CalendarOff, label: 'Xin nghỉ' },
                 { key: 'ai' as const, icon: Bot, label: 'AI Trợ giảng' },
                 { key: 'collections' as const, icon: Layers, label: 'Bộ Nhiệm Vụ' },
               ].map((item) => {
@@ -743,6 +747,41 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             {activeTab === 'calendar' && (
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
                 <ConsumerClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
+              </div>
+            )}
+
+            {/* Leave Request Tab */}
+            {activeTab === 'leave_request' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
+                <LeaveRequestTab
+                  role="student"
+                  classroomId={uid}
+                  classroomName={classroom?.name}
+                  api={{
+                    list: (params) => consumerLeaveRequestApi.list({ classroom_id: params.classroom_id, status: params.status }),
+                    create: (input) => consumerLeaveRequestApi.create(input),
+                    cancel: (lrUid) => consumerLeaveRequestApi.cancel(lrUid),
+                  }}
+                  listEvents={async () => {
+                    const now = new Date();
+                    const start = new Date(now);
+                    start.setDate(start.getDate() - 7);
+                    const end = new Date(now);
+                    end.setDate(end.getDate() + 60);
+                    const data = await consumerCalendarApi.list({
+                      startDate: start.toISOString(),
+                      endDate: end.toISOString(),
+                      classroomId: uid,
+                    });
+                    return (data || []).map((e) => ({
+                      uid: e.uid,
+                      title: e.title,
+                      start_time: e.start_time,
+                      end_time: e.end_time,
+                      classroom_name: e.classroom_name ?? null,
+                    }));
+                  }}
+                />
               </div>
             )}
 

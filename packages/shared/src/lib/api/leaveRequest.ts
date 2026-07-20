@@ -32,6 +32,7 @@ export interface LeaveRequestEventOption {
 
 export interface CreateLeaveRequestInput {
   event_id?: string | null;
+  classroom_id?: string | null;
   start_date?: string | null;
   end_date?: string | null;
   reason: string;

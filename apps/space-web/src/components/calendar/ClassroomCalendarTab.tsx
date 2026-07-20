@@ -1,26 +1,34 @@
 'use client';
 
 import * as React from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { ChevronLeft, ChevronRight, Plus, Loader2, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Loader2, CalendarDays, Repeat, CalendarPlus } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { calendarApi } from '@/lib/api';
+import { calendarApi, classroomApi, type Classroom } from '@/lib/api';
 import {
   CalendarEvent,
   CalendarEventType,
   CreateCalendarEventRequest,
 } from '@shared/lib/api/calendar';
+import { getShiftById } from '@shared/lib/calendar/shifts';
 import {
   EventDialog,
   EventDetailsDialog,
   MonthGrid,
+  RecurringScheduleDialog,
+  ShiftWeekGrid,
   UpcomingList,
   ViewSwitcher,
-  WeekGrid,
   useCalendarState,
 } from '@shared/components/calendar';
 import { Button } from '@shared/components/ui/button';
+
+const EMPTY_EVENT: Partial<CalendarEvent> = {
+  type: 'class',
+  title: '',
+  description: '',
+};
 
 const TYPE_FILTERS: Array<{ key: CalendarEventType | 'all'; labelKey: string }> = [
   { key: 'all', labelKey: 'calendar.labels.all_classrooms' },
@@ -43,6 +51,28 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [recurringOpen, setRecurringOpen] = useState(false);
+  const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const [recurringResult, setRecurringResult] = useState<{ created: number; failed: number } | null>(null);
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    classroomApi
+      .list()
+      .then((data) => {
+        if (cancelled) return;
+        const list = Array.isArray(data) ? data : data.results;
+        setClassrooms(list);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setClassrooms([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const fetchEvents = useCallback(
     async (params: { startDate?: string; endDate?: string }) => {
@@ -74,6 +104,21 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
 
   const handleCreate = useCallback(() => {
     setEditing(null);
+    setDialogOpen(true);
+  }, []);
+
+  const handleShiftCellClick = useCallback((date: Date, shiftId: 1 | 2 | 3 | 4) => {
+    const shift = getShiftById(shiftId);
+    if (!shift) return;
+    const start = new Date(date);
+    start.setHours(shift.startHour, shift.startMinute, 0, 0);
+    const end = new Date(date);
+    end.setHours(shift.endHour, shift.endMinute, 0, 0);
+    setEditing({
+      ...EMPTY_EVENT,
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+    } as CalendarEvent);
     setDialogOpen(true);
   }, []);
 
@@ -130,6 +175,30 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
     }
   }, [editing, refetch, t]);
 
+  const handleRecurringSubmit = useCallback(
+    async (payload: Parameters<typeof calendarApi.createRecurring>[0]) => {
+      const result = await calendarApi.createRecurring(payload);
+      setRecurringResult({ created: result.created, failed: result.failed });
+    },
+    []
+  );
+
+  const handleRecurringClose = useCallback(async () => {
+    setRecurringOpen(false);
+    if (recurringResult && recurringResult.created > 0) {
+      toast.success(
+        t(
+          'calendar.recurring.success',
+          `Created ${recurringResult.created} event(s) and emailed students`
+        )
+      );
+      setRecurringResult(null);
+      await refetch();
+    } else {
+      setRecurringResult(null);
+    }
+  }, [recurringResult, refetch, t]);
+
   const headerLabel = useMemo(() => {
     const d = currentDate;
     if (view === 'month') {
@@ -185,13 +254,44 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
               </option>
             ))}
           </select>
-          <Button
-            onClick={handleCreate}
-            className="h-9 px-3 rounded-lg bg-indigo-600 text-white text-[12.5px] font-semibold hover:bg-indigo-700 gap-1.5"
-          >
-            <Plus size={14} strokeWidth={2.5} />
-            {t('calendar.labels.new_event', 'New event')}
-          </Button>
+          <div className="relative">
+            <Button
+              onClick={() => setCreateMenuOpen((o) => !o)}
+              className="h-9 px-3 rounded-lg bg-indigo-600 text-white text-[12.5px] font-semibold hover:bg-indigo-700 gap-1.5"
+            >
+              <Plus size={14} strokeWidth={2.5} />
+              {t('calendar.labels.new_event', 'New event')}
+            </Button>
+            {createMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setCreateMenuOpen(false)} />
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-40 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCreateMenuOpen(false);
+                      handleCreate();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <CalendarPlus size={14} className="text-indigo-600" />
+                    {t('calendar.recurring.menu_one_day', 'Sự kiện 1 ngày')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCreateMenuOpen(false);
+                      setRecurringOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] font-semibold text-slate-700 hover:bg-slate-50 border-t border-slate-100"
+                  >
+                    <Repeat size={14} className="text-indigo-600" />
+                    {t('calendar.recurring.menu_recurring', 'Thời khóa biểu')}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -254,10 +354,11 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
             />
           )}
           {view === 'week' && (
-            <WeekGrid
+            <ShiftWeekGrid
               weekDate={currentDate}
               events={events}
               onSelectEvent={handleEdit}
+              onShiftCellClick={handleShiftCellClick}
               locale={locale}
             />
           )}
@@ -291,6 +392,21 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
         event={viewing}
         onOpenChange={(o) => !o && setViewing(null)}
         locale={locale}
+      />
+
+      <RecurringScheduleDialog
+        open={recurringOpen}
+        onOpenChange={(o) => {
+          if (o) {
+            setRecurringOpen(true);
+          } else {
+            void handleRecurringClose();
+          }
+        }}
+        classroomOptions={classrooms}
+        defaultClassroomId={classroomUid}
+        onSubmit={handleRecurringSubmit}
+        saving={saving}
       />
     </div>
   );

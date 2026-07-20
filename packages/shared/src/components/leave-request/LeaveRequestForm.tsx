@@ -13,6 +13,7 @@ interface LeaveRequestFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   events: LeaveRequestEventOption[];
+  classroomId?: string;
   onSubmit: (input: CreateLeaveRequestInput) => Promise<void>;
   saving?: boolean;
 }
@@ -32,6 +33,7 @@ export function LeaveRequestForm({
   open,
   onOpenChange,
   events,
+  classroomId,
   onSubmit,
   saving = false,
 }: LeaveRequestFormProps) {
@@ -79,6 +81,7 @@ export function LeaveRequestForm({
       try {
         await onSubmit({
           event_id: ev.uid,
+          classroom_id: classroomId ?? null,
           reason: reason.trim(),
           evidence,
         });
@@ -100,6 +103,7 @@ export function LeaveRequestForm({
     try {
       await onSubmit({
         event_id: null,
+        classroom_id: classroomId ?? null,
         start_date: fromLocalInput(startDate),
         end_date: fromLocalInput(endDate),
         reason: reason.trim(),

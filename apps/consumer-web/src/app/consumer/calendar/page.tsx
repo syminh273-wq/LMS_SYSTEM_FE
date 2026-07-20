@@ -8,9 +8,9 @@ import { CalendarEvent } from '@shared/lib/api/calendar';
 import {
   EventDetailsDialog,
   MonthGrid,
+  ShiftWeekGrid,
   UpcomingList,
   ViewSwitcher,
-  WeekGrid,
   useCalendarState,
 } from '@shared/components/calendar';
 import { CalendarDays, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -147,7 +147,7 @@ export default function ConsumerCalendarPage() {
               />
             )}
             {view === 'week' && (
-              <WeekGrid
+              <ShiftWeekGrid
                 weekDate={currentDate}
                 events={events}
                 onSelectEvent={setViewing}

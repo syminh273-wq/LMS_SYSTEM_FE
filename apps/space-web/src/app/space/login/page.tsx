@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setProfile } from '@/lib/redux/userSlice';
 import {
@@ -40,9 +40,9 @@ function GoogleIcon() {
 
 export default function SpaceLoginPage() {
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
   const [globalError, setGlobalError] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get('error');
+    const err = searchParams.get('error');
     return err ? decodeURIComponent(err) : '';
   });
   const [showPassword, setShowPassword] = useState(false);
