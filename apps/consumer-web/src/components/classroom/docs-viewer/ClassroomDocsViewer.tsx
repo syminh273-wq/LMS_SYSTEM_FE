@@ -19,6 +19,7 @@ import {
   Search,
   ArrowUpDown,
   CheckCircle2,
+  Download,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { toast } from 'sonner';
@@ -30,6 +31,7 @@ import {
 import { buildFolderTree, findPathToFolder } from './tree-utils';
 import type { ClassroomDoc, ClassroomFolder, SortField, SortDir, FolderNode } from './types';
 import { DocViewerPanel } from '../doc-viewer/DocViewerPanel';
+import { isMediaFile } from '../doc-viewer/utils';
 
 const ICON_BY_TYPE: Record<string, typeof FileText> = {
   pdf: FileText, doc: FileText, docx: FileText, txt: FileText, md: FileText,
@@ -364,12 +366,13 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
                 const prog = progressByDoc[d.uid];
                 const completed = prog?.is_completed ?? false;
                 const pct = prog?.read_progress ?? 0;
+                const media = isMediaFile(d.file_type);
                 return (
                   <button
                     type="button"
                     key={d.uid}
                     onClick={() => setOpenDoc(d)}
-                    className="group text-left flex items-start gap-3 p-3 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
+                    className="group relative text-left flex items-start gap-3 p-3 pr-10 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
                   >
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-100">
                       {React.createElement(Icon, { size: 20 })}
@@ -377,7 +380,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <p className="text-sm font-bold text-slate-800 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
-                        {completed && (
+                        {completed && !media && (
                           <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
                         )}
                       </div>
@@ -397,6 +400,17 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
                         </div>
                       )}
                     </div>
+                    <a
+                      href={d.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute top-2 right-2 p-1.5 rounded-md text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 opacity-0 group-hover:opacity-100 transition"
+                      title="Tải xuống"
+                    >
+                      <Download size={14} />
+                    </a>
                   </button>
                 );
               })}

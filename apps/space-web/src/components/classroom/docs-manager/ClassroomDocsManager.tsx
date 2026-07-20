@@ -9,6 +9,8 @@ import { DocsTreeSidebar } from './DocsTreeSidebar';
 import { DocsListView } from './DocsListView';
 import { UploadToFolderDialog } from './UploadToFolderDialog';
 import { FolderNameDialog } from './FolderNameDialog';
+import { ConfirmDialog } from './ConfirmDialog';
+import { DocPreviewModal } from './DocPreviewModal';
 import {
   fetchDocsTree,
   fetchDocsInFolder,
@@ -54,6 +56,9 @@ export function ClassroomDocsManager({
   const [createParentId, setCreateParentId] = useState<string | null>(null);
   const [renameTarget, setRenameTarget] = useState<ClassroomFolder | null>(null);
   const [progressDoc, setProgressDoc] = useState<ClassroomDoc | null>(null);
+  const [deleteFolderTarget, setDeleteFolderTarget] = useState<ClassroomFolder | null>(null);
+  const [deleteDocTarget, setDeleteDocTarget] = useState<{ uid: string; name: string } | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<ClassroomDoc | null>(null);
 
   const ctx = useMemo(
     () => ({ apiBase, accessToken, classroomUid }),
@@ -109,10 +114,17 @@ export function ClassroomDocsManager({
     return findPathToFolder(allFolders, selectedFolderId);
   }, [allFolders, selectedFolderId]);
 
-  const handleCreateFolder = async (name: string) => {
+  const handleCreateFolder = async ({
+    name,
+    parentFolderId,
+  }: {
+    name: string;
+    parentFolderId: string | null;
+  }) => {
     if (!canManage) return;
+    const resolvedParent = parentFolderId ?? createParentId ?? null;
     try {
-      await createFolder(ctx, { name, parent_folder_id: createParentId });
+      await createFolder(ctx, { name, parent_folder_id: resolvedParent });
       toast.success(t('classroom.docs.folder_created', 'Đã tạo thư mục'));
       setCreateOpen(false);
       setCreateParentId(null);
@@ -122,7 +134,7 @@ export function ClassroomDocsManager({
     }
   };
 
-  const handleRename = async (name: string) => {
+  const handleRename = async ({ name }: { name: string; parentFolderId: string | null }) => {
     if (!renameTarget) return;
     try {
       await updateFolder(ctx, renameTarget.uid, { name });
@@ -134,25 +146,44 @@ export function ClassroomDocsManager({
     }
   };
 
-  const handleDelete = async (folder: ClassroomFolder) => {
+  const requestDeleteFolder = (folder: ClassroomFolder) => {
     if (!canManage) return;
-    if (
-      !window.confirm(
-        t(
-          'classroom.docs.confirm_delete_folder',
-          `Xóa thư mục "${folder.name}" và tất cả thư mục con? Tài liệu sẽ được chuyển về thư mục gốc.`,
-        ),
-      )
-    ) {
-      return;
-    }
+    setDeleteFolderTarget(folder);
+  };
+
+  const confirmDeleteFolder = async () => {
+    const folder = deleteFolderTarget;
+    if (!folder) return;
     try {
       await deleteFolder(ctx, folder.uid);
       if (selectedFolderId === folder.uid) setSelectedFolderId(null);
       toast.success(t('classroom.docs.folder_deleted', 'Đã xóa thư mục'));
+      setDeleteFolderTarget(null);
       await refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi xóa thư mục');
+    }
+  };
+
+  const requestDeleteDoc = (doc: ClassroomDoc) => {
+    if (!canManage) return;
+    setDeleteDocTarget({ uid: doc.uid, name: doc.name });
+  };
+
+  const confirmDeleteDoc = async () => {
+    const target = deleteDocTarget;
+    if (!target) return;
+    try {
+      await deleteDoc(ctx, target.uid);
+      if (selectedFolderId === null) {
+        setRootDocs((prev) => prev.filter((d) => d.uid !== target.uid));
+      } else {
+        setFolderDocs((prev) => prev.filter((d) => d.uid !== target.uid));
+      }
+      toast.success(t('classroom.docs.doc_deleted', 'Đã xóa tài liệu'));
+      setDeleteDocTarget(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi xóa tài liệu');
     }
   };
 
@@ -181,20 +212,8 @@ export function ClassroomDocsManager({
     }
   };
 
-  const handleDeleteDoc = async (uid: string) => {
-    if (!canManage) return;
-    if (!window.confirm(t('classroom.docs.confirm_delete_doc', 'Xóa tài liệu này?'))) return;
-    try {
-      await deleteDoc(ctx, uid);
-      if (selectedFolderId === null) {
-        setRootDocs((prev) => prev.filter((d) => d.uid !== uid));
-      } else {
-        setFolderDocs((prev) => prev.filter((d) => d.uid !== uid));
-      }
-      toast.success(t('classroom.docs.doc_deleted', 'Đã xóa tài liệu'));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi xóa tài liệu');
-    }
+  const handleDeleteDoc = (doc: ClassroomDoc) => {
+    requestDeleteDoc(doc);
   };
 
   const handleUpload = async (payload: { file: File; section: string; folderId: string | null }) => {
@@ -211,6 +230,7 @@ export function ClassroomDocsManager({
         }
       }
       toast.success(t('classroom.docs.uploaded', 'Đã tải lên'));
+      setUploadOpen(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi tải lên');
     }
@@ -294,7 +314,7 @@ export function ClassroomDocsManager({
             setCreateOpen(true);
           }}
           onRenameFolder={(f) => setRenameTarget(f)}
-          onDeleteFolder={handleDelete}
+          onDeleteFolder={requestDeleteFolder}
           totalRootDocs={rootDocs.length}
           t={t}
         />
@@ -313,6 +333,7 @@ export function ClassroomDocsManager({
               onReorder={handleReorder}
               onDelete={handleDeleteDoc}
               onShowProgress={(d) => setProgressDoc(d)}
+              onOpenPreview={(d) => setPreviewDoc(d)}
               search={search}
               onSearchChange={setSearch}
               sortField={sortField}
@@ -341,6 +362,8 @@ export function ClassroomDocsManager({
         }}
         mode="create"
         onSubmit={handleCreateFolder}
+        parentFolders={allFolders}
+        initialParentId={createParentId}
         t={t}
       />
 
@@ -352,6 +375,38 @@ export function ClassroomDocsManager({
         mode="rename"
         initialName={renameTarget?.name}
         onSubmit={handleRename}
+        t={t}
+      />
+
+      <ConfirmDialog
+        open={deleteFolderTarget !== null}
+        onOpenChange={(v) => {
+          if (!v) setDeleteFolderTarget(null);
+        }}
+        title={t('classroom.docs.delete_folder_title', 'Xóa thư mục')}
+        description={t(
+          'classroom.docs.confirm_delete_folder',
+          `Xóa thư mục "${deleteFolderTarget?.name ?? ''}" và tất cả thư mục con? Tài liệu sẽ được chuyển về thư mục gốc.`,
+        )}
+        confirmLabel={t('classroom.docs.delete', 'Xóa')}
+        destructive
+        onConfirm={confirmDeleteFolder}
+        t={t}
+      />
+
+      <ConfirmDialog
+        open={deleteDocTarget !== null}
+        onOpenChange={(v) => {
+          if (!v) setDeleteDocTarget(null);
+        }}
+        title={t('classroom.docs.delete_doc_title', 'Xóa tài liệu')}
+        description={t(
+          'classroom.docs.confirm_delete_doc',
+          `Xóa tài liệu "${deleteDocTarget?.name ?? ''}"?`,
+        )}
+        confirmLabel={t('classroom.docs.delete', 'Xóa')}
+        destructive
+        onConfirm={confirmDeleteDoc}
         t={t}
       />
 
@@ -368,6 +423,13 @@ export function ClassroomDocsManager({
           accessToken={accessToken}
         />
       )}
+
+      <DocPreviewModal
+        doc={previewDoc}
+        open={previewDoc !== null}
+        onClose={() => setPreviewDoc(null)}
+        t={t}
+      />
     </div>
   );
 }

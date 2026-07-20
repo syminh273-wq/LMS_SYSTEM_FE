@@ -64,11 +64,13 @@ function SortableRow({
   doc,
   onDelete,
   onShowProgress,
+  onOpenPreview,
   canManage,
 }: {
   doc: ClassroomDoc;
-  onDelete: (uid: string) => void;
+  onDelete: (doc: ClassroomDoc) => void;
   onShowProgress: (doc: ClassroomDoc) => void;
+  onOpenPreview: (doc: ClassroomDoc) => void;
   canManage: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -84,6 +86,7 @@ function SortableRow({
     <div
       ref={setNodeRef}
       style={style}
+      onDoubleClick={() => onOpenPreview(doc)}
       className="grid grid-cols-[24px_36px_minmax(0,1fr)_120px_100px_120px_100px] items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-200 transition group min-w-0"
     >
       {canManage ? (
@@ -145,7 +148,7 @@ function SortableRow({
         {canManage && (
           <button
             type="button"
-            onClick={() => onDelete(doc.uid)}
+            onClick={() => onDelete(doc)}
             className="p-1.5 rounded-md hover:bg-rose-50 text-slate-500 hover:text-rose-600"
             title="Xóa"
           >
@@ -161,8 +164,9 @@ type Props = {
   docs: ClassroomDoc[];
   canManage: boolean;
   onReorder: (orderedUids: string[]) => void;
-  onDelete: (uid: string) => void;
+  onDelete: (doc: ClassroomDoc) => void;
   onShowProgress: (doc: ClassroomDoc) => void;
+  onOpenPreview: (doc: ClassroomDoc) => void;
   search: string;
   onSearchChange: (s: string) => void;
   sortField: SortField;
@@ -184,6 +188,7 @@ export function DocsListView({
   onReorder,
   onDelete,
   onShowProgress,
+  onOpenPreview,
   search,
   onSearchChange,
   sortField,
@@ -257,7 +262,14 @@ export function DocsListView({
           >
             <div className="space-y-1.5">
               {filtered.map((d) => (
-                <SortableRow key={d.uid} doc={d} onDelete={onDelete} onShowProgress={onShowProgress} canManage={canManage} />
+                <SortableRow
+                  key={d.uid}
+                  doc={d}
+                  onDelete={onDelete}
+                  onShowProgress={onShowProgress}
+                  onOpenPreview={onOpenPreview}
+                  canManage={canManage}
+                />
               ))}
             </div>
           </SortableContext>

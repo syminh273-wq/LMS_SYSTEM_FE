@@ -28,6 +28,8 @@ import certificateEn from '@/locales/certificate/en.json';
 import certificateVi from '@/locales/certificate/vi.json';
 import validationEn from '@/locales/validation/en.json';
 import validationVi from '@/locales/validation/vi.json';
+import courseEn from '@/locales/course/en.json';
+import courseVi from '@/locales/course/vi.json';
 
 import sharedLayoutEn from '@shared/locales/layout/en.json';
 import sharedLayoutVi from '@shared/locales/layout/vi.json';
@@ -60,6 +62,7 @@ export const consumerWebBundles: LocaleBundles = {
     certificate: certificateEn,
     validation: validationEn,
     leave_request: leaveRequestEn,
+    course: courseEn,
     layout: sharedLayoutEn,
     settings: sharedSettingsEn,
     profile: sharedProfileEn,
@@ -83,6 +86,7 @@ export const consumerWebBundles: LocaleBundles = {
     certificate: certificateVi,
     validation: validationVi,
     leave_request: leaveRequestVi,
+    course: courseVi,
     layout: sharedLayoutVi,
     settings: sharedSettingsVi,
     profile: sharedProfileVi,

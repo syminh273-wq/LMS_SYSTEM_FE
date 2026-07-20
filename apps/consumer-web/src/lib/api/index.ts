@@ -13,6 +13,7 @@ import { consumerCalendarApi } from './calendar';
 import { consumerLeaveRequestApi } from './leaveRequest';
 import { ApiException } from './exceptions';
 import { SharingLink, NotificationItem, PaginatedResponse } from './types';
+import { consumerCourseApi } from './course';
 
 export * from './types';
 export * from './exceptions';
@@ -24,6 +25,7 @@ export { faceApi };
 export { examSessionApi };
 export { consumerCalendarApi };
 export { consumerLeaveRequestApi };
+export { consumerCourseApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -34,6 +36,7 @@ export const api = {
   account: accountService,
   calendar: consumerCalendarApi,
   leaveRequests: consumerLeaveRequestApi,
+  courses: consumerCourseApi,
 };
 
 // Re-export specific instances
@@ -58,6 +61,7 @@ export const spaceApi = {
     register: authApi.spaceRegister.bind(authApi),
   },
   classrooms: classroomApi,
+  courses: consumerCourseApi,
 };
 
 // Sharing logic
@@ -70,6 +74,7 @@ export const consumerApi = {
   sharing: sharingApi,
   calendar: consumerCalendarApi,
   leaveRequests: consumerLeaveRequestApi,
+  courses: consumerCourseApi,
 };
 
 export const notificationApi = {

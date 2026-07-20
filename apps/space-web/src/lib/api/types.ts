@@ -765,3 +765,94 @@ export type FaceLogEntry = {
   similarity: number;
   verified_at: string | null;
 };
+
+// ── Course Management ────────────────────────────────────────────────────────
+
+export type PricingType = 'free' | 'paid';
+export type CourseStatus = 'draft' | 'published' | 'archived';
+
+export type CourseMaterial = {
+  uid: string;
+  name: string;
+  url: string;
+  file_type: string;
+};
+
+export type CourseLesson = {
+  uid: string;
+  course_uid: string;
+  title: string;
+  description: string;
+  video_url: string | null;
+  material_urls: CourseMaterial[];
+  order_index: number;
+  duration_seconds: number;
+  is_preview: boolean;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Course = {
+  uid: string;
+  pid: string;
+  name: string;
+  description: string;
+  cover_url: string;
+  teacher_id: string;
+  pricing_type: PricingType;
+  price_vnd: number;
+  status: CourseStatus;
+  classroom_uid: string | null;
+  resolve_link?: SharingLink;
+  lesson_count: number;
+  enrollment_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreateCourseRequest = {
+  name: string;
+  description?: string;
+  cover_url?: string;
+  pricing_type?: PricingType;
+  price_vnd?: number;
+  status?: CourseStatus;
+};
+
+export type UpdateCourseRequest = Partial<CreateCourseRequest>;
+
+export type CreateLessonRequest = {
+  title: string;
+  description?: string;
+  video_resource_uid?: string | null;
+  material_resource_uids?: string[];
+  duration_seconds?: number;
+  is_preview?: boolean;
+  is_published?: boolean;
+  order_index?: number | null;
+};
+
+export type UpdateLessonRequest = Partial<CreateLessonRequest>;
+
+export type ReorderLessonItem = {
+  uid: string;
+  order_index: number;
+};
+
+export type CourseEnrollment = {
+  consumer_id: string;
+  consumer_name: string;
+  consumer_avatar: string;
+  enrolled_at: string;
+  pricing_type: PricingType;
+  amount_vnd: number;
+  payment_order_id: string | null;
+};
+
+export type CourseStats = {
+  total_enrollments: number;
+  total_revenue_vnd: number;
+  free_enrollments: number;
+  paid_enrollments: number;
+};

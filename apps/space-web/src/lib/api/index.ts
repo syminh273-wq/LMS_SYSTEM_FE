@@ -13,12 +13,13 @@ import { notificationApi } from './notification';
 import { studentApi } from './student';
 import { calendarApi } from './calendar';
 import { spaceLeaveRequestApi } from './leaveRequest';
+import { courseApi } from './course';
 
 export * from './types';
 export * from './exceptions';
 export * from './calendar';
 export * from './leaveRequest';
-export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi };
+export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi, courseApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -36,6 +37,7 @@ export const api = {
   notifications: notificationApi,
   calendar: calendarApi,
   leaveRequests: spaceLeaveRequestApi,
+  courses: courseApi,
 };
 
 // Re-export specific instances
@@ -67,6 +69,7 @@ export const spaceApi = {
   certificates: certificateApi,
   calendar: calendarApi,
   leaveRequests: spaceLeaveRequestApi,
+  courses: courseApi,
   sharing: {
     getDownloadQrUrl: (linkUid: string) => `${classroomApi.baseURL}/api/v1/sharing/links/${linkUid}/download_qr/`,
   },

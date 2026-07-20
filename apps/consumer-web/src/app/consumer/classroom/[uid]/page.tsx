@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { classroomApi, meetingRoomApi, examSessionApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
 import { useTranslation } from '@shared/components/LocaleProvider';
@@ -132,6 +132,8 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
 export default function ClassroomDetailPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = use(params);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { isAuthenticated, mounted } = useRequireAuth();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,6 +149,40 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
   const [activeTab, setActiveTab] = useState<ClassroomTab>("discussion");
   const { t } = useTranslation();
+
+  type ActiveTab = typeof activeTab;
+  const VALID_TABS: ActiveTab[] = ['discussion', 'lessons', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
+
+  const buildQueryString = React.useCallback(
+    (overrides: Record<string, string | null>) => {
+      const next = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(overrides)) {
+        if (value === null || value === '') next.delete(key);
+        else next.set(key, value);
+      }
+      const qs = next.toString();
+      return qs ? `${pathname}?${qs}` : pathname;
+    },
+    [pathname, searchParams],
+  );
+
+  const goToTab = React.useCallback(
+    (tab: ActiveTab) => {
+      const url = buildQueryString({ tab: tab === 'discussion' ? null : tab });
+      router.replace(url, { scroll: false });
+      setActiveTab(tab);
+    },
+    [buildQueryString, router],
+  );
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && (VALID_TABS as string[]).includes(tab)) {
+      setActiveTab(tab as ActiveTab);
+    } else {
+      setActiveTab('discussion');
+    }
+  }, [searchParams]);
   const [collections, setCollections] = useState<QuizCollection[]>([]);
   const [collectionProgress, setCollectionProgress] = useState<Record<string, QuizCollectionProgress>>({});
   const [loadingCollections, setLoadingCollections] = useState(false);
@@ -496,7 +532,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   <button
                     key={item.key}
                     type="button"
-                    onClick={() => setActiveTab(item.key)}
+                    onClick={() => goToTab(item.key)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap cursor-pointer text-left w-full ${
                       isActive
                         ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100'

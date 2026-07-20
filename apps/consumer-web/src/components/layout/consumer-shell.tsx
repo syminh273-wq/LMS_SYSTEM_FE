@@ -101,6 +101,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
   { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
+  { name: 'My Courses', href: '/consumer/course', icon: GraduationCap },
   { name: 'Feed', href: '/consumer/feed', icon: Sparkles },
   { name: 'Calendar', href: '/consumer/calendar', icon: CalendarIcon },
   { name: 'Grades', href: '/consumer/grades', icon: GraduationCap },
@@ -195,11 +196,11 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
             </div>
           ) : (
             <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-              {list.map(item => {
+              {list.map((item, idx) => {
                 const meta = parseNotificationMetadata(item.metadata);
                 const hasLink = !!meta.classroom_uid;
                 return (
-                  <li key={item.uid}>
+                  <li key={item.uid ?? `notification-${idx}`}>
                     <button
                       onClick={() => handleClickItem(item)}
                       className={cn(

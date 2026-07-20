@@ -98,17 +98,17 @@ function NodeRow({
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onSelect={() => onAddChild(node)}>
+            <DropdownMenuItem onClick={() => onAddChild(node)}>
               <Plus size={14} className="mr-2" />
               {t('classroom.docs.new_subfolder', 'Thêm thư mục con')}
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => onRename(node)}>
+            <DropdownMenuItem onClick={() => onRename(node)}>
               <Edit2 size={14} className="mr-2" />
               {t('classroom.docs.rename', 'Đổi tên')}
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-rose-600 focus:text-rose-600"
-              onSelect={() => onDelete(node)}
+              onClick={() => onDelete(node)}
             >
               <Trash2 size={14} className="mr-2" />
               {t('classroom.docs.delete', 'Xóa')}

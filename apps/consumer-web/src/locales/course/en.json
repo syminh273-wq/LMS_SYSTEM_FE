@@ -1,0 +1,49 @@
+{
+  "preview": {
+    "title": "Preview Course",
+    "free_badge": "Free",
+    "paid_badge": "Paid",
+    "cta_buy": "Buy now",
+    "cta_join_free": "Join for free",
+    "cta_signin": "Sign in to continue",
+    "lessons_section": "Preview lessons",
+    "no_preview": "This course does not have any preview lessons yet.",
+    "locked_overlay": "Sign in to unlock all lessons",
+    "back": "Back to home",
+    "not_found": "Course not found",
+    "not_found_desc": "This course does not exist or has been unpublished by the teacher.",
+    "play_video": "Play lesson",
+    "materials": "Attached materials",
+    "duration_min": "{{count}} min",
+    "lesson_count": "{{count}} preview lessons",
+    "course_by": "Course"
+  },
+  "checkout": {
+    "success_title": "Payment successful!",
+    "success_desc": "Redirecting to your classroom...",
+    "processing_title": "Processing payment",
+    "processing_desc": "Waiting for MoMo to confirm your transaction. Please do not close this window.",
+    "failed_title": "Payment failed",
+    "failed_desc": "Your transaction was not completed. Please try again or contact your teacher.",
+    "timeout_title": "Still processing",
+    "timeout_desc": "Your payment is still being confirmed. Please check back in a few minutes — your course will appear in 'My Courses' once confirmed.",
+    "go_to_class": "Go to classroom",
+    "go_to_courses": "Go to my courses",
+    "retry": "Retry",
+    "cancel": "Cancel"
+  },
+  "mine": {
+    "title": "My Courses",
+    "empty": "You haven't enrolled in any course yet.",
+    "empty_desc": "Browse the public preview page from your teacher's link, or sign in to see your courses.",
+    "go_to_classroom": "Enter classroom",
+    "free": "Free",
+    "paid": "Paid"
+  },
+  "detail": {
+    "unenrolled": "You haven't purchased this course yet.",
+    "preview_only_banner": "Showing preview lessons only. Purchase to unlock all content.",
+    "lessons": "Lessons",
+    "loading": "Loading course..."
+  }
+}

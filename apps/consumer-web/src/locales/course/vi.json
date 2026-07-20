@@ -1,0 +1,49 @@
+{
+  "preview": {
+    "title": "Xem trước khóa học",
+    "free_badge": "Miễn phí",
+    "paid_badge": "Trả phí",
+    "cta_buy": "Mua ngay",
+    "cta_join_free": "Tham gia miễn phí",
+    "cta_signin": "Đăng nhập để tiếp tục",
+    "lessons_section": "Bài học xem trước",
+    "no_preview": "Khóa học này hiện chưa có bài học xem trước nào.",
+    "locked_overlay": "Đăng nhập để mở khóa tất cả bài học",
+    "back": "Về trang chủ",
+    "not_found": "Không tìm thấy khóa học",
+    "not_found_desc": "Khóa học này không tồn tại hoặc đã bị giáo viên ẩn.",
+    "play_video": "Xem bài học",
+    "materials": "Tài liệu đính kèm",
+    "duration_min": "{{count}} phút",
+    "lesson_count": "{{count}} bài học xem trước",
+    "course_by": "Khóa học"
+  },
+  "checkout": {
+    "success_title": "Thanh toán thành công!",
+    "success_desc": "Đang chuyển vào lớp học của bạn...",
+    "processing_title": "Đang xử lý thanh toán",
+    "processing_desc": "Đang chờ MoMo xác nhận giao dịch. Vui lòng không đóng cửa sổ này.",
+    "failed_title": "Thanh toán thất bại",
+    "failed_desc": "Giao dịch của bạn chưa hoàn tất. Vui lòng thử lại hoặc liên hệ giáo viên.",
+    "timeout_title": "Đang xử lý",
+    "timeout_desc": "Thanh toán của bạn vẫn đang được xác nhận. Vui lòng kiểm tra lại sau vài phút — khóa học sẽ xuất hiện trong 'Khóa học của tôi' khi hoàn tất.",
+    "go_to_class": "Vào lớp học",
+    "go_to_courses": "Về khóa học của tôi",
+    "retry": "Thử lại",
+    "cancel": "Hủy"
+  },
+  "mine": {
+    "title": "Khóa học của tôi",
+    "empty": "Bạn chưa tham gia khóa học nào.",
+    "empty_desc": "Truy cập liên kết xem trước từ giáo viên, hoặc đăng nhập để xem các khóa học của bạn.",
+    "go_to_classroom": "Vào lớp học",
+    "free": "Miễn phí",
+    "paid": "Trả phí"
+  },
+  "detail": {
+    "unenrolled": "Bạn chưa sở hữu khóa học này.",
+    "preview_only_banner": "Đang hiển thị các bài học xem trước. Mua khóa học để mở khóa toàn bộ nội dung.",
+    "lessons": "Bài học",
+    "loading": "Đang tải khóa học..."
+  }
+}

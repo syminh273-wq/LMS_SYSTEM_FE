@@ -26,7 +26,7 @@ import {
 } from './api';
 import type { ApiCtx } from './api';
 import type { ClassroomDoc, DocNote, DocProgress } from '../docs-viewer/types';
-import { isImageFile, isPdfFile, NOTE_COLORS } from './utils';
+import { isImageFile, isMediaFile, isPdfFile, NOTE_COLORS } from './utils';
 import { NoteEditor } from './NoteEditor';
 
 type Props = {
@@ -68,6 +68,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
 
   const imageable = isImageFile(doc.file_type);
   const pdfable = isPdfFile(doc.file_type);
+  const isMedia = isMediaFile(doc.file_type);
 
   const onProgressChangeRef = useRef(onProgressChange);
   const ctxRef = useRef(ctx);
@@ -347,21 +348,23 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
             </Button>
           )}
 
-          <Button
-            size="sm"
-            variant={isCompleted ? 'default' : 'outline'}
-            className={`h-8 text-xs ${isCompleted ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
-            onClick={handleComplete}
-          >
-            {isCompleted ? (
-              <CheckCircle2 size={13} className="mr-1" />
-            ) : (
-              <Circle size={13} className="mr-1" />
-            )}
-            {isCompleted
-              ? t('doc_viewer.done', 'Đã hoàn thành')
-              : t('doc_viewer.mark_done', 'Hoàn thành')}
-          </Button>
+          {!isMedia && (
+            <Button
+              size="sm"
+              variant={isCompleted ? 'default' : 'outline'}
+              className={`h-8 text-xs ${isCompleted ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
+              onClick={handleComplete}
+            >
+              {isCompleted ? (
+                <CheckCircle2 size={13} className="mr-1" />
+              ) : (
+                <Circle size={13} className="mr-1" />
+              )}
+              {isCompleted
+                ? t('doc_viewer.done', 'Đã hoàn thành')
+                : t('doc_viewer.mark_done', 'Hoàn thành')}
+            </Button>
+          )}
 
           <a
             href={doc.url}

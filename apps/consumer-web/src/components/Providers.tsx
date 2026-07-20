@@ -11,7 +11,7 @@ import { FaceEnrollModal } from '@/components/face/face-enroll-modal';
 import { setFaceEnrolled } from '@/lib/redux/userSlice';
 import type { RootState } from '@/lib/redux/store';
 
-const PUBLIC_PATHS = ['/login', '/auth/', '/join/'];
+const PUBLIC_PATHS = ['/login', '/auth/', '/join/', '/preview/'];
 
 function FaceEnrollmentGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

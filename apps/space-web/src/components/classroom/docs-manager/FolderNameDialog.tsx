@@ -13,27 +13,50 @@ import {
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
+import type { ClassroomFolder } from './types';
+
+type SubmitPayload = { name: string; parentFolderId: string | null };
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialName?: string;
   mode: 'create' | 'rename';
-  onSubmit: (name: string) => Promise<void>;
+  onSubmit: (payload: SubmitPayload) => Promise<void>;
+  parentFolders?: ClassroomFolder[];
+  initialParentId?: string | null;
   t: (key: string, fallback?: string) => string;
 };
 
 type BodyProps = Omit<Props, 'open' | 'onOpenChange'> & { onCancel: () => void };
 
-function DialogBody({ initialName, mode, onSubmit, onCancel, t }: BodyProps) {
+function buildParentOptions(folders: ClassroomFolder[]): ClassroomFolder[] {
+  return [...folders].sort(
+    (a, b) => (a.order_index ?? 0) - (b.order_index ?? 0) || a.name.localeCompare(b.name),
+  );
+}
+
+function DialogBody({
+  initialName,
+  mode,
+  onSubmit,
+  onCancel,
+  parentFolders,
+  initialParentId,
+  t,
+}: BodyProps) {
   const [name, setName] = useState(initialName ?? '');
+  const [parentId, setParentId] = useState<string | null>(initialParentId ?? null);
   const [submitting, setSubmitting] = useState(false);
+
+  const showParentPicker = mode === 'create';
+  const parentOptions = showParentPicker ? buildParentOptions(parentFolders ?? []) : [];
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
     setSubmitting(true);
     try {
-      await onSubmit(name.trim());
+      await onSubmit({ name: name.trim(), parentFolderId: showParentPicker ? parentId : null });
     } finally {
       setSubmitting(false);
     }
@@ -58,6 +81,25 @@ function DialogBody({ initialName, mode, onSubmit, onCancel, t }: BodyProps) {
         className="mt-2"
         autoFocus
       />
+      {showParentPicker && (
+        <div className="mt-3">
+          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            {t('classroom.docs.parent_folder_label', 'Thư mục cha')}
+          </label>
+          <select
+            value={parentId ?? ''}
+            onChange={(e) => setParentId(e.target.value || null)}
+            className="mt-1 w-full h-9 text-xs rounded-md border border-slate-200 bg-white px-2"
+          >
+            <option value="">{t('classroom.docs.root_option', 'Gốc (không có thư mục cha)')}</option>
+            {parentOptions.map((f) => (
+              <option key={f.uid} value={f.uid}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <DialogFooter>
         <Button variant="ghost" onClick={onCancel} disabled={submitting}>
           {t('classroom.docs.cancel', 'Huỷ')}
@@ -71,16 +113,28 @@ function DialogBody({ initialName, mode, onSubmit, onCancel, t }: BodyProps) {
   );
 }
 
-export function FolderNameDialog({ open, onOpenChange, initialName, mode, onSubmit, t }: Props) {
+export function FolderNameDialog({
+  open,
+  onOpenChange,
+  initialName,
+  mode,
+  onSubmit,
+  parentFolders,
+  initialParentId,
+  t,
+}: Props) {
+  const isCreate = mode === 'create';
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         {open && (
           <DialogBody
-            key={`${mode}-${initialName ?? ''}-${open}`}
+            key={`${mode}-${initialName ?? ''}-${initialParentId ?? 'root'}-${open}`}
             initialName={initialName}
             mode={mode}
             onSubmit={onSubmit}
+            parentFolders={isCreate ? parentFolders : undefined}
+            initialParentId={isCreate ? initialParentId : null}
             onCancel={() => onOpenChange(false)}
             t={t}
           />

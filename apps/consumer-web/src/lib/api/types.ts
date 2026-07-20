@@ -554,3 +554,102 @@ export type NotificationItem = {
   is_read: boolean;
   created_at: string;
 };
+
+// ── Course Management ────────────────────────────────────────────────────────
+
+export type PricingType = 'free' | 'paid';
+export type CourseStatus = 'draft' | 'published' | 'archived';
+
+export type CourseMaterial = {
+  uid: string;
+  name: string;
+  url: string;
+  file_type: string;
+};
+
+export type CourseLesson = {
+  uid: string;
+  course_uid: string;
+  title: string;
+  description: string;
+  video_url: string | null;
+  material_urls: CourseMaterial[];
+  order_index: number;
+  duration_seconds: number;
+  is_preview: boolean;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Course = {
+  uid: string;
+  pid: string;
+  name: string;
+  description: string;
+  cover_url: string;
+  teacher_id: string;
+  pricing_type: PricingType;
+  price_vnd: number;
+  status: CourseStatus;
+  classroom_uid: string | null;
+  resolve_link?: SharingLink;
+  lesson_count: number;
+  enrollment_count: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CourseEnrolled = Course & {
+  enrolled_at: string;
+  enrollment_pricing_type: PricingType;
+  enrollment_amount_vnd: number;
+};
+
+export type CoursePreviewLesson = {
+  uid: string;
+  title: string;
+  description: string;
+  order_index: number;
+  duration_seconds: number;
+  video_url: string | null;
+  material_urls: CourseMaterial[];
+};
+
+export type CoursePreviewCourse = {
+  uid: string;
+  pid: string;
+  name: string;
+  description: string;
+  cover_url: string;
+  teacher_id: string;
+  pricing_type: PricingType;
+  price_vnd: number;
+  status: CourseStatus;
+};
+
+export type CoursePreview = {
+  course: CoursePreviewCourse;
+  is_free: boolean;
+  requires_payment: boolean;
+  preview_lessons: CoursePreviewLesson[];
+};
+
+export type EnrollResponse = {
+  enrollment: unknown;
+  classroom_uid: string;
+  redirect_to: string;
+};
+
+export type AccessResponse = {
+  enrolled: boolean;
+  classroom_uid?: string;
+  redirect_to?: string;
+};
+
+export type CheckoutResponse = {
+  order_id: string;
+  pay_url: string;
+  deeplink?: string;
+  qr_code_url?: string;
+};

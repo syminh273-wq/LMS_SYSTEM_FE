@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback, use, useRef } from 'react';
 import { usePendingRealtime } from '@/lib/hooks/use-pending-realtime';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { spaceApi, SharingLink, Classroom, Exam, userSettingsApi } from '@/lib/api';
 import type { ClassroomMember, StudentExamRecord, ActivityLog, BlacklistEntry } from '@/lib/api/types';
 import {
@@ -159,6 +159,8 @@ const EXAM_KIND_KEYWORDS: Record<ExamKind, string[]> = {
 export default function ClassroomDetailsPage({ params }: ClassroomDetailsPageProps) {
   const { uid } = use(params);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { t, formatDateTime: localeFormatDateTime, formatDate: localeFormatDate, locale } = useTranslation();
   const formatDateTime = React.useCallback((v: string) => (v ? localeFormatDateTime(v) : '--'), [localeFormatDateTime]);
   const formatDate = React.useCallback((v: string | null | undefined) => (v ? localeFormatDate(v) : '--'), [localeFormatDate]);
@@ -225,6 +227,47 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [deletingExamUid, setDeletingExamUid] = useState<string | null>(null);
   const [canManageExams, setCanManageExams] = useState(false);
 
+  type ActiveTab = typeof activeTab;
+  const VALID_TABS: ActiveTab[] = ['info', 'docs', 'chat', 'meeting', 'exams', 'final_exams', 'quiz', 'students', 'ai', 'blacklist', 'calendar', 'leave_request'];
+
+  const buildQueryString = React.useCallback(
+    (overrides: Record<string, string | null>) => {
+      const next = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(overrides)) {
+        if (value === null || value === '') next.delete(key);
+        else next.set(key, value);
+      }
+      const qs = next.toString();
+      return qs ? `${pathname}?${qs}` : pathname;
+    },
+    [pathname, searchParams],
+  );
+
+  const goToTab = React.useCallback(
+    (tab: ActiveTab, extras: Record<string, string | null> = {}) => {
+      const overrides: Record<string, string | null> = { tab: tab === 'info' ? null : tab, ...extras };
+      if (tab === 'exams' || tab === 'final_exams') {
+        if (!('kind' in overrides)) {
+          overrides.kind = null;
+        }
+      } else {
+        overrides.kind = null;
+      }
+      const url = buildQueryString(overrides);
+      router.replace(url, { scroll: false });
+      setActiveTab(tab);
+    },
+    [buildQueryString, router],
+  );
+
+  const goToExamKind = React.useCallback(
+    (kind: ExamKind) => {
+      router.replace(buildQueryString({ kind: kind === 'midterm' ? null : kind }), { scroll: false });
+      setSelectedExamKind(kind);
+    },
+    [buildQueryString, router],
+  );
+
   // Quiz tab state
   const [assignedQuizzes, setAssignedQuizzes] = useState<Quiz[]>([]);
   const [loadingQuizzes, setLoadingQuizzes] = useState(false);
@@ -263,18 +306,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   }, []);
 
   useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    const tab = query.get('tab');
-    const kind = query.get('kind');
+    const tab = searchParams.get('tab');
+    const kind = searchParams.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai' || tab === 'blacklist' || tab === 'calendar' || tab === 'leave_request') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
-      setActiveTab(tab);
+    if (tab && (VALID_TABS as string[]).includes(tab)) {
+      setActiveTab(tab as ActiveTab);
+    } else {
+      setActiveTab('info');
     }
     if (isExamKind(kind)) {
       setSelectedExamKind(kind);
     }
-  }, []);
+  }, [searchParams]);
 
   const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   const isTeacher = typeof window !== 'undefined' && (localStorage.getItem('userType') === 'space' || localStorage.getItem('role') === 'teacher');
@@ -1005,7 +1048,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   <button
                     key={id}
                     title={label}
-                    onClick={() => setActiveTab(id as typeof activeTab)}
+                    onClick={() => goToTab(id as ActiveTab)}
                     className={`w-full flex justify-center py-3 transition-colors relative ${
                       isActive ? 'text-primary-brand bg-primary-brand-light' : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
                     }`}
@@ -1056,7 +1099,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     return (
                       <button
                         key={id}
-                        onClick={() => setActiveTab(id as typeof activeTab)}
+                        onClick={() => goToTab(id as ActiveTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
@@ -1094,7 +1137,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     return (
                       <button
                         key={id}
-                        onClick={() => setActiveTab(id as typeof activeTab)}
+                        onClick={() => goToTab(id as ActiveTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
@@ -1124,7 +1167,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     const isActive = activeTab === 'students';
                     return (
                       <button
-                        onClick={() => setActiveTab('students')}
+                        onClick={() => goToTab('students')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
@@ -1144,7 +1187,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     const isActive = activeTab === 'blacklist';
                     return (
                       <button
-                        onClick={() => setActiveTab('blacklist')}
+                        onClick={() => goToTab('blacklist')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
                         }`}
@@ -1793,7 +1836,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   {(['midterm', 'final', 'regular'] as ExamKind[]).map(kind => (
                     <button
                       key={kind}
-                      onClick={() => setSelectedExamKind(kind)}
+                      onClick={() => goToExamKind(kind)}
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
                         selectedExamKind === kind
                           ? 'bg-card text-primary-brand shadow-sm border border-border'
@@ -2374,7 +2417,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           onOpened={(exam, studentCount) => {
             setExams(prev => [exam, ...prev.filter(item => item.uid !== exam.uid)]);
             setShowOpenExamModal(false);
-            setActiveTab('final_exams');
+            goToTab('final_exams');
             toast.success(t('classroom.ui.exams_open_success', undefined, { count: studentCount }));
           }}
         />
