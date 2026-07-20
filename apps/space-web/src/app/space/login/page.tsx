@@ -1,25 +1,50 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setProfile } from '@/lib/redux/userSlice';
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Mail,
+  Lock,
+} from 'lucide-react';
+import { Input } from '@shared/components/ui/input';
 import Image from 'next/image';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
+import { MasterLayout, MasterBody } from '@shared/components/layout/MasterLayout';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { cn } from '@/lib/utils';
 
 type LoginFormValues = {
   email: string;
   password: string;
 };
 
+function GoogleIcon() {
+  return (
+    <svg width='18' height='18' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
+      <path d='M6.306 14.691l6.571 4.819C14.655 15.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z' fill='#FF3D00'/>
+      <path d='M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.316 0-9.829-3.562-11.448-8.47l-6.522 5.025C9.505 39.556 16.227 44 24 44z' fill='#4CAF50'/>
+      <path d='M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z' fill='#1976D2'/>
+    </svg>
+  );
+}
+
 export default function SpaceLoginPage() {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState('');
+  const [globalError, setGlobalError] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    return err ? decodeURIComponent(err) : '';
+  });
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
@@ -29,19 +54,16 @@ export default function SpaceLoginPage() {
     defaultValues: { email: '', password: '' }
   });
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get('error');
-    if (err) setGlobalError(decodeURIComponent(err));
-  }, []);
-
-  const handleApiError = (err: any) => {
+  const handleApiError = (err: unknown) => {
     if (err instanceof ValidationException) {
       Object.entries(err.errors).forEach(([field, message]) => {
-        setFormError(field as any, { type: 'server', message });
+        setFormError(field as keyof LoginFormValues, { type: 'server', message });
       });
-      } else {
-      setGlobalError(err.message || t('auth.login.login_failed'));
+      toast.error('Vui lòng kiểm tra lại thông tin đăng nhập.');
+    } else {
+      const message = err instanceof Error ? err.message : t('auth.login.login_failed');
+      setGlobalError(message);
+      toast.error(message);
     }
   };
 
@@ -58,126 +80,151 @@ export default function SpaceLoginPage() {
       dispatch(setProfile(profile));
 
       router.push('/space');
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleApiError(err);
     } finally { setLoading(false); }
   };
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-muted px-4'>
-      <div className='max-w-md w-full'>
-        <div className='bg-card rounded-2xl shadow-xl overflow-hidden'>
-          <div className='bg-slate-900 py-8 px-10 text-center'>
-            <div className="flex justify-center mb-4">
-              <Image src="/logo.jpg" alt="LMS LOGO" width={150} height={50} className="h-12 w-auto object-contain brightness-0 invert" />
-            </div>
-            <h2 className='text-white text-2xl font-bold'>{t('auth.login.title')}</h2>
-            <p className='text-muted-foreground text-sm mt-1'>{t('auth.login.subtitle')}</p>
-          </div>
+    <MasterLayout footer={null}>
+      <MasterBody className="min-h-screen">
+        <div className="flex min-h-screen flex-col lg:flex-row bg-slate-50 dark:bg-slate-950">
 
-          <div className='p-10'>
-            {globalError && (
-              <div className='bg-red-50 border-l-4 border-red-500 p-4 mb-6 text-red-700 text-sm'>
-                {globalError}
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
+            <div className="w-full max-w-[420px] animate-fade-up">
+              <div className="mb-8 flex justify-center">
+                <Image src="/logo-icon.svg" alt="LMS System" width={140} height={150} />
               </div>
-            )}
 
-            <form onSubmit={handleSubmit(onLogin)} className='space-y-6'>
-              <div>
-                <label className='block text-sm font-semibold text-foreground mb-2'>{t('auth.login.email_label')}</label>
-                <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
-                    <Mail size={18} />
-                  </div>
-                  <input
-                    type='email'
-                    {...register('email', { required: t('auth.login.email_required') })}
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500 ring-red-100' : 'border-border'}`}
-                    placeholder={t('auth.login.email_placeholder')}
-                  />
+              <div className="mb-8 text-center">
+                <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
+                  Đăng Nhập
+                </h2>
+                <p className="text-slate-600 text-[15px] dark:text-slate-400">
+                  Đăng nhập để quản lý không gian đào tạo của bạn.
+                </p>
+              </div>
+
+              {globalError && (
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-fade-down dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                  <span className="font-medium">{globalError}</span>
                 </div>
-                {errors.email && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.email.message}</p>}
-              </div>
+              )}
 
-              <div>
-                <label className='block text-sm font-semibold text-foreground mb-2'>{t('auth.login.password_label')}</label>
-                <div className='relative'>
-                  <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground'>
-                    <Lock size={18} />
+              <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <Input
+                      {...register('email', { required: 'Vui lòng nhập email' })}
+                      type="email"
+                      autoComplete="email"
+                      placeholder="name@company.com"
+                      className="h-11 pl-10 pr-4 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
+                    />
                   </div>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    {...register('password', { required: t('auth.login.password_required') })}
-                    className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.password ? 'border-red-500 ring-red-100' : 'border-border'}`}
-                    placeholder='••••••••'
-                  />
-                  <button
-                    type='button'
-                    onClick={() => setShowPassword(!showPassword)}
-                    className='absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-muted-foreground'
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  {errors.email && (
+                    <p className="text-rose-600 text-xs font-medium mt-1">{errors.email.message}</p>
+                  )}
                 </div>
-                {errors.password && <p className='text-red-500 text-xs mt-1 font-medium'>{errors.password.message}</p>}
-              </div>
 
-              <div className='flex justify-end'>
-                <Link href='/space/forgot-password' className='text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors'>
-                  {t('auth.login.forgot_password')}
-                </Link>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Mật khẩu
+                    </label>
+                    <Link
+                      href="/space/forgot-password"
+                      className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    >
+                      Quên mật khẩu?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
+                      placeholder="••••••••"
+                      className="h-11 pl-10 pr-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors dark:hover:text-slate-200"
+                      aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-rose-600 text-xs font-medium mt-1">{errors.password.message}</p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={cn(
+                    "w-full h-11 rounded-lg font-semibold text-sm text-white",
+                    "bg-indigo-600 hover:bg-indigo-700",
+                    "shadow-sm transition-colors",
+                    "flex items-center justify-center gap-2",
+                    "disabled:opacity-60 disabled:cursor-not-allowed"
+                  )}
+                >
+                  {loading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Đang xác thực...
+                    </>
+                  ) : (
+                    <>
+                      Đăng nhập
+                      <ArrowRight size={16} strokeWidth={2.5} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold dark:bg-slate-950">
+                    Hoặc tiếp tục với
+                  </span>
+                </div>
               </div>
 
               <button
-                type='submit'
-                disabled={loading}
-                className='w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98] flex justify-center items-center gap-2'
+                type="button"
+                onClick={() => {
+                  const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+                  window.location.href = `${backendUrl}/api/v1/space/account/auth/google/login/`;
+                }}
+                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
-                {loading ? t('auth.login.submit_loading') : t('auth.login.submit')}
+                <GoogleIcon />
+                Tiếp tục với Google
               </button>
-            </form>
 
-            <div className='mt-6 flex items-center gap-3'>
-              <div className='h-px flex-1 bg-muted' />
-              <span className='text-xs text-muted-foreground font-medium'>{t('auth.common.or')}</span>
-              <div className='h-px flex-1 bg-muted' />
-            </div>
-
-            <button
-              type='button'
-              onClick={() => {
-                const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-                window.location.href = `${backendUrl}/api/v1/space/account/auth/google/login/`;
-              }}
-              className='mt-4 w-full flex items-center justify-center gap-3 border border-border rounded-lg px-4 py-2.5 text-sm font-medium text-foreground bg-card hover:bg-muted/50 active:scale-[0.98] transform transition-all shadow-sm'
-            >
-              <svg width='20' height='20' viewBox='0 0 48 48' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                <path d='M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.332 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z' fill='#FFC107'/>
-                <path d='M6.306 14.691l6.571 4.819C14.655 15.108 19.001 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z' fill='#FF3D00'/>
-                <path d='M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.316 0-9.829-3.562-11.448-8.47l-6.522 5.025C9.505 39.556 16.227 44 24 44z' fill='#4CAF50'/>
-                <path d='M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z' fill='#1976D2'/>
-              </svg>
-              Đăng nhập với Google
-            </button>
-            <p className='mt-2 text-center text-xs text-muted-foreground'>Chỉ dành cho Space đã đăng ký</p>
-
-            <div className='mt-8 pt-6 border-t border-border text-center'>
-              <p className='text-muted-foreground text-sm'>
-                Chưa có Space? {' '}
-                <Link href='/space/register' className='text-foreground font-bold hover:underline'>
-                  Tạo Space mới
-                </Link>
-              </p>
+              <Link
+                href="/space/register"
+                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
+              >
+                Chưa có Space? Đăng ký
+              </Link>
             </div>
           </div>
         </div>
-        
-        <div className='mt-6 text-center'>
-          <Link href='http://localhost:3000/login' className='text-muted-foreground text-xs hover:text-foreground font-medium transition-colors'>
-            &larr; Quay lại trang người dùng
-          </Link>
-        </div>
-      </div>
-    </div>
+      </MasterBody>
+    </MasterLayout>
   );
 }
