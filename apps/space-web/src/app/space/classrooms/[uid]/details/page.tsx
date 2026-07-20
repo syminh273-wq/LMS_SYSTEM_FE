@@ -100,6 +100,7 @@ import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { ClassroomDocsManager } from '@/components/classroom/docs-manager/ClassroomDocsManager';
+import { ClassroomCalendarTab } from '@/components/calendar/ClassroomCalendarTab';
 import {
   CartesianGrid,
   Line,
@@ -162,7 +163,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [blacklist, setBlacklist] = useState<BlacklistEntry[]>([]);
   const [loadingBlacklist, setLoadingBlacklist] = useState(false);
@@ -264,7 +265,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     const tab = query.get('tab');
     const kind = query.get('kind');
 
-    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai' || tab === 'blacklist') {
+    if (tab === 'info' || tab === 'docs' || tab === 'chat' || tab === 'meeting' || tab === 'exams' || tab === 'final_exams' || tab === 'quiz' || tab === 'students' || tab === 'ai' || tab === 'blacklist' || tab === 'calendar') {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- The URL selects the initially visible tab.
       setActiveTab(tab);
     }
@@ -989,6 +990,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 { id: 'ai',       label: t('classroom.ui.tab_ai'),       icon: Bot },
                 { id: 'chat',     label: t('classroom.ui.tab_chat'),     icon: MessageSquare },
                 { id: 'meeting',  label: t('classroom.ui.tab_meeting'),  icon: Video },
+                { id: 'calendar', label: t('classroom.ui.tab_calendar'), icon: Calendar },
                 { id: 'exams',    label: t('classroom.ui.tab_exams'),    icon: ClipboardList },
                 { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
                 { id: 'quiz',     label: t('classroom.ui.tab_quiz'),     icon: Gamepad2 },
@@ -1045,6 +1047,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     { id: 'ai',      label: t('classroom.ui.tab_ai'),      icon: Bot },
                     { id: 'chat',    label: t('classroom.ui.tab_chat'),    icon: MessageSquare },
                     { id: 'meeting', label: t('classroom.ui.tab_meeting'), icon: Video },
+                    { id: 'calendar', label: t('classroom.ui.tab_calendar'), icon: Calendar },
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
@@ -1721,6 +1724,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   </>
                 )}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'calendar' && (
+            <div className="animate-in fade-in duration-300 bg-card rounded-3xl border border-border shadow-sm p-6 sm:p-8">
+              <ClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
             </div>
           )}
 

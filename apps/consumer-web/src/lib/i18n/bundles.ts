@@ -18,6 +18,8 @@ import gradesEn from '@/locales/grades/en.json';
 import gradesVi from '@/locales/grades/vi.json';
 import joinEn from '@/locales/join/en.json';
 import joinVi from '@/locales/join/vi.json';
+import leaveRequestEn from '@/locales/leave-request/en.json';
+import leaveRequestVi from '@/locales/leave-request/vi.json';
 import quizEn from '@/locales/quiz/en.json';
 import quizVi from '@/locales/quiz/vi.json';
 import quizCollectionEn from '@/locales/quiz-collection/en.json';
@@ -57,6 +59,7 @@ export const consumerWebBundles: LocaleBundles = {
     quizCollection: quizCollectionEn,
     certificate: certificateEn,
     validation: validationEn,
+    leave_request: leaveRequestEn,
     layout: sharedLayoutEn,
     settings: sharedSettingsEn,
     profile: sharedProfileEn,
@@ -79,6 +82,7 @@ export const consumerWebBundles: LocaleBundles = {
     quizCollection: quizCollectionVi,
     certificate: certificateVi,
     validation: validationVi,
+    leave_request: leaveRequestVi,
     layout: sharedLayoutVi,
     settings: sharedSettingsVi,
     profile: sharedProfileVi,

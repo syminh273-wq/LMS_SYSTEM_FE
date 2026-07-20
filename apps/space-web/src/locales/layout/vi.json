@@ -2,6 +2,8 @@
   "nav": {
     "dashboard": "Bảng điều khiển",
     "classrooms": "Lớp học",
+    "calendar": "Lịch",
+    "leave_requests": "Đơn nghỉ phép",
     "quizzes": "Thư viện Quiz",
     "quiz_collections": "Nhiệm vụ",
     "certificates": "Chứng chỉ",

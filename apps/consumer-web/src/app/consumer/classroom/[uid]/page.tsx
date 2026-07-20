@@ -55,8 +55,9 @@ import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { ClassroomDocsViewer } from '@/components/classroom/docs-viewer/ClassroomDocsViewer';
+import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClassroomCalendarTab';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections';
+type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -482,6 +483,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
                 { key: 'quiz' as const, icon: Trophy, label: 'Thi trắc nghiệm' },
                 { key: 'meeting' as const, icon: Video, label: 'Phòng họp' },
+                { key: 'calendar' as const, icon: Calendar, label: 'Lịch' },
                 { key: 'ai' as const, icon: Bot, label: 'AI Trợ giảng' },
                 { key: 'collections' as const, icon: Layers, label: 'Bộ Nhiệm Vụ' },
               ].map((item) => {
@@ -735,6 +737,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 apiBase={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
                 t={t}
               />
+            )}
+
+            {/* Calendar Tab */}
+            {activeTab === 'calendar' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
+                <ConsumerClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
+              </div>
             )}
 
             {/* Meeting Tab */}

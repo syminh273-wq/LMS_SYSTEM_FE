@@ -20,6 +20,8 @@ import {
   Layers,
   Award,
   ChevronDown,
+  CalendarDays,
+  ClipboardList,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
@@ -87,6 +89,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     () => [
       { key: 'dashboard',       label: t('layout.nav.dashboard'),       href: '/space',                  icon: LayoutDashboard },
       { key: 'classrooms',      label: t('layout.nav.classrooms'),      href: '/space/classrooms',       icon: BookOpen },
+      { key: 'calendar',        label: t('layout.nav.calendar'),        href: '/space/calendar',         icon: CalendarDays },
+      { key: 'leave_requests',  label: t('layout.nav.leave_requests'),  href: '/space/leave-requests',   icon: ClipboardList },
       { key: 'quizzes',         label: t('layout.nav.quizzes'),         href: '/space/quizzes',          icon: Gamepad2 },
       {
         key: 'certificates',

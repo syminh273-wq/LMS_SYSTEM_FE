@@ -1,0 +1,84 @@
+{
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "form": {
+    "title": "New leave request",
+    "mode_event": "For an event",
+    "mode_range": "For a date range",
+    "field_event": "Event",
+    "field_start": "Start",
+    "field_end": "End",
+    "field_reason": "Reason",
+    "field_evidence": "Evidence (optional)",
+    "select_event": "-- Select an event --",
+    "no_events": "You don't have any events to request leave for.",
+    "reason_placeholder": "Please describe your reason...",
+    "upload_hint": "Choose an image or document...",
+    "cancel": "Cancel",
+    "submit": "Submit"
+  },
+  "list": {
+    "loading": "Loading...",
+    "empty": "No leave requests yet.",
+    "empty_student": "You haven't submitted any leave requests yet.",
+    "empty_teacher": "No leave requests from your students.",
+    "view_evidence": "Evidence",
+    "event": "Event",
+    "range": "Time range",
+    "submitted_at": "Submitted at",
+    "rejection_reason": "Rejection reason"
+  },
+  "process": {
+    "title": "Process leave request",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejection_label": "Rejection reason",
+    "reason_required": "Please enter a rejection reason.",
+    "cancel": "Cancel",
+    "close": "Close",
+    "submit_approve": "Approve request",
+    "submit_reject": "Reject request"
+  },
+  "page": {
+    "title_student": "My Leave Requests",
+    "title_teacher": "Leave Requests",
+    "subtitle_student": "Submit a new request and track approval status.",
+    "subtitle_teacher": "Review and process leave requests from your students.",
+    "new_request": "New request",
+    "filter_all": "All",
+    "filter_pending": "Pending",
+    "filter_approved": "Approved",
+    "filter_rejected": "Rejected",
+    "filter_cancelled": "Cancelled",
+    "view": "View",
+    "cancel_request": "Cancel request",
+    "cancel_confirm": "Cancel this leave request?",
+    "view_details": "View details",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "actions": {
+    "create_success": "Leave request submitted.",
+    "create_error": "Failed to submit request.",
+    "process_success": "Leave request updated.",
+    "process_error": "Failed to update request.",
+    "cancel_success": "Leave request cancelled.",
+    "cancel_error": "Failed to cancel request."
+  },
+  "errors": {
+    "reason_required": "Please enter a reason.",
+    "event_required": "Please select an event.",
+    "event_not_found": "Event not found.",
+    "range_required": "Please select a date range.",
+    "end_before_start": "End time must be after start time.",
+    "generic": "Something went wrong."
+  }
+}
