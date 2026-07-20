@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { setProfile } from '@/lib/redux/userSlice';
@@ -10,14 +10,12 @@ import { useRouter } from 'next/navigation';
 import {
   Eye,
   EyeOff,
-  ShieldCheck,
-  Zap,
   ArrowRight,
-  Sparkles,
   Mail,
   Lock,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MasterLayout, MasterBody } from '@shared/components/layout/MasterLayout';
@@ -39,28 +37,25 @@ function GoogleIcon() {
   );
 }
 
+const ERROR_MESSAGES: Record<string, string> = {
+  google_auth_failed: 'Đăng nhập Google thất bại. Vui lòng thử lại.',
+  google_token_failed: 'Không thể xác thực với Google.',
+  google_token_invalid: 'Token Google không hợp lệ.',
+  account_disabled: 'Tài khoản đã bị vô hiệu hóa.',
+};
+
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState('');
+  const [globalError, setGlobalError] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get('error');
+    return err ? (ERROR_MESSAGES[err] || 'Đăng nhập thất bại.') : '';
+  });
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
 
   const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<LoginFormValues>();
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const err = params.get('error');
-    if (err) {
-      const errorMessages: Record<string, string> = {
-        google_auth_failed: 'Đăng nhập Google thất bại. Vui lòng thử lại.',
-        google_token_failed: 'Không thể xác thực với Google.',
-        google_token_invalid: 'Token Google không hợp lệ.',
-        account_disabled: 'Tài khoản đã bị vô hiệu hóa.',
-      };
-      setGlobalError(errorMessages[err] || 'Đăng nhập thất bại.');
-    }
-  }, []);
 
   const onLogin = async (data: LoginFormValues) => {
     setGlobalError(''); setLoading(true);
@@ -93,86 +88,16 @@ export default function LoginPage() {
       <MasterBody className="min-h-screen">
         <div className="flex min-h-screen flex-col lg:flex-row bg-slate-50 dark:bg-slate-950">
 
-          {/* Left Side - Hero */}
-          <div className="relative hidden lg:flex lg:w-1/2 xl:w-[55%] flex-col justify-between overflow-hidden bg-indigo-600 p-10 xl:p-16">
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-indigo-500/40 blur-3xl" />
-            <div className="absolute -bottom-32 -left-10 w-72 h-72 rounded-full bg-sky-500/30 blur-3xl" />
-
-            <div className="relative">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-md">
-                  <Sparkles size={18} className="text-indigo-600" strokeWidth={2.5} />
-                </div>
-                <span className="text-xl font-bold text-white tracking-tight">EduSphere</span>
-              </div>
-            </div>
-
-            <div className="relative space-y-7">
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide text-white">
-                <span className="w-1.5 h-1.5 bg-emerald-300 rounded-full" />
-                NỀN TẢNG HỌC TẬP 2026
-              </div>
-
-              <h1 className="text-5xl xl:text-6xl font-bold leading-[1.05] text-white tracking-tight text-balance">
-                Nâng tầm tri thức Việt.
-              </h1>
-
-              <p className="text-indigo-100 text-base xl:text-lg max-w-md leading-relaxed font-normal">
-                Hệ thống quản lý học tập thông minh, kiến tạo tương lai số cho thế hệ trẻ Việt Nam.
-              </p>
-
-              <div className="space-y-3 pt-2">
-                {[
-                  { icon: ShieldCheck, title: 'Bảo mật chuẩn quốc tế', desc: 'Mã hóa end-to-end' },
-                  { icon: Zap, title: 'Trải nghiệm mượt mà', desc: 'Tối ưu cho mọi thiết bị' },
-                  { icon: Sparkles, title: 'Cá nhân hoá lộ trình', desc: 'AI gợi ý bài học phù hợp' },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div
-                    key={title}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-white/10 border border-white/15 backdrop-blur-md"
-                  >
-                    <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                      <Icon className="text-white" size={17} strokeWidth={2.2} />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm text-white">{title}</p>
-                      <p className="text-xs text-indigo-100">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative flex items-center gap-6 text-xs text-indigo-100">
-              <span>© 2026 EduSphere</span>
-              <span>·</span>
-              <span>Điều khoản</span>
-              <span>·</span>
-              <span>Bảo mật</span>
-            </div>
-          </div>
-
           {/* Right Side - Form */}
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
-            <div className="absolute top-6 right-6 sm:top-8 sm:right-10 text-sm text-slate-600 dark:text-slate-400">
-              Chưa có tài khoản?{' '}
-              <Link href="/consumer/register" className="text-indigo-600 font-semibold hover:underline dark:text-indigo-400">
-                Đăng ký
-              </Link>
-            </div>
-
             <div className="w-full max-w-[420px] animate-fade-up">
-              <div className="lg:hidden mb-8 flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center">
-                  <Sparkles size={18} className="text-white" strokeWidth={2.5} />
-                </div>
-                <span className="text-xl font-bold text-slate-900 tracking-tight dark:text-white">EduSphere</span>
+              <div className="mb-8 flex justify-center">
+                <Image src="/logo-icon.svg" alt="LMS System" width={140} height={150} />
               </div>
 
-              <div className="mb-8">
+              <div className="mb-8 text-center">
                 <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
-                  Chào mừng trở lại
+                  Đăng Nhập
                 </h2>
                 <p className="text-slate-600 text-[15px] dark:text-slate-400">
                   Đăng nhập để tiếp tục hành trình học tập của bạn.
@@ -289,17 +214,12 @@ export default function LoginPage() {
                 Tiếp tục với Google
               </button>
 
-              <p className="mt-8 text-center text-xs text-slate-500 leading-relaxed dark:text-slate-400">
-                Bằng việc đăng nhập, bạn đồng ý với{' '}
-                <Link href="#" className="text-slate-700 hover:text-slate-900 underline dark:text-slate-300 dark:hover:text-white">
-                  Điều khoản
-                </Link>{' '}
-                và{' '}
-                <Link href="#" className="text-slate-700 hover:text-slate-900 underline dark:text-slate-300 dark:hover:text-white">
-                  Chính sách bảo mật
-                </Link>
-                .
-              </p>
+              <Link
+                href="/consumer/register"
+                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
+              >
+                Chưa có tài khoản? Đăng ký
+              </Link>
             </div>
           </div>
         </div>
