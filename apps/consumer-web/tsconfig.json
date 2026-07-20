@@ -20,7 +20,14 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["../../packages/shared/src/*"]
+      "@shared/*": ["../../packages/shared/src/*"],
+      "@lms/types": ["../../packages/types/src/index.ts"],
+      "@lms/api": ["../../packages/api/src/index.ts"],
+      "@lms/hooks": ["../../packages/hooks/src/index.ts"],
+      "@lms/ui": ["../../packages/ui/src/index.ts"],
+      "@lms/ui/*": ["../../packages/ui/src/*"],
+      "@lms/utils": ["../../packages/utils/src/index.ts"],
+      "@lms/config": ["../../packages/config"]
     }
   },
   "include": [

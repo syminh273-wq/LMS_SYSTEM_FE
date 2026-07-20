@@ -1399,8 +1399,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <VoiceSettingsDialog
-                    getSettings={() => userSettingsApi.getSettings()}
-                    updateSettings={(data) => userSettingsApi.updateSettings(data)}
+                    getSettings={() => userSettingsApi.getSettings() as any}
+                    updateSettings={(data) => userSettingsApi.updateSettings(data) as any}
                     getAvailableVoices={() => userSettingsApi.getAvailableVoices()}
                     previewVoice={(voiceId, text) => userSettingsApi.previewVoice(voiceId, text)}
                   />

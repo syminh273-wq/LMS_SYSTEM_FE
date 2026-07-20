@@ -14,6 +14,7 @@ export type ProctoringEventType =
   | 'visibility_restored'
   | 'camera_lost'
   | 'face_not_recognized'
+  | 'face_recognized'
   | 'no_face'
   | 'multiple_faces'
   | 'joined'

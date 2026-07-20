@@ -280,7 +280,8 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
             {exam.exam_type === 'quiz' && (
               <div className="space-y-6">
                 {submission ? (
-                  <section className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm shadow-emerald-100/40">
+                  <>
+                    <section className="overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm shadow-emerald-100/40">
                     <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-emerald-50 px-5 py-6">
                       <div>
                         <h2 className="text-xl font-black text-emerald-900">Kết quả thi trắc nghiệm</h2>
@@ -370,6 +371,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                       ))}
                     </div>
                   )}
+                  </>
                 ) : !quizData ? (
                   <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white">
                     <Loader2 className="mb-4 animate-spin text-indigo-500" size={32} />
@@ -474,7 +476,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => setPreviewFile({ url: assignmentResource, name: exam.resource_name || exam.title, type: exam.content_type })}
+                            onClick={() => setPreviewFile({ url: assignmentResource, name: (exam as any).resource_name || exam.title, type: exam.content_type })}
                             className="rounded-lg text-indigo-600 hover:bg-indigo-50"
                           >
                             Xem đề bài

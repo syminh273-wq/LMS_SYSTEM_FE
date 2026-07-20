@@ -1,5 +1,5 @@
 import BaseRestApiClient from './client';
-import type { AIGradeBatchResponse, AIGradeRequest, CreateExamRequest, Exam, ExamSession, ExamSubmission, OpenOnlineResponse, UpdateExamRequest } from './types';
+import type { AIGradeBatchResponse, AIGradeRequest, CreateExamRequest, Exam, ExamSession, ExamSubmission, OpenOnlineResponse, UpdateExamRequest, AuditOverviewResponse, AuditDetailsResponse, AuditAnswersResponse, FaceLogEntry } from './types';
 
 export class ExamApiClient extends BaseRestApiClient {
   public async listByClassroom(
@@ -60,7 +60,7 @@ export class ExamApiClient extends BaseRestApiClient {
 
   public async openOnline(
     examUid: string,
-    settings: { late_threshold_seconds: number; duration_seconds: number; camera_required: boolean; max_face_warnings: number }
+    settings: { late_threshold_seconds: number; duration_seconds: number; camera_required: boolean; max_tab_leaves?: number; max_face_warnings: number }
   ): Promise<OpenOnlineResponse> {
     return this.post<OpenOnlineResponse>(`/api/v1/space/course/exams/${examUid}/open-online/`, settings);
   }

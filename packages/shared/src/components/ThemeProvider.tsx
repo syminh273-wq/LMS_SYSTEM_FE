@@ -44,7 +44,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = React.useCallback((event?: React.MouseEvent) => {
     const isAppearanceTransition =
-      document.startViewTransition &&
+      typeof document.startViewTransition === 'function' &&
       !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (!isAppearanceTransition || !event) {

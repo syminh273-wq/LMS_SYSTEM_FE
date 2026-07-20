@@ -12,7 +12,7 @@ const authHeaders = (token: string | null): Record<string, string> => {
   return h;
 };
 
-export async function fetchMyProgress(ctx: ApiCtx, resourceUid: string): Promise<DocProgress> {
+export async function fetchMyProgress(ctx: ApiCtx, resourceUid: string, _onlyMine = true): Promise<DocProgress> {
   const res = await fetch(
     `${ctx.apiBase}/api/v1/consumer/course/classrooms/${ctx.classroomUid}/docs/${resourceUid}/progress/`,
     { headers: authHeaders(ctx.accessToken) },

@@ -25,7 +25,8 @@ import {
   listNotes,
 } from './api';
 import type { ApiCtx } from './api';
-import type { ClassroomDoc, DocNote, DocProgress } from '../docs-viewer/types';
+import type { ClassroomDoc } from '../docs-viewer/types';
+import type { DocNote, DocProgress } from './types';
 import { isImageFile, isPdfFile, NOTE_COLORS } from './utils';
 import { NoteEditor } from './NoteEditor';
 
@@ -231,7 +232,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   };
 
   const syncLocalProgress = (nextNotes: DocNote[]) => {
-    setProgress((prev) => {
+    setProgress((prev: DocProgress | null) => {
       const isCompleted = prev?.is_completed ?? false;
       let maxOffset = 0;
       let maxPage = 1;
@@ -261,7 +262,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     });
     /* Defer parent notification outside of the render cycle. */
     queueMicrotask(() => {
-      setProgress((current) => {
+      setProgress((current: DocProgress | null) => {
         if (current) onProgressChangeRef.current?.(current);
         return current;
       });

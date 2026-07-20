@@ -142,6 +142,7 @@ export type Exam = {
   max_grade?: number;
   max_visibility_breaks?: number;
   max_face_warnings?: number;
+  max_tab_leaves?: number;
   created_at?: string;
   updated_at?: string;
 };
@@ -173,6 +174,7 @@ export type ExamSubmission = {
   submission_type: ExamSubmissionType;
   ref_id?: string | null;
   content: string;
+  content_type?: string;
   meta: Record<string, unknown>;
   // convenience fields from meta
   resource_url?: string | null;

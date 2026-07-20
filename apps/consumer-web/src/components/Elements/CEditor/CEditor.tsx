@@ -44,7 +44,7 @@ const CEditor = <TFieldValues extends FieldValues = FieldValues, TName extends F
 }: CEditorProps<TFieldValues, TName>) => {
   return (
     <FormField
-      control={control}
+      control={control as any}
       name={name}
       render={({ field, fieldState }) => (
         <FormItem className="w-full">
@@ -136,7 +136,7 @@ const CEditorContent = React.forwardRef<HTMLDivElement, any & { minHeight?: stri
       const normalizedCurrent = currentEditorContent === '<p></p>' ? '' : currentEditorContent
 
       if (normalizedValue !== normalizedCurrent && normalizedValue !== previousValueRef.current) {
-        editor.commands.setContent(normalizedValue, false)
+        editor.commands.setContent(normalizedValue)
       }
       previousValueRef.current = normalizedValue
     }, [value, editor])
@@ -144,7 +144,7 @@ const CEditorContent = React.forwardRef<HTMLDivElement, any & { minHeight?: stri
     useEffect(() => {
       if (editor && !initializedRef.current) {
         initializedRef.current = true
-        editor.commands.setContent(value || '', false)
+        editor.commands.setContent(value || '')
         previousValueRef.current = value
       }
     }, [editor, value])

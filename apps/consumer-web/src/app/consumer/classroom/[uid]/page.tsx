@@ -1471,7 +1471,7 @@ function CollectionExpandedPanel({
                 <p className="font-black text-slate-900 text-[12px]">{t('quizCollection.certificate_card_title')}</p>
                 <p className="text-[10px] text-slate-500">
                   {t('quizCollection.certificate_card_issued_at', undefined, {
-                    date: new Date(certificate.issued_at).toLocaleDateString('vi-VN'),
+                    date: certificate.issued_at ? new Date(certificate.issued_at).toLocaleDateString('vi-VN') : '',
                   })}
                 </p>
                 <div className="flex items-center gap-1 text-[9px] text-amber-700 font-mono font-bold">

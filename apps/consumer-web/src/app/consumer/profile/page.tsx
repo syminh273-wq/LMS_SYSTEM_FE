@@ -102,7 +102,7 @@ export default function ProfilePage() {
   const [myPosts, setMyPosts] = useState<Post[]>([]);
 
   const [modalMode, setModalMode] = useState<'none' | 'followers' | 'following'>('none');
-  const [modalUsers, setModalUsers] = useState<unknown[]>([]);
+  const [modalUsers, setModalUsers] = useState<Array<{ consumer_uid: string; name: string; avatar: string }>>([]);
   const [, setModalLoading] = useState(false);
 
   const form = useForm({
@@ -352,7 +352,7 @@ export default function ProfilePage() {
                     </p>
                     {profile?.pid && (
                       <button
-                        onClick={() => { navigator.clipboard.writeText(profile.pid); toast.success('Đã copy PID!'); }}
+                        onClick={() => { navigator.clipboard.writeText(profile.pid!); toast.success('Đã copy PID!'); }}
                         className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-colors text-[12px] font-mono font-semibold text-slate-700"
                         title="Click để copy PID"
                       >

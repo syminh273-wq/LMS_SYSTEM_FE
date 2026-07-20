@@ -1,22 +1,28 @@
-import { authApi } from './auth';
-import { classroomApi } from './classroom';
-import { examApi } from './exam';
-import { meetingRoomApi } from './meeting-room';
-import { quizApi } from './quiz';
-import { quizTasksApi } from './quiz-tasks';
-import { quizCollectionApi, certificateApi } from './quiz-collection';
-import { spaceApi as spaceApiInstance } from './space';
-import { consumerApi as consumerApiInstance } from './consumer';
-import { accountService } from './account';
-import { userSettingsApi } from './user-settings';
-import { notificationApi } from './notification';
-import { studentApi } from './student';
+import { authApi } from '@/features/auth/api';
+import { classroomApi } from '@/features/classroom/api';
+import { examApi } from '@/features/exam/api';
+import { meetingRoomApi } from '@/features/meeting-room/api';
+import { quizApi } from '@/features/quiz/api';
+import { quizTasksApi } from '@/features/quiz/api/quiz-tasks';
+import { quizCollectionApi, certificateApi } from '@/features/quiz-collection/api';
+import { spaceApi as spaceApiInstance } from '@/features/settings/api/space';
+import { consumerApi as consumerApiInstance } from '@/features/student/api/consumer';
+import { accountService } from '@/features/auth/api/account';
+import { userSettingsApi } from '@/features/settings/api/user-settings';
+import { notificationApi } from '@/features/notification/api';
+import { studentApi } from '@/features/student/api';
 
-export * from './types';
-export * from './exceptions';
-export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi };
+export * from '@lms/types';
+export * from '@/core/api/exceptions';
 
-// For backward compatibility and centralized access
+export {
+  quizApi,
+  quizTasksApi,
+  quizCollectionApi,
+  certificateApi,
+  studentApi,
+};
+
 export const api = {
   auth: authApi,
   classrooms: classroomApi,
@@ -32,10 +38,18 @@ export const api = {
   notifications: notificationApi,
 };
 
-// Re-export specific instances
-export { authApi, classroomApi, examApi, meetingRoomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService, notificationApi, userSettingsApi };
+export {
+  authApi,
+  classroomApi,
+  examApi,
+  meetingRoomApi,
+  spaceApiInstance as spaceApiClient,
+  consumerApiInstance as consumerApiClient,
+  accountService,
+  notificationApi,
+  userSettingsApi,
+};
 
-// Backward compatibility exports for the previous structure
 export const consumerApi = {
   auth: {
     login: authApi.consumerLogin.bind(authApi),

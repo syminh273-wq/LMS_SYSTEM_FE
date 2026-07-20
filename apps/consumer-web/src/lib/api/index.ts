@@ -1,25 +1,24 @@
-import { authApi } from './auth';
-import { classroomApi } from './classroom';
-import { meetingRoomApi } from './meeting-room';
-import { faceApi } from './face';
-import { consumerQuizApi } from './quiz';
-import { consumerQuizCollectionApi } from './quiz-collection';
-import { spaceApi as spaceApiInstance } from './space';
-import { consumerApi as consumerApiInstance } from './consumer';
-import { accountService } from './account';
-import { userSettingsApi } from './user-settings';
-import { examSessionApi } from './exam-session';
-import { ApiException } from './exceptions';
-import { SharingLink, NotificationItem, PaginatedResponse } from './types';
+import { authApi } from '@/features/auth/api';
+import { classroomApi } from '@/features/classroom/api';
+import { meetingRoomApi } from '@/features/meeting-room/api';
+import { faceApi } from '@/features/face/api';
+import { consumerQuizApi } from '@/features/quiz/api';
+import { consumerQuizCollectionApi } from '@/features/quiz-collection/api';
+import { spaceApi as spaceApiInstance } from '@/features/settings/api/space';
+import { consumerApi as consumerApiInstance } from '@/features/student/api/consumer';
+import { accountService } from '@/features/auth/api/account';
+import { userSettingsApi } from '@/features/settings/api/user-settings';
+import { examSessionApi } from '@/features/exam/api/exam-session';
+import { ApiException } from '@/core/api/exceptions';
+import type { SharingLink, NotificationItem, PaginatedResponse } from '@lms/types';
 
-export * from './types';
-export * from './exceptions';
+export * from '@lms/types';
+export * from '@/core/api/exceptions';
 export { consumerQuizApi };
 export { consumerQuizCollectionApi };
 export { faceApi };
 export { examSessionApi };
 
-// For backward compatibility and centralized access
 export const api = {
   auth: authApi,
   classrooms: classroomApi,
@@ -28,10 +27,16 @@ export const api = {
   account: accountService,
 };
 
-// Re-export specific instances
-export { authApi, classroomApi, meetingRoomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService, userSettingsApi };
+export {
+  authApi,
+  classroomApi,
+  meetingRoomApi,
+  spaceApiInstance as spaceApiClient,
+  consumerApiInstance as consumerApiClient,
+  accountService,
+  userSettingsApi,
+};
 
-// Backward compatibility exports for the previous structure
 export const consumerApiCompat = {
   auth: {
     login: authApi.consumerLogin.bind(authApi),
@@ -44,15 +49,6 @@ export const consumerApiCompat = {
   }
 };
 
-export const spaceApi = {
-  auth: {
-    login: authApi.spaceLogin.bind(authApi),
-    register: authApi.spaceRegister.bind(authApi),
-  },
-  classrooms: classroomApi,
-};
-
-// Sharing logic
 export const sharingApi = {
   resolve: (code: string) => consumerApiInstance.get<SharingLink>(`/api/v1/sharing/links/resolve/?code=${code}`),
 };
@@ -74,10 +70,6 @@ export const notificationApi = {
     try {
       await consumerApiInstance.post(`/api/v1/notifications/${uid}/read/`, {});
     } catch (err) {
-      // 404 is expected for notifications that exist only in the realtime feed
-      // (e.g. pushed via Firebase but not persisted to the backend yet). The
-      // caller has already updated local state — do not surface this as a
-      // failure that triggers a revert.
       if (err instanceof ApiException && err.status === 404) {
         return;
       }
