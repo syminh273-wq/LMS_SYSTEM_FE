@@ -89,6 +89,18 @@ export default function DiscoverPage() {
       });
       setResults(res.results as any);
       setTotalPages(res.total_pages || 1);
+      // Debug: log first row membership_status so we can see what the
+      // backend actually returned (delete after verified).
+      if ((res.results as any[])?.[0]) {
+        const first = (res.results as any[])[0];
+        // eslint-disable-next-line no-console
+        console.log('[discover] first row', {
+          name: first.name,
+          membership_status: first.membership_status,
+          is_joined: first.is_joined,
+          has_paid: first.has_paid,
+        });
+      }
     } catch (e: any) {
       toast.error(e?.message || 'Không thể tải danh sách lớp học');
     } finally {
@@ -248,8 +260,9 @@ export default function DiscoverPage() {
             const status = c.membership_status as 'pending' | 'approved' | null | undefined;
             const isApproved = status === 'approved';
             const isPending = status === 'pending';
-            const isJoined = isApproved || isPending;
             const grad = coverGradientFor(c.uid);
+            // eslint-disable-next-line no-console
+            console.log('[card]', c.name, 'status=', status, 'is_joined=', c.is_joined);
             return (
               <div
                 key={c.uid}
