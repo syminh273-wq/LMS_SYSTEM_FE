@@ -310,7 +310,18 @@ export default function ClassroomsPage() {
                           {classroom.name.substring(0, 2)}
                         </div>
                         <div className="space-y-0.5">
-                          <div className="font-bold text-foreground group-hover:text-primary-brand transition-colors">{classroom.name}</div>
+                          <div className="flex items-center gap-2">
+                            <div className="font-bold text-foreground group-hover:text-primary-brand transition-colors">{classroom.name}</div>
+                            {classroom.pricing_type === 'paid' ? (
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                                {classroom.price_vnd ? `${(classroom.price_vnd / 1000).toFixed(0)}k` : 'PAID'}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded">
+                                FREE
+                              </span>
+                            )}
+                          </div>
                           <div className="text-[11px] text-muted-foreground font-semibold line-clamp-1 max-w-[300px]">{classroom.description}</div>
                         </div>
                       </div>

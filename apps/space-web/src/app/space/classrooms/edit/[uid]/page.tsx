@@ -4,7 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { spaceApi, UpdateClassroomRequest, ValidationException, Classroom } from '@/lib/api';
-import { 
+import {
   ArrowLeft,
   Loader2,
   BookOpen,
@@ -12,12 +12,17 @@ import {
   Info,
   Save,
   QrCode,
-  Download
+  Download,
+  Tag,
+  Wallet,
+  Globe,
+  Lock,
+  Sparkles,
 } from 'lucide-react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
+import {
+  Card,
+  CardContent,
+  CardHeader,
   CardTitle,
   CardDescription
 } from '@shared/components/ui/card';
@@ -25,6 +30,19 @@ import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { renderToStaticMarkup } from 'react-dom/server';
+
+const CATEGORIES: Array<{ value: NonNullable<UpdateClassroomRequest['category']>; label: string }> = [
+  { value: 'math', label: 'Toán học' },
+  { value: 'physics', label: 'Vật lý' },
+  { value: 'chemistry', label: 'Hóa học' },
+  { value: 'biology', label: 'Sinh học' },
+  { value: 'language', label: 'Ngoại ngữ' },
+  { value: 'programming', label: 'Lập trình' },
+  { value: 'business', label: 'Kinh doanh' },
+  { value: 'design', label: 'Thiết kế' },
+  { value: 'music', label: 'Âm nhạc' },
+  { value: 'other', label: 'Khác' },
+];
 
 interface EditClassroomPageProps {
   params: Promise<{ uid: string }>;
@@ -39,13 +57,20 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<any>(null);
 
-  const { register, handleSubmit, formState: { errors }, setError: setFormError, reset } = useForm<UpdateClassroomRequest>({
+  const { register, handleSubmit, watch, formState: { errors }, setError: setFormError, reset } = useForm<UpdateClassroomRequest>({
     defaultValues: {
       name: '',
       description: '',
-      max_students: 30
+      max_students: 30,
+      pricing_type: 'free',
+      price_vnd: 0,
+      category: 'other',
+      visibility_type: 'public',
     }
   });
+
+  const pricingType = watch('pricing_type');
+  const visibilityType = watch('visibility_type');
 
   useEffect(() => {
     const fetchClassroom = async () => {
@@ -56,7 +81,6 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         if (data.resolve_link) {
           setLinkData(data.resolve_link);
         } else {
-          // Fetch sharing link if not resolved
           try {
             const link = await spaceApi.classrooms.getSharingLink(uid);
             setLinkData(link);
@@ -67,7 +91,11 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         reset({
           name: data.name,
           description: data.description,
-          max_students: data.max_students
+          max_students: data.max_students,
+          pricing_type: (data.pricing_type as any) || 'free',
+          price_vnd: (data.price_vnd as any) || 0,
+          category: (data.category as any) || 'other',
+          visibility_type: (data.visibility_type as any) || 'public',
         });
       } catch (err: any) {
         setGlobalError(err.message || 'Không thể tải thông tin phòng học');
@@ -82,24 +110,24 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
 
   const handleDownloadQr = () => {
     if (!linkData || !classroom) return;
-    
+
     try {
       toast.info('Đang tạo ảnh QR...');
       const joinUrl = `${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`;
-      
+
       let svgString = renderToStaticMarkup(
-        <QRCodeSVG 
+        <QRCodeSVG
           value={joinUrl}
           size={400}
           level="H"
           includeMargin={true}
         />
       );
-      
+
       if (!svgString.includes('xmlns=')) {
         svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
       }
-      
+
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       const img = document.createElement("img");
@@ -112,8 +140,8 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         if (ctx) {
           ctx.fillStyle = "white";
           ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 50, 50, 400, 400); 
-          
+          ctx.drawImage(img, 50, 50, 400, 400);
+
           const pngUrl = canvas.toDataURL("image/png");
           const downloadLink = document.createElement("a");
           downloadLink.href = pngUrl;
@@ -121,12 +149,12 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
           document.body.appendChild(downloadLink);
           downloadLink.click();
           document.body.removeChild(downloadLink);
-          
+
           toast.success('Đã tải mã QR xuống');
         }
         URL.revokeObjectURL(url);
       };
-      
+
       img.onerror = () => {
         toast.error('Có lỗi xảy ra khi tạo ảnh QR');
         URL.revokeObjectURL(url);
@@ -142,7 +170,11 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
     setLoading(true);
     setGlobalError('');
     try {
-      await spaceApi.classrooms.update(uid, data);
+      const payload: any = { ...data };
+      if (data.pricing_type === 'free') {
+        payload.price_vnd = 0;
+      }
+      await spaceApi.classrooms.update(uid, payload);
       toast.success('Cập nhật phòng học thành công');
       router.push('/space/classrooms');
     } catch (err: any) {
@@ -171,9 +203,9 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   return (
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-4 mb-8">
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => router.push('/space/classrooms')}
           className="rounded-xl border border-border bg-card shadow-sm hover:bg-muted/50 transition-all"
         >
@@ -211,7 +243,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
                   <BookOpen size={18} />
                 </div>
-                <input 
+                <input
                   {...register('name', { required: 'Tên phòng học là bắt buộc' })}
                   className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                   placeholder="Ví dụ: Toán học nâng cao lớp 12A1"
@@ -222,7 +254,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
 
             <div className="space-y-2">
               <label className="text-sm font-bold text-foreground px-1">Mô tả khóa học <span className="text-rose-500">*</span></label>
-              <textarea 
+              <textarea
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 rows={4}
                 className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
@@ -239,9 +271,9 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
                   <Users size={18} />
                 </div>
-                <input 
+                <input
                   type="number"
-                  {...register('max_students', { 
+                  {...register('max_students', {
                     required: 'Vui lòng nhập số lượng',
                     min: { value: 1, message: 'Tối thiểu 1 học sinh' }
                   })}
@@ -249,6 +281,107 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                 />
               </div>
               {errors.max_students && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.max_students.message}</p>}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
+          <div className="h-2 bg-primary-brand" />
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
+              <Tag size={20} className="text-primary-brand" />
+              Hình thức lớp học
+            </CardTitle>
+            <CardDescription className="font-medium text-muted-foreground">Cập nhật miễn phí hoặc trả phí</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground px-1">Hình thức</label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'free' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground">Miễn phí</div>
+                    <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
+                  </div>
+                </label>
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'paid' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground">Trả phí</div>
+                    <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {pricingType === 'paid' && (
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
+                  <Wallet size={16} className="text-primary-brand" />
+                  Giá lớp học (VND) <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min={1000}
+                  step={1000}
+                  {...register('price_vnd', {
+                    required: 'Giá là bắt buộc khi trả phí',
+                    min: { value: 1000, message: 'Tối thiểu 1.000 VND' },
+                  })}
+                  className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.price_vnd ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  placeholder="Ví dụ: 299000"
+                />
+                {errors.price_vnd && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.price_vnd.message}</p>}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
+          <div className="h-2 bg-primary-brand" />
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
+              <Sparkles size={20} className="text-primary-brand" />
+              Phân loại & Hiển thị
+            </CardTitle>
+            <CardDescription className="font-medium text-muted-foreground">Cập nhật danh mục và chế độ hiển thị</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
+                <Tag size={16} className="text-primary-brand" />
+                Danh mục <span className="text-rose-500">*</span>
+              </label>
+              <select
+                {...register('category', { required: 'Vui lòng chọn danh mục' })}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.category ? 'border-rose-500' : 'border-border'}`}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+              {errors.category && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.category.message}</p>}
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground px-1">Chế độ hiển thị</label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'public' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1"><Globe size={14} /> Công khai</div>
+                    <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
+                  </div>
+                </label>
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'private' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1"><Lock size={14} /> Riêng tư</div>
+                    <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
+                  </div>
+                </label>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -266,7 +399,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
             <div className="flex flex-col sm:flex-row items-center gap-8 p-4 bg-muted/50 rounded-2xl border border-border">
               <div className="bg-card p-3 rounded-xl shadow-sm border border-border">
                 {linkData ? (
-                  <QRCodeSVG 
+                  <QRCodeSVG
                     value={`${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`}
                     size={140}
                     level="H"
@@ -278,7 +411,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                   </div>
                 )}
               </div>
-              
+
               <div className="flex-1 space-y-4 text-center sm:text-left w-full">
                 <div>
                   <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Mã tham gia</div>
@@ -286,8 +419,8 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                     {linkData?.code || '------'}
                   </div>
                 </div>
-                
-                <Button 
+
+                <Button
                   type="button"
                   variant="outline"
                   onClick={handleDownloadQr}
@@ -303,17 +436,17 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         </Card>
 
         <div className="flex items-center justify-end gap-4 pt-4">
-          <Button 
-            type="button" 
-            variant="ghost" 
+          <Button
+            type="button"
+            variant="ghost"
             onClick={() => router.push('/space/classrooms')}
             disabled={loading}
             className="text-muted-foreground font-bold text-xs tracking-widest hover:bg-muted rounded-xl px-6"
           >
             HỦY BỎ
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={loading}
             className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-primary-brand/20 transition-all active:scale-95"
           >

@@ -23,6 +23,8 @@ import {
   GraduationCap,
   Sparkles,
   Inbox,
+  Compass,
+  Heart,
 } from 'lucide-react';
 import {
   Avatar,
@@ -100,6 +102,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
+  { name: 'Khám phá', href: '/consumer/discover', icon: Compass },
+  { name: 'Yêu thích', href: '/consumer/classroom/favorites', icon: Heart },
   { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
   { name: 'My Courses', href: '/consumer/course', icon: GraduationCap },
   { name: 'Feed', href: '/consumer/feed', icon: Sparkles },

@@ -20,8 +20,12 @@ import {
   ArrowUpDown,
   CheckCircle2,
   Download,
+  Lock,
+  Eye,
+  Crown,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import {
   fetchDocsTree,
@@ -74,6 +78,10 @@ type Props = {
   apiBase: string;
   accessToken: string | null;
   t: (key: string, fallback?: string) => string;
+  isPaidClassroom?: boolean;
+  hasPaid?: boolean;
+  onUpgrade?: () => void;
+  upgrading?: boolean;
 };
 
 function NodeRow({
@@ -81,11 +89,15 @@ function NodeRow({
   depth,
   selected,
   onSelect,
+  isPreview,
+  locked,
 }: {
   node: FolderNode;
   depth: number;
   selected: boolean;
   onSelect: (id: string) => void;
+  isPreview?: boolean;
+  locked?: boolean;
 }) {
   const [open, setOpen] = useState(true);
   const hasChildren = node.children.length > 0;
@@ -94,7 +106,7 @@ function NodeRow({
       <div
         className={`flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium transition ${
           selected ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100'
-        }`}
+        } ${locked ? 'opacity-60' : ''}`}
         style={{ paddingLeft: 8 + depth * 12 }}
         onClick={() => onSelect(node.uid)}
       >
@@ -111,11 +123,21 @@ function NodeRow({
         </button>
         {open ? <FolderOpen size={15} className="shrink-0" /> : <FolderIcon size={15} className="shrink-0" />}
         <span className="truncate flex-1 ml-1">{node.name}</span>
+        {isPreview && <Eye size={12} className="text-emerald-600" title="Preview" />}
+        {locked && <Lock size={12} className="text-slate-400" title="Cần nâng cấp" />}
       </div>
       {open && hasChildren && (
         <div>
           {node.children.map((c) => (
-            <NodeRow key={c.uid} node={c} depth={depth + 1} selected={false} onSelect={onSelect} />
+            <NodeRow
+              key={c.uid}
+              node={c}
+              depth={depth + 1}
+              selected={false}
+              onSelect={onSelect}
+              isPreview={Boolean((c as any).is_preview_only)}
+              locked={paidLocked && !(c as any).is_preview_only}
+            />
           ))}
         </div>
       )}
@@ -130,11 +152,12 @@ const SORT_FIELDS: { field: SortField; label: string }[] = [
   { field: 'file_type', label: 'Loại' },
 ];
 
-export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: Props) {
+export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isPaidClassroom = false, hasPaid = false, onUpgrade, upgrading }: Props) {
   const [tree, setTree] = useState<FolderNode[]>([]);
   const [allFolders, setAllFolders] = useState<ClassroomFolder[]>([]);
   const [rootDocs, setRootDocs] = useState<ClassroomDoc[]>([]);
   const [folderDocs, setFolderDocs] = useState<ClassroomDoc[]>([]);
+  const [previewOnly, setPreviewOnly] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -146,17 +169,17 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
   const [progressByDoc, setProgressByDoc] = useState<ProgressByDoc>({});
 
   const ctx = useMemo(() => ({ apiBase, accessToken, classroomUid }), [apiBase, accessToken, classroomUid]);
+  const paidLocked = isPaidClassroom && !hasPaid;
 
   useEffect(() => {
     let cancelled = false;
-    /* eslint-disable react-hooks/set-state-in-effect --
-       data-fetch on mount: setState happens inside .then() callbacks. */
     setLoading(true);
     fetchDocsTree(ctx)
-      .then((data) => {
+      .then((data: any) => {
         if (cancelled) return;
         setAllFolders(data.folders);
         setRootDocs(data.docs_root);
+        setPreviewOnly(Boolean(data.preview_only));
         setTree(buildFolderTree(data.folders));
       })
       .catch(() => {
@@ -257,6 +280,25 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
 
   return (
     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
+      {paidLocked && (
+        <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Crown size={16} className="text-amber-700" />
+            <span className="text-sm font-bold text-foreground">Chỉ hiển thị Preview folder cho đến khi bạn nâng cấp.</span>
+          </div>
+          {onUpgrade && (
+            <Button
+              onClick={onUpgrade}
+              disabled={upgrading}
+              size="sm"
+              className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs h-8 rounded-lg px-4 shadow-sm shadow-amber-500/20"
+            >
+              {upgrading ? <Loader2 size={12} className="animate-spin mr-1" /> : <Crown size={12} className="mr-1" />}
+              Nâng cấp
+            </Button>
+          )}
+        </div>
+      )}
       <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
         <button
           type="button"
@@ -310,6 +352,8 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t }: P
               depth={0}
               selected={selectedFolderId === node.uid}
               onSelect={setSelectedFolderId}
+              isPreview={Boolean((node as any).is_preview_only)}
+              locked={paidLocked && !(node as any).is_preview_only}
             />
           ))}
         </div>

@@ -156,7 +156,42 @@
     "load_exams": "Không thể tải danh sách bài kiểm tra",
     "invalid_code": "Mã lớp không hợp lệ.",
     "code_required": "Vui lòng nhập mã lớp.",
-    "browser_no_qr": "Trình duyệt không hỗ trợ quét QR. Vui lòng nhập mã thủ công.",
+    "browser_no_qr": "Trình duyệt không hỗ trợ quét QR. Vui dụng mã thủ công.",
     "camera": "Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập."
+  },
+  "preview": {
+    "title": "Xem trước lớp học",
+    "back": "Quay lại",
+    "teacher_label": "Giáo viên",
+    "teacher_fallback": "Cung cấp khóa học trên LMS",
+    "free_lessons": "Bài giảng miễn phí",
+    "free_lessons_count": "· {{count}} tài liệu",
+    "no_free_docs": "Chưa có bài giảng miễn phí",
+    "no_free_docs_desc_paid": "Giáo viên chưa đăng tải bài học xem trước. Hãy quay lại sau hoặc tham gia để mở khóa toàn bộ.",
+    "no_free_docs_desc_free": "Giáo viên chưa đăng tải tài liệu nào.",
+    "preview_only_notice": "Đây chỉ là phần xem trước. Tham gia để mở khóa toàn bộ bài giảng.",
+    "action_one_time": "Thanh toán 1 lần",
+    "action_free": "Hoàn toàn miễn phí",
+    "action_request": "Yêu cầu tham gia",
+    "btn_open": "Mở lớp",
+    "btn_pay": "Thanh toán MoMo",
+    "btn_join": "Tham gia",
+    "pending_notice": "Yêu cầu tham gia của bạn đang chờ giáo viên duyệt.",
+    "not_found": "Không tìm thấy lớp học",
+    "back_to_discover": "Quay lại Khám phá"
+  },
+  "favorite": {
+    "nav_label": "Yêu thích",
+    "page_title": "Lớp học yêu thích",
+    "page_subtitle": "Danh sách các lớp học bạn đã đánh dấu yêu thích",
+    "empty_title": "Chưa có lớp học yêu thích",
+    "empty_desc": "Nhấn biểu tượng trái tim trên lớp học bất kỳ để thêm vào danh sách yêu thích của bạn.",
+    "search_placeholder": "Tìm trong yêu thích...",
+    "no_results": "Không tìm thấy kết quả phù hợp với \"{{query}}\".",
+    "btn_view": "Xem trước",
+    "btn_favorite": "Yêu thích",
+    "btn_unfavorite": "Đã thích",
+    "load_error": "Không thể cập nhật yêu thích"
   }
+}
 }

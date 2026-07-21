@@ -39,12 +39,106 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
   }
 
-  public async joinByCode(code: string): Promise<{ membership_status: string }> {
-    return this.post<{ membership_status: string }>('/api/v1/consumer/course/classrooms/join/', { code });
+  public async discover(params: {
+    category?: string;
+    pricing_type?: 'free' | 'paid';
+    search?: string;
+    page?: number;
+  } = {}): Promise<PaginatedResponse<Classroom & { is_joined?: boolean; has_paid?: boolean }>> {
+    const search = new URLSearchParams();
+    if (params.category) search.set('category', params.category);
+    if (params.pricing_type) search.set('pricing_type', params.pricing_type);
+    if (params.search) search.set('search', params.search);
+    search.set('page', String(params.page ?? 1));
+    return this.get(`/api/v1/consumer/course/classrooms/discover/?${search.toString()}`);
   }
 
-  public async getConversation(uid: string): Promise<Conversation> {
-    return this.get<Conversation>(`/api/v1/consumer/course/classrooms/${uid}/conversation/`);
+  public async quickJoin(uid: string): Promise<{
+    joined: boolean;
+    requires_payment: boolean;
+    membership_status: string;
+    classroom_uid: string;
+    amount?: number;
+    order_id?: string;
+    pay_url?: string;
+    deeplink?: string;
+    qr_code_url?: string;
+  }> {
+    return this.post('/api/v1/consumer/course/classrooms/quick-join/', { classroom_uid: uid });
+  }
+
+  public async joinByCode(code: string): Promise<{
+    requires_payment: boolean;
+    membership_status: string;
+    classroom_uid?: string;
+    amount?: number;
+    order_id?: string;
+    pay_url?: string;
+    deeplink?: string;
+    qr_code_url?: string;
+    message?: string;
+  }> {
+    return this.post('/api/v1/consumer/course/classrooms/join/', { code });
+  }
+
+  public async checkout(uid: string): Promise<{
+    classroom_uid: string;
+    amount: number;
+    order_id: string;
+    pay_url: string;
+    deeplink?: string;
+    qr_code_url?: string;
+  }> {
+    return this.post(`/api/v1/consumer/course/classrooms/${uid}/checkout/`);
+  }
+
+  public async access(uid: string): Promise<{
+    classroom_uid: string;
+    pricing_type: 'free' | 'paid';
+    is_paid_classroom: boolean;
+    has_access: boolean;
+    has_paid: boolean;
+    membership_status: string | null;
+    pending_payment: { order_id: string; pay_url: string; amount: number } | null;
+  }> {
+    return this.get(`/api/v1/consumer/course/classrooms/${uid}/access/`);
+  }
+
+  public async preview(uid: string): Promise<{
+    classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
+    preview: {
+      folder: { uid: string; name: string } | null;
+      docs: Array<{
+        uid: string;
+        name: string;
+        url: string;
+        file_type?: string;
+        size?: number;
+      }>;
+    };
+    actions: {
+      type: 'join' | 'checkout' | 'none';
+      requires_payment: boolean;
+      membership_status: 'pending' | 'approved' | null;
+      pay_url: string | null;
+      amount: number;
+    };
+    is_favorited: boolean;
+    favorite_count: number;
+  }> {
+    return this.get(`/api/v1/consumer/course/classrooms/${uid}/preview/`);
+  }
+
+  public async favoriteToggle(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
+    return this.post(`/api/v1/consumer/social/classrooms/${uid}/favorite/`);
+  }
+
+  public async favoriteStatus(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
+    return this.get(`/api/v1/consumer/social/classrooms/${uid}/favorite/status/`);
+  }
+
+  public async favorites(page: number = 1): Promise<PaginatedResponse<{ classroom: Classroom; created_at: string }>> {
+    return this.get(`/api/v1/consumer/social/classrooms/favorites/?page=${page}`);
   }
 
   public async exams(uid: string): Promise<Exam[]> {

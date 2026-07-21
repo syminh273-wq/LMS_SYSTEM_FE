@@ -44,6 +44,7 @@ export function ClassroomDocsManager({
   const [allFolders, setAllFolders] = useState<ClassroomFolder[]>([]);
   const [rootDocs, setRootDocs] = useState<ClassroomDoc[]>([]);
   const [folderDocs, setFolderDocs] = useState<ClassroomDoc[]>([]);
+  const [previewFolderUid, setPreviewFolderUid] = useState<string | null>(null);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -71,6 +72,7 @@ export function ClassroomDocsManager({
       const data = await fetchDocsTree(ctx);
       setAllFolders(data.folders);
       setRootDocs(data.docs_root);
+      setPreviewFolderUid(data.preview_folder_uid ?? null);
       setTree(buildFolderTree(data.folders));
       if (selectedFolderId) {
         const docs = await fetchDocsInFolder(ctx, selectedFolderId);
@@ -117,14 +119,16 @@ export function ClassroomDocsManager({
   const handleCreateFolder = async ({
     name,
     parentFolderId,
+    isPreviewOnly,
   }: {
     name: string;
     parentFolderId: string | null;
+    isPreviewOnly: boolean;
   }) => {
     if (!canManage) return;
     const resolvedParent = parentFolderId ?? createParentId ?? null;
     try {
-      await createFolder(ctx, { name, parent_folder_id: resolvedParent });
+      await createFolder(ctx, { name, parent_folder_id: resolvedParent, is_preview_only: isPreviewOnly });
       toast.success(t('classroom.docs.folder_created', 'Đã tạo thư mục'));
       setCreateOpen(false);
       setCreateParentId(null);
@@ -134,10 +138,17 @@ export function ClassroomDocsManager({
     }
   };
 
-  const handleRename = async ({ name }: { name: string; parentFolderId: string | null }) => {
+  const handleRename = async ({
+    name,
+    isPreviewOnly,
+  }: {
+    name: string;
+    parentFolderId: string | null;
+    isPreviewOnly: boolean;
+  }) => {
     if (!renameTarget) return;
     try {
-      await updateFolder(ctx, renameTarget.uid, { name });
+      await updateFolder(ctx, renameTarget.uid, { name, is_preview_only: isPreviewOnly });
       toast.success(t('classroom.docs.folder_renamed', 'Đã đổi tên'));
       setRenameTarget(null);
       await refresh();
@@ -364,6 +375,8 @@ export function ClassroomDocsManager({
         onSubmit={handleCreateFolder}
         parentFolders={allFolders}
         initialParentId={createParentId}
+        initialIsPreviewOnly={false}
+        disablePreviewOption={Boolean(previewFolderUid)}
         t={t}
       />
 
@@ -374,6 +387,10 @@ export function ClassroomDocsManager({
         }}
         mode="rename"
         initialName={renameTarget?.name}
+        initialIsPreviewOnly={renameTarget?.is_preview_only ?? false}
+        disablePreviewOption={
+          Boolean(previewFolderUid) && previewFolderUid !== renameTarget?.uid
+        }
         onSubmit={handleRename}
         t={t}
       />

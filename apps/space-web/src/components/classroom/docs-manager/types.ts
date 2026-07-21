@@ -19,6 +19,7 @@ export type ClassroomFolder = {
   owner_id: string;
   order_index: number;
   color?: string | null;
+  is_preview_only?: boolean;
   created_at?: string;
   updated_at?: string;
 };
@@ -26,6 +27,7 @@ export type ClassroomFolder = {
 export type DocsTreeResponse = {
   folders: ClassroomFolder[];
   docs_root: ClassroomDoc[];
+  preview_folder_uid?: string | null;
 };
 
 export type SortField = 'name' | 'created_at' | 'size' | 'file_type';

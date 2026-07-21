@@ -48,6 +48,7 @@ import {
   Circle,
   ArrowRight,
   FolderOpen,
+  Crown,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -60,7 +61,7 @@ import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClas
 import { LeaveRequestTab } from '@shared/components/leave-request';
 import { consumerCalendarApi, consumerLeaveRequestApi } from '@/lib/api';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request';
+type ClassroomTab = 'discussion' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -129,6 +130,66 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
+function JoinRequiredPage({
+  classroom,
+  onJoin,
+  joining,
+}: {
+  classroom: Classroom;
+  onJoin: () => void;
+  joining: boolean;
+}) {
+  const isPaid = classroom.pricing_type === 'paid';
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+        <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
+          {isPaid ? <Crown size={32} /> : <Sparkles size={32} />}
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">{classroom.name}</h2>
+        <p className="text-slate-500 text-sm">
+          {classroom.description || 'Bạn cần tham gia lớp học này để xem nội dung bên trong.'}
+        </p>
+        <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+          <Hash size={12} /> Mã lớp: {classroom.pid}
+        </div>
+        {isPaid && classroom.price_vnd ? (
+          <div className="text-2xl font-black text-amber-600">
+            {(classroom.price_vnd).toLocaleString('vi-VN')}đ
+          </div>
+        ) : (
+          <div className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100 inline-block px-3 py-1 rounded-full">
+            Miễn phí
+          </div>
+        )}
+        <p className="text-xs text-slate-500">
+          Yêu cầu của bạn sẽ được giáo viên duyệt sau khi {isPaid ? 'thanh toán thành công' : 'gửi yêu cầu'}.
+        </p>
+        <Button
+          onClick={onJoin}
+          disabled={joining}
+          className="w-full h-12 rounded-xl bg-primary-brand hover:bg-primary-brand-dark text-white font-bold"
+        >
+          {joining ? (
+            <><Loader2 size={16} className="animate-spin mr-2" /> Đang xử lý...</>
+          ) : isPaid ? (
+            <><Crown size={16} className="mr-2" /> Mua &amp; yêu cầu tham gia</>
+          ) : (
+            <><Sparkles size={16} className="mr-2" /> Yêu cầu tham gia</>
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => (typeof window !== 'undefined' ? window.history.back() : null)}
+          className="w-full text-xs text-muted-foreground"
+        >
+          Quay lại
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function ClassroomDetailPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = use(params);
   const router = useRouter();
@@ -151,7 +212,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const { t } = useTranslation();
 
   type ActiveTab = typeof activeTab;
-  const VALID_TABS: ActiveTab[] = ['discussion', 'lessons', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
+  const VALID_TABS: ActiveTab[] = ['discussion', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
 
   const buildQueryString = React.useCallback(
     (overrides: Record<string, string | null>) => {
@@ -214,9 +275,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoading(true);
         setError("");
-        const data = await classroomApi.retrieve(uid);
+        const data: any = await classroomApi.retrieve(uid);
         setClassroom(data);
-        setMembershipStatus('approved');
+        setMembershipStatus((data.membership_status as any) || (data.join_required ? null : 'approved'));
       } catch (err: unknown) {
         const apiData = (err as any)?.data;
         if ((err as any)?.status === 403 && (apiData as any)?.membership_status === 'pending') {
@@ -231,6 +292,63 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
     void fetchClassroom();
   }, [isAuthenticated, uid]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !uid) return;
+    if (!classroom) return;
+    if (activeTab !== 'docs') return;
+
+    const fetchLessons = async () => {
+      try {
+        await classroomApi.access(uid);
+      } catch {
+      }
+    };
+    void fetchLessons();
+  }, [activeTab, isAuthenticated, uid, classroom]);
+
+  const [joiningCheckout, setJoiningCheckout] = useState(false);
+  const handleJoinPaidClassroom = async () => {
+    if (!classroom) return;
+    try {
+      setJoiningCheckout(true);
+      const res = await classroomApi.joinByCode(classroom.pid);
+      if (res.requires_payment && res.pay_url) {
+        window.location.href = `/consumer/classroom/checkout/${classroom.uid}?order_id=${res.order_id || ''}`;
+      } else {
+        toast.success('Đã tham gia lớp');
+        router.refresh();
+      }
+    } catch (e: any) {
+      toast.error(e?.message || 'Không thể bắt đầu thanh toán');
+    } finally {
+      setJoiningCheckout(false);
+    }
+  };
+
+  const handleJoinClassroom = async () => {
+    if (!classroom) return;
+    try {
+      setJoiningCheckout(true);
+      const res = await classroomApi.quickJoin(classroom.uid);
+      if (res.requires_payment && res.pay_url) {
+        toast.info('Lớp học trả phí, đang chuyển đến MoMo...');
+        const orderId = res.order_id ? `?order_id=${res.order_id}` : '';
+        window.location.href = `/consumer/classroom/checkout/${classroom.uid}${orderId}`;
+        return;
+      }
+      if (res.membership_status === 'pending') {
+        toast.success(`Đã gửi yêu cầu tham gia lớp "${classroom.name}". Vui lòng chờ giáo viên duyệt.`);
+      } else {
+        toast.success(`Đã tham gia lớp "${classroom.name}"!`);
+      }
+      router.refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Không thể tham gia lớp');
+    } finally {
+      setJoiningCheckout(false);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated || !uid) return;
@@ -438,6 +556,10 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     );
   }
 
+  if (classroom && (classroom as any).join_required && membershipStatus === null) {
+    return <JoinRequiredPage classroom={classroom} onJoin={handleJoinClassroom} joining={joiningCheckout} />;
+  }
+
   if (error || !classroom) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
@@ -516,7 +638,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             <div className="bg-white rounded-2xl border border-slate-200 lg:p-1.5 p-2 shadow-sm flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
               {[
                 { key: 'discussion' as const, icon: MessageSquare, label: 'Thảo luận' },
-                { key: 'lessons' as const, icon: BookOpen, label: 'Bài học' },
                 { key: 'docs' as const, icon: FolderOpen, label: 'Tài liệu' },
                 { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
@@ -769,6 +890,31 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
+            {/* Paid banner + CTA */}
+            {classroom?.is_paid_classroom && !classroom?.has_paid && (
+              <div className="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <Crown size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground">Lớp học trả phí</div>
+                    <div className="text-xs text-muted-foreground">
+                      Bạn chỉ xem được nội dung miễn phí (Preview folder + bài học xem trước). Nâng cấp để mở khóa toàn bộ.
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleJoinPaidClassroom}
+                  disabled={joiningCheckout}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs h-10 rounded-xl px-5 shadow-md shadow-amber-500/20"
+                >
+                  {joiningCheckout ? <Loader2 size={14} className="animate-spin mr-1" /> : <Crown size={14} className="mr-1" />}
+                  NÂNG CẤP {classroom.price_vnd ? `${(classroom.price_vnd).toLocaleString('vi-VN')}đ` : ''}
+                </Button>
+              </div>
+            )}
+
             {/* Docs Tab */}
             {activeTab === 'docs' && (
               <ClassroomDocsViewer
@@ -776,6 +922,10 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 accessToken={typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null}
                 apiBase={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
                 t={t}
+                isPaidClassroom={Boolean(classroom?.is_paid_classroom)}
+                hasPaid={Boolean(classroom?.has_paid)}
+                onUpgrade={handleJoinPaidClassroom}
+                upgrading={joiningCheckout}
               />
             )}
 

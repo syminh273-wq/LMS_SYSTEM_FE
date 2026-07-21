@@ -88,9 +88,54 @@ export type Classroom = {
   status: string;
   membership_status?: 'approved' | 'pending';
   teacher_id: string;
+  pricing_type?: 'free' | 'paid';
+  price_vnd?: number;
+  category?: 'math' | 'physics' | 'chemistry' | 'biology' | 'language' | 'programming' | 'business' | 'design' | 'music' | 'other';
+  visibility_type?: 'public' | 'private';
+  preview_folder_uid?: string | null;
+  membership_status?: 'pending' | 'approved' | null;
+  has_paid?: boolean;
+  is_joined?: boolean;
+  join_required?: boolean;
+  has_access?: boolean;
+  has_paid?: boolean;
+  requires_payment?: boolean;
+  is_paid_classroom?: boolean;
   resolve_link?: SharingLink;
+  is_favorited?: boolean;
+  favorite_count?: number;
   created_at: string;
   updated_at: string;
+};
+
+export type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
+
+export type ClassroomPreviewResponse = {
+  classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
+  preview: {
+    folder: { uid: string; name: string } | null;
+    docs: Array<{
+      uid: string;
+      name: string;
+      url: string;
+      file_type?: string;
+      size?: number;
+    }>;
+  };
+  actions: {
+    type: ClassroomPreviewActionType;
+    requires_payment: boolean;
+    membership_status: 'pending' | 'approved' | null;
+    pay_url: string | null;
+    amount: number;
+  };
+  is_favorited: boolean;
+  favorite_count: number;
+};
+
+export type ClassroomFavoriteItem = {
+  classroom: Classroom;
+  created_at: string;
 };
 
 export type PaginatedResponse<T> = {
@@ -108,6 +153,10 @@ export type CreateClassroomRequest = {
   name: string;
   description: string;
   max_students: number;
+  pricing_type?: 'free' | 'paid';
+  price_vnd?: number;
+  category?: 'math' | 'physics' | 'chemistry' | 'biology' | 'language' | 'programming' | 'business' | 'design' | 'music' | 'other';
+  visibility_type?: 'public' | 'private';
 };
 
 export type Conversation = {

@@ -106,16 +106,24 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
     try {
       const result = await classroomApi.joinByCode(trimmed);
       const membershipStatus = (result as { membership_status?: string }).membership_status ?? 'pending';
+      const requiresPayment = Boolean((result as any).requires_payment);
 
       let classroomName = trimmed;
-      let classroomUid = trimmed;
+      let classroomUid = (result as any).classroom_uid || trimmed;
       try {
         const link = await consumerApi.sharing.resolve(trimmed);
-        classroomUid = link.resource_id || trimmed;
+        classroomUid = link.resource_id || classroomUid;
         classroomName = link.metadata?.name || trimmed;
       } catch { /* best effort */ }
 
       void sendJoinClassroomNotification({ classroomId: classroomUid, classroomName, code: trimmed });
+
+      if (requiresPayment && (result as any).pay_url) {
+        toast.info('Lớp học này yêu cầu thanh toán. Đang chuyển đến MoMo...');
+        const orderId = (result as any).order_id;
+        window.location.href = `/consumer/classroom/checkout/${classroomUid}${orderId ? `?order_id=${orderId}` : ''}`;
+        return;
+      }
 
       if (membershipStatus === 'approved') {
         toast.success(`Đã tham gia lớp "${classroomName}" thành công!`);
@@ -400,7 +408,14 @@ export default function ClassroomPage() {
                     {classroom.name?.[0]?.toUpperCase() || '?'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-slate-900 text-[14px] leading-tight line-clamp-2">{classroom.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-slate-900 text-[14px] leading-tight line-clamp-2 flex-1">{classroom.name}</h3>
+                      {classroom.pricing_type === 'paid' && (
+                        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded shrink-0">
+                          {classroom.price_vnd ? `${(classroom.price_vnd / 1000).toFixed(0)}k` : 'PAID'}
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-1 mt-1 text-slate-500 text-[11px] font-medium">
                       <Hash size={10} />
                       {classroom.pid}
