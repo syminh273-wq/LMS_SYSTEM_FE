@@ -11,6 +11,7 @@ import { userSettingsApi } from './user-settings';
 import { examSessionApi } from './exam-session';
 import { consumerCalendarApi } from './calendar';
 import { consumerLeaveRequestApi } from './leaveRequest';
+import { paymentApi } from './payment';
 import { ApiException } from './exceptions';
 import { SharingLink, NotificationItem, PaginatedResponse } from './types';
 import { consumerCourseApi } from './course';
@@ -19,6 +20,7 @@ export * from './types';
 export * from './exceptions';
 export * from './calendar';
 export * from './leaveRequest';
+export * from './payment';
 export { consumerQuizApi };
 export { consumerQuizCollectionApi };
 export { faceApi };
@@ -26,6 +28,7 @@ export { examSessionApi };
 export { consumerCalendarApi };
 export { consumerLeaveRequestApi };
 export { consumerCourseApi };
+export { paymentApi };
 
 // For backward compatibility and centralized access
 export const api = {
