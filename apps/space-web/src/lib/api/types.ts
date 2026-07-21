@@ -83,6 +83,13 @@ export type Classroom = {
   max_students: number;
   status: string;
   teacher_id: string;
+  pricing_type?: 'free' | 'paid';
+  price_vnd?: number;
+  course_uid?: string | null;
+  preview_folder_uid?: string | null;
+  has_access?: boolean;
+  has_paid?: boolean;
+  is_paid_classroom?: boolean;
   resolve_link?: SharingLink;
   created_at: string;
   updated_at: string;
@@ -103,6 +110,9 @@ export type CreateClassroomRequest = {
   name: string;
   description: string;
   max_students: number;
+  pricing_type?: 'free' | 'paid';
+  price_vnd?: number;
+  course_uid?: string | null;
 };
 
 export type UpdateClassroomRequest = Partial<CreateClassroomRequest>;

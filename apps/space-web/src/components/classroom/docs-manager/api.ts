@@ -36,7 +36,7 @@ export async function fetchDocsInFolder(
 
 export async function createFolder(
   ctx: ApiCtx,
-  payload: { name: string; parent_folder_id?: string | null; color?: string | null },
+  payload: { name: string; parent_folder_id?: string | null; color?: string | null; is_preview_only?: boolean },
 ): Promise<ClassroomFolder> {
   const res = await fetch(
     `${ctx.apiBase}/api/v1/space/course/classrooms/${ctx.classroomUid}/folders/`,
@@ -46,14 +46,17 @@ export async function createFolder(
       body: JSON.stringify(payload),
     },
   );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error((err.message as string) || `HTTP ${res.status}`);
+  }
   return (await res.json()) as ClassroomFolder;
 }
 
 export async function updateFolder(
   ctx: ApiCtx,
   folderUid: string,
-  payload: Partial<{ name: string; parent_folder_id: string | null; order_index: number; color: string | null }>,
+  payload: Partial<{ name: string; parent_folder_id: string | null; order_index: number; color: string | null; is_preview_only: boolean }>,
 ): Promise<ClassroomFolder> {
   const res = await fetch(
     `${ctx.apiBase}/api/v1/space/course/classrooms/${ctx.classroomUid}/folders/${folderUid}/`,
@@ -63,7 +66,10 @@ export async function updateFolder(
       body: JSON.stringify(payload),
     },
   );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error((err.message as string) || `HTTP ${res.status}`);
+  }
   return (await res.json()) as ClassroomFolder;
 }
 

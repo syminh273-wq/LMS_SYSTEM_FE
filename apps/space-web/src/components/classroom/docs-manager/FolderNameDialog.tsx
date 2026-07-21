@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { FolderPlus, Edit2 } from 'lucide-react';
+import { FolderPlus, Edit2, Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import type { ClassroomFolder } from './types';
 
-type SubmitPayload = { name: string; parentFolderId: string | null };
+type SubmitPayload = { name: string; parentFolderId: string | null; isPreviewOnly: boolean };
 
 type Props = {
   open: boolean;
@@ -25,6 +25,8 @@ type Props = {
   onSubmit: (payload: SubmitPayload) => Promise<void>;
   parentFolders?: ClassroomFolder[];
   initialParentId?: string | null;
+  initialIsPreviewOnly?: boolean;
+  disablePreviewOption?: boolean;
   t: (key: string, fallback?: string) => string;
 };
 
@@ -43,10 +45,13 @@ function DialogBody({
   onCancel,
   parentFolders,
   initialParentId,
+  initialIsPreviewOnly,
+  disablePreviewOption,
   t,
 }: BodyProps) {
   const [name, setName] = useState(initialName ?? '');
   const [parentId, setParentId] = useState<string | null>(initialParentId ?? null);
+  const [isPreviewOnly, setIsPreviewOnly] = useState<boolean>(!!initialIsPreviewOnly);
   const [submitting, setSubmitting] = useState(false);
 
   const showParentPicker = mode === 'create';
@@ -56,7 +61,11 @@ function DialogBody({
     if (!name.trim()) return;
     setSubmitting(true);
     try {
-      await onSubmit({ name: name.trim(), parentFolderId: showParentPicker ? parentId : null });
+      await onSubmit({
+        name: name.trim(),
+        parentFolderId: showParentPicker ? parentId : null,
+        isPreviewOnly,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -100,6 +109,26 @@ function DialogBody({
           </select>
         </div>
       )}
+      <label className="mt-4 flex items-start gap-2 cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={isPreviewOnly}
+          disabled={!!disablePreviewOption && !isPreviewOnly}
+          onChange={(e) => setIsPreviewOnly(e.target.checked)}
+          className="mt-0.5"
+        />
+        <div className="flex-1">
+          <div className="text-xs font-bold text-foreground flex items-center gap-1">
+            <Eye size={12} className="text-primary-brand" />
+            {t('classroom.docs.preview_folder_label', 'Đặt làm Preview folder (mặc định cho mọi người xem)')}
+          </div>
+          {!!disablePreviewOption && !isPreviewOnly && (
+            <div className="text-[10px] text-muted-foreground mt-0.5">
+              {t('classroom.docs.preview_folder_already_set', 'Lớp học này đã có Preview folder.')}
+            </div>
+          )}
+        </div>
+      </label>
       <DialogFooter>
         <Button variant="ghost" onClick={onCancel} disabled={submitting}>
           {t('classroom.docs.cancel', 'Huỷ')}
@@ -121,6 +150,8 @@ export function FolderNameDialog({
   onSubmit,
   parentFolders,
   initialParentId,
+  initialIsPreviewOnly,
+  disablePreviewOption,
   t,
 }: Props) {
   const isCreate = mode === 'create';
@@ -129,12 +160,14 @@ export function FolderNameDialog({
       <DialogContent className="sm:max-w-sm">
         {open && (
           <DialogBody
-            key={`${mode}-${initialName ?? ''}-${initialParentId ?? 'root'}-${open}`}
+            key={`${mode}-${initialName ?? ''}-${initialParentId ?? 'root'}-${open}-${initialIsPreviewOnly ?? false}`}
             initialName={initialName}
             mode={mode}
             onSubmit={onSubmit}
             parentFolders={isCreate ? parentFolders : undefined}
             initialParentId={isCreate ? initialParentId : null}
+            initialIsPreviewOnly={initialIsPreviewOnly}
+            disablePreviewOption={disablePreviewOption}
             onCancel={() => onOpenChange(false)}
             t={t}
           />

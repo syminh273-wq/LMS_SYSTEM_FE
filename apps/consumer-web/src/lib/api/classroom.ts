@@ -39,8 +39,63 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
   }
 
-  public async joinByCode(code: string): Promise<{ membership_status: string }> {
-    return this.post<{ membership_status: string }>('/api/v1/consumer/course/classrooms/join/', { code });
+  public async joinByCode(code: string): Promise<{
+    requires_payment: boolean;
+    membership_status: string;
+    classroom_uid?: string;
+    amount?: number;
+    order_id?: string;
+    pay_url?: string;
+    deeplink?: string;
+    qr_code_url?: string;
+    message?: string;
+  }> {
+    return this.post('/api/v1/consumer/course/classrooms/join/', { code });
+  }
+
+  public async checkout(uid: string): Promise<{
+    classroom_uid: string;
+    amount: number;
+    order_id: string;
+    pay_url: string;
+    deeplink?: string;
+    qr_code_url?: string;
+  }> {
+    return this.post(`/api/v1/consumer/course/classrooms/${uid}/checkout/`);
+  }
+
+  public async access(uid: string): Promise<{
+    classroom_uid: string;
+    pricing_type: 'free' | 'paid';
+    is_paid_classroom: boolean;
+    has_access: boolean;
+    has_paid: boolean;
+    membership_status: string | null;
+    pending_payment: { order_id: string; pay_url: string; amount: number } | null;
+  }> {
+    return this.get(`/api/v1/consumer/course/classrooms/${uid}/access/`);
+  }
+
+  public async lessons(uid: string): Promise<{
+    lessons: Array<{
+      uid: string;
+      course_uid: string;
+      title: string;
+      description: string;
+      video_url: string | null;
+      material_urls: Array<{ uid: string; name: string; url: string; file_type: string }>;
+      order_index: number;
+      duration_seconds: number;
+      is_preview: boolean;
+      is_published: boolean;
+      created_at: string;
+      updated_at: string;
+    }>;
+    pricing_type: 'free' | 'paid';
+    is_locked: boolean;
+    is_paid_member: boolean;
+  }> {
+    return this.get(`/api/v1/consumer/course/classrooms/${uid}/lessons/`);
   }
 
   public async getConversation(uid: string): Promise<Conversation> {

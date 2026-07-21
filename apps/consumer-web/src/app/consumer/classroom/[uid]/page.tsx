@@ -48,6 +48,9 @@ import {
   Circle,
   ArrowRight,
   FolderOpen,
+  Eye,
+  PlayCircle,
+  Crown,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -150,6 +153,20 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [activeTab, setActiveTab] = useState<ClassroomTab>("discussion");
   const { t } = useTranslation();
 
+  const [lessons, setLessons] = useState<Array<{
+    uid: string;
+    title: string;
+    description: string;
+    video_url: string | null;
+    duration_seconds: number;
+    is_preview: boolean;
+    order_index: number;
+  }>>([]);
+  const [lessonsLocked, setLessonsLocked] = useState(false);
+  const [lessonsLoading, setLessonsLoading] = useState(false);
+  const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
+  const [previewFolder, setPreviewFolder] = useState<{ folder: any; docs: any[] } | null>(null);
+
   type ActiveTab = typeof activeTab;
   const VALID_TABS: ActiveTab[] = ['discussion', 'lessons', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
 
@@ -231,6 +248,48 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
     void fetchClassroom();
   }, [isAuthenticated, uid]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !uid) return;
+    if (!classroom) return;
+    if (activeTab !== 'lessons') return;
+    if (lessons.length > 0 || lessonsLoading) return;
+
+    const fetchLessons = async () => {
+      try {
+        setLessonsLoading(true);
+        const data = await classroomApi.lessons(uid);
+        setLessons(data.lessons as any);
+        setLessonsLocked(Boolean(data.is_locked));
+      } catch {
+        setLessons([]);
+        setLessonsLocked(false);
+      } finally {
+        setLessonsLoading(false);
+      }
+    };
+    void fetchLessons();
+  }, [activeTab, isAuthenticated, uid, classroom, lessons.length, lessonsLoading]);
+
+  const isPaidLocked = Boolean(classroom?.is_paid_classroom && !classroom?.has_paid);
+  const [joiningCheckout, setJoiningCheckout] = useState(false);
+  const handleJoinPaidClassroom = async () => {
+    if (!classroom) return;
+    try {
+      setJoiningCheckout(true);
+      const res = await classroomApi.joinByCode(classroom.pid);
+      if (res.requires_payment && res.pay_url) {
+        window.location.href = `/consumer/classroom/checkout/${classroom.uid}?order_id=${res.order_id || ''}`;
+      } else {
+        toast.success('Đã tham gia lớp');
+        router.refresh();
+      }
+    } catch (e: any) {
+      toast.error(e?.message || 'Không thể bắt đầu thanh toán');
+    } finally {
+      setJoiningCheckout(false);
+    }
+  };
 
   useEffect(() => {
     if (!isAuthenticated || !uid) return;
@@ -769,6 +828,88 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
+            {/* Paid banner + CTA */}
+            {classroom?.is_paid_classroom && !classroom?.has_paid && (
+              <div className="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <Crown size={20} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground">Lớp học trả phí</div>
+                    <div className="text-xs text-muted-foreground">
+                      Bạn chỉ xem được nội dung miễn phí (Preview folder + bài học xem trước). Nâng cấp để mở khóa toàn bộ.
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={handleJoinPaidClassroom}
+                  disabled={joiningCheckout}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs h-10 rounded-xl px-5 shadow-md shadow-amber-500/20"
+                >
+                  {joiningCheckout ? <Loader2 size={14} className="animate-spin mr-1" /> : <Crown size={14} className="mr-1" />}
+                  NÂNG CẤP {classroom.price_vnd ? `${(classroom.price_vnd).toLocaleString('vi-VN')}đ` : ''}
+                </Button>
+              </div>
+            )}
+
+            {/* Lessons Tab */}
+            {activeTab === 'lessons' && (
+              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen size={17} className="text-indigo-600" />
+                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Bài giảng</h3>
+                  </div>
+                  {classroom?.is_paid_classroom && !classroom?.has_paid && lessons.length > 0 && (
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-1 rounded-md">
+                      <Lock size={10} className="inline mr-1" />Chỉ bài xem trước
+                    </span>
+                  )}
+                </div>
+                <div className="p-5 space-y-2">
+                  {lessonsLoading ? (
+                    <div className="flex items-center justify-center py-12 text-slate-400">
+                      <Loader2 size={20} className="animate-spin mr-2" />
+                      <span className="text-sm font-medium">Đang tải bài giảng...</span>
+                    </div>
+                  ) : lessons.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400">
+                      <BookOpen size={32} className="mx-auto mb-2 opacity-40" />
+                      <p className="text-sm font-medium">
+                        {classroom?.course_uid ? 'Khóa học chưa có bài giảng nào.' : 'Lớp học chưa liên kết với khóa học nào.'}
+                      </p>
+                    </div>
+                  ) : (
+                    lessons.map((lesson) => (
+                      <div
+                        key={lesson.uid}
+                        className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                          {lesson.is_preview ? <Eye size={16} /> : <PlayCircle size={16} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-bold text-foreground truncate">{lesson.title}</div>
+                            {lesson.is_preview && (
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+                                Preview
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">{lesson.description || '—'}</div>
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 shrink-0">
+                          {lesson.duration_seconds ? `${Math.round(lesson.duration_seconds / 60)} phút` : '—'}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Docs Tab */}
             {activeTab === 'docs' && (
               <ClassroomDocsViewer
@@ -776,6 +917,10 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 accessToken={typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null}
                 apiBase={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}
                 t={t}
+                isPaidClassroom={Boolean(classroom?.is_paid_classroom)}
+                hasPaid={Boolean(classroom?.has_paid)}
+                onUpgrade={handleJoinPaidClassroom}
+                upgrading={joiningCheckout}
               />
             )}
 
