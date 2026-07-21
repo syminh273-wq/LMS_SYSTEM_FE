@@ -76,32 +76,6 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get(`/api/v1/consumer/course/classrooms/${uid}/access/`);
   }
 
-  public async lessons(uid: string): Promise<{
-    lessons: Array<{
-      uid: string;
-      course_uid: string;
-      title: string;
-      description: string;
-      video_url: string | null;
-      material_urls: Array<{ uid: string; name: string; url: string; file_type: string }>;
-      order_index: number;
-      duration_seconds: number;
-      is_preview: boolean;
-      is_published: boolean;
-      created_at: string;
-      updated_at: string;
-    }>;
-    pricing_type: 'free' | 'paid';
-    is_locked: boolean;
-    is_paid_member: boolean;
-  }> {
-    return this.get(`/api/v1/consumer/course/classrooms/${uid}/lessons/`);
-  }
-
-  public async getConversation(uid: string): Promise<Conversation> {
-    return this.get<Conversation>(`/api/v1/consumer/course/classrooms/${uid}/conversation/`);
-  }
-
   public async exams(uid: string): Promise<Exam[]> {
     const response = await this.get<Exam[] | { results: Exam[] }>(
       `/api/v1/consumer/course/classrooms/${uid}/exams/`

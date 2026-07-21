@@ -14,8 +14,7 @@ import {
   QrCode,
   Download,
   Tag,
-  Wallet,
-  Eye
+  Wallet
 } from 'lucide-react';
 import {
   Card,
@@ -41,7 +40,6 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   const [globalError, setGlobalError] = useState('');
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<any>(null);
-  const [courses, setCourses] = useState<Array<{ uid: string; name: string }>>([]);
 
   const { register, handleSubmit, watch, formState: { errors }, setError: setFormError, reset } = useForm<UpdateClassroomRequest>({
     defaultValues: {
@@ -50,7 +48,6 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
       max_students: 30,
       pricing_type: 'free',
       price_vnd: 0,
-      course_uid: null,
     }
   });
 
@@ -78,7 +75,6 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
           max_students: data.max_students,
           pricing_type: (data.pricing_type as any) || 'free',
           price_vnd: (data.price_vnd as any) || 0,
-          course_uid: (data.course_uid as any) || null,
         });
       } catch (err: any) {
         setGlobalError(err.message || 'Không thể tải thông tin phòng học');
@@ -90,19 +86,6 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
 
     fetchClassroom();
   }, [uid, reset]);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await spaceApi.courses.list(1);
-        if (!cancelled) setCourses(res.results.map((c: any) => ({ uid: c.uid, name: c.name })));
-      } catch {
-        if (!cancelled) setCourses([]);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
 
   const handleDownloadQr = () => {
     if (!linkData || !classroom) return;
@@ -286,9 +269,9 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Tag size={20} className="text-primary-brand" />
-              Giá & Bài giảng
+              Hình thức lớp học
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Cập nhật hình thức thu phí và khóa học nguồn</CardDescription>
+            <CardDescription className="font-medium text-muted-foreground">Cập nhật miễn phí hoặc trả phí</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
@@ -298,14 +281,14 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                   <input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
                   <div>
                     <div className="font-bold text-foreground">Miễn phí</div>
-                    <div className="text-xs text-muted-foreground">Học sinh tham gia tự do.</div>
+                    <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
                   </div>
                 </label>
                 <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'paid' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
                   <input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
                   <div>
                     <div className="font-bold text-foreground">Trả phí</div>
-                    <div className="text-xs text-muted-foreground">Học sinh thanh toán qua MoMo trước khi vào.</div>
+                    <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
                   </div>
                 </label>
               </div>
@@ -331,23 +314,6 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                 {errors.price_vnd && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.price_vnd.message}</p>}
               </div>
             )}
-
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                <Eye size={16} className="text-primary-brand" />
-                Liên kết khóa học (tùy chọn)
-              </label>
-              <select
-                {...register('course_uid')}
-                className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground"
-                defaultValue=""
-              >
-                <option value="">— Không liên kết —</option>
-                {courses.map((c) => (
-                  <option key={c.uid} value={c.uid}>{c.name}</option>
-                ))}
-              </select>
-            </div>
           </CardContent>
         </Card>
 

@@ -48,8 +48,6 @@ import {
   Circle,
   ArrowRight,
   FolderOpen,
-  Eye,
-  PlayCircle,
   Crown,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
@@ -63,7 +61,7 @@ import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClas
 import { LeaveRequestTab } from '@shared/components/leave-request';
 import { consumerCalendarApi, consumerLeaveRequestApi } from '@/lib/api';
 
-type ClassroomTab = 'discussion' | 'lessons' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request';
+type ClassroomTab = 'discussion' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -153,22 +151,8 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [activeTab, setActiveTab] = useState<ClassroomTab>("discussion");
   const { t } = useTranslation();
 
-  const [lessons, setLessons] = useState<Array<{
-    uid: string;
-    title: string;
-    description: string;
-    video_url: string | null;
-    duration_seconds: number;
-    is_preview: boolean;
-    order_index: number;
-  }>>([]);
-  const [lessonsLocked, setLessonsLocked] = useState(false);
-  const [lessonsLoading, setLessonsLoading] = useState(false);
-  const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
-  const [previewFolder, setPreviewFolder] = useState<{ folder: any; docs: any[] } | null>(null);
-
   type ActiveTab = typeof activeTab;
-  const VALID_TABS: ActiveTab[] = ['discussion', 'lessons', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
+  const VALID_TABS: ActiveTab[] = ['discussion', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
 
   const buildQueryString = React.useCallback(
     (overrides: Record<string, string | null>) => {
@@ -252,26 +236,17 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   useEffect(() => {
     if (!isAuthenticated || !uid) return;
     if (!classroom) return;
-    if (activeTab !== 'lessons') return;
-    if (lessons.length > 0 || lessonsLoading) return;
+    if (activeTab !== 'docs') return;
 
     const fetchLessons = async () => {
       try {
-        setLessonsLoading(true);
-        const data = await classroomApi.lessons(uid);
-        setLessons(data.lessons as any);
-        setLessonsLocked(Boolean(data.is_locked));
+        await classroomApi.access(uid);
       } catch {
-        setLessons([]);
-        setLessonsLocked(false);
-      } finally {
-        setLessonsLoading(false);
       }
     };
     void fetchLessons();
-  }, [activeTab, isAuthenticated, uid, classroom, lessons.length, lessonsLoading]);
+  }, [activeTab, isAuthenticated, uid, classroom]);
 
-  const isPaidLocked = Boolean(classroom?.is_paid_classroom && !classroom?.has_paid);
   const [joiningCheckout, setJoiningCheckout] = useState(false);
   const handleJoinPaidClassroom = async () => {
     if (!classroom) return;
@@ -575,7 +550,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             <div className="bg-white rounded-2xl border border-slate-200 lg:p-1.5 p-2 shadow-sm flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
               {[
                 { key: 'discussion' as const, icon: MessageSquare, label: 'Thảo luận' },
-                { key: 'lessons' as const, icon: BookOpen, label: 'Bài học' },
                 { key: 'docs' as const, icon: FolderOpen, label: 'Tài liệu' },
                 { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
@@ -850,63 +824,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   {joiningCheckout ? <Loader2 size={14} className="animate-spin mr-1" /> : <Crown size={14} className="mr-1" />}
                   NÂNG CẤP {classroom.price_vnd ? `${(classroom.price_vnd).toLocaleString('vi-VN')}đ` : ''}
                 </Button>
-              </div>
-            )}
-
-            {/* Lessons Tab */}
-            {activeTab === 'lessons' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BookOpen size={17} className="text-indigo-600" />
-                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Bài giảng</h3>
-                  </div>
-                  {classroom?.is_paid_classroom && !classroom?.has_paid && lessons.length > 0 && (
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-2 py-1 rounded-md">
-                      <Lock size={10} className="inline mr-1" />Chỉ bài xem trước
-                    </span>
-                  )}
-                </div>
-                <div className="p-5 space-y-2">
-                  {lessonsLoading ? (
-                    <div className="flex items-center justify-center py-12 text-slate-400">
-                      <Loader2 size={20} className="animate-spin mr-2" />
-                      <span className="text-sm font-medium">Đang tải bài giảng...</span>
-                    </div>
-                  ) : lessons.length === 0 ? (
-                    <div className="text-center py-12 text-slate-400">
-                      <BookOpen size={32} className="mx-auto mb-2 opacity-40" />
-                      <p className="text-sm font-medium">
-                        {classroom?.course_uid ? 'Khóa học chưa có bài giảng nào.' : 'Lớp học chưa liên kết với khóa học nào.'}
-                      </p>
-                    </div>
-                  ) : (
-                    lessons.map((lesson) => (
-                      <div
-                        key={lesson.uid}
-                        className="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                          {lesson.is_preview ? <Eye size={16} /> : <PlayCircle size={16} />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-bold text-foreground truncate">{lesson.title}</div>
-                            {lesson.is_preview && (
-                              <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
-                                Preview
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-xs text-muted-foreground truncate">{lesson.description || '—'}</div>
-                        </div>
-                        <div className="text-xs font-bold text-slate-500 shrink-0">
-                          {lesson.duration_seconds ? `${Math.round(lesson.duration_seconds / 60)} phút` : '—'}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
               </div>
             )}
 

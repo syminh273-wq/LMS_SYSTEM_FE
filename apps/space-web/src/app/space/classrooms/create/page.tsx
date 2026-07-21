@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { spaceApi, CreateClassroomRequest, ValidationException } from '@/lib/api';
@@ -27,7 +27,6 @@ export default function CreateClassroomPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
-  const [courses, setCourses] = useState<Array<{ uid: string; name: string }>>([]);
 
   const { register, handleSubmit, watch, formState: { errors }, setError: setFormError } = useForm<CreateClassroomRequest>({
     defaultValues: {
@@ -36,26 +35,10 @@ export default function CreateClassroomPage() {
       max_students: 30,
       pricing_type: 'free',
       price_vnd: 0,
-      course_uid: null,
     }
   });
 
   const pricingType = watch('pricing_type');
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await spaceApi.courses.list(1);
-        if (!cancelled) {
-          setCourses(res.results.map((c: any) => ({ uid: c.uid, name: c.name })));
-        }
-      } catch {
-        if (!cancelled) setCourses([]);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
 
   const onSubmit = async (data: CreateClassroomRequest) => {
     setLoading(true);
@@ -171,9 +154,9 @@ export default function CreateClassroomPage() {
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
               <Tag size={20} className="text-primary-brand" />
-              Giá & Bài giảng
+              Hình thức lớp học
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Chọn hình thức thu phí và khóa học nguồn (nếu có)</CardDescription>
+            <CardDescription className="font-medium text-muted-foreground">Chọn miễn phí hoặc trả phí qua MoMo</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
@@ -183,14 +166,14 @@ export default function CreateClassroomPage() {
                   <input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
                   <div>
                     <div className="font-bold text-foreground">Miễn phí</div>
-                    <div className="text-xs text-muted-foreground">Học sinh tham gia tự do.</div>
+                    <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
                   </div>
                 </label>
                 <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'paid' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
                   <input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
                   <div>
                     <div className="font-bold text-foreground">Trả phí</div>
-                    <div className="text-xs text-muted-foreground">Học sinh thanh toán qua MoMo trước khi vào.</div>
+                    <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
                   </div>
                 </label>
               </div>
@@ -217,29 +200,9 @@ export default function CreateClassroomPage() {
               </div>
             )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                <Eye size={16} className="text-primary-brand" />
-                Liên kết khóa học (tùy chọn)
-              </label>
-              <select
-                {...register('course_uid')}
-                className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground"
-                defaultValue=""
-              >
-                <option value="">— Không liên kết —</option>
-                {courses.map((c) => (
-                  <option key={c.uid} value={c.uid}>{c.name}</option>
-                ))}
-              </select>
-              <p className="text-[11px] text-muted-foreground font-bold px-1 uppercase tracking-tighter">
-                Liên kết tới 1 khóa học để học sinh xem được các bài giảng từ khóa đó.
-              </p>
-            </div>
-
             <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-xs font-medium">
               <Eye size={14} className="mt-0.5 shrink-0" />
-              <span>Một <strong>Preview folder</strong> sẽ được tự động tạo và hiển thị mặc định cho tất cả mọi người, kể cả học sinh chưa thanh toán.</span>
+              <span>Một <strong>Preview folder</strong> sẽ được tự động tạo — nơi bạn up tài liệu miễn phí mà mọi học sinh đều xem được, kể cả khi chưa thanh toán.</span>
             </div>
           </CardContent>
         </Card>
