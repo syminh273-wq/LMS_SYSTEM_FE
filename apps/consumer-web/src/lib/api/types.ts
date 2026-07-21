@@ -114,13 +114,26 @@ export type ClassroomPreviewResponse = {
   classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
   preview: {
     folder: { uid: string; name: string } | null;
-    docs: Array<{
-      uid: string;
-      name: string;
-      url: string;
-      file_type?: string;
-      size?: number;
-    }>;
+    items: Array<
+      | {
+          type: 'folder';
+          uid: string;
+          name: string;
+          parent_folder_id: string | null;
+          is_preview_only: boolean;
+          depth: number;
+        }
+      | {
+          type: 'doc';
+          uid: string;
+          name: string;
+          url: string;
+          file_type: string;
+          size: number;
+          folder_id: string;
+          depth: number;
+        }
+    >;
   };
   actions: {
     type: ClassroomPreviewActionType;
@@ -136,6 +149,27 @@ export type ClassroomPreviewResponse = {
 export type ClassroomFavoriteItem = {
   classroom: Classroom;
   created_at: string;
+};
+
+export type LeaderboardEntry = {
+  rank: number;
+  student_id: string;
+  student_name: string;
+  student_avatar: string;
+  total_score: number;
+  quiz_avg: number;
+  exam_avg: number;
+  quiz_count: number;
+  exam_count: number;
+  attendance_pct: number;
+};
+
+export type LeaderboardResponse = {
+  classroom_uid: string;
+  total_students: number;
+  my_rank: number | null;
+  my_score: number | null;
+  entries: LeaderboardEntry[];
 };
 
 export type PaginatedResponse<T> = {
