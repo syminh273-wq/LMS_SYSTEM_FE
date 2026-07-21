@@ -90,6 +90,8 @@ export type Classroom = {
   teacher_id: string;
   pricing_type?: 'free' | 'paid';
   price_vnd?: number;
+  category?: 'math' | 'physics' | 'chemistry' | 'biology' | 'language' | 'programming' | 'business' | 'design' | 'music' | 'other';
+  visibility_type?: 'public' | 'private';
   preview_folder_uid?: string | null;
   has_access?: boolean;
   has_paid?: boolean;
@@ -117,6 +119,8 @@ export type CreateClassroomRequest = {
   max_students: number;
   pricing_type?: 'free' | 'paid';
   price_vnd?: number;
+  category?: 'math' | 'physics' | 'chemistry' | 'biology' | 'language' | 'programming' | 'business' | 'design' | 'music' | 'other';
+  visibility_type?: 'public' | 'private';
 };
 
 export type Conversation = {

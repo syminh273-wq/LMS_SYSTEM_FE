@@ -12,7 +12,10 @@ import {
   Info,
   Tag,
   Wallet,
-  Eye
+  Eye,
+  Globe,
+  Lock,
+  Sparkles,
 } from 'lucide-react';
 import {
   Card,
@@ -22,6 +25,19 @@ import {
   CardDescription
 } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
+
+const CATEGORIES: Array<{ value: NonNullable<CreateClassroomRequest['category']>; label: string }> = [
+  { value: 'math', label: 'Toán học' },
+  { value: 'physics', label: 'Vật lý' },
+  { value: 'chemistry', label: 'Hóa học' },
+  { value: 'biology', label: 'Sinh học' },
+  { value: 'language', label: 'Ngoại ngữ' },
+  { value: 'programming', label: 'Lập trình' },
+  { value: 'business', label: 'Kinh doanh' },
+  { value: 'design', label: 'Thiết kế' },
+  { value: 'music', label: 'Âm nhạc' },
+  { value: 'other', label: 'Khác' },
+];
 
 export default function CreateClassroomPage() {
   const router = useRouter();
@@ -35,10 +51,13 @@ export default function CreateClassroomPage() {
       max_students: 30,
       pricing_type: 'free',
       price_vnd: 0,
+      category: 'other',
+      visibility_type: 'public',
     }
   });
 
   const pricingType = watch('pricing_type');
+  const visibilityType = watch('visibility_type');
 
   const onSubmit = async (data: CreateClassroomRequest) => {
     setLoading(true);
@@ -203,6 +222,54 @@ export default function CreateClassroomPage() {
             <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-xs font-medium">
               <Eye size={14} className="mt-0.5 shrink-0" />
               <span>Một <strong>Preview folder</strong> sẽ được tự động tạo — nơi bạn up tài liệu miễn phí mà mọi học sinh đều xem được, kể cả khi chưa thanh toán.</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
+          <div className="h-2 bg-primary-brand" />
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
+              <Sparkles size={20} className="text-primary-brand" />
+              Phân loại & Hiển thị
+            </CardTitle>
+            <CardDescription className="font-medium text-muted-foreground">Danh mục giúp học sinh dễ tìm thấy lớp của bạn trong trang Khám phá</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
+                <Tag size={16} className="text-primary-brand" />
+                Danh mục <span className="text-rose-500">*</span>
+              </label>
+              <select
+                {...register('category', { required: 'Vui lòng chọn danh mục' })}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.category ? 'border-rose-500' : 'border-border'}`}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+              {errors.category && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.category.message}</p>}
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground px-1">Chế độ hiển thị</label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'public' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1"><Globe size={14} /> Công khai</div>
+                    <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
+                  </div>
+                </label>
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'private' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1"><Lock size={14} /> Riêng tư</div>
+                    <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
+                  </div>
+                </label>
+              </div>
             </div>
           </CardContent>
         </Card>

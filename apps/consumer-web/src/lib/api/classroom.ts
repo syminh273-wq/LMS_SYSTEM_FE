@@ -39,6 +39,34 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
   }
 
+  public async discover(params: {
+    category?: string;
+    pricing_type?: 'free' | 'paid';
+    search?: string;
+    page?: number;
+  } = {}): Promise<PaginatedResponse<Classroom & { is_joined?: boolean; has_paid?: boolean }>> {
+    const search = new URLSearchParams();
+    if (params.category) search.set('category', params.category);
+    if (params.pricing_type) search.set('pricing_type', params.pricing_type);
+    if (params.search) search.set('search', params.search);
+    search.set('page', String(params.page ?? 1));
+    return this.get(`/api/v1/consumer/course/classrooms/discover/?${search.toString()}`);
+  }
+
+  public async quickJoin(uid: string): Promise<{
+    joined: boolean;
+    requires_payment: boolean;
+    membership_status: string;
+    classroom_uid: string;
+    amount?: number;
+    order_id?: string;
+    pay_url?: string;
+    deeplink?: string;
+    qr_code_url?: string;
+  }> {
+    return this.post('/api/v1/consumer/course/classrooms/quick-join/', { classroom_uid: uid });
+  }
+
   public async joinByCode(code: string): Promise<{
     requires_payment: boolean;
     membership_status: string;

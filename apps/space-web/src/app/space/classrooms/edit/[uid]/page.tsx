@@ -14,7 +14,10 @@ import {
   QrCode,
   Download,
   Tag,
-  Wallet
+  Wallet,
+  Globe,
+  Lock,
+  Sparkles,
 } from 'lucide-react';
 import {
   Card,
@@ -27,6 +30,19 @@ import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { renderToStaticMarkup } from 'react-dom/server';
+
+const CATEGORIES: Array<{ value: NonNullable<UpdateClassroomRequest['category']>; label: string }> = [
+  { value: 'math', label: 'Toán học' },
+  { value: 'physics', label: 'Vật lý' },
+  { value: 'chemistry', label: 'Hóa học' },
+  { value: 'biology', label: 'Sinh học' },
+  { value: 'language', label: 'Ngoại ngữ' },
+  { value: 'programming', label: 'Lập trình' },
+  { value: 'business', label: 'Kinh doanh' },
+  { value: 'design', label: 'Thiết kế' },
+  { value: 'music', label: 'Âm nhạc' },
+  { value: 'other', label: 'Khác' },
+];
 
 interface EditClassroomPageProps {
   params: Promise<{ uid: string }>;
@@ -48,10 +64,13 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
       max_students: 30,
       pricing_type: 'free',
       price_vnd: 0,
+      category: 'other',
+      visibility_type: 'public',
     }
   });
 
   const pricingType = watch('pricing_type');
+  const visibilityType = watch('visibility_type');
 
   useEffect(() => {
     const fetchClassroom = async () => {
@@ -75,6 +94,8 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
           max_students: data.max_students,
           pricing_type: (data.pricing_type as any) || 'free',
           price_vnd: (data.price_vnd as any) || 0,
+          category: (data.category as any) || 'other',
+          visibility_type: (data.visibility_type as any) || 'public',
         });
       } catch (err: any) {
         setGlobalError(err.message || 'Không thể tải thông tin phòng học');
@@ -314,6 +335,54 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                 {errors.price_vnd && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.price_vnd.message}</p>}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
+          <div className="h-2 bg-primary-brand" />
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
+              <Sparkles size={20} className="text-primary-brand" />
+              Phân loại & Hiển thị
+            </CardTitle>
+            <CardDescription className="font-medium text-muted-foreground">Cập nhật danh mục và chế độ hiển thị</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
+                <Tag size={16} className="text-primary-brand" />
+                Danh mục <span className="text-rose-500">*</span>
+              </label>
+              <select
+                {...register('category', { required: 'Vui lòng chọn danh mục' })}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.category ? 'border-rose-500' : 'border-border'}`}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+              {errors.category && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.category.message}</p>}
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-foreground px-1">Chế độ hiển thị</label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'public' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1"><Globe size={14} /> Công khai</div>
+                    <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
+                  </div>
+                </label>
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'private' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1"><Lock size={14} /> Riêng tư</div>
+                    <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
