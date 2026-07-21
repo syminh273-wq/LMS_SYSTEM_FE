@@ -102,8 +102,40 @@ export type Classroom = {
   requires_payment?: boolean;
   is_paid_classroom?: boolean;
   resolve_link?: SharingLink;
+  is_favorited?: boolean;
+  favorite_count?: number;
   created_at: string;
   updated_at: string;
+};
+
+export type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
+
+export type ClassroomPreviewResponse = {
+  classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
+  preview: {
+    folder: { uid: string; name: string } | null;
+    docs: Array<{
+      uid: string;
+      name: string;
+      url: string;
+      file_type?: string;
+      size?: number;
+    }>;
+  };
+  actions: {
+    type: ClassroomPreviewActionType;
+    requires_payment: boolean;
+    membership_status: 'pending' | 'approved' | null;
+    pay_url: string | null;
+    amount: number;
+  };
+  is_favorited: boolean;
+  favorite_count: number;
+};
+
+export type ClassroomFavoriteItem = {
+  classroom: Classroom;
+  created_at: string;
 };
 
 export type PaginatedResponse<T> = {

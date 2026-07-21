@@ -158,5 +158,39 @@
     "code_required": "Please enter the class code.",
     "browser_no_qr": "Your browser does not support QR scanning. Please enter the code manually.",
     "camera": "Cannot access camera. Please check your permissions."
+  },
+  "preview": {
+    "title": "Classroom preview",
+    "back": "Back",
+    "teacher_label": "Teacher",
+    "teacher_fallback": "Provides courses on LMS",
+    "free_lessons": "Free lessons",
+    "free_lessons_count": "· {{count}} resources",
+    "no_free_docs": "No free lessons yet",
+    "no_free_docs_desc_paid": "The teacher has not posted any preview lessons. Come back later or join to unlock everything.",
+    "no_free_docs_desc_free": "The teacher has not posted any materials yet.",
+    "preview_only_notice": "This is a preview only. Join the class to unlock the full content.",
+    "action_one_time": "One-time payment",
+    "action_free": "Completely free",
+    "action_request": "Request to join",
+    "btn_open": "Open class",
+    "btn_pay": "Pay with MoMo",
+    "btn_join": "Join",
+    "pending_notice": "Your join request is waiting for teacher approval.",
+    "not_found": "Classroom not found",
+    "back_to_discover": "Back to Discover"
+  },
+  "favorite": {
+    "nav_label": "Favorites",
+    "page_title": "Favorite classrooms",
+    "page_subtitle": "Classrooms you have marked as favorite",
+    "empty_title": "No favorite classrooms yet",
+    "empty_desc": "Tap the heart icon on any classroom to add it to your favorites.",
+    "search_placeholder": "Search favorites...",
+    "no_results": "No results match \"{{query}}\".",
+    "btn_view": "Preview",
+    "btn_favorite": "Favorite",
+    "btn_unfavorite": "Favorited",
+    "load_error": "Cannot update favorite"
   }
 }

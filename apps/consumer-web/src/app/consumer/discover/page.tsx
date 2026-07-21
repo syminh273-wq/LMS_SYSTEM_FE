@@ -19,7 +19,9 @@ import {
   BookOpen,
   Clock,
   Hourglass,
+  ArrowRight,
 } from 'lucide-react';
+import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 
 type CategoryValue = NonNullable<Classroom['category']>;
 type PricingFilter = 'all' | 'free' | 'paid';
@@ -261,15 +263,20 @@ export default function DiscoverPage() {
             const isApproved = status === 'approved';
             const isPending = status === 'pending';
             const grad = coverGradientFor(c.uid);
-            // eslint-disable-next-line no-console
-            console.log('[card]', c.name, 'status=', status, 'is_joined=', c.is_joined);
             return (
               <div
                 key={c.uid}
-                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden card-elevated hover:shadow-lg transition-all flex flex-col"
+                onClick={() => router.push(`/consumer/classroom/preview/${c.uid}`)}
+                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden card-elevated hover:shadow-lg transition-all flex flex-col cursor-pointer"
               >
                 <div className={`h-28 bg-gradient-to-br ${grad} relative flex items-end p-3`}>
                   <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+                    <ClassroomFavoriteButton
+                      classroomUid={c.uid}
+                      initialIsFavorited={!!(c as any).is_favorited}
+                      initialCount={(c as any).favorite_count || 0}
+                      variant="overlay"
+                    />
                     {isPaid ? (
                       <span className="text-[10px] font-black uppercase tracking-widest text-amber-900 bg-amber-100/90 backdrop-blur px-2 py-0.5 rounded">
                         <Crown size={10} className="inline mr-0.5" />
@@ -312,7 +319,10 @@ export default function DiscoverPage() {
                   {isApproved ? (
                     <button
                       type="button"
-                      onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/consumer/classroom/${c.uid}`);
+                      }}
                       className="w-full h-10 rounded-xl bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-emerald-600 transition"
                     >
                       <CheckCircle2 size={14} /> Đã tham gia · Mở lớp
@@ -320,7 +330,10 @@ export default function DiscoverPage() {
                   ) : isPending ? (
                     <button
                       type="button"
-                      onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/consumer/classroom/${c.uid}`);
+                      }}
                       className="w-full h-10 rounded-xl bg-amber-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-amber-600 transition"
                     >
                       <Hourglass size={14} /> {c.has_paid ? 'Đã thanh toán · ' : ''}Chờ giáo viên duyệt
@@ -328,18 +341,13 @@ export default function DiscoverPage() {
                   ) : (
                     <button
                       type="button"
-                      disabled={joining === c.uid}
-                      onClick={() => handleJoin(c)}
-                      className="w-full h-10 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-indigo-700 transition active:scale-95 disabled:opacity-60"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/consumer/classroom/preview/${c.uid}`);
+                      }}
+                      className="w-full h-10 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-indigo-700 transition active:scale-95"
                     >
-                      {joining === c.uid ? (
-                        <Loader2 size={14} className="animate-spin" />
-                      ) : isPaid ? (
-                        <Crown size={14} />
-                      ) : (
-                        <Sparkles size={14} />
-                      )}
-                      {isPaid ? 'Mua & tham gia' : 'Yêu cầu tham gia'}
+                      <ArrowRight size={14} /> Xem trước
                     </button>
                   )}
                 </div>
