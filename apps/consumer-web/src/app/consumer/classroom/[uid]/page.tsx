@@ -130,6 +130,66 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
   );
 }
 
+function JoinRequiredPage({
+  classroom,
+  onJoin,
+  joining,
+}: {
+  classroom: Classroom;
+  onJoin: () => void;
+  joining: boolean;
+}) {
+  const isPaid = classroom.pricing_type === 'paid';
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+        <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
+          {isPaid ? <Crown size={32} /> : <Sparkles size={32} />}
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">{classroom.name}</h2>
+        <p className="text-slate-500 text-sm">
+          {classroom.description || 'Bạn cần tham gia lớp học này để xem nội dung bên trong.'}
+        </p>
+        <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+          <Hash size={12} /> Mã lớp: {classroom.pid}
+        </div>
+        {isPaid && classroom.price_vnd ? (
+          <div className="text-2xl font-black text-amber-600">
+            {(classroom.price_vnd).toLocaleString('vi-VN')}đ
+          </div>
+        ) : (
+          <div className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100 inline-block px-3 py-1 rounded-full">
+            Miễn phí
+          </div>
+        )}
+        <p className="text-xs text-slate-500">
+          Yêu cầu của bạn sẽ được giáo viên duyệt sau khi {isPaid ? 'thanh toán thành công' : 'gửi yêu cầu'}.
+        </p>
+        <Button
+          onClick={onJoin}
+          disabled={joining}
+          className="w-full h-12 rounded-xl bg-primary-brand hover:bg-primary-brand-dark text-white font-bold"
+        >
+          {joining ? (
+            <><Loader2 size={16} className="animate-spin mr-2" /> Đang xử lý...</>
+          ) : isPaid ? (
+            <><Crown size={16} className="mr-2" /> Mua &amp; yêu cầu tham gia</>
+          ) : (
+            <><Sparkles size={16} className="mr-2" /> Yêu cầu tham gia</>
+          )}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={() => (typeof window !== 'undefined' ? window.history.back() : null)}
+          className="w-full text-xs text-muted-foreground"
+        >
+          Quay lại
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function ClassroomDetailPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = use(params);
   const router = useRouter();
@@ -215,9 +275,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoading(true);
         setError("");
-        const data = await classroomApi.retrieve(uid);
+        const data: any = await classroomApi.retrieve(uid);
         setClassroom(data);
-        setMembershipStatus('approved');
+        setMembershipStatus((data.membership_status as any) || (data.join_required ? null : 'approved'));
       } catch (err: unknown) {
         const apiData = (err as any)?.data;
         if ((err as any)?.status === 403 && (apiData as any)?.membership_status === 'pending') {
@@ -261,6 +321,30 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       }
     } catch (e: any) {
       toast.error(e?.message || 'Không thể bắt đầu thanh toán');
+    } finally {
+      setJoiningCheckout(false);
+    }
+  };
+
+  const handleJoinClassroom = async () => {
+    if (!classroom) return;
+    try {
+      setJoiningCheckout(true);
+      const res = await classroomApi.quickJoin(classroom.uid);
+      if (res.requires_payment && res.pay_url) {
+        toast.info('Lớp học trả phí, đang chuyển đến MoMo...');
+        const orderId = res.order_id ? `?order_id=${res.order_id}` : '';
+        window.location.href = `/consumer/classroom/checkout/${classroom.uid}${orderId}`;
+        return;
+      }
+      if (res.membership_status === 'pending') {
+        toast.success(`Đã gửi yêu cầu tham gia lớp "${classroom.name}". Vui lòng chờ giáo viên duyệt.`);
+      } else {
+        toast.success(`Đã tham gia lớp "${classroom.name}"!`);
+      }
+      router.refresh();
+    } catch (e: any) {
+      toast.error(e?.message || 'Không thể tham gia lớp');
     } finally {
       setJoiningCheckout(false);
     }
@@ -470,6 +554,10 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
         </div>
       </div>
     );
+  }
+
+  if (classroom && (classroom as any).join_required && membershipStatus === null) {
+    return <JoinRequiredPage classroom={classroom} onJoin={handleJoinClassroom} joining={joiningCheckout} />;
   }
 
   if (error || !classroom) {

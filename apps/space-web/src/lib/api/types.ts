@@ -91,6 +91,7 @@ export type Classroom = {
   membership_status?: 'pending' | 'approved' | null;
   has_paid?: boolean;
   is_joined?: boolean;
+  join_required?: boolean;
   has_access?: boolean;
   has_paid?: boolean;
   is_paid_classroom?: boolean;
