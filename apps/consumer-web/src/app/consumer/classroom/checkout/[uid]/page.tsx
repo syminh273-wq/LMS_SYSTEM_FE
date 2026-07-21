@@ -36,9 +36,18 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
-    classroomApi
-      .checkout(uid)
-      .then((res) => {
+    (async () => {
+      try {
+        const access = await classroomApi.access(uid);
+        if (access.pending_payment?.pay_url) {
+          setStatus('redirecting');
+          window.location.href = access.pending_payment.pay_url;
+          return;
+        }
+      } catch {}
+
+      try {
+        const res = await classroomApi.checkout(uid);
         if (res.pay_url) {
           setStatus('redirecting');
           window.location.href = res.pay_url;
@@ -46,11 +55,11 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
           setStatus('failed');
           setErrorMsg('Không nhận được liên kết thanh toán');
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         setStatus('failed');
         setErrorMsg(err instanceof Error ? err.message : 'Thanh toán thất bại');
-      });
+      }
+    })();
   }, [uid]);
 
   useEffect(() => {
