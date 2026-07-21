@@ -1,9 +1,12 @@
 import BaseRestApiClient from './client';
 import type {
   Classroom,
+  ClassroomPreviewResponse,
   Conversation,
   Exam,
   ExamSubmission,
+  LeaderboardEntry,
+  LeaderboardResponse,
   Message,
   PaginatedResponse,
   CreateClassroomRequest,
@@ -104,29 +107,12 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.get(`/api/v1/consumer/course/classrooms/${uid}/access/`);
   }
 
-  public async preview(uid: string): Promise<{
-    classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
-    preview: {
-      folder: { uid: string; name: string } | null;
-      docs: Array<{
-        uid: string;
-        name: string;
-        url: string;
-        file_type?: string;
-        size?: number;
-      }>;
-    };
-    actions: {
-      type: 'join' | 'checkout' | 'none';
-      requires_payment: boolean;
-      membership_status: 'pending' | 'approved' | null;
-      pay_url: string | null;
-      amount: number;
-    };
-    is_favorited: boolean;
-    favorite_count: number;
-  }> {
-    return this.get(`/api/v1/consumer/course/classrooms/${uid}/preview/`);
+  public async leaderboard(uid: string, limit: number = 10): Promise<LeaderboardResponse> {
+    return this.get<LeaderboardResponse>(`/api/v1/consumer/course/classrooms/${uid}/leaderboard/?limit=${limit}`);
+  }
+
+  public async preview(uid: string): Promise<ClassroomPreviewResponse> {
+    return this.get<ClassroomPreviewResponse>(`/api/v1/consumer/course/classrooms/${uid}/preview/`);
   }
 
   public async favoriteToggle(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {

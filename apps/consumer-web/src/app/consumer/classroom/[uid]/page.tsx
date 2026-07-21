@@ -25,6 +25,7 @@ import {
   Video,
   MonitorUp,
   Camera,
+  BarChart3,
   ShieldCheck,
   Send,
   Wifi,
@@ -59,9 +60,10 @@ import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { ClassroomDocsViewer } from '@/components/classroom/docs-viewer/ClassroomDocsViewer';
 import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClassroomCalendarTab';
 import { LeaveRequestTab } from '@shared/components/leave-request';
+import { LeaderboardTab } from '@/components/classroom/LeaderboardTab';
 import { consumerCalendarApi, consumerLeaveRequestApi } from '@/lib/api';
 
-type ClassroomTab = 'discussion' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request';
+type ClassroomTab = 'discussion' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request' | 'leaderboard';
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
@@ -212,7 +214,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const { t } = useTranslation();
 
   type ActiveTab = typeof activeTab;
-  const VALID_TABS: ActiveTab[] = ['discussion', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request'];
+  const VALID_TABS: ActiveTab[] = ['discussion', 'docs', 'assignments', 'exams', 'quiz', 'meeting', 'ai', 'collections', 'calendar', 'leave_request', 'leaderboard'];
 
   const buildQueryString = React.useCallback(
     (overrides: Record<string, string | null>) => {
@@ -642,6 +644,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 { key: 'assignments' as const, icon: FileText, label: 'Bài tập' },
                 { key: 'exams' as const, icon: ClipboardList, label: 'Bài kiểm tra' },
                 { key: 'quiz' as const, icon: Trophy, label: 'Thi trắc nghiệm' },
+                { key: 'leaderboard' as const, icon: BarChart3, label: 'Bảng xếp hạng' },
                 { key: 'meeting' as const, icon: Video, label: 'Phòng họp' },
                 { key: 'calendar' as const, icon: Calendar, label: 'Lịch' },
                 { key: 'leave_request' as const, icon: CalendarOff, label: 'Xin nghỉ' },
@@ -934,6 +937,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
                 <ConsumerClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
               </div>
+            )}
+
+            {/* Leaderboard Tab */}
+            {activeTab === 'leaderboard' && (
+              <LeaderboardTab classroomUid={uid} />
             )}
 
             {/* Leave Request Tab */}
