@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   Crown,
   BookOpen,
+  Clock,
+  Hourglass,
 } from 'lucide-react';
 
 type CategoryValue = NonNullable<Classroom['category']>;
@@ -121,7 +123,11 @@ export default function DiscoverPage() {
         window.location.href = `/consumer/classroom/checkout/${c.uid}${orderId}`;
         return;
       }
-      toast.success(`Đã tham gia lớp "${c.name}"!`);
+      if (res.membership_status === 'pending') {
+        toast.success(`Đã gửi yêu cầu tham gia lớp "${c.name}". Vui lòng chờ giáo viên duyệt.`);
+      } else {
+        toast.success(`Đã tham gia lớp "${c.name}"!`);
+      }
       router.push(`/consumer/classroom/${c.uid}`);
     } catch (e: any) {
       toast.error(e?.message || 'Không thể tham gia lớp');
@@ -239,7 +245,10 @@ export default function DiscoverPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {results.map((c) => {
             const isPaid = c.pricing_type === 'paid';
-            const isJoined = Boolean(c.is_joined);
+            const status = c.membership_status as 'pending' | 'approved' | null | undefined;
+            const isApproved = status === 'approved';
+            const isPending = status === 'pending';
+            const isJoined = isApproved || isPending;
             const grad = coverGradientFor(c.uid);
             return (
               <div
@@ -256,6 +265,11 @@ export default function DiscoverPage() {
                     ) : (
                       <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900 bg-emerald-100/90 backdrop-blur px-2 py-0.5 rounded">
                         Free
+                      </span>
+                    )}
+                    {isPaid && isPending && c.has_paid && (
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white bg-emerald-500/90 backdrop-blur px-2 py-0.5 rounded">
+                        Đã thanh toán
                       </span>
                     )}
                   </div>
@@ -280,13 +294,21 @@ export default function DiscoverPage() {
                     <Hash size={10} /> {c.pid}
                   </div>
                   <div className="mt-auto pt-2">
-                    {isJoined ? (
+                    {isApproved ? (
                       <button
                         type="button"
                         onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
                         className="w-full h-10 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-emerald-100 transition"
                       >
                         <CheckCircle2 size={14} /> Đã tham gia · Mở lớp
+                      </button>
+                    ) : isPending ? (
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
+                        className="w-full h-10 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-amber-100 transition"
+                      >
+                        <Hourglass size={14} /> {c.has_paid ? 'Đã thanh toán · ' : ''}Chờ giáo viên duyệt
                       </button>
                     ) : (
                       <button
@@ -302,7 +324,7 @@ export default function DiscoverPage() {
                         ) : (
                           <Sparkles size={14} />
                         )}
-                        {isPaid ? 'Mua & tham gia' : 'Tham gia miễn phí'}
+                        {isPaid ? 'Mua & tham gia' : 'Yêu cầu tham gia'}
                       </button>
                     )}
                   </div>

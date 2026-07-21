@@ -88,6 +88,9 @@ export type Classroom = {
   category?: 'math' | 'physics' | 'chemistry' | 'biology' | 'language' | 'programming' | 'business' | 'design' | 'music' | 'other';
   visibility_type?: 'public' | 'private';
   preview_folder_uid?: string | null;
+  membership_status?: 'pending' | 'approved' | null;
+  has_paid?: boolean;
+  is_joined?: boolean;
   has_access?: boolean;
   has_paid?: boolean;
   is_paid_classroom?: boolean;
