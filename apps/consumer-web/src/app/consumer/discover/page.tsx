@@ -306,41 +306,42 @@ export default function DiscoverPage() {
                   <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                     <Hash size={10} /> {c.pid}
                   </div>
-                  <div className="mt-auto pt-2">
-                    {isApproved ? (
-                      <button
-                        type="button"
-                        onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
-                        className="w-full h-10 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-emerald-100 transition"
-                      >
-                        <CheckCircle2 size={14} /> Đã tham gia · Mở lớp
-                      </button>
-                    ) : isPending ? (
-                      <button
-                        type="button"
-                        onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
-                        className="w-full h-10 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-amber-100 transition"
-                      >
-                        <Hourglass size={14} /> {c.has_paid ? 'Đã thanh toán · ' : ''}Chờ giáo viên duyệt
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={joining === c.uid}
-                        onClick={() => handleJoin(c)}
-                        className="w-full h-10 rounded-xl bg-primary-brand hover:bg-primary-brand-dark text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 transition active:scale-95 disabled:opacity-60"
-                      >
-                        {joining === c.uid ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : isPaid ? (
-                          <Crown size={14} />
-                        ) : (
-                          <Sparkles size={14} />
-                        )}
-                        {isPaid ? 'Mua & tham gia' : 'Yêu cầu tham gia'}
-                      </button>
-                    )}
-                  </div>
+                </div>
+
+                <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/50">
+                  {isApproved ? (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
+                      className="w-full h-10 rounded-xl bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-emerald-600 transition"
+                    >
+                      <CheckCircle2 size={14} /> Đã tham gia · Mở lớp
+                    </button>
+                  ) : isPending ? (
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/consumer/classroom/${c.uid}`)}
+                      className="w-full h-10 rounded-xl bg-amber-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-amber-600 transition"
+                    >
+                      <Hourglass size={14} /> {c.has_paid ? 'Đã thanh toán · ' : ''}Chờ giáo viên duyệt
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={joining === c.uid}
+                      onClick={() => handleJoin(c)}
+                      className="w-full h-10 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-indigo-700 transition active:scale-95 disabled:opacity-60"
+                    >
+                      {joining === c.uid ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : isPaid ? (
+                        <Crown size={14} />
+                      ) : (
+                        <Sparkles size={14} />
+                      )}
+                      {isPaid ? 'Mua & tham gia' : 'Yêu cầu tham gia'}
+                    </button>
+                  )}
                 </div>
               </div>
             );
