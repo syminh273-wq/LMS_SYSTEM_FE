@@ -192,5 +192,13 @@
     "btn_favorite": "Favorite",
     "btn_unfavorite": "Favorited",
     "load_error": "Cannot update favorite"
+  },
+  "payment": {
+    "success_title": "Payment successful!",
+    "success_pending_body": "Your payment has been received. Please wait for the teacher to approve your join request.",
+    "class_label": "Classroom",
+    "course_label": "Course",
+    "btn_go_to_class": "Enter classroom",
+    "btn_close": "Close"
   }
 }

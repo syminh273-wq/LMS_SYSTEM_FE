@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Download } from 'lucide-react';
+import { X, Download, Trash2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { isImageFile, isPdfFile, isVideoFile, isAudioFile } from './doc-utils';
 import type { ClassroomDoc } from './types';
@@ -13,9 +13,11 @@ type Props = {
   open: boolean;
   onClose: () => void;
   t: (key: string, fallback?: string) => string;
+  canManage?: boolean;
+  onDelete?: (doc: ClassroomDoc) => void;
 };
 
-export function DocPreviewModal({ doc, open, onClose, t }: Props) {
+export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDelete }: Props) {
   const [mounted] = useState(() => typeof document !== 'undefined');
 
   useEffect(() => {
@@ -48,6 +50,16 @@ export function DocPreviewModal({ doc, open, onClose, t }: Props) {
           <p className="text-sm font-bold text-slate-900 truncate flex-1 min-w-0" title={doc.name}>
             {doc.name}
           </p>
+          {canManage && onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(doc)}
+              className="p-2 rounded-md hover:bg-rose-50 text-slate-500 hover:text-rose-600"
+              title={t('classroom.docs.delete', 'Xóa')}
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
           <a
             href={doc.url}
             target="_blank"

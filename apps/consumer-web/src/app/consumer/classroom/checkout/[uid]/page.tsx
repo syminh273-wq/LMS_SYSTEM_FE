@@ -8,6 +8,7 @@ import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { classroomApi, Classroom } from '@/lib/api';
+import { PaymentSuccessDialog } from '@/components/payment';
 
 const POLL_INTERVAL_MS = 1500;
 const POLL_TIMEOUT_MS = 30000;
@@ -20,6 +21,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [status, setStatus] = useState<'initiating' | 'redirecting' | 'processing' | 'success' | 'failed' | 'timeout'>('initiating');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successOpen, setSuccessOpen] = useState(false);
   const startedRef = useRef(false);
 
   useEffect(() => {
@@ -78,8 +80,8 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
         if (access.has_access) {
           clearInterval(interval);
           setStatus('success');
-          toast.success('Thanh toán thành công!');
-          setTimeout(() => router.push(`/consumer/classroom/${uid}`), 800);
+          toast.success(t('classroom.payment.success_title', 'Thanh toán thành công!'));
+          setSuccessOpen(true);
           return;
         }
       } catch (err) {
@@ -91,7 +93,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
     }, POLL_INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [uid, router]);
+  }, [uid, router, t]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
@@ -196,6 +198,14 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
           </CardContent>
         </Card>
       </div>
+
+      <PaymentSuccessDialog
+        open={successOpen}
+        variant="classroom"
+        classroomUid={uid}
+        classroomName={classroom?.name}
+        onClose={() => setSuccessOpen(false)}
+      />
     </div>
   );
 }

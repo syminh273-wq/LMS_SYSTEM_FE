@@ -1,0 +1,68 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "close": "Close",
+    "retry": "Retry"
+  },
+  "nav": {
+    "feed": "Feed",
+    "profile": "Profile",
+    "messages": "Messages",
+    "settings": "Settings"
+  },
+  "profile": {
+    "title": "Profile",
+    "section_bio": "About",
+    "section_skills": "Skills",
+    "section_social": "Links",
+    "section_stats": "Stats",
+    "section_about": "Info",
+    "edit_profile": "Edit profile",
+    "edit_about": "Edit about",
+    "edit_about_desc": "You can write about your years of experience, industry, or skills. People also talk about their achievements or previous job experiences.",
+    "edit_cover": "Edit cover",
+    "edit_avatar": "Change avatar",
+    "follow": "Follow",
+    "following": "Following",
+    "message": "Message",
+    "posts": "posts",
+    "followers": "followers",
+    "following_count": "following",
+    "no_bio": "No bio yet.",
+    "no_skills": "No skills added yet.",
+    "no_social": "No links yet.",
+    "fields": {
+      "bio": "Bio",
+      "bio_placeholder": "Tell people about yourself, your experience, and what you're passionate about...",
+      "major": "Major",
+      "department": "Department",
+      "skills": "Skills",
+      "skills_desc": "Show your top skills — add up to 5 skills you want to be known for. They'll also appear in your Skills section.",
+      "skills_placeholder": "Add a skill",
+      "github": "GitHub URL",
+      "linkedin": "LinkedIn URL",
+      "website": "Website URL"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "empty_list": "No conversations yet",
+    "empty_list_desc": "Start chatting with a teacher or classmate!",
+    "empty_chat": "Send your first message",
+    "input_placeholder": "Type a message...",
+    "send": "Send",
+    "connecting": "Connecting...",
+    "connected": "Online",
+    "disconnected": "Disconnected",
+    "load_error": "Failed to load conversations",
+    "send_error": "Failed to send message",
+    "unread": "Unread"
+  }
+}

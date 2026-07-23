@@ -11,26 +11,14 @@ import type { RootState } from '@/lib/redux/store';
 import { toast } from 'sonner';
 import { sendJoinClassroomNotification } from '@/lib/firebase-notifications';
 import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
+import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 import {
   Loader2, QrCode, KeyRound, X, Camera, Plus, BookOpen,
-  Users, Hash, ArrowRight, School, Sparkles,
+  Users, Hash, School, Sparkles, ArrowRight,
 } from 'lucide-react';
 import { cn } from '@shared/lib/utils';
 
 type JoinTab = 'code' | 'qr';
-
-const COVER_GRADIENTS = [
-  'bg-indigo-600',
-  'bg-emerald-600',
-  'bg-orange-500',
-  'bg-pink-600',
-  'bg-sky-600',
-  'bg-violet-600',
-];
-
-function getCoverGradient(index: number) {
-  return COVER_GRADIENTS[index % COVER_GRADIENTS.length];
-}
 
 function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: Classroom) => void }) {
   const [tab, setTab] = useState<JoinTab>('code');
@@ -397,64 +385,52 @@ export default function ClassroomPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filtered.map((classroom, index) => (
-              <div
-                key={classroom.uid}
-                style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
-                className="group bg-white border border-slate-200 rounded-xl card-elevated animate-fade-up p-4 flex flex-col gap-3"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={cn("w-11 h-11 rounded-lg flex items-center justify-center text-white font-bold text-base shrink-0", getCoverGradient(index))}>
-                    {classroom.name?.[0]?.toUpperCase() || '?'}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-900 text-[14px] leading-tight line-clamp-2 flex-1">{classroom.name}</h3>
-                      {classroom.pricing_type === 'paid' && (
-                        <span className="text-[9px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded shrink-0">
-                          {classroom.price_vnd ? `${(classroom.price_vnd / 1000).toFixed(0)}k` : 'PAID'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1 mt-1 text-slate-500 text-[11px] font-medium">
-                      <Hash size={10} />
-                      {classroom.pid}
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-[12.5px] text-slate-600 line-clamp-2 min-h-[2.5em]">
-                  {classroom.description || 'Chưa có mô tả cho lớp học này.'}
-                </p>
-
-                <div className="flex items-center justify-between mt-auto">
-                  <div className="flex items-center gap-1 text-slate-500 text-[11px] font-medium">
-                    <Users size={11} />
-                    {Math.floor(Math.random() * 30) + 5} thành viên
-                  </div>
-                  <span className={cn(
-                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold",
-                    classroom.status === 'active'
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-slate-100 text-slate-600"
-                  )}>
-                    <span className={cn(
-                      "w-1.5 h-1.5 rounded-full",
-                      classroom.status === 'active' ? "bg-emerald-500" : "bg-slate-400"
-                    )} />
-                    {classroom.status === 'active' ? 'Đang học' : 'Đã đóng'}
-                  </span>
-                </div>
-
-                <button
+            {filtered.map((classroom, index) => {
+              const isActive = classroom.status === 'active';
+              return (
+                <div
+                  key={classroom.uid}
+                  style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
                   onClick={() => router.push(`/consumer/classroom/${classroom.uid}`)}
-                  className="w-full h-9 rounded-lg bg-slate-100 hover:bg-indigo-600 text-[12.5px] font-semibold text-slate-700 hover:text-white transition-colors flex items-center justify-center gap-1.5 group/btn"
+                  className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300 animate-fade-up"
                 >
-                  Vào lớp học
-                  <ArrowRight size={13} className="group-hover/btn:translate-x-0.5 transition-transform" />
-                </button>
-              </div>
-            ))}
+                  <div className="flex items-center justify-end gap-2 px-4 pt-3.5 pb-2">
+                    <ClassroomFavoriteButton
+                      classroomUid={classroom.uid}
+                      initialIsFavorited={!!(classroom as any).is_favorited}
+                      initialCount={(classroom as any).favorite_count || 0}
+                      variant="overlay"
+                    />
+                  </div>
+
+                  <div className="px-4 pb-4 flex-1 flex flex-col gap-1.5">
+                    <h3 className="font-bold text-foreground text-[15px] leading-tight line-clamp-2 group-hover:text-primary-brand transition-colors">
+                      {classroom.name}
+                    </h3>
+                    <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                      <Hash size={10} /> {classroom.pid}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                    <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                      <Users size={11} />
+                      {classroom.member_count ?? '—'} thành viên
+                    </div>
+                    <span
+                      className={cn(
+                        "text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded",
+                        isActive
+                          ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
+                          : "text-slate-500 bg-slate-50 border border-slate-200"
+                      )}
+                    >
+                      {isActive ? 'Đang học' : 'Đã đóng'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

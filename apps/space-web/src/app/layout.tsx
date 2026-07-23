@@ -1,7 +1,6 @@
 import React from 'react';
 import { Providers } from "@/components/Providers";
 import { Toaster } from "sonner";
-import AppShell from "@/components/AppShell";
 import "./globals.css";
 
 export default function RootLayout({
@@ -14,7 +13,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Providers>
           <Toaster position="top-right" richColors />
-          <AppShell>{children}</AppShell>
+          {children}
         </Providers>
       </body>
     </html>

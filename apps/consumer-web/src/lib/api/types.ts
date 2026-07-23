@@ -522,9 +522,12 @@ export type Post = {
   consumer_uid: string;
   author_name: string;
   author_avatar: string;
+  author_type: 'consumer' | 'space';
+  space_uid: string | null;
   content: string;
   emotion: PostEmotion;
   image_url: string;
+  image_urls?: string[];
   visibility: PostVisibility;
   classroom_tag: string | null;
   likes_count: number;
@@ -547,6 +550,7 @@ export type CreatePostRequest = {
   content: string;
   emotion?: PostEmotion;
   image_url?: string;
+  image_urls?: string[];
   visibility: PostVisibility;
   classroom_tag?: string;
 };

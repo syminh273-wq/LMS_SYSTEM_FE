@@ -45,6 +45,10 @@ import sharedRtcEn from '@shared/locales/rtc/en.json';
 import sharedRtcVi from '@shared/locales/rtc/vi.json';
 import sharedResourceEn from '@shared/locales/resource/en.json';
 import sharedResourceVi from '@shared/locales/resource/vi.json';
+import sharedPortfolioEn from '@shared/locales/portfolio/en.json';
+import sharedPortfolioVi from '@shared/locales/portfolio/vi.json';
+import sharedWorkspaceEn from '@shared/locales/workspace/en.json';
+import sharedWorkspaceVi from '@shared/locales/workspace/vi.json';
 
 export const consumerWebBundles: LocaleBundles = {
   en: {
@@ -70,6 +74,8 @@ export const consumerWebBundles: LocaleBundles = {
     face: sharedFaceEn,
     rtc: sharedRtcEn,
     resource: sharedResourceEn,
+    portfolio: sharedPortfolioEn,
+    workspace: sharedWorkspaceEn,
   },
   vi: {
     common: commonVi,
@@ -94,5 +100,7 @@ export const consumerWebBundles: LocaleBundles = {
     face: sharedFaceVi,
     rtc: sharedRtcVi,
     resource: sharedResourceVi,
+    portfolio: sharedPortfolioVi,
+    workspace: sharedWorkspaceVi,
   },
 };

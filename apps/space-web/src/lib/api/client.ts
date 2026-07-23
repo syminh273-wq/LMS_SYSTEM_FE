@@ -46,9 +46,9 @@ export default class BaseRestApiClient {
     options: RequestInit = {}
   ): Promise<TResponse> {
     const url = `${this.baseURL}${path.startsWith('/') ? path : `/${path}`}`;
-    
+
     const isFormData = body instanceof FormData;
-    
+
     const headers: Record<string, string> = {};
 
     if (!isFormData && method !== 'GET' && body) {
@@ -80,14 +80,18 @@ export default class BaseRestApiClient {
 
     try {
       const response = await fetch(url, config);
-      return await this.handleResponse<TResponse>(response);
+      return await this.handleResponse<TResponse>(response, url, config);
     } catch (error) {
       if (error instanceof ApiException) throw error;
       throw new ApiException(error instanceof Error ? error.message : 'Network Error');
     }
   }
 
-  protected async handleResponse<TResponse = unknown>(response: Response): Promise<TResponse> {
+  protected async handleResponse<TResponse = unknown>(
+    response: Response,
+    url: string,
+    config: RequestInit,
+  ): Promise<TResponse> {
     if (response.status === 204) return null as TResponse;
 
     const data = await response.json().catch(() => null);
@@ -103,7 +107,7 @@ export default class BaseRestApiClient {
                 const retryResponse = await fetch(url, {
                   ...config,
                   headers: {
-                    ...headers,
+                    ...(config.headers as Record<string, string> | undefined),
                     'Authorization': `Bearer ${this.getAccessToken()}`,
                   },
                 });

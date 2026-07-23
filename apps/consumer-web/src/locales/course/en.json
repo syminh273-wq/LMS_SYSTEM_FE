@@ -21,6 +21,7 @@
   "checkout": {
     "success_title": "Payment successful!",
     "success_desc": "Redirecting to your classroom...",
+    "success_pending_body": "Your payment has been received. You have been added to the classroom.",
     "processing_title": "Processing payment",
     "processing_desc": "Waiting for MoMo to confirm your transaction. Please do not close this window.",
     "failed_title": "Payment failed",

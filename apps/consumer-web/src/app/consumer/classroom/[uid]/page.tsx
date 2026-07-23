@@ -28,6 +28,7 @@ import {
   BarChart3,
   ShieldCheck,
   Send,
+  Hash,
   Wifi,
   WifiOff,
   FileDown,

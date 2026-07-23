@@ -21,6 +21,7 @@
   "checkout": {
     "success_title": "Thanh toán thành công!",
     "success_desc": "Đang chuyển vào lớp học của bạn...",
+    "success_pending_body": "Đã thanh toán. Bạn đã được thêm vào lớp học.",
     "processing_title": "Đang xử lý thanh toán",
     "processing_desc": "Đang chờ MoMo xác nhận giao dịch. Vui lòng không đóng cửa sổ này.",
     "failed_title": "Thanh toán thất bại",

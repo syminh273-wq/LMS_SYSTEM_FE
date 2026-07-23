@@ -1,0 +1,68 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "cancel": "Huỷ",
+    "edit": "Sửa",
+    "delete": "Xoá",
+    "add": "Thêm",
+    "close": "Đóng",
+    "retry": "Thử lại"
+  },
+  "nav": {
+    "feed": "Bảng tin",
+    "profile": "Hồ sơ",
+    "messages": "Tin nhắn",
+    "settings": "Cài đặt"
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "section_bio": "Giới thiệu",
+    "section_skills": "Kỹ năng",
+    "section_social": "Liên kết",
+    "section_stats": "Thống kê",
+    "section_about": "Thông tin",
+    "edit_profile": "Sửa hồ sơ",
+    "edit_about": "Chỉnh sửa giới thiệu",
+    "edit_about_desc": "Hãy viết về số năm kinh nghiệm, lĩnh vực hoặc kỹ năng của bạn. Bạn cũng có thể chia sẻ thành tựu hay kinh nghiệm làm việc trước đây.",
+    "edit_cover": "Sửa ảnh bìa",
+    "edit_avatar": "Đổi ảnh đại diện",
+    "follow": "Theo dõi",
+    "following": "Đang theo dõi",
+    "message": "Nhắn tin",
+    "posts": "bài viết",
+    "followers": "người theo dõi",
+    "following_count": "đang theo dõi",
+    "no_bio": "Chưa có phần giới thiệu.",
+    "no_skills": "Chưa thêm kỹ năng nào.",
+    "no_social": "Chưa có liên kết nào.",
+    "fields": {
+      "bio": "Giới thiệu",
+      "bio_placeholder": "Hãy kể về bản thân, kinh nghiệm và điều bạn đam mê...",
+      "major": "Chuyên ngành",
+      "department": "Khoa / Bộ môn",
+      "skills": "Kỹ năng",
+      "skills_desc": "Thêm tối đa 5 kỹ năng nổi bật bạn muốn mọi người biết đến. Chúng cũng sẽ hiển thị ở mục Kỹ năng.",
+      "skills_placeholder": "Thêm kỹ năng",
+      "github": "GitHub URL",
+      "linkedin": "LinkedIn URL",
+      "website": "Website URL"
+    }
+  },
+  "messages": {
+    "title": "Tin nhắn",
+    "empty_list": "Chưa có cuộc trò chuyện nào",
+    "empty_list_desc": "Hãy bắt đầu trò chuyện với giáo viên hoặc bạn học!",
+    "empty_chat": "Hãy gửi tin nhắn đầu tiên",
+    "input_placeholder": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "connecting": "Đang kết nối...",
+    "connected": "Trực tuyến",
+    "disconnected": "Mất kết nối",
+    "load_error": "Không thể tải cuộc trò chuyện",
+    "send_error": "Gửi tin nhắn thất bại",
+    "unread": "Chưa đọc"
+  }
+}

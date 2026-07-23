@@ -15,6 +15,7 @@ import { paymentApi } from './payment';
 import { ApiException } from './exceptions';
 import { SharingLink, NotificationItem, PaginatedResponse } from './types';
 import { consumerCourseApi } from './course';
+import { portfolioApi } from './portfolio';
 
 export * from './types';
 export * from './exceptions';
@@ -29,6 +30,7 @@ export { consumerCalendarApi };
 export { consumerLeaveRequestApi };
 export { consumerCourseApi };
 export { paymentApi };
+export { portfolioApi };
 
 // For backward compatibility and centralized access
 export const api = {

@@ -1,4 +1,4 @@
-import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfigured =
@@ -16,11 +16,32 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const app: FirebaseApp | null = firebaseConfigured
-  ? getApps().length === 0
-    ? initializeApp(firebaseConfig)
-    : getApps()[0]
-  : null;
+const RTDB_APP_NAME = "consumer-rtdb";
+
+function resolveApp(): FirebaseApp | null {
+  if (!firebaseConfigured) return null;
+
+  const wantsRtdb = !!firebaseConfig.databaseURL;
+
+  if (wantsRtdb) {
+    const existing = getApps().find(a => a.name === RTDB_APP_NAME);
+    if (existing) return existing;
+    return initializeApp(firebaseConfig, RTDB_APP_NAME);
+  }
+
+  if (getApps().length === 0) {
+    return initializeApp(firebaseConfig);
+  }
+  try {
+    return getApp();
+  } catch {
+    const all = getApps();
+    if (all.length > 0) return all[0];
+    return null;
+  }
+}
+
+const app = resolveApp();
 
 export const analytics = async () => {
   if (!app) return null;

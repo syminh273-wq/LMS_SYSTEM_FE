@@ -872,3 +872,46 @@ export type CourseStats = {
   free_enrollments: number;
   paid_enrollments: number;
 };
+// ── Social Feed ───────────────────────────────────────────────────────────────
+
+export type PostVisibility = 'public' | 'private' | 'friends';
+
+export type PostEmotion = 'happy' | 'sad' | 'motivated' | 'excited' | 'tired' | 'thinking' | 'confident' | 'celebrating' | 'stressed' | 'loved' | '';
+
+export type Post = {
+  uid: string;
+  consumer_uid: string;
+  author_name: string;
+  author_avatar: string;
+  author_type: 'consumer' | 'space';
+  space_uid: string | null;
+  content: string;
+  emotion: PostEmotion;
+  image_url: string;
+  image_urls?: string[];
+  visibility: PostVisibility;
+  classroom_tags: string[];
+  likes_count: number;
+  comments_count: number;
+  liked_by_me: boolean;
+  created_at: string;
+};
+
+export type PostComment = {
+  uid: string;
+  post_uid: string;
+  consumer_uid: string;
+  author_name: string;
+  author_avatar: string;
+  content: string;
+  created_at: string;
+};
+
+export type CreatePostRequest = {
+  content: string;
+  emotion?: PostEmotion;
+  image_url?: string;
+  image_urls?: string[];
+  visibility: PostVisibility;
+  classroom_tags?: string[];
+};

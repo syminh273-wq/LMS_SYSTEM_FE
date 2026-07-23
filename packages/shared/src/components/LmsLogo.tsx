@@ -28,12 +28,18 @@ export function LmsLogo({
   const shineGradId = `shine-${id}`;
   const shadowId    = `shadow-${id}`;
 
+  const widthAttr =
+    typeof width === 'number' || (typeof width === 'string' && width !== 'auto')
+      ? width
+      : undefined;
+  const heightAttr = typeof height === 'number' ? height : undefined;
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 330 120"
-      width={width}
-      height={height}
+      width={widthAttr}
+      height={heightAttr}
       className={className}
       aria-label="LMS System"
       role="img"

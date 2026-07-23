@@ -91,18 +91,6 @@ export default function DiscoverPage() {
       });
       setResults(res.results as any);
       setTotalPages(res.total_pages || 1);
-      // Debug: log first row membership_status so we can see what the
-      // backend actually returned (delete after verified).
-      if ((res.results as any[])?.[0]) {
-        const first = (res.results as any[])[0];
-        // eslint-disable-next-line no-console
-        console.log('[discover] first row', {
-          name: first.name,
-          membership_status: first.membership_status,
-          is_joined: first.is_joined,
-          has_paid: first.has_paid,
-        });
-      }
     } catch (e: any) {
       toast.error(e?.message || 'Không thể tải danh sách lớp học');
     } finally {
@@ -129,6 +117,17 @@ export default function DiscoverPage() {
 
   const handleJoin = useCallback(async (c: Classroom) => {
     try {
+      const hasPaid = !!c.has_paid;
+      const isAlreadyPending = c.membership_status === 'pending';
+      if (hasPaid || isAlreadyPending) {
+        toast.info(
+          hasPaid
+            ? 'Bạn đã thanh toán lớp này, vui lòng chờ giáo viên duyệt.'
+            : `Đã gửi yêu cầu tham gia lớp "${c.name}". Vui lòng chờ giáo viên duyệt.`,
+        );
+        router.push(`/consumer/classroom/${c.uid}`);
+        return;
+      }
       setJoining(c.uid);
       const res = await classroomApi.quickJoin(c.uid);
       if (res.requires_payment && res.pay_url) {
@@ -165,7 +164,7 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
@@ -262,93 +261,58 @@ export default function DiscoverPage() {
             const status = c.membership_status as 'pending' | 'approved' | null | undefined;
             const isApproved = status === 'approved';
             const isPending = status === 'pending';
+            const hasPaid = !!c.has_paid;
+            const isPaidPending = isPaid && (isPending || hasPaid);
             const grad = coverGradientFor(c.uid);
             return (
               <div
                 key={c.uid}
                 onClick={() => router.push(`/consumer/classroom/preview/${c.uid}`)}
-                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden card-elevated hover:shadow-lg transition-all flex flex-col cursor-pointer"
+                className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300"
               >
-                <div className={`h-28 bg-gradient-to-br ${grad} relative flex items-end p-3`}>
-                  <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
-                    <ClassroomFavoriteButton
-                      classroomUid={c.uid}
-                      initialIsFavorited={!!(c as any).is_favorited}
-                      initialCount={(c as any).favorite_count || 0}
-                      variant="overlay"
-                    />
-                    {isPaid ? (
-                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-900 bg-amber-100/90 backdrop-blur px-2 py-0.5 rounded">
-                        <Crown size={10} className="inline mr-0.5" />
-                        {c.price_vnd ? formatPrice(c.price_vnd) : 'PAID'}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900 bg-emerald-100/90 backdrop-blur px-2 py-0.5 rounded">
-                        Free
-                      </span>
-                    )}
-                    {isPaid && isPending && c.has_paid && (
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white bg-emerald-500/90 backdrop-blur px-2 py-0.5 rounded">
-                        Đã thanh toán
-                      </span>
-                    )}
-                  </div>
-                  <div className="absolute top-3 left-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white bg-black/30 backdrop-blur px-2 py-0.5 rounded">
+                <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground truncate">
                       {categoryEmoji(c.category)} {categoryLabel(c.category)}
                     </span>
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-white/95 text-slate-800 flex items-center justify-center text-base font-black shadow-md">
-                    {c.name?.[0]?.toUpperCase() || '?'}
-                  </div>
+                  <ClassroomFavoriteButton
+                    classroomUid={c.uid}
+                    initialIsFavorited={!!(c as any).is_favorited}
+                    initialCount={(c as any).favorite_count || 0}
+                    variant="overlay"
+                  />
                 </div>
 
-                <div className="p-4 flex-1 flex flex-col gap-2">
+                <div className="px-4 pb-4 flex-1 flex flex-col gap-1.5">
                   <h3 className="font-bold text-foreground text-[15px] leading-tight line-clamp-2 group-hover:text-primary-brand transition-colors">
                     {c.name}
                   </h3>
-                  <p className="text-[12px] text-slate-500 line-clamp-2 min-h-[2.4em]">
-                    {c.description || 'Lớp học này chưa có mô tả.'}
-                  </p>
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
                     <Hash size={10} /> {c.pid}
                   </div>
                 </div>
 
-                <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/50">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                  <span className="text-sm font-bold text-foreground">
+                    {c.price_vnd ? formatPrice(c.price_vnd) : (isPaid ? '—' : 'Miễn phí')}
+                  </span>
                   {isApproved ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/consumer/classroom/${c.uid}`);
-                      }}
-                      className="w-full h-10 rounded-xl bg-emerald-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-emerald-600 transition"
-                    >
-                      <CheckCircle2 size={14} /> Đã tham gia · Mở lớp
-                    </button>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded">
+                      Đã tham gia
+                    </span>
                   ) : isPending ? (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/consumer/classroom/${c.uid}`);
-                      }}
-                      className="w-full h-10 rounded-xl bg-amber-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-amber-600 transition"
-                    >
-                      <Hourglass size={14} /> {c.has_paid ? 'Đã thanh toán · ' : ''}Chờ giáo viên duyệt
-                    </button>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded">
+                      Chờ duyệt
+                    </span>
+                  ) : isPaidPending ? (
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded">
+                      Chờ duyệt
+                    </span>
                   ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/consumer/classroom/preview/${c.uid}`);
-                      }}
-                      className="w-full h-10 rounded-xl bg-indigo-600 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-indigo-700 transition active:scale-95"
-                    >
-                      <ArrowRight size={14} /> Xem trước
-                    </button>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded group-hover:text-indigo-700 group-hover:bg-indigo-50 group-hover:border-indigo-200 transition-colors">
+                      Xem trước →
+                    </span>
                   )}
                 </div>
               </div>

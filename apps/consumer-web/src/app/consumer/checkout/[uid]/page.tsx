@@ -8,6 +8,7 @@ import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { consumerCourseApi, type Course } from '@/lib/api';
+import { PaymentSuccessDialog } from '@/components/payment';
 
 const formatVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ';
 
@@ -22,7 +23,20 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
   const [course, setCourse] = useState<Course | null>(null);
   const [status, setStatus] = useState<'initiating' | 'redirecting' | 'processing' | 'success' | 'failed' | 'timeout'>('initiating');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [successRedirect, setSuccessRedirect] = useState<string | undefined>(undefined);
   const startedRef = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await consumerCourseApi.retrieve(uid);
+        if (!cancelled) setCourse(data);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [uid]);
 
   // Initiate payment on mount (once)
   useEffect(() => {
@@ -66,7 +80,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
           clearInterval(interval);
           setStatus('success');
           toast.success(t('course.checkout.success_title', 'Payment successful!'));
-          setTimeout(() => router.push(access.redirect_to!), 800);
+          setSuccessRedirect(access.redirect_to);
+          setSuccessOpen(true);
           return;
         }
       } catch (err) {
@@ -174,6 +189,15 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
           </CardContent>
         </Card>
       </div>
+
+      <PaymentSuccessDialog
+        open={successOpen}
+        variant="course"
+        classroomUid={course?.classroom_uid || uid}
+        courseName={course?.name}
+        redirectTo={successRedirect}
+        onClose={() => setSuccessOpen(false)}
+      />
     </div>
   );
 }

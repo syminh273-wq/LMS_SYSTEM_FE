@@ -193,9 +193,14 @@ export function ClassroomDocsManager({
       }
       toast.success(t('classroom.docs.doc_deleted', 'Đã xóa tài liệu'));
       setDeleteDocTarget(null);
+      setPreviewDoc(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi xóa tài liệu');
     }
+  };
+
+  const handlePreviewDelete = (doc: ClassroomDoc) => {
+    requestDeleteDoc(doc);
   };
 
   const handleReorder = async (orderedUids: string[]) => {
@@ -446,6 +451,8 @@ export function ClassroomDocsManager({
         open={previewDoc !== null}
         onClose={() => setPreviewDoc(null)}
         t={t}
+        canManage={canManage}
+        onDelete={handlePreviewDelete}
       />
     </div>
   );

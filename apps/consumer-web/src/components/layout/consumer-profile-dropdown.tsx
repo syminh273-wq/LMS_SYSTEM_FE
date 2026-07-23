@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
-import { accountService } from '@/lib/api/account';
-import type { Consumer } from '@/lib/api/types';
+import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
+import { accountService, type UserProfile } from '@/lib/api/account';
 import {
   Avatar,
   AvatarFallback,
@@ -16,40 +16,73 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import { BookOpen, ChevronDown, LayoutDashboard, LogOut, Settings, User } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Sparkles,
+  User,
+  Bell,
+  HelpCircle,
+  Moon,
+  Globe,
+  Award,
+  Calendar,
+  FileText,
+} from 'lucide-react';
 
-type ProfileSummary = Pick<Consumer, 'full_name' | 'email' | 'avatar_url' | 'username'>;
-
-type ConsumerProfileDropdownProps = {
-  profile?: ProfileSummary | null;
+type ProfileData = {
+  full_name: string;
+  email: string;
+  avatar_url: string;
+  username: string;
 };
 
-export function ConsumerProfileDropdown({ profile }: ConsumerProfileDropdownProps) {
+export function ConsumerProfileDropdown() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [loadedProfile, setLoadedProfile] = useState<ProfileSummary | null>(null);
-  const effectiveProfile = profile !== undefined ? profile : loadedProfile;
+  const [profile, setProfile] = useState<ProfileData | null>(null);
 
   useEffect(() => {
-    if (profile !== undefined) return;
-
     let mounted = true;
-    accountService.getProfile()
-      .then((data) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (!token) return;
+
+    const load = async () => {
+      try {
+        const [account, workspace] = await Promise.all([
+          accountService.getProfile().catch(() => null as UserProfile | null),
+          communityApi.getMyProfile().catch(() => null as WorkspaceProfile | null),
+        ]);
         if (!mounted) return;
-        setLoadedProfile({
-          full_name: data.full_name,
-          email: data.email,
-          avatar_url: data.avatar_url,
-          username: data.username,
+        setProfile({
+          full_name: account?.full_name || account?.username || 'User',
+          email: account?.email || '',
+          avatar_url: workspace?.avatar_url || account?.avatar_url || '',
+          username: account?.username || '',
         });
-      })
-      .catch(() => {});
+      } catch {}
+    };
+
+    load();
+
+    const onProfileUpdated = (e: Event) => {
+      const detail = (e as CustomEvent<{ avatar_url?: string }>).detail;
+      if (detail?.avatar_url) {
+        setProfile((prev) => (prev ? { ...prev, avatar_url: detail.avatar_url! } : prev));
+      } else {
+        load();
+      }
+    };
+    window.addEventListener('community:profile-updated', onProfileUpdated);
 
     return () => {
       mounted = false;
+      window.removeEventListener('community:profile-updated', onProfileUpdated);
     };
-  }, [profile]);
+  }, []);
 
   const handleLogout = () => {
     dispatch(clearProfile());
@@ -58,16 +91,51 @@ export function ConsumerProfileDropdown({ profile }: ConsumerProfileDropdownProp
     router.push('/consumer/login');
   };
 
-  const displayName = effectiveProfile?.full_name || effectiveProfile?.username || 'User';
+  const goToProfile = () => {
+    router.push('/consumer/profile');
+  };
+
+  const displayName = profile?.full_name || profile?.username || 'User';
   const initials = displayName.slice(0, 2).toUpperCase();
-  const email = effectiveProfile?.email || 'Học sinh';
+  const email = profile?.email || 'Học sinh';
+
+  const menuItems: Array<{
+    label: string;
+    Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+    bg: string;
+    color: string;
+    path: string;
+  }> = [
+    { label: 'Dashboard',       Icon: LayoutDashboard, bg: 'bg-blue-100',     color: 'text-blue-600',     path: '/consumer/dashboard' },
+    { label: 'Lớp học của tôi', Icon: BookOpen,        bg: 'bg-emerald-100',  color: 'text-emerald-600',  path: '/consumer/classroom' },
+    { label: 'Lịch học',        Icon: Calendar,        bg: 'bg-rose-100',     color: 'text-rose-600',     path: '/consumer/calendar' },
+    { label: 'Chứng chỉ',       Icon: Award,           bg: 'bg-amber-100',    color: 'text-amber-600',    path: '/consumer/certificates' },
+    { label: 'Hồ sơ cá nhân',   Icon: User,            bg: 'bg-indigo-100',   color: 'text-indigo-600',   path: '/consumer/profile' },
+    { label: 'Settings',        Icon: Settings,        bg: 'bg-violet-100',   color: 'text-violet-600',   path: '/consumer/settings' },
+  ];
+
+  const quickItems: Array<{
+    label: string;
+    Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+    bg: string;
+    color: string;
+  }> = [
+    { label: 'Thông báo',  Icon: Bell,        bg: 'bg-sky-100',     color: 'text-sky-600' },
+    { label: 'Ngôn ngữ',   Icon: Globe,       bg: 'bg-teal-100',    color: 'text-teal-600' },
+    { label: 'Dark mode',  Icon: Moon,        bg: 'bg-slate-100',   color: 'text-slate-600' },
+    { label: 'Trợ giúp',   Icon: HelpCircle,  bg: 'bg-orange-100',  color: 'text-orange-600' },
+  ];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex max-w-[220px] items-center gap-2.5 rounded-2xl border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group">
+        <button
+          type="button"
+          aria-label="Mở menu tài khoản"
+          className="flex max-w-[220px] items-center gap-2.5 rounded-2xl border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group"
+        >
           <Avatar className="h-8 w-8 shrink-0">
-            <AvatarImage src={effectiveProfile?.avatar_url || ''} alt={displayName} />
+            <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
             <AvatarFallback className="bg-indigo-100 text-xs font-black text-indigo-700">
               {initials}
             </AvatarFallback>
@@ -85,31 +153,47 @@ export function ConsumerProfileDropdown({ profile }: ConsumerProfileDropdownProp
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        style={{ width: '260px', minWidth: '260px' }}
+        style={{ width: '280px', minWidth: '280px' }}
         className="rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl"
       >
-        <div className="flex items-center gap-3 px-3 py-3">
-          <Avatar className="h-9 w-9 shrink-0">
-            <AvatarImage src={effectiveProfile?.avatar_url || ''} alt={displayName} />
-            <AvatarFallback className="bg-indigo-100 text-xs font-black text-indigo-700">
+        <button
+          onClick={goToProfile}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-gray-50"
+        >
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
+            <AvatarFallback className="bg-indigo-100 text-sm font-black text-indigo-700">
               {initials}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold leading-tight text-gray-900">{displayName}</p>
             <p className="mt-0.5 truncate text-xs text-gray-400">{email}</p>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-indigo-600">
+              Xem trang cá nhân →
+            </p>
           </div>
-        </div>
+        </button>
+
+        <div className="mx-1 my-1 h-px bg-gray-100" />
+
+        <button
+          onClick={() => router.push('/consumer/feed')}
+          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
+        >
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-pink-100 text-pink-600">
+            <Sparkles size={13} strokeWidth={2.5} />
+          </div>
+          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Social Feed</span>
+          <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
+            MỚI
+          </span>
+        </button>
 
         <div className="mx-1 my-1 h-px bg-gray-100" />
 
         <div className="space-y-0.5">
-          {[
-            { label: 'Hồ sơ cá nhân', Icon: User, bg: 'bg-indigo-100', color: 'text-indigo-600', path: '/consumer/profile' },
-            { label: 'Lớp học của tôi', Icon: BookOpen, bg: 'bg-emerald-100', color: 'text-emerald-600', path: '/consumer/classroom' },
-            { label: 'Dashboard', Icon: LayoutDashboard, bg: 'bg-blue-100', color: 'text-blue-600', path: '/consumer/dashboard' },
-            { label: 'Settings', Icon: Settings, bg: 'bg-violet-100', color: 'text-violet-600', path: '/consumer/settings' },
-          ].map(({ label, Icon, bg, color, path }) => (
+          {menuItems.map(({ label, Icon, bg, color, path }) => (
             <button
               key={path}
               onClick={() => router.push(path)}
@@ -124,6 +208,45 @@ export function ConsumerProfileDropdown({ profile }: ConsumerProfileDropdownProp
         </div>
 
         <div className="mx-1 my-1 h-px bg-gray-100" />
+
+        <div className="grid grid-cols-4 gap-1 px-1 py-1">
+          {quickItems.map(({ label, Icon, bg, color }) => (
+            <button
+              key={label}
+              onClick={() => {
+                if (label === 'Thông báo') router.push('/consumer/notifications');
+                else if (label === 'Trợ giúp') router.push('/consumer/help');
+                else if (label === 'Ngôn ngữ') router.push('/consumer/settings?tab=language');
+                else if (label === 'Dark mode') {
+                  if (typeof document !== 'undefined') {
+                    document.documentElement.classList.toggle('dark');
+                  }
+                }
+              }}
+              className="flex flex-col items-center gap-1 rounded-xl py-2 transition-colors hover:bg-gray-50 group"
+              title={label}
+            >
+              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${bg} ${color}`}>
+                <Icon size={15} strokeWidth={2.5} />
+              </div>
+              <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900">
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="mx-1 my-1 h-px bg-gray-100" />
+
+        <button
+          onClick={() => router.push('/consumer/profile/edit')}
+          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
+        >
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-cyan-100 text-cyan-600">
+            <FileText size={13} strokeWidth={2.5} />
+          </div>
+          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Chỉnh sửa hồ sơ</span>
+        </button>
 
         <button
           onClick={handleLogout}

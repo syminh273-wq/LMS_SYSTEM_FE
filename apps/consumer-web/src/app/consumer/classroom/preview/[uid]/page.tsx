@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { use, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { classroomApi, type ClassroomPreviewResponse } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
@@ -16,11 +17,21 @@ import {
   Crown,
   Sparkles,
   FileText,
+  FileImage,
+  FileVideo,
+  FileAudio,
   ExternalLink,
   Hash,
   GraduationCap,
   Lock,
   Eye,
+  FolderOpen,
+  Folder as FolderIcon,
+  ChevronRight,
+  ChevronDown,
+  Play,
+  X,
+  Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -68,13 +79,32 @@ function formatBytes(bytes?: number) {
   return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
 }
 
-function fileIcon(name: string) {
-  const ext = name.split('.').pop()?.toLowerCase() || '';
-  if (['pdf'].includes(ext)) return <FileText size={16} className="text-rose-500" />;
-  if (['ppt', 'pptx'].includes(ext)) return <FileText size={16} className="text-orange-500" />;
-  if (['doc', 'docx'].includes(ext)) return <FileText size={16} className="text-blue-500" />;
-  if (['xls', 'xlsx'].includes(ext)) return <FileText size={16} className="text-emerald-500" />;
+function fileIcon(name: string, fileType?: string) {
+  const ext = (name.split('.').pop() || fileType || '').toLowerCase();
+  if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext))
+    return <FileVideo size={16} className="text-violet-500" />;
+  if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext))
+    return <FileAudio size={16} className="text-pink-500" />;
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext))
+    return <FileImage size={16} className="text-emerald-500" />;
+  if (['pdf'].includes(ext))
+    return <FileText size={16} className="text-rose-500" />;
+  if (['ppt', 'pptx'].includes(ext))
+    return <FileText size={16} className="text-orange-500" />;
+  if (['doc', 'docx'].includes(ext))
+    return <FileText size={16} className="text-blue-500" />;
+  if (['xls', 'xlsx', 'csv'].includes(ext))
+    return <FileText size={16} className="text-emerald-600" />;
   return <FileText size={16} className="text-slate-400" />;
+}
+
+function fileKind(name: string, fileType?: string): 'image' | 'video' | 'audio' | 'pdf' | 'other' {
+  const ext = (name.split('.').pop() || fileType || '').toLowerCase();
+  if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext)) return 'video';
+  if (['mp3', 'wav', 'ogg', 'm4a'].includes(ext)) return 'audio';
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(ext)) return 'image';
+  if (ext === 'pdf') return 'pdf';
+  return 'other';
 }
 
 export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid: string }> }) {
@@ -86,6 +116,39 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [previewDoc, setPreviewDoc] = useState<{
+    uid: string;
+    name: string;
+    url: string;
+    kind: 'image' | 'video' | 'audio' | 'pdf' | 'other';
+  } | null>(null);
+
+  useEffect(() => {
+    if (!data) return;
+    /* eslint-disable react-hooks/set-state-in-effect --
+       Initialize folder-expansion defaults from the loaded preview tree. */
+    const next: Record<string, boolean> = {};
+    for (const item of data.preview.items) {
+      if (item.type === 'folder' && next[item.uid] === undefined) {
+        next[item.uid] = true;
+      }
+    }
+    setExpanded((prev) => ({ ...next, ...prev }));
+  }, [data]);
+
+  useEffect(() => {
+    if (!previewDoc) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPreviewDoc(null);
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [previewDoc]);
 
   useEffect(() => {
     if (!mounted || !isAuthenticated) return;
@@ -222,39 +285,65 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
         </div>
       </div>
 
-      <Card className="border-slate-200">
-        <CardContent className="p-5 flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 text-lg font-black overflow-hidden shrink-0">
-            {teacherAvatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={teacherAvatar} alt={teacherName} className="h-full w-full object-cover" />
-            ) : (
+      {classroom.teacher_id ? (
+        <Link
+          href={`/teachers/${classroom.teacher_id}/portfolio`}
+          prefetch={false}
+          className="block group"
+          aria-label={`Xem portfolio của giáo viên ${teacherName}`}
+        >
+          <Card className="border-slate-200 transition group-hover:shadow-md group-hover:border-indigo-200 cursor-pointer">
+            <CardContent className="p-5 flex items-center gap-4">
+              <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 text-lg font-black overflow-hidden shrink-0">
+                {teacherAvatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={teacherAvatar} alt={teacherName} className="h-full w-full object-cover" />
+                ) : (
+                  <GraduationCap size={26} />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Giáo viên
+                </div>
+                <div className="text-base font-black text-foreground truncate">{teacherName}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  Cung cấp khóa học trên LMS · Nhấn để xem portfolio
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      ) : (
+        <Card className="border-slate-200">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 text-lg font-black overflow-hidden shrink-0">
               <GraduationCap size={26} />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              Giáo viên
             </div>
-            <div className="text-base font-black text-foreground truncate">{teacherName}</div>
-            <div className="text-xs text-muted-foreground mt-0.5">
-              Cung cấp khóa học trên LMS
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                Giáo viên
+              </div>
+              <div className="text-base font-black text-foreground truncate">{teacherName}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                Cung cấp khóa học trên LMS
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="space-y-3">
         <div className="flex items-center gap-2 px-1">
           <Eye size={16} className="text-emerald-600" />
           <h2 className="text-base font-black text-foreground">Bài giảng miễn phí</h2>
-          {preview.docs.length > 0 && (
+          {preview.items.length > 0 && (
             <span className="text-xs font-bold text-muted-foreground">
-              · {preview.docs.length} tài liệu
+              · {preview.items.filter((it) => it.type === 'doc').length} tài liệu
             </span>
           )}
         </div>
-        {preview.docs.length === 0 ? (
+        {preview.items.length === 0 ? (
           <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-8 text-center">
             <div className="text-3xl mb-2">📭</div>
             <div className="text-sm font-bold text-foreground">Chưa có bài giảng miễn phí</div>
@@ -265,33 +354,90 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {preview.docs.map((doc) => (
-              <a
-                key={doc.uid}
-                href={doc.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-3 hover:border-emerald-300 hover:shadow-sm transition-all"
-              >
-                <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
-                  {fileIcon(doc.name)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-bold text-foreground truncate group-hover:text-emerald-700">
-                    {doc.name}
+          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
+            {preview.items.map((item) => {
+              if (item.type === 'folder') {
+                const isOpen = expanded[item.uid] ?? true;
+                const isRootPreview = item.is_preview_only && item.depth === 0;
+                return (
+                  <div
+                    key={`f-${item.uid}`}
+                    className={`group flex items-center gap-2 px-3 py-2 cursor-pointer select-none transition border-b border-slate-100 last:border-b-0 ${
+                      isRootPreview
+                        ? 'bg-emerald-50/60 hover:bg-emerald-50 text-emerald-800'
+                        : 'hover:bg-slate-50 text-slate-700'
+                    }`}
+                    style={{ paddingLeft: 8 + item.depth * 16 }}
+                    onClick={() =>
+                      setExpanded((prev) => ({ ...prev, [item.uid]: !(prev[item.uid] ?? true) }))
+                    }
+                  >
+                    {isOpen ? (
+                      <ChevronDown size={14} className="text-slate-400 shrink-0" />
+                    ) : (
+                      <ChevronRight size={14} className="text-slate-400 shrink-0" />
+                    )}
+                    {isOpen ? (
+                      <FolderOpen
+                        size={15}
+                        className={isRootPreview ? 'text-emerald-600 shrink-0' : 'text-amber-500 shrink-0'}
+                      />
+                    ) : (
+                      <FolderIcon
+                        size={15}
+                        className={isRootPreview ? 'text-emerald-600 shrink-0' : 'text-amber-500 shrink-0'}
+                      />
+                    )}
+                    <span className="truncate text-sm font-bold flex-1">{item.name}</span>
+                    {isRootPreview && (
+                      <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-100/80 rounded px-1.5 py-0.5">
+                        Preview
+                      </span>
+                    )}
                   </div>
-                  <div className="text-[11px] text-muted-foreground">
-                    {doc.file_type?.toUpperCase() || 'FILE'}
-                    {doc.size ? ` · ${formatBytes(doc.size)}` : ''}
+                );
+              }
+              const parentOpen = expanded[item.folder_id] ?? true;
+              if (!parentOpen) return null;
+              return (
+                <button
+                  type="button"
+                  key={`d-${item.uid}`}
+                  onClick={() =>
+                    setPreviewDoc({
+                      uid: item.uid,
+                      name: item.name,
+                      url: item.url,
+                      kind: fileKind(item.name, item.file_type),
+                    })
+                  }
+                  className="w-full group flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0 text-left"
+                  style={{ paddingLeft: 28 + item.depth * 16 }}
+                >
+                  <div className="h-9 w-9 rounded-lg bg-slate-50 group-hover:bg-white flex items-center justify-center shrink-0 border border-slate-100">
+                    {fileIcon(item.name, item.file_type)}
                   </div>
-                </div>
-                <ExternalLink size={14} className="text-slate-400 group-hover:text-emerald-600" />
-              </a>
-            ))}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold text-foreground truncate group-hover:text-emerald-700">
+                      {item.name}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {(item.file_type || '').toUpperCase() || 'FILE'}
+                      {item.size ? ` · ${formatBytes(item.size)}` : ''}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+                    {fileKind(item.name, item.file_type) === 'video' && (
+                      <Play size={12} className="text-slate-400" />
+                    )}
+                    <ExternalLink size={13} className="text-slate-400" />
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
-        {isPaid && preview.docs.length > 0 && (
+        {isPaid && preview.items.some((it) => it.type === 'doc') && (
           <div className="text-[11px] text-muted-foreground px-1 flex items-center gap-1">
             <Lock size={11} /> Đây chỉ là phần xem trước. Tham gia để mở khóa toàn bộ bài giảng.
           </div>
@@ -344,6 +490,88 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
           )}
         </div>
       </div>
+
+      {previewDoc && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setPreviewDoc(null)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 bg-slate-50">
+              <p className="text-sm font-bold text-slate-900 truncate flex-1 min-w-0" title={previewDoc.name}>
+                {previewDoc.name}
+              </p>
+              <a
+                href={previewDoc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
+                title="Tải xuống"
+              >
+                <Download size={14} />
+              </a>
+              <button
+                type="button"
+                onClick={() => setPreviewDoc(null)}
+                className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
+                title="Đóng (Esc)"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex-1 min-h-0 flex items-center justify-center bg-slate-100 p-4 overflow-auto">
+              {previewDoc.kind === 'image' ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={previewDoc.url}
+                  alt={previewDoc.name}
+                  className="max-w-full max-h-full object-contain rounded-lg shadow"
+                />
+              ) : previewDoc.kind === 'video' ? (
+                <video
+                  src={previewDoc.url}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-full rounded-lg shadow bg-black"
+                />
+              ) : previewDoc.kind === 'audio' ? (
+                <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow">
+                  <p className="text-sm font-bold text-slate-900 mb-4 truncate" title={previewDoc.name}>
+                    {previewDoc.name}
+                  </p>
+                  <audio src={previewDoc.url} controls autoPlay className="w-full" />
+                </div>
+              ) : previewDoc.kind === 'pdf' ? (
+                <iframe
+                  src={previewDoc.url}
+                  title={previewDoc.name}
+                  className="w-full h-full rounded-lg shadow bg-white"
+                />
+              ) : (
+                <div className="text-center text-slate-500">
+                  <p className="text-sm font-medium mb-3">
+                    Không hỗ trợ xem trước cho định dạng này.
+                  </p>
+                  <a
+                    href={previewDoc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block"
+                  >
+                    <Button size="sm" className="rounded-xl">
+                      <Download size={13} className="mr-1" /> Tải xuống
+                    </Button>
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

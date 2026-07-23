@@ -107,8 +107,21 @@ export function useNotifications({ userId }: Options) {
 
   useEffect(() => {
     if (!firebaseApp || !userId) return;
+    const databaseURL = firebaseApp.options.databaseURL;
+    if (!databaseURL) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('[useNotifications] Realtime DB not configured; skipping live subscription');
+      }
+      return;
+    }
 
-    const db = getDatabase(firebaseApp);
+    let db: ReturnType<typeof getDatabase>;
+    try {
+      db = getDatabase(firebaseApp, databaseURL);
+    } catch (err) {
+      console.error('[useNotifications] getDatabase failed, realtime disabled', err);
+      return;
+    }
     const notifRef = ref(db, `notifications/${userId}`);
 
     const unsubscribe = onValue(notifRef, snapshot => {

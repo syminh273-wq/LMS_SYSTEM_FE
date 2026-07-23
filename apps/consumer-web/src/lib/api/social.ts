@@ -24,6 +24,12 @@ class SocialApiClient extends BaseRestApiClient {
     return this.post('/api/v1/consumer/social/posts/', data);
   }
 
+  public async uploadPostImages(files: File[]): Promise<{ urls: string[]; errors: { name: string; error: string }[]; count: number }> {
+    const fd = new FormData();
+    files.forEach((f) => fd.append('files', f));
+    return this.post('/api/v1/consumer/social/posts/upload-images/', fd);
+  }
+
   public async deletePost(uid: string): Promise<void> {
     return super.delete(`/api/v1/consumer/social/posts/${uid}/`);
   }

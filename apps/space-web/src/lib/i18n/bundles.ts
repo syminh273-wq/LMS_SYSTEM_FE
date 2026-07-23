@@ -61,6 +61,10 @@ import sharedRtcEn from '@shared/locales/rtc/en.json';
 import sharedRtcVi from '@shared/locales/rtc/vi.json';
 import sharedStudentEn from '@shared/locales/student/en.json';
 import sharedStudentVi from '@shared/locales/student/vi.json';
+import sharedPortfolioEn from '@shared/locales/portfolio/en.json';
+import sharedPortfolioVi from '@shared/locales/portfolio/vi.json';
+import sharedWorkspaceEn from '@shared/locales/workspace/en.json';
+import sharedWorkspaceVi from '@shared/locales/workspace/vi.json';
 
 export const spaceWebBundles: LocaleBundles = {
   en: {
@@ -94,6 +98,8 @@ export const spaceWebBundles: LocaleBundles = {
     resource: sharedResourceEn,
     rtc: sharedRtcEn,
     sharedStudent: sharedStudentEn,
+    portfolio: sharedPortfolioEn,
+    workspace: sharedWorkspaceEn,
   },
   vi: {
     common: commonVi,
@@ -126,5 +132,7 @@ export const spaceWebBundles: LocaleBundles = {
     resource: sharedResourceVi,
     rtc: sharedRtcVi,
     sharedStudent: sharedStudentVi,
+    portfolio: sharedPortfolioVi,
+    workspace: sharedWorkspaceVi,
   },
 };

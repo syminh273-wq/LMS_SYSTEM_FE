@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { CreatePost } from './CreatePost';
 import { PostCard } from './PostCard';
 import { cn } from '@shared/lib/utils';
+import { WorkspaceShell } from '@/components/WorkspaceShell';
 
 export default function FeedPage() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function FeedPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (!localStorage.getItem('accessToken')) { router.push('/consumer/login'); return; }
     const init = async () => {
@@ -83,7 +85,7 @@ export default function FeedPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <WorkspaceShell>
       <div className="max-w-2xl mx-auto px-4 sm:px-0 py-6 sm:py-8 space-y-4 sm:space-y-5">
         <div className="px-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
@@ -161,6 +163,6 @@ export default function FeedPage() {
           </div>
         )}
       </div>
-    </div>
+    </WorkspaceShell>
   );
 }

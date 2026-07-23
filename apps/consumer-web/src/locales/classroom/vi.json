@@ -192,6 +192,13 @@
     "btn_favorite": "Yêu thích",
     "btn_unfavorite": "Đã thích",
     "load_error": "Không thể cập nhật yêu thích"
+  },
+  "payment": {
+    "success_title": "Thanh toán thành công!",
+    "success_pending_body": "Đã thanh toán. Vui lòng chờ giáo viên phê duyệt yêu cầu tham gia lớp.",
+    "class_label": "Lớp học",
+    "course_label": "Khóa học",
+    "btn_go_to_class": "Vào lớp học",
+    "btn_close": "Đóng"
   }
-}
 }

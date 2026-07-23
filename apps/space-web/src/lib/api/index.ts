@@ -14,12 +14,13 @@ import { studentApi } from './student';
 import { calendarApi } from './calendar';
 import { spaceLeaveRequestApi } from './leaveRequest';
 import { courseApi } from './course';
+import { portfolioApi } from './portfolio';
 
 export * from './types';
 export * from './exceptions';
 export * from './calendar';
 export * from './leaveRequest';
-export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi, courseApi };
+export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi, courseApi, portfolioApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -38,6 +39,7 @@ export const api = {
   calendar: calendarApi,
   leaveRequests: spaceLeaveRequestApi,
   courses: courseApi,
+  portfolio: portfolioApi,
 };
 
 // Re-export specific instances

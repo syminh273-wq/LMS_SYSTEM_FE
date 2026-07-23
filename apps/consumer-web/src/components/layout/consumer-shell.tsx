@@ -100,16 +100,18 @@ interface NavItem {
   icon: React.ElementType;
 }
 
-const navItems: NavItem[] = [
+const primaryNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
   { name: 'Khám phá', href: '/consumer/discover', icon: Compass },
-  { name: 'Yêu thích', href: '/consumer/classroom/favorites', icon: Heart },
   { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
-  { name: 'My Courses', href: '/consumer/course', icon: GraduationCap },
+];
+
+const utilityNavItems: NavItem[] = [
+  { name: 'Yêu thích', href: '/consumer/classroom/favorites', icon: Heart },
   { name: 'Feed', href: '/consumer/feed', icon: Sparkles },
-  { name: 'Calendar', href: '/consumer/calendar', icon: CalendarIcon },
-  { name: 'Grades', href: '/consumer/grades', icon: GraduationCap },
-  { name: 'Certificates', href: '/consumer/certificate', icon: Award },
+  { name: 'Lịch học', href: '/consumer/calendar', icon: CalendarIcon },
+  { name: 'Bảng điểm', href: '/consumer/grades', icon: GraduationCap },
+  { name: 'Chứng chỉ', href: '/consumer/certificate', icon: Award },
 ];
 
 function parseNotificationMetadata(raw: string | NotificationMetadata | undefined | null): NotificationMetadata {
@@ -344,7 +346,6 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
             >
               <LmsLogo
                 height={32}
-                width="auto"
                 className="h-8 w-auto object-contain"
               />
             </Link>
@@ -352,10 +353,9 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
             <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-700" />
 
             <nav className="hidden lg:flex items-center gap-1" aria-label="Main">
-              {navItems.map((item) => {
+              {primaryNavItems.map((item) => {
                 const active = isActive(item.href);
                 const Icon = item.icon;
-                const showCertDot = item.href === '/consumer/certificate' && unseenCertCount > 0;
                 return (
                   <Link
                     key={item.href}
@@ -370,17 +370,73 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                   >
                     <Icon size={15} strokeWidth={2.2} />
                     <span className="whitespace-nowrap">{item.name}</span>
-                    {showCertDot && (
-                      <span
-                        className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900"
-                        aria-label={`${unseenCertCount} new certificate(s)`}
-                      >
-                        {unseenCertCount > 9 ? '9+' : unseenCertCount}
-                      </span>
-                    )}
                   </Link>
                 );
               })}
+
+              {(() => {
+                return (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={cn(
+                          "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none",
+                          "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800",
+                          "data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-100"
+                        )}
+                      >
+                        <Sparkles size={15} strokeWidth={2.2} />
+                        <span className="whitespace-nowrap">Tiện ích</span>
+                        <ChevronDown size={13} className="opacity-70" />
+                        {unseenCertCount > 0 && (
+                          <span
+                            className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900"
+                            aria-label={`${unseenCertCount} new certificate(s)`}
+                          >
+                            {unseenCertCount > 9 ? '9+' : unseenCertCount}
+                          </span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      sideOffset={8}
+                      className="w-[220px] rounded-xl shadow-xl border border-slate-200 bg-white p-1.5 animate-fade-down dark:bg-slate-900 dark:border-slate-700"
+                    >
+                      {utilityNavItems.map((item) => {
+                        const active = isActive(item.href);
+                        const Icon = item.icon;
+                        const showCertDot = item.href === '/consumer/certificate' && unseenCertCount > 0;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left transition-colors",
+                              active
+                                ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
+                                : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                            )}
+                          >
+                            <span className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center dark:bg-slate-800">
+                              <Icon size={14} className="text-slate-500 dark:text-slate-400" />
+                            </span>
+                            <span className="text-sm font-medium flex-1">{item.name}</span>
+                            {showCertDot && (
+                              <span
+                                className="min-w-[18px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center"
+                                aria-label={`${unseenCertCount} new certificate(s)`}
+                              >
+                                {unseenCertCount > 9 ? '9+' : unseenCertCount}
+                              </span>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              })()}
             </nav>
           </div>
 
