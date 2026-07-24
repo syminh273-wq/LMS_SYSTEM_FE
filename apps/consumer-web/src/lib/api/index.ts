@@ -16,6 +16,7 @@ import { ApiException } from './exceptions';
 import { SharingLink, NotificationItem, PaginatedResponse } from './types';
 import { consumerCourseApi } from './course';
 import { portfolioApi } from './portfolio';
+import { rankingApi } from './ranking';
 
 export * from './types';
 export * from './exceptions';
@@ -31,6 +32,7 @@ export { consumerLeaveRequestApi };
 export { consumerCourseApi };
 export { paymentApi };
 export { portfolioApi };
+export { rankingApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -42,6 +44,7 @@ export const api = {
   calendar: consumerCalendarApi,
   leaveRequests: consumerLeaveRequestApi,
   courses: consumerCourseApi,
+  ranking: rankingApi,
 };
 
 // Re-export specific instances

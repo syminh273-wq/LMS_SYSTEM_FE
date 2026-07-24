@@ -758,3 +758,91 @@ export type CheckoutResponse = {
   deeplink?: string;
   qr_code_url?: string;
 };
+
+// ── Ranking / XP / Level / Achievements ─────────────────────────────────────
+
+export type RankingProfile = {
+  student_id: string;
+  total_xp: number;
+  level: number;
+  current_level_xp: number;
+  next_level_xp: number;
+  progress_pct: number;
+  xp_to_next_level: number;
+  streak_days: number;
+  last_active_date: string | null;
+  classrooms_joined_count: number;
+  quizzes_passed_count: number;
+  exams_passed_count: number;
+  perfect_scores_count: number;
+  certificates_count: number;
+  attendance_count: number;
+  level_title: string;
+};
+
+export type XpTransaction = {
+  uid: string;
+  event_type: string;
+  delta_xp: number;
+  ref_type?: string;
+  ref_id?: string | null;
+  classroom_id?: string | null;
+  description?: string;
+  created_at: string;
+};
+
+export type Achievement = {
+  code: string;
+  title: string;
+  description: string;
+  icon: string;
+  target_value: number;
+  current_value: number;
+  progress_pct: number;
+  is_unlocked: boolean;
+  unlocked_at?: string | null;
+};
+
+export type GlobalLeaderboardEntry = {
+  rank: number;
+  student_id: string;
+  student_name: string;
+  student_avatar: string;
+  total_xp: number;
+  level: number;
+};
+
+export type GlobalLeaderboardResponse = {
+  period: 'all' | 'week' | 'month';
+  total_students: number;
+  entries: GlobalLeaderboardEntry[];
+};
+
+export type MyRankResponse = {
+  rank: number | null;
+  total_xp: number;
+  level: number;
+  student_id: string;
+};
+
+export type LevelDefinition = {
+  level: number;
+  required_xp: number;
+  title: string;
+};
+
+export type LevelsResponse = {
+  levels: LevelDefinition[];
+};
+
+export type AchievementsCatalogResponse = {
+  achievements: Array<{
+    code: string;
+    title: string;
+    description: string;
+    icon: string;
+    target_value: number;
+  }>;
+};
+
+export type LeaderboardPeriod = 'all' | 'week' | 'month';

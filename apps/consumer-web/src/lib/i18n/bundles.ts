@@ -32,6 +32,8 @@ import validationEn from '@/locales/validation/en.json';
 import validationVi from '@/locales/validation/vi.json';
 import courseEn from '@/locales/course/en.json';
 import courseVi from '@/locales/course/vi.json';
+import rankingEn from '@/locales/ranking/en.json';
+import rankingVi from '@/locales/ranking/vi.json';
 
 import sharedLayoutEn from '@shared/locales/layout/en.json';
 import sharedLayoutVi from '@shared/locales/layout/vi.json';
@@ -70,6 +72,7 @@ export const consumerWebBundles: LocaleBundles = {
     validation: validationEn,
     leave_request: leaveRequestEn,
     course: courseEn,
+    ranking: rankingEn,
     layout: sharedLayoutEn,
     settings: sharedSettingsEn,
     profile: sharedProfileEn,
@@ -97,6 +100,7 @@ export const consumerWebBundles: LocaleBundles = {
     validation: validationVi,
     leave_request: leaveRequestVi,
     course: courseVi,
+    ranking: rankingVi,
     layout: sharedLayoutVi,
     settings: sharedSettingsVi,
     profile: sharedProfileVi,
