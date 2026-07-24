@@ -69,6 +69,7 @@ import {
   ShieldBan,
   ShieldOff,
   ShieldAlert,
+  Trophy,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
 import type { Quiz } from '@/lib/api/types';
@@ -101,6 +102,7 @@ import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { ClassroomDocsManager } from '@/components/classroom/docs-manager/ClassroomDocsManager';
 import { ClassroomCalendarTab } from '@/components/calendar/ClassroomCalendarTab';
+import SpaceClassroomRankingView from '@/components/ranking/SpaceClassroomRankingView';
 import { LeaveRequestTab } from '@shared/components/leave-request';
 import { spaceLeaveRequestApi, calendarApi as spaceCalendarApi } from '@/lib/api';
 import {
@@ -167,7 +169,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<SharingLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking'>('info');
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [blacklist, setBlacklist] = useState<BlacklistEntry[]>([]);
   const [loadingBlacklist, setLoadingBlacklist] = useState(false);
@@ -228,7 +230,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [canManageExams, setCanManageExams] = useState(false);
 
   type ActiveTab = typeof activeTab;
-  const VALID_TABS: ActiveTab[] = ['info', 'docs', 'chat', 'meeting', 'exams', 'final_exams', 'quiz', 'students', 'ai', 'blacklist', 'calendar', 'leave_request'];
+  const VALID_TABS: ActiveTab[] = ['info', 'docs', 'chat', 'meeting', 'exams', 'final_exams', 'quiz', 'students', 'ai', 'blacklist', 'calendar', 'leave_request', 'ranking'];
 
   const buildQueryString = React.useCallback(
     (overrides: Record<string, string | null>) => {
@@ -1040,6 +1042,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
                 { id: 'quiz',     label: t('classroom.ui.tab_quiz'),     icon: Gamepad2 },
                 { id: 'students',  label: t('classroom.ui.tab_students'),  icon: Users },
+                { id: 'ranking',  label: t('classroom.ui.tab_ranking'),  icon: Trophy },
                 { id: 'leave_request', label: t('classroom.ui.tab_leave_request', 'Xin nghỉ'), icon: ClipboardList },
                 { id: 'blacklist', label: t('classroom.ui.tab_blacklist'), icon: ShieldBan },
               ] as const).map(({ id, label, icon: Icon }) => {
@@ -1180,6 +1183,21 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             {members.filter(m => m.role === 'student').length}
                           </span>
                         )}
+                      </button>
+                    );
+                  })()}
+                  {(() => {
+                    const isActive = activeTab === 'ranking';
+                    return (
+                      <button
+                        onClick={() => goToTab('ranking')}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
+                        <Trophy size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        {t('classroom.ui.tab_ranking')}
                       </button>
                     );
                   })()}
@@ -2282,6 +2300,24 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </table>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'ranking' && (
+            <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+              <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+                <div className="p-10 border-b border-border bg-muted/50">
+                  <h3 className="text-xl font-bold text-foreground">
+                    {t('classroom.ui.tab_ranking', 'Ranking')}
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">
+                    {t('ranking.subtitle', 'Top students by total XP earned from classroom activities.')}
+                  </p>
+                </div>
+                <div className="p-6">
+                  <SpaceClassroomRankingView classroomUid={uid} t={t} />
                 </div>
               </div>
             </div>
