@@ -1,6 +1,6 @@
 'use client';
 
-import { Award, CheckCircle2, Lock, Star, Trophy, Medal, Sparkles, School, Verified, PlayCircle, EventAvailable, EventNote, Explore, LayoutDashboard, MilitaryTech, WorkspacePremium, EmojiEvents, LocalFireDepartment } from 'lucide-react';
+import { Award, CheckCircle2, Lock, Star, Trophy, Medal, Sparkles, School, Verified, PlayCircle, CalendarCheck, CalendarDays, Compass, LayoutDashboard, Flame } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Achievement } from '@/lib/api';
@@ -19,14 +19,14 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   school: School,
   verified: Verified,
   play_circle: PlayCircle,
-  event_available: EventAvailable,
-  event_note: EventNote,
-  explore: Explore,
+  event_available: CalendarCheck,
+  event_note: CalendarDays,
+  explore: Compass,
   dashboard: LayoutDashboard,
-  military_tech: MilitaryTech,
-  workspace_premium: WorkspacePremium,
-  emoji_events: EmojiEvents,
-  local_fire_department: LocalFireDepartment,
+  military_tech: Medal,
+  workspace_premium: Award,
+  emoji_events: Trophy,
+  local_fire_department: Flame,
 };
 
 function getIcon(name: string) {
