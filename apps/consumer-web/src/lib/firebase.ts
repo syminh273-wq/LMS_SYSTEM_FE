@@ -16,6 +16,8 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+export { firebaseConfig };
+
 const RTDB_APP_NAME = "consumer-rtdb";
 
 function resolveApp(): FirebaseApp | null {

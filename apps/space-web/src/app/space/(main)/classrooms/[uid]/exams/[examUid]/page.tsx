@@ -1,9 +1,9 @@
 'use client';
 
-import { use, useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  ArrowLeft,
+  AlertCircle,
   BarChart3,
   Calendar,
   Camera,
@@ -13,19 +13,43 @@ import {
   FileText,
   Loader2,
   Monitor,
+  MoreVertical,
+  Save,
   Search,
   ShieldAlert,
   Timer,
   Users,
+  Wand2,
   Wifi,
   WifiOff,
+  X,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { classroomApi, examApi, Classroom, ClassroomMember, Exam, ExamSession, ExamSubmission } from '@/lib/api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { Badge } from '@shared/components/ui/badge';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
+import { Progress } from '@shared/components/ui/progress';
+import { Switch } from '@shared/components/ui/switch';
+import { Separator } from '@shared/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import { Tabs, TabsList, TabsTrigger } from '@shared/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@shared/components/ui/dropdown-menu';
+import { classroomApi, examApi, type Classroom, type ClassroomMember, type Exam, type ExamSession, type ExamSubmission } from '@/lib/api';
 import { SubmissionAuditModal } from '@/components/exam/submission-audit-modal';
+import { useTranslation } from '@shared/components/LocaleProvider';
+import { toast } from 'sonner';
 
 type SubmissionFilter = 'submitted' | 'missing';
 type ExamDetailTab = 'submissions' | 'online';
+type GradeFilter = 'all' | 'submitted' | 'missing' | 'graded' | 'ungraded';
+type GradeRow = { member: ClassroomMember; submission: ExamSubmission | null };
 
 interface OpenExamSettings {
   camera_required: boolean;
@@ -38,13 +62,14 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
   const { uid, examUid } = use(params);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t, formatDateTime } = useTranslation();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [exam, setExam] = useState<Exam | null>(null);
   const [members, setMembers] = useState<ClassroomMember[]>([]);
   const [submissions, setSubmissions] = useState<ExamSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState<SubmissionFilter>('submitted');
+  const [filter, setFilter] = useState<GradeFilter>('all');
   const [query, setQuery] = useState('');
   const [sessions, setSessions] = useState<ExamSession[]>([]);
   const [auditSubmission, setAuditSubmission] = useState<ExamSubmission | null>(null);
@@ -57,32 +82,62 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
     late_threshold_minutes: 5,
     max_face_warnings: 3,
   });
+
+  // Grade table state (moved from modal)
+  const [gradeTableLoading, setGradeTableLoading] = useState(false);
+  const membersRef = useRef<ClassroomMember[]>([]);
+  const [gradeTableError, setGradeTableError] = useState('');
+  const [activeStudentId, setActiveStudentId] = useState<string | null>(null);
+  const [grade, setGrade] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [aiGradingTarget, setAiGradingTarget] = useState<string | null>(null);
+
   const activeTab = (searchParams.get('tab') as ExamDetailTab) || 'submissions';
+
+  const loadGradeTable = useCallback(async () => {
+    setGradeTableLoading(true);
+    setGradeTableError('');
+    try {
+      const [memberData, submissionData] = await Promise.all([
+        classroomApi.members(uid),
+        examApi.listSubmissions(examUid),
+      ]);
+      const studentsOnly = memberData.filter(member => member.role === 'student' && member.status === 'approved');
+      setMembers(studentsOnly);
+      membersRef.current = studentsOnly;
+      setSubmissions(submissionData);
+    } catch (err: unknown) {
+      setGradeTableError(err instanceof Error ? err.message : t('classroom.ui.score_load_error'));
+    } finally {
+      setGradeTableLoading(false);
+    }
+  }, [uid, examUid, t]);
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
         setError('');
-        const [classroomData, examData, memberData, submissionData] = await Promise.all([
+        const [classroomData, examData] = await Promise.all([
           classroomApi.retrieve(uid),
           examApi.retrieve(examUid),
-          classroomApi.members(uid),
-          examApi.listSubmissions(examUid),
         ]);
         setClassroom(classroomData);
         setExam(examData);
-        setMembers(memberData.filter(member => member.role === 'student' && member.member_type === 'consumer'));
-        setSubmissions(submissionData);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Không thể tải chi tiết bài kiểm tra');
       } finally {
         setLoading(false);
       }
     };
-
     void load();
   }, [examUid, uid]);
+
+  useEffect(() => {
+    if (activeTab !== 'submissions') return;
+    void loadGradeTable();
+  }, [activeTab, loadGradeTable]);
 
   // Pre-fill modal settings from exam data
   useEffect(() => {
@@ -97,20 +152,34 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
 
   useEffect(() => {
     if (activeTab !== 'online') return;
+    let cancelled = false;
     const loadSessions = async () => {
       try {
         setSessionLoading(true);
         setSessionError('');
+        if (membersRef.current.length === 0) {
+          const memberData = await classroomApi.members(uid);
+          if (cancelled) return;
+          const studentsOnly = memberData.filter((m: ClassroomMember) => m.role === 'student' && m.status === 'approved');
+          setMembers(studentsOnly);
+          membersRef.current = studentsOnly;
+        }
         const data = await examApi.listOnlineSessions(examUid);
+        if (cancelled) return;
         setSessions(data);
       } catch (err: unknown) {
-        setSessionError(err instanceof Error ? err.message : 'Không thể tải phiên thi');
+        if (!cancelled) {
+          setSessionError(err instanceof Error ? err.message : 'Không thể tải phiên thi');
+        }
       } finally {
-        setSessionLoading(false);
+        if (!cancelled) setSessionLoading(false);
       }
     };
     void loadSessions();
-  }, [activeTab, examUid]);
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, examUid, uid]);
 
   const handleOpenOnline = async () => {
     try {
@@ -144,127 +213,225 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
     }
   };
 
-  const submittedStudentIds = useMemo(
-    () => new Set(submissions.map(submission => submission.student_id)),
-    [submissions]
+  const subMap = useMemo(() => new Map(submissions.map(s => [s.student_id, s])), [submissions]);
+  const rows = useMemo<GradeRow[]>(
+    () => members.map(member => ({ member, submission: subMap.get(member.member_id) || null })),
+    [members, subMap]
   );
+  const activeRow = rows.find(row => row.member.member_id === activeStudentId) || null;
 
-  const submittedRows = useMemo(() => {
-    return submissions.map(submission => ({
-      kind: 'submitted' as const,
-      submission,
-      member: members.find(member => member.member_id === submission.student_id) || null,
-    }));
-  }, [members, submissions]);
+  const submitted = rows.filter(row => row.submission).length;
+  const missing = Math.max(0, members.length - submitted);
+  const gradedSubmissions = rows.map(r => r.submission).filter((s): s is ExamSubmission => s?.grade != null);
+  const graded = gradedSubmissions.length;
+  const submissionRate = members.length > 0 ? Math.round((submitted / members.length) * 100) : 0;
+  const gradingRate = submitted > 0 ? Math.round((graded / submitted) * 100) : 0;
+  const averageScore = graded > 0
+    ? gradedSubmissions.reduce((acc, s) => acc + (s.grade ?? 0), 0) / graded
+    : null;
+  const avg = averageScore != null ? averageScore.toFixed(1) : '--';
+  const averageRate = averageScore != null ? Math.round(averageScore * 10) : 0;
 
-  const missingRows = useMemo(() => {
-    return members
-      .filter(member => !submittedStudentIds.has(member.member_id))
-      .map(member => ({ kind: 'missing' as const, member }));
-  }, [members, submittedStudentIds]);
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleRows = rows.filter(row => {
+    const submission = row.submission;
+    const searchable = `${row.member.member_name} ${row.member.member_id}`.toLowerCase();
+    if (normalizedQuery && !searchable.includes(normalizedQuery)) return false;
+    if (filter === 'submitted') return Boolean(submission);
+    if (filter === 'missing') return !submission;
+    if (filter === 'graded') return submission?.grade != null;
+    if (filter === 'ungraded') return Boolean(submission) && submission?.grade == null;
+    return true;
+  });
 
-  const visibleRows = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-    const rows = filter === 'submitted' ? submittedRows : missingRows;
-    if (!normalizedQuery) return rows;
+  const filters: { value: GradeFilter; label: string; count: number }[] = [
+    { value: 'all', label: t('classroom.ui.grade_table_filter_all'), count: rows.length },
+    { value: 'submitted', label: t('classroom.ui.grade_table_filter_submitted'), count: submitted },
+    { value: 'missing', label: t('classroom.ui.grade_table_filter_missing'), count: missing },
+    { value: 'graded', label: t('classroom.ui.grade_table_filter_graded'), count: graded },
+    { value: 'ungraded', label: t('classroom.ui.grade_table_filter_ungraded'), count: Math.max(0, submitted - graded) },
+  ];
 
-    return rows.filter(row => {
-      const name = row.member?.member_name || (row.kind === 'submitted' ? row.submission.student_id : row.member.member_id);
-      return name.toLowerCase().includes(normalizedQuery);
-    });
-  }, [filter, missingRows, query, submittedRows]);
+  const openSubmission = (row: GradeRow) => {
+    setActiveStudentId(row.member.member_id);
+    setGrade(row.submission?.grade != null ? String(row.submission.grade) : '');
+    setFeedback(row.submission?.feedback || '');
+  };
 
-  const analytics = useMemo(() => buildAnalytics(members, submissions), [members, submissions]);
+  const handleSaveGrade = async () => {
+    if (!activeRow?.submission) return;
+    const score = Number(grade);
+    if (grade.trim() === '' || !Number.isFinite(score) || score < 0 || score > 10) {
+      toast.error(t('classroom.ui.score_range_error'));
+      return;
+    }
+    try {
+      setSaving(true);
+      const updated = await examApi.gradeSubmission(activeRow.submission.uid, {
+        grade: score,
+        feedback: feedback.trim(),
+      });
+      setSubmissions(prev => prev.map(s => s.uid === updated.uid ? updated : s));
+      toast.success(t('classroom.ui.score_save_success'));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.score_save_error'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const buildAIGradeRequest = (defaultOverwrite: boolean) => {
+    const rubric = window.prompt(
+      t('classroom.ui.ai_grading_prompt_hint'),
+      t('classroom.ui.ai_grading_prompt_default')
+    );
+    if (rubric === null) return null;
+    return {
+      rubric: rubric.trim(),
+      max_grade: 10,
+      overwrite: defaultOverwrite,
+      top_k: 5,
+    };
+  };
+
+  const handleAIGradeSubmission = async (row: GradeRow) => {
+    if (!row.submission || aiGradingTarget) return;
+    const request = buildAIGradeRequest(row.submission.grade != null);
+    if (!request) return;
+
+    setAiGradingTarget(row.submission.uid);
+    try {
+      const updated = await examApi.aiGradeSubmission(row.submission.uid, request);
+      setSubmissions(prev => prev.map(s => s.uid === updated.uid ? updated : s));
+      if (activeStudentId === row.member.member_id) {
+        setGrade(updated.grade != null ? String(updated.grade) : '');
+        setFeedback(updated.feedback || '');
+      }
+      toast.success(t('classroom.ui.ai_graded_one', undefined, { name: row.member.member_name }));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.ai_cannot_grade'));
+    } finally {
+      setAiGradingTarget(null);
+    }
+  };
+
+  const handleAIGradeAll = async () => {
+    if (aiGradingTarget) return;
+    const ungradedCount = rows.filter(row => row.submission && row.submission.grade == null).length;
+    if (ungradedCount === 0) {
+      const overwrite = window.confirm(t('classroom.ui.ai_grade_confirm_overwrite'));
+      if (!overwrite) return;
+    }
+    const request = buildAIGradeRequest(ungradedCount === 0);
+    if (!request) return;
+
+    setAiGradingTarget('all');
+    try {
+      const result = await examApi.aiGradeExamSubmissions(examUid, request);
+      const updatedByUid = new Map(result.results.map(item => [item.submission.uid, item.submission]));
+      setSubmissions(prev => prev.map(s => updatedByUid.get(s.uid) || s));
+      toast.success(t('classroom.ui.ai_graded_summary', undefined, { graded: result.graded, total: result.total }));
+      if (result.failed > 0) {
+        toast.warning(t('classroom.ui.ai_grade_partial_failure', undefined, { count: result.failed }));
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.score_ai_regrade_failed'));
+    } finally {
+      setAiGradingTarget(null);
+    }
+  };
+
+  // Keyboard: ESC closes drawer
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && activeStudentId) {
+        setActiveStudentId(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeStudentId]);
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/50">
-        <Loader2 className="h-10 w-10 animate-spin text-primary-brand" />
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error || !exam) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-muted/50 p-6">
-        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
-          <h1 className="text-lg font-black text-foreground">Không thể tải dữ liệu</h1>
-          <p className="mt-2 text-sm font-bold text-muted-foreground">{error || 'Không tìm thấy bài kiểm tra'}</p>
-          <Button onClick={() => router.push(`/space/classrooms/${uid}/details?tab=exams`)} className="mt-5 w-full rounded-xl bg-primary-brand">
-            Quay lại lớp học
-          </Button>
-        </div>
+      <div className="flex min-h-[60vh] items-center justify-center p-4">
+        <Card className="w-full max-w-md rounded-2xl text-center">
+          <CardHeader>
+            <CardTitle className="text-base font-semibold">Không thể tải dữ liệu</CardTitle>
+            <CardDescription className="font-medium">{error || 'Không tìm thấy bài kiểm tra'}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => router.push(`/space/classrooms/${uid}/details?tab=exams`)}
+              className="w-full"
+            >
+              Quay lại lớp học
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-muted/50">
-      <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-card px-6">
-        <div className="flex min-w-0 items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.push(`/space/classrooms/${uid}/details?tab=exams`)}
-            className="shrink-0 rounded-full"
-          >
-            <ArrowLeft size={20} />
-          </Button>
-          <div className="min-w-0">
-            <p className="truncate text-[10px] font-black uppercase tracking-widest text-primary-brand">
-              {classroom?.name || 'Lớp học'}
-            </p>
-            <h1 className="truncate text-lg font-black text-foreground">{exam.title}</h1>
-          </div>
-        </div>
-        <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${getExamStatusClass(exam.status)}`}>
-          {exam.status}
-        </span>
-      </header>
-
-      <main className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <section className="min-w-0 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="border-b border-border p-6">
+    <div className="space-y-4">
+      <main className="mx-auto w-full max-w-7xl space-y-4 p-4">
+        <Card className="min-w-0 overflow-hidden rounded-2xl gap-0">
+          <div className="border-b border-border p-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="min-w-0">
-                <div className="text-[10px] font-black uppercase tracking-widest text-primary-brand">Chi tiết bài kiểm tra</div>
-                <h2 className="mt-1 text-2xl font-black tracking-tight text-foreground">{exam.title}</h2>
-                <p className="mt-2 text-sm font-medium leading-relaxed text-muted-foreground">{exam.description || 'Không có mô tả'}</p>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-primary">Chi tiết bài kiểm tra</div>
+                <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">{exam.title}</h2>
+                <p className="mt-1.5 text-sm font-medium leading-relaxed text-muted-foreground">{exam.description || 'Không có mô tả'}</p>
               </div>
-              <div className="shrink-0 rounded-xl border border-border bg-muted/50 px-4 py-3 text-right">
-                <div className="flex items-center justify-end gap-1.5 text-[10px] font-black uppercase text-muted-foreground">
-                  <Calendar size={13} />
-                  Due date
+              <div className="flex shrink-0 flex-col items-end gap-2">
+                <Button asChild variant="outline" size="sm" className="rounded-xl text-[11px] font-semibold uppercase tracking-wider text-primary">
+                  <a href={`/space/classrooms/${uid}/exams/${examUid}/analytics`} target="_blank" rel="noopener noreferrer">
+                    <BarChart3 />
+                    Xem Dashboard
+                  </a>
+                </Button>
+                <div className="rounded-xl border border-border bg-muted/40 px-4 py-3 text-right">
+                  <div className="flex items-center justify-end gap-1.5 text-[10px] font-semibold uppercase text-muted-foreground">
+                    <Calendar />
+                    Due date
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-foreground">{formatDateTime(exam.due_date)}</div>
                 </div>
-                <div className="mt-1 text-xs font-black text-foreground">{formatDateTime(exam.due_date)}</div>
               </div>
             </div>
           </div>
 
-          <div className="border-b border-border px-6 pt-4">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=submissions`)}
-                className={`border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'submissions' ? 'border-primary-brand text-primary-brand' : 'border-transparent text-muted-foreground hover:text-muted-foreground'}`}
-              >
-                Danh sách bài nộp
-              </button>
-              {exam.exam_mode === 'online' && (
-                <button
-                  type="button"
-                  onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=online`)}
-                  className={`flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-black uppercase ${activeTab === 'online' ? 'border-primary-brand text-primary-brand' : 'border-transparent text-muted-foreground hover:text-muted-foreground'}`}
-                >
-                  <Monitor size={13} />
-                  Thi trực tuyến
-                </button>
-              )}
-            </div>
+          <div className="border-b border-border px-4 pt-3 pb-1">
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) => {
+                const next = (value as ExamDetailTab) || 'submissions';
+                router.push(`/space/classrooms/${uid}/exams/${examUid}?tab=${next}`);
+              }}
+            >
+              <TabsList>
+                <TabsTrigger value="submissions">Danh sách bài nộp</TabsTrigger>
+                {exam.exam_mode === 'online' && (
+                  <TabsTrigger value="online">
+                    <Monitor />
+                    Thi trực tuyến
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </Tabs>
           </div>
 
           {activeTab === 'online' ? (
-            <div className="space-y-5 p-6">
+            <div className="space-y-4 p-4">
               {exam.exam_mode !== 'online' ? (
                 <div className="rounded-2xl border border-dashed border-border bg-muted/50 py-12 text-center">
                   <Monitor size={32} className="mx-auto mb-3 text-muted-foreground/60" />
@@ -272,99 +439,92 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                 </div>
               ) : (
                 <>
-                  {/* ── Inline settings card ── */}
-                  <div className="rounded-2xl border border-border bg-muted/50">
-                    <div className="flex items-center gap-2 border-b border-border px-5 py-3">
-                      <Monitor size={14} className="text-primary-brand" />
-                      <span className="text-[11px] font-black uppercase tracking-widest text-foreground">Cài đặt phiên thi</span>
-                      <span className="ml-auto text-[10px] font-bold text-muted-foreground">Áp dụng khi nhấn "Mở phiên thi"</span>
+                  <Card className="rounded-2xl gap-0">
+                    <div className="flex items-center gap-2 border-b border-border px-4 py-3">
+                      <Monitor className="size-3.5 text-primary" />
+                      <span className="text-[11px] font-semibold uppercase tracking-widest text-foreground">Cài đặt phiên thi</span>
+                      <span className="ml-auto text-[10px] font-medium text-muted-foreground">Áp dụng khi nhấn "Mở phiên thi"</span>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-0 divide-y divide-slate-200 sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0">
-                      {/* Duration */}
-                      <div className="flex flex-col gap-2 px-5 py-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="flex flex-col gap-2 px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <Timer size={13} className="text-primary-brand" />
-                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Thời gian làm bài</span>
-                          <span className="text-rose-500 text-[10px] font-black">*</span>
+                          <Timer className="size-3 text-primary" />
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Thời gian làm bài</span>
+                          <span className="text-destructive text-[10px] font-semibold">*</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <input
+                          <Input
                             type="number"
                             min={1}
                             max={360}
                             value={openSettings.duration_minutes}
                             onChange={e => setOpenSettings(s => ({ ...s, duration_minutes: Math.max(1, Number(e.target.value)) }))}
-                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
+                            className="h-9 w-20 px-2 text-sm font-semibold"
                           />
-                          <span className="text-xs font-bold text-muted-foreground">phút</span>
+                          <span className="text-xs font-medium text-muted-foreground">phút</span>
                         </div>
                         <p className="text-[10px] text-muted-foreground">Tính từ lúc học sinh bắt đầu</p>
                       </div>
 
-                      {/* Late threshold */}
-                      <div className="flex flex-col gap-2 px-5 py-4">
+                      <div className="flex flex-col gap-2 px-4 py-3 sm:border-l border-border">
                         <div className="flex items-center gap-1.5">
-                          <Clock size={13} className="text-amber-500" />
-                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Cho phép vào muộn</span>
+                          <Clock className="size-3 text-amber-500" />
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Cho phép vào muộn</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <input
+                          <Input
                             type="number"
                             min={0}
                             max={60}
                             value={openSettings.late_threshold_minutes}
                             onChange={e => setOpenSettings(s => ({ ...s, late_threshold_minutes: Math.max(0, Number(e.target.value)) }))}
-                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
+                            className="h-9 w-20 px-2 text-sm font-semibold"
                           />
-                          <span className="text-xs font-bold text-muted-foreground">phút</span>
+                          <span className="text-xs font-medium text-muted-foreground">phút</span>
                         </div>
                         <p className="text-[10px] text-muted-foreground">0 = không cho vào sau khi mở</p>
                       </div>
 
-                      {/* Camera */}
-                      <div className="flex flex-col gap-2 px-5 py-4">
+                      <div className="flex flex-col gap-2 px-4 py-3 sm:border-l border-border">
                         <div className="flex items-center gap-1.5">
-                          <Camera size={13} className="text-emerald-500" />
-                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Yêu cầu camera</span>
+                          <Camera className="size-3 text-emerald-500" />
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Yêu cầu camera</span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setOpenSettings(s => ({ ...s, camera_required: !s.camera_required }))}
-                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${openSettings.camera_required ? 'bg-primary-brand' : 'bg-muted'}`}
-                        >
-                          <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${openSettings.camera_required ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
+                        <Switch
+                          checked={openSettings.camera_required}
+                          onCheckedChange={(checked) => setOpenSettings(s => ({ ...s, camera_required: checked }))}
+                        />
                         <p className="text-[10px] text-muted-foreground">
                           {openSettings.camera_required ? 'Bắt buộc nhận diện khuôn mặt' : 'Không bắt buộc camera'}
                         </p>
                       </div>
 
-                      {/* Max face warnings */}
-                      <div className="flex flex-col gap-2 px-5 py-4">
+                      <div className="flex flex-col gap-2 px-4 py-3 sm:border-l border-border">
                         <div className="flex items-center gap-1.5">
-                          <ShieldAlert size={13} className="text-rose-500" />
-                          <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Số lần nhận diện</span>
+                          <ShieldAlert className="size-3 text-destructive" />
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Số lần nhận diện</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <input
+                          <Input
                             type="number"
                             min={0}
                             max={20}
                             value={openSettings.max_face_warnings}
                             onChange={e => setOpenSettings(s => ({ ...s, max_face_warnings: Math.max(0, Number(e.target.value)) }))}
-                            className="h-9 w-20 rounded-lg border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
+                            className="h-9 w-20 px-2 text-sm font-semibold"
                           />
-                          <span className="text-xs font-bold text-muted-foreground">lần</span>
+                          <span className="text-xs font-medium text-muted-foreground">lần</span>
                         </div>
                         <p className="text-[10px] text-muted-foreground">0 = không giới hạn · Vượt → nộp bài bắt buộc</p>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-between border-t border-border px-5 py-3">
+                    <Separator />
+
+                    <div className="flex items-center justify-between px-4 py-3">
                       {sessionError && (
-                        <p className="text-xs font-bold text-rose-600">{sessionError}</p>
+                        <p className="text-xs font-medium text-destructive">{sessionError}</p>
                       )}
                       <div className="ml-auto flex gap-2">
                         <Button
@@ -372,252 +532,264 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                           size="sm"
                           onClick={handleCloseOnline}
                           disabled={sessionAction || sessions.every(s => s.token_status !== 'pending' && s.token_status !== 'active')}
-                          className="rounded-xl gap-1.5 text-xs font-bold text-rose-600 border-rose-200 hover:bg-rose-50"
+                          className="rounded-xl text-destructive border-destructive/30 hover:bg-destructive/10"
                         >
-                          {sessionAction ? <Loader2 size={13} className="animate-spin" /> : <WifiOff size={13} />}
+                          {sessionAction ? <Loader2 className="animate-spin" /> : <WifiOff />}
                           Đóng phiên
                         </Button>
                         <Button
                           size="sm"
                           onClick={() => void handleOpenOnline()}
                           disabled={sessionAction || openSettings.duration_minutes <= 0}
-                          className="rounded-xl gap-1.5 bg-primary-brand text-xs font-bold hover:bg-primary-brand-dark"
                         >
-                          {sessionAction ? <Loader2 size={13} className="animate-spin" /> : <Wifi size={13} />}
+                          {sessionAction ? <Loader2 className="animate-spin" /> : <Wifi />}
                           Mở phiên thi
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  </Card>
 
-                  <div className="overflow-hidden rounded-2xl border border-border">
+                  <Card className="overflow-hidden rounded-2xl gap-0 p-0">
                     {sessionLoading ? (
-                      <div className="py-12 text-center"><Loader2 size={24} className="mx-auto animate-spin text-primary-brand" /></div>
+                      <div className="py-10 text-center"><Loader2 className="mx-auto animate-spin text-primary" /></div>
                     ) : sessions.length === 0 ? (
-                      <div className="py-12 text-center text-sm font-bold text-muted-foreground">Chưa có phiên thi nào. Nhấn "Mở phiên thi" để bắt đầu.</div>
+                      <div className="py-10 text-center text-sm font-medium text-muted-foreground">Chưa có phiên thi nào. Nhấn "Mở phiên thi" để bắt đầu.</div>
                     ) : (
-                      <table className="w-full min-w-[640px] text-left">
-                        <thead className="bg-muted/50">
-                          <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                            <th className="px-4 py-3">Học sinh</th>
-                            <th className="px-4 py-3">Token</th>
-                            <th className="px-4 py-3">Trạng thái</th>
-                            <th className="px-4 py-3">Hết hạn link</th>
-                            <th className="px-4 py-3">Bắt đầu</th>
-                            <th className="px-4 py-3">Kết thúc</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {sessions.map(s => (
-                            <tr key={s.uid} className="border-t border-border">
-                              <td className="px-4 py-3 text-xs font-bold text-muted-foreground">{s.student_id.slice(0, 8)}…</td>
-                              <td className="px-4 py-3">
-                                <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-bold text-foreground">{s.token.slice(0, 8)}…</code>
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${getSessionStatusClass(s.token_status)}`}>
-                                  {getSessionStatusLabel(s.token_status)}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3 text-xs font-bold text-muted-foreground">{formatDateTime(s.token_expires_at)}</td>
-                              <td className="px-4 py-3 text-xs font-bold text-muted-foreground">{formatDateTime(s.started_at)}</td>
-                              <td className="px-4 py-3 text-xs font-bold text-muted-foreground">{formatDateTime(s.ends_at)}</td>
+                      <div className="overflow-auto">
+                        <table className="w-full min-w-[640px] text-left text-sm">
+                          <thead className="bg-muted/50">
+                            <tr className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                              <th className="px-4 py-3">Học sinh</th>
+                              <th className="px-4 py-3">Token</th>
+                              <th className="px-4 py-3">Trạng thái</th>
+                              <th className="px-4 py-3">Hết hạn link</th>
+                              <th className="px-4 py-3">Bắt đầu</th>
+                              <th className="px-4 py-3">Kết thúc</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {sessions.map(s => {
+                              const sessionStudent = members.find(m => m.member_id === s.student_id);
+                              return (
+                              <tr key={s.uid} className="border-t border-border">
+                                <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{sessionStudent?.member_name || '--'}</td>
+                                <td className="px-4 py-3">
+                                  <code className="rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-foreground">{s.token}</code>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <Badge variant={getSessionStatusVariant(s.token_status)}>
+                                    {getSessionStatusLabel(s.token_status)}
+                                  </Badge>
+                                </td>
+                                <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{s.token_expires_at ? formatDateTime(s.token_expires_at) : '--'}</td>
+                                <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{s.started_at ? formatDateTime(s.started_at) : '--'}</td>
+                                <td className="px-4 py-3 text-xs font-medium text-muted-foreground">{s.ends_at ? formatDateTime(s.ends_at) : '--'}</td>
+                              </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
                     )}
-                  </div>
+                  </Card>
                 </>
               )}
             </div>
           ) : (
-          <div className="space-y-4 p-6">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="inline-flex w-fit rounded-xl border border-border bg-muted/50 p-1">
-                <FilterButton active={filter === 'submitted'} onClick={() => setFilter('submitted')}>
-                  Đã nộp ({submissions.length})
-                </FilterButton>
-                <FilterButton active={filter === 'missing'} onClick={() => setFilter('missing')}>
-                  Chưa nộp ({missingRows.length})
-                </FilterButton>
-              </div>
-
-              <label className="relative w-full md:w-72">
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  value={query}
-                  onChange={event => setQuery(event.target.value)}
-                  placeholder="Tìm học sinh..."
-                  className="h-10 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm font-bold text-foreground outline-none focus:border-primary-brand focus:ring-4 focus:ring-primary-brand/10"
-                />
-              </label>
-            </div>
-
-            <div className="overflow-x-auto rounded-2xl border border-border">
-              <table className="w-full min-w-[640px] text-left">
-                <thead className="bg-muted/50">
-                  <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-                    <th className="px-4 py-3">Học sinh</th>
-                    <th className="px-4 py-3">Trạng thái</th>
-                    <th className="px-4 py-3">Nộp lúc</th>
-                    <th className="px-4 py-3">Kết quả</th>
-                    <th className="px-4 py-3">Điểm</th>
-                    <th className="px-4 py-3">Đạt/Không</th>
-                    <th className="px-4 py-3 text-right">Thao tác</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleRows.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-4 py-12 text-center text-sm font-bold text-muted-foreground">
-                        Không có dữ liệu phù hợp
-                      </td>
-                    </tr>
-                  ) : (
-                    visibleRows.map(row => (
-                      <tr key={row.kind === 'submitted' ? row.submission.uid : row.member.member_id} className="border-t border-border">
-                        <td className="px-4 py-3">
-                          <div className="text-sm font-black text-foreground">
-                            {row.member?.member_name || (row.kind === 'submitted' ? row.submission.student_id : row.member.member_id)}
-                          </div>
-                          <div className="text-xs font-medium text-muted-foreground">
-                            {row.kind === 'submitted' ? row.submission.student_id : row.member.member_id}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${row.kind === 'submitted' ? getSubmissionStatusClass(row.submission.status) : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                            {row.kind === 'submitted' ? getSubmissionStatusLabel(row.submission.status) : 'chưa nộp'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-xs font-bold text-muted-foreground">
-                          {row.kind === 'submitted' ? formatDateTime(row.submission.submitted_at) : '--'}
-                        </td>
-                        <td className="px-4 py-3">
-                          {row.kind === 'submitted' && row.submission.quiz_result ? (
-                            <div className="min-w-[90px]">
-                              <div className="text-xs font-black text-slate-800">
-                                {row.submission.quiz_result.correct_count}/{row.submission.quiz_result.total} câu
-                              </div>
-                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                                <div
-                                  className="h-full rounded-full bg-emerald-500"
-                                  style={{ width: `${row.submission.quiz_result.score_pct}%` }}
-                                />
-                              </div>
-                              <div className="mt-0.5 text-[10px] font-bold text-emerald-600">
-                                {row.submission.quiz_result.score_pct}%
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-xs font-bold text-muted-foreground/60">--</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-sm font-black text-foreground">
-                          {row.kind === 'submitted' && typeof row.submission.grade === 'number' ? row.submission.grade : '--'}
-                        </td>
-                        <td className="px-4 py-3">
-                          {row.kind === 'submitted' && row.submission.passed != null ? (
-                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-black uppercase ${row.submission.passed ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
-                              {row.submission.passed ? 'Đạt' : 'Không đạt'}
-                            </span>
-                          ) : (
-                            <span className="text-xs font-bold text-muted-foreground/60">--</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {row.kind === 'submitted' && row.submission.resource_url ? (
-                              <a href={row.submission.resource_url} download target="_blank" rel="noopener noreferrer">
-                                <Button variant="outline" size="sm" className="h-8 gap-1.5 rounded-lg text-xs font-bold">
-                                  <Download size={14} />
-                                  Tải file
-                                </Button>
-                              </a>
-                            ) : null}
-                            {row.kind === 'submitted' ? (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setAuditSubmission(row.submission)}
-                                className="h-8 gap-1.5 rounded-lg text-xs font-bold"
-                              >
-                                <Eye size={14} />
-                                Xem chi tiết
-                              </Button>
-                            ) : (
-                              <span className="text-xs font-bold text-muted-foreground/60">--</span>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          )}
-        </section>
-
-        <aside className="h-fit space-y-4 lg:sticky lg:top-24">
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-primary-brand" />
-              <h3 className="text-sm font-black uppercase text-foreground">Dashboard</h3>
-            </div>
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <Metric label="Đã nộp" value={`${analytics.submitted}/${analytics.totalStudents}`} />
-              <Metric label="Chưa nộp" value={String(analytics.missing)} />
-              <Metric label="Điểm TB" value={analytics.averageLabel} />
-              <Metric label="Đã chấm" value={String(analytics.graded)} />
-              <Metric label="Đạt" value={String(analytics.passed)} />
-              <Metric label="Không đạt" value={String(analytics.failed)} />
-            </div>
-
-            <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between text-xs font-black text-foreground">
-                <span>Tỉ lệ nộp bài</span>
-                <span>{analytics.submitRate}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary-brand" style={{ width: `${analytics.submitRate}%` }} />
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-            <div className="mb-4 flex items-center gap-2">
-              <Users size={18} className="text-primary-brand" />
-              <h3 className="text-sm font-black uppercase text-foreground">Cột điểm</h3>
-            </div>
-            <div className="space-y-3">
-              {analytics.scoreBuckets.map(bucket => (
-                <div key={bucket.label}>
-                  <div className="mb-1 flex items-center justify-between text-xs font-bold text-muted-foreground">
-                    <span>{bucket.label}</span>
-                    <span>{bucket.count}</span>
+            <div className="space-y-4 p-4">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <Card className="rounded-xl border-primary/30 bg-primary/5 p-3 gap-0">
+                  <div className="flex items-start justify-between">
+                    <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_submission_rate')}</p>
+                    <span className="text-lg font-semibold tracking-tight text-primary">{gradeTableLoading ? '--' : `${submissionRate}%`}</span>
                   </div>
-                  <div className="h-8 overflow-hidden rounded-lg bg-muted">
-                    <div
-                      className="flex h-full items-center justify-end rounded-lg bg-primary-brand px-2 text-[10px] font-black text-white"
-                      style={{ width: `${Math.max(bucket.percent, bucket.count > 0 ? 10 : 0)}%` }}
-                    >
-                      {bucket.count > 0 ? bucket.count : ''}
-                    </div>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{gradeTableLoading ? t('classroom.ui.students_loading') : t('classroom.ui.grade_table_submission_rate_detail', undefined, { submitted, total: members.length })}</p>
+                  <Progress value={submissionRate} className="mt-3 h-1.5" />
+                </Card>
+                <Card className="rounded-xl border-emerald-200 bg-emerald-50/50 p-3 gap-0">
+                  <div className="flex items-start justify-between">
+                    <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_avg_score')}</p>
+                    <span className="text-lg font-semibold tracking-tight text-emerald-700">{gradeTableLoading ? '--' : avg}</span>
                   </div>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{graded > 0 ? t('classroom.ui.grade_table_avg_score_detail', undefined, { count: graded }) : t('classroom.ui.grade_table_avg_score_empty')}</p>
+                  <Progress value={averageRate} className="mt-3 h-1.5 [&>div>div]:bg-emerald-500" />
+                </Card>
+                <Card className="rounded-xl p-3 gap-0">
+                  <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_pending_grading')}</p>
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-primary">{gradeTableLoading ? '--' : Math.max(0, submitted - graded)}</p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{t('classroom.ui.grade_table_pending_detail', undefined, { rate: gradingRate })}</p>
+                </Card>
+                <Card className="rounded-xl border-rose-200 bg-rose-50/40 p-3 gap-0">
+                  <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_missing_label')}</p>
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-rose-600">{gradeTableLoading ? '--' : missing}</p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">{t('classroom.ui.grade_table_missing_detail')}</p>
+                </Card>
+              </div>
+
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="relative w-full xl:max-w-sm">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    value={query}
+                    onChange={event => setQuery(event.target.value)}
+                    placeholder={t('classroom.ui.grade_table_search_placeholder')}
+                    className="h-10 pl-10 pr-4"
+                  />
                 </div>
-              ))}
-            </div>
-            {analytics.graded === 0 && (
-              <div className="mt-4 rounded-xl border border-dashed border-border bg-muted/50 p-4 text-center">
-                <FileText size={24} className="mx-auto mb-2 text-muted-foreground/60" />
-                <p className="text-xs font-bold text-muted-foreground">Chưa có điểm để phân tích</p>
+                <div className="flex gap-1.5 overflow-x-auto pb-1">
+                  {filters.map(option => (
+                    <Button
+                      key={option.value}
+                      type="button"
+                      variant={filter === option.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setFilter(option.value)}
+                      className="h-9 shrink-0 rounded-lg gap-2 px-3 text-xs font-medium"
+                    >
+                      {option.label}
+                      <Badge variant={filter === option.value ? 'secondary' : 'outline'} className="rounded px-1.5 py-0 text-[10px]">
+                        {gradeTableLoading ? '--' : option.count}
+                      </Badge>
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => void handleAIGradeAll()}
+                  disabled={gradeTableLoading || aiGradingTarget !== null || submitted === 0}
+                  size="sm"
+                  className="h-9 shrink-0 rounded-lg px-3 text-xs"
+                >
+                  {aiGradingTarget === 'all' ? <Loader2 className="animate-spin" /> : <Wand2 />}
+                  {t('classroom.ui.grade_table_ai_grade_all')}
+                </Button>
               </div>
-            )}
-          </div>
-        </aside>
+
+              {gradeTableLoading ? (
+                <div className="flex min-h-56 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground">
+                  <Loader2 className="size-8 animate-spin text-primary" />
+                  <p className="ml-3 text-sm font-medium">{t('classroom.ui.grade_table_loading')}</p>
+                </div>
+              ) : gradeTableError ? (
+                <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-destructive/30 bg-card p-6 text-center">
+                  <AlertCircle className="size-8 mb-3 text-destructive" />
+                  <p className="text-sm font-semibold text-foreground">{t('classroom.ui.score_load_error')}</p>
+                  <p className="mt-1 max-w-md text-xs font-medium text-muted-foreground">{gradeTableError}</p>
+                  <Button onClick={() => void loadGradeTable()} className="mt-4 rounded-xl">
+                    {t('classroom.ui.grade_table_retry')}
+                  </Button>
+                </div>
+              ) : members.length === 0 ? (
+                <GradeTableEmptyState
+                  title={t('classroom.ui.grade_table_empty_no_students_title')}
+                  description={t('classroom.ui.grade_table_empty_no_students_desc')}
+                />
+              ) : visibleRows.length === 0 ? (
+                <GradeTableEmptyState
+                  title={t('classroom.ui.grade_table_empty_no_match_title')}
+                  description={t('classroom.ui.grade_table_empty_no_match_desc')}
+                />
+              ) : (
+                <Card className="overflow-auto rounded-xl p-0 gap-0">
+                  <table className="w-full min-w-[850px] text-left text-sm">
+                    <thead className="sticky top-0 z-[1] border-b border-border bg-muted/50 backdrop-blur">
+                      <tr className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        <th className="px-4 py-3">{t('classroom.ui.grade_table_col_student')}</th>
+                        <th className="px-4 py-3">{t('classroom.ui.grade_table_col_submission')}</th>
+                        <th className="px-4 py-3">{t('classroom.ui.grade_table_col_submitted_at')}</th>
+                        <th className="px-4 py-3">{t('classroom.ui.grade_table_col_grade')}</th>
+                        <th className="px-4 py-3">{t('classroom.ui.grade_table_col_grading')}</th>
+                        <th className="px-4 py-3 text-right">{t('classroom.ui.grade_table_col_actions')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {visibleRows.map(row => {
+                        const submission = row.submission;
+                        return (
+                          <tr key={row.member.member_id} className="border-b border-border last:border-b-0 transition-colors hover:bg-muted/40">
+                            <td className="px-4 py-3">
+                              <StudentIdentity member={row.member} />
+                            </td>
+                            <td className="px-4 py-3">
+                              <SubmissionBadge submission={submission} />
+                            </td>
+                            <td className="px-4 py-3 text-xs font-medium text-muted-foreground">
+                              {submission?.submitted_at ? formatDateTime(submission.submitted_at) : '--'}
+                            </td>
+                            <td className="px-4 py-3">
+                              {submission?.grade != null ? (
+                                <span className={`text-sm font-semibold ${submission.grade >= 5 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                                  {submission.grade.toFixed(1)}
+                                </span>
+                              ) : <span className="text-sm font-medium text-muted-foreground/60">--</span>}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <GradingBadge submission={submission} />
+                                {submission?.grading_method === 'ai' && (
+                                  <Badge variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-primary/10 text-primary border-primary/20">
+                                    {t('classroom.ui.grade_table_ai_graded_badge')}
+                                  </Badge>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex justify-end gap-1.5">
+                                {submission ? (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      disabled={aiGradingTarget !== null}
+                                      className="h-8 rounded-lg text-primary border-primary/30 hover:bg-primary/10"
+                                      onClick={() => void handleAIGradeSubmission(row)}
+                                    >
+                                      {aiGradingTarget === submission.uid ? <Loader2 className="animate-spin" /> : <Wand2 />}
+                                      {t('classroom.ui.grade_table_ai_grade_single')}
+                                    </Button>
+                                    <Button size="sm" className="h-8 rounded-lg" onClick={() => openSubmission(row)}>
+                                      {submission.grade == null ? t('classroom.ui.grade_table_action_grade') : t('classroom.ui.grade_table_action_view_grade')}
+                                    </Button>
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg">
+                                          <MoreVertical />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end" className="w-44">
+                                        <DropdownMenuItem onClick={() => openSubmission(row)} className="gap-2">
+                                          <Eye /> {t('classroom.ui.grade_table_action_view')}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setAuditSubmission(submission)} className="gap-2">
+                                          <Eye /> Audit log
+                                        </DropdownMenuItem>
+                                        {submission.resource_url && (
+                                          <DropdownMenuItem
+                                            onClick={() => window.open(submission.resource_url!, '_blank', 'noopener,noreferrer')}
+                                            className="gap-2"
+                                          >
+                                            <Download /> {t('classroom.ui.grade_table_action_open_file')}
+                                          </DropdownMenuItem>
+                                        )}
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </>
+                                ) : (
+                                  <span className="text-xs font-medium text-muted-foreground">{t('classroom.ui.grade_table_no_submission')}</span>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </Card>
+              )}
+            </div>
+          )}
+        </Card>
+
       </main>
 
       {auditSubmission && exam && (
@@ -629,74 +801,238 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         />
       )}
 
+      {activeRow?.submission && (
+        <SubmissionGradingDrawer
+          row={{ member: activeRow.member, submission: activeRow.submission }}
+          grade={grade}
+          feedback={feedback}
+          saving={saving}
+          aiGrading={aiGradingTarget === activeRow.submission.uid}
+          onGradeChange={setGrade}
+          onFeedbackChange={setFeedback}
+          onSave={() => void handleSaveGrade()}
+          onAIGrade={() => void handleAIGradeSubmission(activeRow)}
+          onClose={() => setActiveStudentId(null)}
+        />
+      )}
     </div>
   );
 }
 
-function FilterButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function GradeTableEmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`h-8 rounded-lg px-3 text-xs font-black uppercase transition-colors ${active ? 'bg-card text-primary-brand shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-muted/50 p-3">
-      <div className="text-[10px] font-black uppercase text-muted-foreground">{label}</div>
-      <div className="mt-1 text-lg font-black text-foreground">{value}</div>
+    <div className="flex min-h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card p-6 text-center text-muted-foreground">
+      <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-muted/50">
+        <Users className="size-5 text-muted-foreground" />
+      </span>
+      <p className="text-sm font-semibold text-foreground">{title}</p>
+      <p className="mt-1 text-xs font-medium">{description}</p>
     </div>
   );
 }
 
-function buildAnalytics(members: ClassroomMember[], submissions: ExamSubmission[]) {
-  const totalStudents = members.length;
-  const submitted = submissions.length;
-  const missing = Math.max(0, totalStudents - submitted);
-  const grades = submissions
-    .map(submission => submission.grade)
-    .filter((grade): grade is number => typeof grade === 'number' && Number.isFinite(grade));
-  const average = grades.length ? grades.reduce((sum, grade) => sum + grade, 0) / grades.length : null;
-  const buckets = [
-    { label: '0 - 4.9', min: 0, max: 4.999 },
-    { label: '5 - 6.4', min: 5, max: 6.499 },
-    { label: '6.5 - 7.9', min: 6.5, max: 7.999 },
-    { label: '8 - 10', min: 8, max: 10 },
-  ];
-
-  const passed = submissions.filter(s => s.passed === true).length;
-  const failed = submissions.filter(s => s.passed === false).length;
-
-  return {
-    totalStudents,
-    submitted,
-    missing,
-    graded: grades.length,
-    passed,
-    failed,
-    submitRate: totalStudents > 0 ? Math.round((submitted / totalStudents) * 100) : 0,
-    averageLabel: average === null ? '--' : average.toFixed(1),
-    scoreBuckets: buckets.map(bucket => {
-      const count = grades.filter(grade => grade >= bucket.min && grade <= bucket.max).length;
-      return {
-        label: bucket.label,
-        count,
-        percent: grades.length > 0 ? Math.round((count / grades.length) * 100) : 0,
-      };
-    }),
-  };
+function StudentIdentity({ member }: { member: ClassroomMember }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <Avatar className="size-8 rounded-lg">
+        {member.member_avatar ? (
+          <AvatarImage src={member.member_avatar} alt={member.member_name} className="rounded-lg" />
+        ) : null}
+        <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-xs font-semibold">
+          {member.member_name.charAt(0).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-foreground">{member.member_name}</p>
+      </div>
+    </div>
+  );
 }
 
-function getSessionStatusClass(status: string) {
-  if (status === 'pending') return 'bg-amber-50 text-amber-600 border border-amber-100';
-  if (status === 'active') return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-  if (status === 'completed') return 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted';
-  return 'bg-rose-50 text-rose-600 border border-rose-100';
+function SubmissionBadge({ submission }: { submission: ExamSubmission | null }) {
+  const { t } = useTranslation();
+  if (!submission) {
+    return <Badge variant="outline" className="rounded-full px-2.5 py-1 text-[10px] font-semibold">{t('classroom.ui.score_status_not_submitted')}</Badge>;
+  }
+  return <Badge variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-primary/10 text-primary border-primary/20">{t('classroom.ui.score_status_submitted')}</Badge>;
+}
+
+function GradingBadge({ submission }: { submission: ExamSubmission | null }) {
+  const { t } = useTranslation();
+  if (!submission) return <span className="text-xs font-medium text-muted-foreground/60">--</span>;
+  if (submission.grade != null) {
+    return <Badge variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border-emerald-200">{t('classroom.ui.score_status_graded')}</Badge>;
+  }
+  return <Badge variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-orange-50 text-orange-700 border-orange-200">{t('classroom.ui.score_status_pending')}</Badge>;
+}
+
+function SubmissionGradingDrawer({
+  row,
+  grade,
+  feedback,
+  saving,
+  aiGrading,
+  onGradeChange,
+  onFeedbackChange,
+  onSave,
+  onAIGrade,
+  onClose,
+}: {
+  row: { member: ClassroomMember; submission: ExamSubmission };
+  grade: string;
+  feedback: string;
+  saving: boolean;
+  aiGrading: boolean;
+  onGradeChange: (value: string) => void;
+  onFeedbackChange: (value: string) => void;
+  onSave: () => void;
+  onAIGrade: () => void;
+  onClose: () => void;
+}) {
+  const { t, formatDateTime } = useTranslation();
+  const { member, submission } = row;
+  const isEssay = submission.submission_type === 'essay';
+  const resourceUrl = submission.resource_url || (!isEssay ? submission.content : '');
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-foreground/30">
+      <button type="button" aria-label={t('classroom.ui.close_submission_detail')} className="absolute inset-0" onClick={onClose} />
+      <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl animate-in slide-in-from-right duration-200">
+        <div className="flex items-start justify-between gap-4 border-b border-border p-4">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">{t('classroom.ui.submission_detail_title')}</p>
+            <div className="mt-3"><StudentIdentity member={member} /></div>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label={t('classroom.ui.close_submission_detail')}>
+            <X />
+          </Button>
+        </div>
+
+        <div className="flex-1 space-y-4 overflow-y-auto p-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border bg-muted/40 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_field_submitted_at')}</p>
+              <p className="mt-1 text-xs font-medium text-foreground">{submission.submitted_at ? formatDateTime(submission.submitted_at) : '--'}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/40 p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_field_status')}</p>
+              <p className="mt-1 text-xs font-medium text-foreground">{submission.grade != null ? t('classroom.ui.score_status_graded') : t('classroom.ui.score_status_pending')}</p>
+            </div>
+          </div>
+
+          <section>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_content_title')}</h3>
+            {isEssay && submission.content ? (
+              <div className="max-h-44 overflow-y-auto whitespace-pre-wrap rounded-lg border border-border bg-muted/40 p-3.5 text-sm font-medium leading-relaxed text-foreground">
+                {submission.content}
+              </div>
+            ) : (
+              <p className="rounded-lg border border-dashed border-border p-3.5 text-sm font-medium text-muted-foreground">
+                {t('classroom.ui.submission_content_empty')}
+              </p>
+            )}
+            {resourceUrl && (
+              <a href={resourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm font-medium text-primary transition hover:border-primary/50 hover:bg-primary/10">
+                <span className="flex items-center gap-2"><FileText className="size-4" /> {submission.resource_name || t('classroom.ui.submission_attach_default')}</span>
+                <Download className="size-4" />
+              </a>
+            )}
+          </section>
+
+          <Separator />
+
+          <section className="space-y-3">
+            {submission.grading_method === 'ai' && (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-3.5">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <Badge variant="secondary" className="rounded-full px-2.5 py-1 text-[10px] font-semibold bg-card text-primary border-primary/20">
+                    <Wand2 />
+                    {t('classroom.ui.ai_graded_badge')}
+                  </Badge>
+                  {submission.ai_confidence != null && (
+                    <span className="text-[11px] font-medium text-primary">
+                      {t('classroom.ui.ai_confidence_label', undefined, { value: (submission.ai_confidence * 100).toFixed(0) })}
+                    </span>
+                  )}
+                </div>
+                {submission.ai_reason && (
+                  <p className="text-xs font-medium leading-relaxed text-foreground">{submission.ai_reason}</p>
+                )}
+                {submission.ai_breakdown && submission.ai_breakdown.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {submission.ai_breakdown.map((item, index) => (
+                      <div key={`${item.question}-${index}`} className="rounded-lg border border-primary/20 bg-card p-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-xs font-semibold text-foreground">{item.question || `Ý ${index + 1}`}</p>
+                          <span className="shrink-0 text-xs font-semibold text-primary">{item.score}/{item.max_score}</span>
+                        </div>
+                        <p className="mt-1 text-[11px] font-medium leading-relaxed text-muted-foreground">{item.reason}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {submission.ai_sources && submission.ai_sources.length > 0 && (
+                  <div className="mt-3 border-t border-primary/20 pt-2">
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-primary">{t('classroom.ui.ai_sources_label')}</p>
+                    <div className="space-y-1">
+                      {submission.ai_sources.slice(0, 3).map((source, index) => (
+                        <div key={`${source.resource_uid || source.doc_name}-${index}`} className="flex items-center justify-between gap-2 text-[11px] font-medium text-muted-foreground">
+                          <span className="truncate">{source.doc_name || source.resource_uid || t('classroom.ui.ai_source_default')}</span>
+                          {typeof source.score === 'number' && <span>{(source.score * 100).toFixed(0)}%</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.score_field_label')}</Label>
+              <Input
+                value={grade}
+                onChange={event => onGradeChange(event.target.value)}
+                type="number"
+                min="0"
+                max="10"
+                step="0.1"
+                placeholder={t('classroom.ui.score_enter_placeholder')}
+                className="h-11 text-base font-semibold"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t('classroom.ui.submission_feedback_label')}</Label>
+              <Textarea
+                value={feedback}
+                onChange={event => onFeedbackChange(event.target.value)}
+                rows={4}
+                placeholder={t('classroom.ui.feedback_placeholder')}
+                className="resize-none text-sm"
+              />
+            </div>
+          </section>
+        </div>
+        <div className="border-t border-border bg-card p-4">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <Button onClick={onAIGrade} disabled={saving || aiGrading} variant="outline" className="h-11 rounded-lg text-primary border-primary/30 hover:bg-primary/10">
+              {aiGrading ? <Loader2 className="animate-spin" /> : <Wand2 />}
+              {t('classroom.ui.ai_grade_btn')}
+            </Button>
+            <Button onClick={onSave} disabled={saving || aiGrading} className="h-11 rounded-lg">
+              {saving ? <Loader2 className="animate-spin" /> : <Save />}
+              {submission.grade == null ? t('classroom.ui.score_save_btn') : t('classroom.ui.score_update_btn')}
+            </Button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function getSessionStatusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
+  if (status === 'pending') return 'outline';
+  if (status === 'active') return 'secondary';
+  if (status === 'completed') return 'default';
+  return 'destructive';
 }
 
 function getSessionStatusLabel(status: string) {
@@ -704,41 +1040,4 @@ function getSessionStatusLabel(status: string) {
   if (status === 'active') return 'Đang thi';
   if (status === 'completed') return 'Đã nộp';
   return 'Hết hạn';
-}
-
-function getExamStatusClass(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized === 'active' || normalized === 'published' || normalized === 'open') {
-    return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-  }
-  if (normalized === 'draft') {
-    return 'bg-amber-50 text-amber-600 border border-amber-100';
-  }
-  if (normalized === 'closed' || normalized === 'expired') {
-    return 'bg-rose-50 text-rose-600 border border-rose-100';
-  }
-  return 'bg-muted text-muted-foreground border border-border';
-}
-
-function getSubmissionStatusClass(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized === 'returned') return 'bg-violet-50 text-violet-600 border border-violet-100';
-  if (normalized === 'graded') return 'bg-primary-brand-light text-primary-brand border border-primary-brand-muted';
-  if (normalized === 'late') return 'bg-amber-50 text-amber-600 border border-amber-100';
-  return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-}
-
-function getSubmissionStatusLabel(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized === 'returned') return 'Đã trả bài';
-  if (normalized === 'graded') return 'Đã chấm';
-  if (normalized === 'late') return 'Nộp trễ';
-  return 'Đã nộp';
-}
-
-function formatDateTime(value: string | null) {
-  if (!value) return '--';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString('vi-VN');
 }

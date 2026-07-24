@@ -194,6 +194,7 @@ export type Exam = {
   late_threshold_seconds?: number;
   due_date: string;
   exam_type?: 'assignment' | 'quiz';
+  exam_period?: 'regular' | 'midterm' | 'final';
   max_grade?: number;
   max_visibility_breaks?: number;
   max_face_warnings?: number;
@@ -299,6 +300,7 @@ export type CreateExamRequest = {
   duration_seconds?: number;
   camera_required?: boolean;
   exam_type?: 'assignment' | 'quiz';
+  exam_period?: 'regular' | 'midterm' | 'final';
   max_grade?: number;
 };
 

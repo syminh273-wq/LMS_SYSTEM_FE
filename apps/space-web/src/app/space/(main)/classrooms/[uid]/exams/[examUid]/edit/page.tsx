@@ -24,9 +24,9 @@ const EXAM_TYPE_OPTIONS = [
 ] as const;
 
 const EXAM_KIND_OPTIONS = [
-  { key: 'midterm', label: 'Kiem tra giua ki', description: 'Bài kiểm tra giữa kỳ của lớp', icon: ClipboardList },
-  { key: 'final', label: 'Kiem Tra Cuoi Ki', description: 'Bài kiểm tra cuối kỳ của lớp', icon: Calendar },
-  { key: 'regular', label: 'Kiem Tra Thuong Xuyen', description: 'Bài kiểm tra thường xuyên', icon: FileText },
+  { key: 'midterm', label: 'Kiểm tra giữa kì', description: 'Bài kiểm tra giữa kỳ của lớp', icon: ClipboardList },
+  { key: 'final', label: 'Kiểm Tra Cuối Kì', description: 'Bài kiểm tra cuối kỳ của lớp', icon: Calendar },
+  { key: 'regular', label: 'Kiểm Tra Thường Xuyên', description: 'Bài kiểm tra thường xuyên', icon: FileText },
 ] as const;
 
 const STATUS_OPTIONS = [
@@ -185,6 +185,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
         title,
         description: form.description.trim(),
         exam_type: form.exam_type,
+        exam_period: form.exam_kind,
         ref_id: form.exam_type === 'quiz' ? form.ref_id : (uploadedResource?.uid ?? exam?.ref_id ?? null),
         max_grade: form.exam_type === 'quiz' ? form.max_grade : 10,
         content_type: form.exam_type === 'quiz' ? 'quiz' : form.content_type,
@@ -714,7 +715,7 @@ function inferExamKind(title: string): ExamKind {
 }
 
 function stripExamKindPrefix(title: string) {
-  return title.replace(/^(Kiem tra giua ki|Kiem Tra Cuoi Ki|Kiem Tra Thuong Xuyen)\s*-\s*/i, '').trim();
+  return title.replace(/^(Kiểm tra giữa kì|Kiểm Tra Cuối Kì|Kiểm Tra Thường Xuyên)\s*-\s*/i, '').trim();
 }
 
 function toDatetimeLocalValue(value: string | null) {

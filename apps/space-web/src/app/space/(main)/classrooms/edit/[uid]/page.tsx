@@ -27,6 +27,9 @@ import {
   CardDescription
 } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -194,7 +197,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   if (fetching) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
-        <Loader2 size={40} className="animate-spin mb-4" />
+        <Loader2 className="size-10 animate-spin mb-4" />
         <p className="text-sm font-medium">Đang tải thông tin phòng học...</p>
       </div>
     );
@@ -207,108 +210,113 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
           variant="ghost"
           size="icon"
           onClick={() => router.push('/space/classrooms')}
-          className="rounded-xl border border-border bg-card shadow-sm hover:bg-muted/50 transition-all"
         >
-          <ArrowLeft size={18} className="text-muted-foreground" />
+          <ArrowLeft className="size-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-black text-foreground tracking-tight">Chỉnh sửa phòng học</h1>
-          <p className="text-muted-foreground text-sm font-medium">Cập nhật thông tin cấu hình cho phòng học {classroom?.name}</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Chỉnh sửa phòng học</h1>
+          <p className="text-sm text-muted-foreground">Cập nhật thông tin cấu hình cho phòng học {classroom?.name}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-primary-brand" />
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Info size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <Info className="size-5 text-primary" />
               Thông tin cấu hình
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Chỉnh sửa các thông tin cần thiết bên dưới</CardDescription>
+            <CardDescription>Chỉnh sửa các thông tin cần thiết bên dưới</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {globalError && (
-              <div className="bg-rose-50 border border-rose-100 p-4 text-rose-600 text-sm rounded-xl font-medium flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+              <div className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-sm font-medium text-destructive">
+                <div className="size-1.5 rounded-full bg-destructive shrink-0" />
                 {globalError}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                Tên phòng học <span className="text-rose-500">*</span>
-              </label>
+              <Label htmlFor="name">
+                Tên phòng học <span className="text-destructive">*</span>
+              </Label>
               <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
-                  <BookOpen size={18} />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                  <BookOpen className="size-4" />
                 </div>
-                <input
+                <Input
+                  id="name"
                   {...register('name', { required: 'Tên phòng học là bắt buộc' })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  className="pl-10"
                   placeholder="Ví dụ: Toán học nâng cao lớp 12A1"
+                  aria-invalid={!!errors.name}
                 />
               </div>
-              {errors.name && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.name.message}</p>}
+              {errors.name && <p className="text-xs font-medium text-destructive">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground px-1">Mô tả khóa học <span className="text-rose-500">*</span></label>
-              <textarea
+              <Label htmlFor="description">
+                Mô tả khóa học <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="description"
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 rows={4}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                className="resize-none"
                 placeholder="Mô tả tóm tắt về mục tiêu, kiến thức sẽ đạt được trong khóa học này..."
+                aria-invalid={!!errors.description}
               />
-              {errors.description && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.description.message}</p>}
+              {errors.description && <p className="text-xs font-medium text-destructive">{errors.description.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                Giới hạn học sinh <span className="text-rose-500">*</span>
-              </label>
+              <Label htmlFor="max_students">
+                Giới hạn học sinh <span className="text-destructive">*</span>
+              </Label>
               <div className="relative group max-w-[240px]">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
-                  <Users size={18} />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                  <Users className="size-4" />
                 </div>
-                <input
+                <Input
+                  id="max_students"
                   type="number"
                   {...register('max_students', {
                     required: 'Vui lòng nhập số lượng',
                     min: { value: 1, message: 'Tối thiểu 1 học sinh' }
                   })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-indigo-500 transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  className="pl-10"
+                  aria-invalid={!!errors.max_students}
                 />
               </div>
-              {errors.max_students && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.max_students.message}</p>}
+              {errors.max_students && <p className="text-xs font-medium text-destructive">{errors.max_students.message}</p>}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-primary-brand" />
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Tag size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <Tag className="size-5 text-primary" />
               Hình thức lớp học
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Cập nhật miễn phí hoặc trả phí</CardDescription>
+            <CardDescription>Cập nhật miễn phí hoặc trả phí</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
-              <label className="text-sm font-bold text-foreground px-1">Hình thức</label>
+              <Label>Hình thức</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'free' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${pricingType === 'free' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <input type="radio" value="free" {...register('pricing_type')} className="mt-1 accent-primary" />
                   <div>
-                    <div className="font-bold text-foreground">Miễn phí</div>
+                    <div className="font-medium text-foreground">Miễn phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
                   </div>
                 </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'paid' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${pricingType === 'paid' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <input type="radio" value="paid" {...register('pricing_type')} className="mt-1 accent-primary" />
                   <div>
-                    <div className="font-bold text-foreground">Trả phí</div>
+                    <div className="font-medium text-foreground">Trả phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
                   </div>
                 </label>
@@ -317,11 +325,12 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
 
             {pricingType === 'paid' && (
               <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                  <Wallet size={16} className="text-primary-brand" />
-                  Giá lớp học (VND) <span className="text-rose-500">*</span>
-                </label>
-                <input
+                <Label htmlFor="price_vnd">
+                  <Wallet className="size-4 text-primary" />
+                  Giá lớp học (VND) <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="price_vnd"
                   type="number"
                   min={1000}
                   step={1000}
@@ -329,55 +338,56 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                     required: 'Giá là bắt buộc khi trả phí',
                     min: { value: 1000, message: 'Tối thiểu 1.000 VND' },
                   })}
-                  className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.price_vnd ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
                   placeholder="Ví dụ: 299000"
+                  aria-invalid={!!errors.price_vnd}
                 />
-                {errors.price_vnd && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.price_vnd.message}</p>}
+                {errors.price_vnd && <p className="text-xs font-medium text-destructive">{errors.price_vnd.message}</p>}
               </div>
             )}
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-primary-brand" />
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Sparkles size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <Sparkles className="size-5 text-primary" />
               Phân loại & Hiển thị
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Cập nhật danh mục và chế độ hiển thị</CardDescription>
+            <CardDescription>Cập nhật danh mục và chế độ hiển thị</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                <Tag size={16} className="text-primary-brand" />
-                Danh mục <span className="text-rose-500">*</span>
-              </label>
+              <Label htmlFor="category">
+                <Tag className="size-4 text-primary" />
+                Danh mục <span className="text-destructive">*</span>
+              </Label>
               <select
+                id="category"
                 {...register('category', { required: 'Vui lòng chọn danh mục' })}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.category ? 'border-rose-500' : 'border-border'}`}
+                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none transition-colors focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 aria-invalid:border-red-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100"
+                aria-invalid={!!errors.category}
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
                 ))}
               </select>
-              {errors.category && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.category.message}</p>}
+              {errors.category && <p className="text-xs font-medium text-destructive">{errors.category.message}</p>}
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-bold text-foreground px-1">Chế độ hiển thị</label>
+              <Label>Chế độ hiển thị</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'public' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${visibilityType === 'public' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1 accent-primary" />
                   <div>
-                    <div className="font-bold text-foreground flex items-center gap-1"><Globe size={14} /> Công khai</div>
+                    <div className="font-medium text-foreground flex items-center gap-1"><Globe className="size-4" /> Công khai</div>
                     <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
                   </div>
                 </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'private' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
+                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${visibilityType === 'private' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1 accent-primary" />
                   <div>
-                    <div className="font-bold text-foreground flex items-center gap-1"><Lock size={14} /> Riêng tư</div>
+                    <div className="font-medium text-foreground flex items-center gap-1"><Lock className="size-4" /> Riêng tư</div>
                     <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
                   </div>
                 </label>
@@ -387,17 +397,17 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         </Card>
 
         {/* QR Code Section */}
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <QrCode size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <QrCode className="size-5 text-primary" />
               Mã QR tham gia
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Học sinh có thể quét mã này để tham gia phòng học nhanh chóng</CardDescription>
+            <CardDescription>Học sinh có thể quét mã này để tham gia phòng học nhanh chóng</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col sm:flex-row items-center gap-8 p-4 bg-muted/50 rounded-2xl border border-border">
-              <div className="bg-card p-3 rounded-xl shadow-sm border border-border">
+            <div className="flex flex-col sm:flex-row items-center gap-6 rounded-xl border border-border bg-muted/50 p-4">
+              <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
                 {linkData ? (
                   <QRCodeSVG
                     value={`${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`}
@@ -406,16 +416,16 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                     includeMargin={false}
                   />
                 ) : (
-                  <div className="w-[140px] h-[140px] flex items-center justify-center bg-muted/50 rounded-lg border border-dashed border-border">
-                    <Loader2 size={24} className="animate-spin text-muted-foreground/60" />
+                  <div className="flex h-[140px] w-[140px] items-center justify-center rounded-lg border border-dashed border-border bg-muted/50">
+                    <Loader2 className="size-6 animate-spin text-muted-foreground/60" />
                   </div>
                 )}
               </div>
 
               <div className="flex-1 space-y-4 text-center sm:text-left w-full">
                 <div>
-                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Mã tham gia</div>
-                  <div className="text-3xl font-black text-foreground tracking-[0.2em] uppercase">
+                  <div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">Mã tham gia</div>
+                  <div className="text-2xl font-semibold uppercase tracking-wide text-foreground">
                     {linkData?.code || '------'}
                   </div>
                 </div>
@@ -425,40 +435,40 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                   variant="outline"
                   onClick={handleDownloadQr}
                   disabled={!linkData}
-                  className="w-full sm:w-auto border-border hover:bg-card hover:border-indigo-500 hover:text-primary-brand h-10 rounded-xl px-6 font-bold text-xs gap-2 transition-all shadow-sm"
                 >
-                  <Download size={16} />
-                  TẢI ẢNH QR
+                  <Download className="size-4" />
+                  Tải ảnh QR
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="flex items-center justify-end gap-4 pt-4">
+        <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="button"
             variant="ghost"
+            size="lg"
             onClick={() => router.push('/space/classrooms')}
             disabled={loading}
-            className="text-muted-foreground font-bold text-xs tracking-widest hover:bg-muted rounded-xl px-6"
           >
-            HỦY BỎ
+            Hủy bỏ
           </Button>
           <Button
             type="submit"
+            size="lg"
             disabled={loading}
-            className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-primary-brand/20 transition-all active:scale-95"
+            className="min-w-[160px]"
           >
             {loading ? (
               <>
-                <Loader2 size={16} className="animate-spin mr-2" />
-                ĐANG LƯU...
+                <Loader2 className="size-4 animate-spin" />
+                Đang lưu...
               </>
             ) : (
               <>
-                <Save size={16} className="mr-2" />
-                LƯU THAY ĐỔI
+                <Save className="size-4" />
+                Lưu thay đổi
               </>
             )}
           </Button>

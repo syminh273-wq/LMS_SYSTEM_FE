@@ -25,6 +25,9 @@ import {
   CardDescription
 } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 
 const CATEGORIES: Array<{ value: NonNullable<CreateClassroomRequest['category']>; label: string }> = [
   { value: 'math', label: 'Toán học' },
@@ -86,112 +89,117 @@ export default function CreateClassroomPage() {
     <div className="max-w-2xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-4 mb-8">
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           onClick={() => router.push('/space/classrooms')}
-          className="rounded-xl border border-border bg-card shadow-sm hover:bg-muted/50 transition-all"
         >
-          <ArrowLeft size={18} className="text-muted-foreground" />
+          <ArrowLeft className="size-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-black text-foreground tracking-tight">Tạo phòng học mới</h1>
-          <p className="text-muted-foreground text-sm font-medium">Khởi tạo không gian học tập chuyên nghiệp cho học sinh của bạn</p>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight">Tạo phòng học mới</h1>
+          <p className="text-muted-foreground text-sm">Khởi tạo không gian học tập chuyên nghiệp cho học sinh của bạn</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-primary-brand" />
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Info size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <Info className="size-4 text-primary" />
               Thông tin cấu hình
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Vui lòng kiểm tra kỹ các thông tin trước khi khởi tạo</CardDescription>
+            <CardDescription>Vui lòng kiểm tra kỹ các thông tin trước khi khởi tạo</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {globalError && (
-              <div className="bg-rose-50 border border-rose-100 p-4 text-rose-600 text-sm rounded-xl font-medium flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+              <div className="bg-destructive/10 border border-destructive/20 p-3 text-destructive text-sm rounded-lg font-medium flex items-center gap-2">
+                <div className="size-1.5 rounded-full bg-destructive shrink-0" />
                 {globalError}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                Tên phòng học <span className="text-rose-500">*</span>
-              </label>
+              <Label htmlFor="name">
+                Tên phòng học <span className="text-destructive">*</span>
+              </Label>
               <div className="relative group">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
-                  <BookOpen size={18} />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                  <BookOpen className="size-4" />
                 </div>
-                <input
+                <Input
+                  id="name"
                   {...register('name', { required: 'Tên phòng học là bắt buộc' })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-medium text-foreground ${errors.name ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  aria-invalid={!!errors.name}
+                  className="pl-9"
                   placeholder="Ví dụ: Toán học nâng cao lớp 12A1"
                 />
               </div>
-              {errors.name && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.name.message}</p>}
+              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground px-1">Mô tả khóa học <span className="text-rose-500">*</span></label>
-              <textarea
+              <Label htmlFor="description">
+                Mô tả khóa học <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="description"
                 {...register('description', { required: 'Mô tả là bắt buộc' })}
                 rows={4}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-medium text-foreground resize-none ${errors.description ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                aria-invalid={!!errors.description}
+                className="resize-none"
                 placeholder="Mô tả tóm tắt về mục tiêu, kiến thức sẽ đạt được trong khóa học này..."
               />
-              {errors.description && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.description.message}</p>}
+              {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                Giới hạn học sinh <span className="text-rose-500">*</span>
-              </label>
+              <Label htmlFor="max_students">
+                Giới hạn học sinh <span className="text-destructive">*</span>
+              </Label>
               <div className="relative group max-w-[240px]">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary-brand transition-colors">
-                  <Users size={18} />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                  <Users className="size-4" />
                 </div>
-                <input
+                <Input
+                  id="max_students"
                   type="number"
                   {...register('max_students', {
                     required: 'Vui lòng nhập số lượng',
                     min: { value: 1, message: 'Tối thiểu 1 học sinh' }
                   })}
-                  className={`w-full pl-10 pr-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.max_students ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  aria-invalid={!!errors.max_students}
+                  className="pl-9"
                 />
               </div>
-              {errors.max_students && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.max_students.message}</p>}
-              <p className="text-[11px] text-muted-foreground font-bold px-1 uppercase tracking-tighter">Hệ thống sẽ tự động khóa đăng ký khi đạt giới hạn</p>
+              {errors.max_students && <p className="text-xs text-destructive">{errors.max_students.message}</p>}
+              <p className="text-xs text-muted-foreground">Hệ thống sẽ tự động khóa đăng ký khi đạt giới hạn</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-primary-brand" />
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Tag size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <Tag className="size-4 text-primary" />
               Hình thức lớp học
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Chọn miễn phí hoặc trả phí qua MoMo</CardDescription>
+            <CardDescription>Chọn miễn phí hoặc trả phí qua MoMo</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
-              <label className="text-sm font-bold text-foreground px-1">Hình thức</label>
+              <Label>Hình thức</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'free' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${pricingType === 'free' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
                   <input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
                   <div>
-                    <div className="font-bold text-foreground">Miễn phí</div>
+                    <div className="font-medium text-foreground">Miễn phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
                   </div>
                 </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${pricingType === 'paid' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${pricingType === 'paid' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
                   <input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
                   <div>
-                    <div className="font-bold text-foreground">Trả phí</div>
+                    <div className="font-medium text-foreground">Trả phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
                   </div>
                 </label>
@@ -200,11 +208,12 @@ export default function CreateClassroomPage() {
 
             {pricingType === 'paid' && (
               <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                  <Wallet size={16} className="text-primary-brand" />
-                  Giá lớp học (VND) <span className="text-rose-500">*</span>
-                </label>
-                <input
+                <Label htmlFor="price_vnd">
+                  <Wallet className="size-4 text-primary" />
+                  Giá lớp học (VND) <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="price_vnd"
                   type="number"
                   min={1000}
                   step={1000}
@@ -212,60 +221,60 @@ export default function CreateClassroomPage() {
                     required: 'Giá là bắt buộc khi trả phí',
                     min: { value: 1000, message: 'Tối thiểu 1.000 VND' },
                   })}
-                  className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.price_vnd ? 'border-rose-500 bg-rose-50/30' : 'border-border'}`}
+                  aria-invalid={!!errors.price_vnd}
                   placeholder="Ví dụ: 299000"
                 />
-                {errors.price_vnd && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.price_vnd.message}</p>}
+                {errors.price_vnd && <p className="text-xs text-destructive">{errors.price_vnd.message}</p>}
               </div>
             )}
 
-            <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-xs font-medium">
-              <Eye size={14} className="mt-0.5 shrink-0" />
+            <div className="flex items-start gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-700 text-xs">
+              <Eye className="size-3.5 mt-0.5 shrink-0" />
               <span>Một <strong>Preview folder</strong> sẽ được tự động tạo — nơi bạn up tài liệu miễn phí mà mọi học sinh đều xem được, kể cả khi chưa thanh toán.</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-primary-brand" />
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <Sparkles size={20} className="text-primary-brand" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-semibold">
+              <Sparkles className="size-4 text-primary" />
               Phân loại & Hiển thị
             </CardTitle>
-            <CardDescription className="font-medium text-muted-foreground">Danh mục giúp học sinh dễ tìm thấy lớp của bạn trong trang Khám phá</CardDescription>
+            <CardDescription>Danh mục giúp học sinh dễ tìm thấy lớp của bạn trong trang Khám phá</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                <Tag size={16} className="text-primary-brand" />
-                Danh mục <span className="text-rose-500">*</span>
-              </label>
+              <Label htmlFor="category">
+                <Tag className="size-4 text-primary" />
+                Danh mục <span className="text-destructive">*</span>
+              </Label>
               <select
+                id="category"
                 {...register('category', { required: 'Vui lòng chọn danh mục' })}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.category ? 'border-rose-500' : 'border-border'}`}
+                className={`h-10 w-full rounded-lg border bg-background px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 ${errors.category ? 'border-destructive' : 'border-border'}`}
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
                 ))}
               </select>
-              {errors.category && <p className="text-rose-500 text-[11px] font-bold px-1 uppercase tracking-tighter">{errors.category.message}</p>}
+              {errors.category && <p className="text-xs text-destructive">{errors.category.message}</p>}
             </div>
 
             <div className="space-y-3">
-              <label className="text-sm font-bold text-foreground px-1">Chế độ hiển thị</label>
+              <Label>Chế độ hiển thị</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'public' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${visibilityType === 'public' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
                   <input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
                   <div>
-                    <div className="font-bold text-foreground flex items-center gap-1"><Globe size={14} /> Công khai</div>
+                    <div className="font-medium text-foreground flex items-center gap-1"><Globe className="size-3.5" /> Công khai</div>
                     <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
                   </div>
                 </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-all ${visibilityType === 'private' ? 'border-primary-brand bg-primary-brand/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${visibilityType === 'private' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
                   <input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
                   <div>
-                    <div className="font-bold text-foreground flex items-center gap-1"><Lock size={14} /> Riêng tư</div>
+                    <div className="font-medium text-foreground flex items-center gap-1"><Lock className="size-3.5" /> Riêng tư</div>
                     <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
                   </div>
                 </label>
@@ -274,24 +283,24 @@ export default function CreateClassroomPage() {
           </CardContent>
         </Card>
 
-        <div className="flex items-center justify-end gap-4 pt-4">
+        <div className="flex items-center justify-end gap-3 pt-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             onClick={() => router.push('/space/classrooms')}
             disabled={loading}
-            className="text-muted-foreground font-bold text-xs tracking-widest hover:bg-muted rounded-xl px-6"
           >
             HỦY BỎ
           </Button>
           <Button
             type="submit"
+            size="lg"
             disabled={loading}
-            className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs tracking-widest min-w-[180px] h-12 rounded-xl shadow-lg shadow-primary-brand/20 transition-all active:scale-95"
+            className="min-w-[180px]"
           >
             {loading ? (
               <>
-                <Loader2 size={16} className="animate-spin mr-2" />
+                <Loader2 className="size-4 animate-spin" />
                 ĐANG XỬ LÝ...
               </>
             ) : 'KHỞI TẠO PHÒNG HỌC'}
@@ -301,4 +310,3 @@ export default function CreateClassroomPage() {
     </div>
   );
 }
-

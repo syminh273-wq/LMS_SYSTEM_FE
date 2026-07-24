@@ -110,7 +110,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-4xl w-[calc(100vw-2rem)] max-h-[90vh] overflow-hidden p-0 rounded-2xl border-border bg-card">
+      <DialogContent className="!max-w-[1100px] w-[calc(100vw-2rem)] h-[820px] max-h-[820px] overflow-hidden p-0 rounded-2xl border-border bg-card flex flex-col">
         <DialogHeader className="border-b border-border bg-muted/30 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-brand-light text-primary-brand">
@@ -149,7 +149,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
           })}
         </div>
 
-        <div className="max-h-[calc(90vh-180px)] overflow-y-auto bg-muted/30 px-6 py-5">
+        <div className="flex-1 min-h-0 overflow-y-auto bg-muted/30 px-6 py-5">
           {error && (
             <div className="mb-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
               <AlertTriangle size={16} />

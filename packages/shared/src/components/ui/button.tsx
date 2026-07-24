@@ -56,10 +56,12 @@ function Button({
   ...props
 }: ButtonProps) {
   if (asChild && React.isValidElement(children)) {
+    const isNativeButton = (children.type as unknown) === "button"
     return (
       <ButtonPrimitive
         data-slot="button"
         className={cn(buttonVariants({ variant, size, className }))}
+        nativeButton={isNativeButton}
         render={children}
         {...props}
       />
