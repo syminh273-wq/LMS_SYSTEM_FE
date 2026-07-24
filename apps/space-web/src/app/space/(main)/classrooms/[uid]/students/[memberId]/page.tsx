@@ -6,12 +6,14 @@ import {
   ArrowLeft, BarChart2, ClipboardCheck, Loader2,
   MapPin, Globe, Github, Facebook, Linkedin, Twitter, Instagram,
   ExternalLink, UserX, TrendingUp, CheckCircle2, Clock, AlertCircle,
-  ShieldBan, ChevronDown,
+  ShieldBan, ChevronDown, Trophy,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
 import type { ClassroomMember, StudentExamRecord, StudentPublicProfile } from '@/lib/api/types';
 import { toast } from 'sonner';
+import SpaceStudentRankingPanel from '@/components/ranking/SpaceStudentRankingPanel';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 const THEME_GRADIENT: Record<string, string> = {
   indigo:  'from-primary-brand via-primary-brand to-violet-600',
@@ -33,6 +35,7 @@ export default function StudentDetailsPage({
 }) {
   const { uid, memberId } = use(params);
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [member, setMember]     = useState<ClassroomMember | null>(null);
   const [records, setRecords]   = useState<StudentExamRecord[]>([]);
@@ -243,6 +246,17 @@ export default function StudentDetailsPage({
             )}
           </div>
         </div>
+      </div>
+
+      {/* ── Ranking (XP / Level / Achievements) ── */}
+      <div className="bg-card border border-border rounded-3xl p-6 shadow-sm">
+        <div className="mb-4 flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-amber-500" />
+          <h2 className="text-base font-black text-foreground">
+            {t('ranking.title', 'Ranking')}
+          </h2>
+        </div>
+        <SpaceStudentRankingPanel studentUid={memberId} t={t} />
       </div>
 
       {/* ── Stats ── */}
