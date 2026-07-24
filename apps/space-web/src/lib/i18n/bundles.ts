@@ -30,6 +30,8 @@ import imageUploaderEn from '@/locales/image-uploader/en.json';
 import imageUploaderVi from '@/locales/image-uploader/vi.json';
 import courseEn from '@/locales/course/en.json';
 import courseVi from '@/locales/course/vi.json';
+import gradingEn from '@/locales/grading/en.json';
+import gradingVi from '@/locales/grading/vi.json';
 
 import sharedCommonEn from '@shared/locales/common/en.json';
 import sharedCommonVi from '@shared/locales/common/vi.json';
@@ -85,6 +87,7 @@ export const spaceWebBundles: LocaleBundles = {
     certificate: certificateEn,
     imageUploader: imageUploaderEn,
     course: courseEn,
+    grading: gradingEn,
     sharedCommon: sharedCommonEn,
     sharedLayout: sharedLayoutEn,
     settings: sharedSettingsEn,
@@ -120,6 +123,7 @@ export const spaceWebBundles: LocaleBundles = {
     certificate: certificateVi,
     imageUploader: imageUploaderVi,
     course: courseVi,
+    grading: gradingVi,
     sharedCommon: sharedCommonVi,
     sharedLayout: sharedLayoutVi,
     settings: sharedSettingsVi,

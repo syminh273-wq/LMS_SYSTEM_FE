@@ -26,6 +26,7 @@ import {
   Compass,
   Heart,
   Trophy,
+  Calculator,
 } from 'lucide-react';
 import {
   Avatar,
@@ -114,6 +115,7 @@ const utilityNavItems: NavItem[] = [
   { name: 'Bảng điểm', href: '/consumer/grades', icon: GraduationCap },
   { name: 'Xếp hạng', href: '/consumer/me', icon: Trophy },
   { name: 'Chứng chỉ', href: '/consumer/certificate', icon: Award },
+  { name: 'Quy đổi điểm', href: '/consumer/grading', icon: Calculator },
 ];
 
 function parseNotificationMetadata(raw: string | NotificationMetadata | undefined | null): NotificationMetadata {

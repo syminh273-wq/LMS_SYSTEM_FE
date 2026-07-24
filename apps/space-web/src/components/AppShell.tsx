@@ -26,6 +26,7 @@ import {
   MessageCircle,
   Sparkles,
   User,
+  Calculator,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
@@ -107,6 +108,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         ],
       },
       { key: 'students',        label: t('layout.nav.students'),        href: '/space/student',          icon: Users },
+      { key: 'grading',         label: t('layout.nav.grading'),         href: '/space/grading',          icon: Calculator },
       { key: 'settings',        label: t('layout.nav.settings'),        href: '/space/settings',         icon: Settings },
     ],
     [t]
