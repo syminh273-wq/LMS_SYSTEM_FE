@@ -24,6 +24,7 @@ export default function FeedPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [profile, setProfile] = useState<{ full_name: string; avatar_url: string; uid: string; email?: string; username?: string; created_at?: string } | null>(null);
+  const [followingCount, setFollowingCount] = useState(0);
   const PAGE = 15;
 
   const fetchFeed = useCallback(async () => {
@@ -55,6 +56,7 @@ export default function FeedPage() {
           username: prof.username,
           created_at: prof.created_at,
         });
+        setFollowingCount(workspace?.following_count ?? 0);
         await fetchFeed();
       } catch { toast.error('Lỗi khởi tạo'); }
     };
@@ -95,7 +97,7 @@ export default function FeedPage() {
   return (
     <WorkspaceShell>
       <div className="mx-auto w-full max-w-[90vw] grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_300px] gap-6 py-6 sm:py-8">
-        {profile && <FeedLeftSidebar profile={profile} />}
+        {profile && <FeedLeftSidebar profile={profile} followingCount={followingCount} />}
 
         <div className="space-y-4 sm:space-y-5 min-w-0">
           <CreatePost profile={profile} onCreated={handleCreated} />

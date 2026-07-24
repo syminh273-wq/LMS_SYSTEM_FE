@@ -29,11 +29,15 @@ Avatar.displayName = "Avatar"
 const AvatarImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
   AvatarPrimitive.Image.Props
->(({ className, ...props }, ref) => {
+>(({ className, src, ...props }, ref) => {
+  if (!src) {
+    return null
+  }
   return (
     <AvatarPrimitive.Image
       ref={ref}
       data-slot="avatar-image"
+      src={src}
       className={cn(
         "aspect-square size-full rounded-full object-cover",
         className

@@ -44,42 +44,27 @@ export default function DirectChatPage() {
   useEffect(() => {
     if (!targetUid) return;
     let mounted = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     (async () => {
       try {
+        const lookup = await communityApi.lookupDirectByTarget(targetUid).catch(() => null);
+        if (lookup?.conversation_uid) {
+          if (mounted) {
+            router.replace(`/space/messages/c/${lookup.conversation_uid}`);
+          }
+          return;
+        }
+
         const { conversation_uid } = await communityApi.getOrCreateDirect(targetUid);
         if (!mounted) return;
-        setConv({
-          conversation_uid,
-          other_user: { uid: targetUid, name: '', avatar: '', last_seen_at: null },
-          last_msg: null,
-          unread_count: 0,
-          created_at: null,
-        });
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/chat/messages/?conversation_uid=${conversation_uid}&limit=50`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`,
-            },
-          }
-        );
-        const data = await res.json();
-        if (mounted && Array.isArray(data.results)) {
-          setMessages(data.results);
-          if (data.results.length > 0) {
-            communityApi.markConversationSeen(conversation_uid, data.results[data.results.length - 1].uid).catch(() => {});
-          }
-        }
+        router.replace(`/space/messages/c/${conversation_uid}`);
       } catch {
         toast.error('Không thể mở cuộc trò chuyện');
-      } finally {
         if (mounted) setLoading(false);
       }
     })();
     return () => { mounted = false; };
-  }, [targetUid]);
+  }, [targetUid, router]);
 
   useEffect(() => {
     if (!conv?.conversation_uid) return;

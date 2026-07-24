@@ -142,8 +142,7 @@ export default function TeacherPublicPage() {
     if (messageBusy || !targetUid) return;
     setMessageBusy(true);
     try {
-      const res = await communityApi.getOrCreateDirect(targetUid);
-      router.push(`/space/messages/${res.conversation_uid}`);
+      router.push(`/space/messages/${targetUid}`);
     } catch (err) {
       console.error(err);
       toast.error('Không thể mở cuộc trò chuyện');

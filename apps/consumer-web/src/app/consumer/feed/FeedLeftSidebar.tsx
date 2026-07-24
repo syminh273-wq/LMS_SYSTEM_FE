@@ -6,7 +6,7 @@ import {
   User as UserIcon,
   Newspaper,
   MessageCircle,
-  Settings as SettingsIcon,
+  UserCheck,
   PenLine,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
@@ -22,17 +22,24 @@ type Profile = {
   created_at?: string;
 };
 
-const NAV_ITEMS = [
-  { label: 'Trang cá nhân', icon: UserIcon,      path: '/consumer/profile' },
-  { label: 'Bảng tin',      icon: Newspaper,     path: '/consumer/feed' },
-  { label: 'Tin nhắn',      icon: MessageCircle, path: '/consumer/messages' },
-  { label: 'Cài đặt',       icon: SettingsIcon,  path: '/consumer/settings' },
-] as const;
+type NavItem = {
+  label: string;
+  icon: React.ComponentType<{ size?: number }>;
+  path: string;
+  badge?: number;
+};
 
-export function FeedLeftSidebar({ profile }: { profile: Profile }) {
+export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Profile; followingCount?: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const initials = (profile.full_name || '?').slice(0, 2).toUpperCase();
+
+  const NAV_ITEMS: NavItem[] = [
+    { label: 'Trang cá nhân', icon: UserIcon,      path: '/consumer/profile' },
+    { label: 'Bảng tin',      icon: Newspaper,     path: '/consumer/feed' },
+    { label: 'Tin nhắn',      icon: MessageCircle, path: '/consumer/messages' },
+    { label: 'Đang theo dõi', icon: UserCheck,     path: '/consumer/following', badge: followingCount },
+  ];
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
@@ -61,7 +68,7 @@ export function FeedLeftSidebar({ profile }: { profile: Profile }) {
 
       <nav className="bg-white border border-slate-200 rounded-xl p-2 card-elevated">
         <ul className="space-y-0.5">
-          {NAV_ITEMS.map(({ label, icon: Icon, path }) => {
+          {NAV_ITEMS.map(({ label, icon: Icon, path, badge }) => {
             const active = pathname === path || (path === '/consumer/feed' && pathname?.startsWith('/consumer/feed'));
             return (
               <li key={path}>
@@ -80,7 +87,15 @@ export function FeedLeftSidebar({ profile }: { profile: Profile }) {
                   )}>
                     <Icon size={15} />
                   </span>
-                  <span className="truncate">{label}</span>
+                  <span className="truncate flex-1">{label}</span>
+                  {typeof badge === 'number' && badge > 0 && (
+                    <span className={cn(
+                      'shrink-0 text-[11px] font-bold px-1.5 py-0.5 rounded-md min-w-[22px] text-center',
+                      active ? 'bg-white text-indigo-600' : 'bg-slate-100 text-slate-600'
+                    )}>
+                      {badge > 999 ? '999+' : badge}
+                    </span>
+                  )}
                 </button>
               </li>
             );

@@ -11,7 +11,7 @@ import {
   LogOut,
   MessageCircle,
   Search,
-  Settings,
+  UserCheck,
   User,
   Users,
 } from 'lucide-react';
@@ -115,7 +115,36 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          <div className="relative flex-1 max-w-md">
+          {authed && (
+            <nav className="hidden md:flex items-center gap-1 ml-2">
+              <button
+                onClick={() => router.push('/space/feed')}
+                className={
+                  'inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-bold transition-colors ' +
+                  (isHome
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900')
+                }
+                aria-label="Trang chủ"
+              >
+                <Home size={14} />
+                Trang chủ
+              </button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => router.push('/space/messages')}
+                className="h-9 w-9 rounded-full"
+                title={t('workspace.nav.messages')}
+              >
+                <MessageCircle size={16} />
+              </Button>
+            </nav>
+          )}
+
+          <div className="flex-1" />
+
+          <div className="hidden md:flex relative w-72 lg:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
             <Input
               placeholder="Tìm kiếm tài liệu, bạn bè..."
@@ -123,40 +152,18 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             />
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {authed ? (
               <>
-                <button
-                  onClick={() => router.push('/space/feed')}
-                  className={
-                    'hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors ' +
-                    (isHome
-                      ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100'
-                      : 'text-slate-700 hover:bg-slate-100')
-                  }
-                  aria-label="Trang chủ"
-                >
-                  <Home size={14} />
-                  Trang chủ
-                </button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => router.push('/space/messages')}
-                  className="h-9 w-9 rounded-full"
-                  title={t('workspace.nav.messages')}
-                >
-                  <MessageCircle size={16} />
-                </Button>
                 <NotificationBell />
-                <LanguageSwitcher />
+                <LanguageSwitcher variant="compact" />
                 <ThemeToggle />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
                       aria-label="Mở menu tài khoản"
-                      className="ml-1 flex items-center gap-1 rounded-full p-0.5 outline-none hover:ring-2 hover:ring-indigo-300 transition-all"
+                      className="ml-2 pl-1.5 pr-2 py-0.5 flex items-center gap-2 rounded-full outline-none hover:ring-2 hover:ring-indigo-300 transition-all"
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || ''} />
@@ -188,11 +195,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
                     </button>
                     <button
-                      onClick={() => router.push('/space/settings')}
+                      onClick={() => router.push('/space/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
-                      <Settings size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">{t('workspace.nav.settings')}</span>
+                      <UserCheck size={14} className="text-muted-foreground" />
+                      <span className="text-sm font-medium">Đang theo dõi</span>
                     </button>
                     <div className="h-px bg-border my-1" />
                     <button

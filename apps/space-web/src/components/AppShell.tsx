@@ -155,26 +155,31 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setSidebarCollapsed(false)}
               title={t('layout.actions.expand_menu')}
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
             >
               <ChevronsRight size={16} />
             </button>
           </div>
         ) : (
-          <div className="p-5 pb-4 flex items-center justify-between">
-            <Link href="/space" className="hover:opacity-80 transition-opacity flex-1 min-w-0 cursor-pointer">
+          <div className="p-5 pb-4 flex items-center justify-between gap-2">
+            <Link
+              href="/space"
+              className="hover:opacity-80 transition-opacity flex-1 min-w-0 cursor-pointer flex items-center"
+              title="LMS System"
+            >
               <LmsLogo
-                height={38}
+                width={140}
+                height={40}
                 primaryColor={mounted ? brandColors.primaryColor : '#4f46e5'}
                 accentColor={mounted ? brandColors.accentColor : '#00b4d8'}
                 goldColor={mounted ? brandColors.goldColor : '#d4a843'}
-                className="h-[38px] w-auto"
+                className="h-10 w-auto"
               />
             </Link>
             <button
               onClick={() => setSidebarCollapsed(true)}
               title={t('layout.actions.collapse_menu')}
-              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted transition-colors ml-2 shrink-0 cursor-pointer"
+              className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0 cursor-pointer"
             >
               <ChevronsLeft size={16} />
             </button>

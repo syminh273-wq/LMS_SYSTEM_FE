@@ -66,7 +66,7 @@ export default function MessagesPage() {
               {list.map((c) => (
                 <li
                   key={c.conversation_uid}
-                  onClick={() => router.push(`/space/messages/${c.other_user.uid}`)}
+                  onClick={() => router.push(`/space/messages/c/${c.conversation_uid}`)}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors"
                 >
                   {c.other_user.avatar ? (

@@ -100,10 +100,6 @@ export default function PublicProfilePage() {
 
   useEffect(() => {
     if (!targetUid || isOwner || !isAuthed) return;
-    if (isSpaceProfile) {
-      setIsFollowing(false);
-      return;
-    }
     let cancelled = false;
     (async () => {
       try {
@@ -275,17 +271,46 @@ export default function PublicProfilePage() {
               ? undefined
               : isSpaceProfile
               ? () => (
-                  <Button
-                    onClick={() => {
-                      const spaceBase =
-                        process.env.NEXT_PUBLIC_SPACE_WEB_URL || 'http://localhost:3001';
-                      window.location.href = `${spaceBase}/space/teachers/${targetUid}`;
-                    }}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
-                  >
-                    <UserPlus className="size-4" />
-                    {t('portfolio.me.view_space_page', { defaultValue: 'Xem trang Space' })}
-                  </Button>
+                  <>
+                    <Button
+                      onClick={handleFollowToggle}
+                      disabled={followBusy}
+                      className={
+                        isFollowing
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 hover:border-slate-300'
+                          : 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold'
+                      }
+                    >
+                      {followBusy ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : isFollowing ? (
+                        <>
+                          <UserCheck className="size-4" />
+                          {t('portfolio.me.following')}
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="size-4" />
+                          {t('portfolio.me.follow')}
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleMessage}
+                      disabled={messageBusy}
+                      variant="outline"
+                      className="border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:text-indigo-600"
+                    >
+                      {messageBusy ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <>
+                          <MessageCircle className="size-4" />
+                          {t('portfolio.me.message')}
+                        </>
+                      )}
+                    </Button>
+                  </>
                 )
               : () => (
                   <>

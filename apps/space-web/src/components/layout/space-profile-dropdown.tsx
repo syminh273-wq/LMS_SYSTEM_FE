@@ -20,13 +20,8 @@ import {
   Sparkles,
   UserCircle,
   Users,
-  Bell,
-  HelpCircle,
-  Moon,
-  Globe,
   Award,
   Calendar,
-  FileText,
 } from 'lucide-react';
 
 type ProfileData = {
@@ -103,30 +98,16 @@ export function SpaceProfileDropdown() {
 
   const menuItems: Array<{
     label: string;
-    Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
-    bg: string;
-    color: string;
+    Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
     path: string;
   }> = [
-    { label: 'Dashboard',     Icon: LayoutDashboard, bg: 'bg-blue-100',     color: 'text-blue-600',     path: '/space' },
-    { label: 'Classrooms',    Icon: BookOpen,        bg: 'bg-emerald-100',  color: 'text-emerald-600',  path: '/space/classrooms' },
-    { label: 'Calendar',      Icon: Calendar,        bg: 'bg-rose-100',     color: 'text-rose-600',     path: '/space/calendar' },
-    { label: 'Certificates',  Icon: Award,           bg: 'bg-amber-100',    color: 'text-amber-600',    path: '/space/quiz-collections' },
-    { label: 'Students',      Icon: Users,           bg: 'bg-indigo-100',   color: 'text-indigo-600',   path: '/space/student' },
-    { label: 'Trang cá nhân', Icon: UserCircle,      bg: 'bg-fuchsia-100',  color: 'text-fuchsia-600',  path: '/space/me' },
-    { label: 'Settings',      Icon: Settings,        bg: 'bg-violet-100',   color: 'text-violet-600',   path: '/space/settings' },
-  ];
-
-  const quickItems: Array<{
-    label: string;
-    Icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
-    bg: string;
-    color: string;
-  }> = [
-    { label: 'Thông báo',  Icon: Bell,        bg: 'bg-sky-100',     color: 'text-sky-600' },
-    { label: 'Ngôn ngữ',   Icon: Globe,       bg: 'bg-teal-100',    color: 'text-teal-600' },
-    { label: 'Dark mode',  Icon: Moon,        bg: 'bg-slate-100',   color: 'text-slate-600' },
-    { label: 'Trợ giúp',   Icon: HelpCircle,  bg: 'bg-orange-100',  color: 'text-orange-600' },
+    { label: 'Trang cá nhân', Icon: UserCircle,     path: '/space/me' },
+    { label: 'Dashboard',     Icon: LayoutDashboard, path: '/space' },
+    { label: 'Classrooms',    Icon: BookOpen,       path: '/space/classrooms' },
+    { label: 'Calendar',      Icon: Calendar,       path: '/space/calendar' },
+    { label: 'Certificates',  Icon: Award,          path: '/space/quiz-collections' },
+    { label: 'Students',      Icon: Users,          path: '/space/student' },
+    { label: 'Settings',      Icon: Settings,       path: '/space/settings' },
   ];
 
   return (
@@ -136,16 +117,16 @@ export function SpaceProfileDropdown() {
           type="button"
           aria-label="Mở menu tài khoản"
           onClick={(e) => e.stopPropagation()}
-          className="flex max-w-[220px] items-center gap-2.5 rounded-2xl border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group"
+          className="flex max-w-[220px] items-center gap-2.5 rounded-full border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group"
         >
           {profile?.avatar_url ? (
             <img
               src={profile.avatar_url}
               alt={displayName}
-              className="h-8 w-8 shrink-0 rounded-full object-cover"
+              className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-background"
             />
           ) : (
-            <div className="h-8 w-8 shrink-0 rounded-full bg-primary-brand/10 text-xs font-black text-primary-brand flex items-center justify-center">
+            <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-primary-brand to-accent text-xs font-black text-white flex items-center justify-center ring-2 ring-background">
               {initials}
             </div>
           )}
@@ -161,8 +142,8 @@ export function SpaceProfileDropdown() {
 
       <DropdownMenuContent
         align="end"
-        sideOffset={8}
-        style={{ width: '280px', minWidth: '280px' }}
+        sideOffset={10}
+        style={{ width: '240px', minWidth: '240px' }}
         className="rounded-2xl border border-border bg-card p-1.5 shadow-xl"
       >
         <button
@@ -176,74 +157,31 @@ export function SpaceProfileDropdown() {
               className="h-10 w-10 shrink-0 rounded-full object-cover"
             />
           ) : (
-            <div className="h-10 w-10 shrink-0 rounded-full bg-primary-brand/10 text-sm font-black text-primary-brand flex items-center justify-center">
+            <div className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-primary-brand to-accent text-sm font-black text-white flex items-center justify-center">
               {initials}
             </div>
           )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold leading-tight text-foreground">{displayName}</p>
             <p className="mt-0.5 truncate text-xs text-muted-foreground">{email}</p>
-            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-primary-brand">
-              Xem trang cá nhân →
-            </p>
           </div>
-        </button>
-
-        <div className="mx-1 my-1 h-px bg-border" />
-
-        <button
-          onClick={() => router.push('/space/feed')}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted group"
-        >
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-pink-100 text-pink-600">
-            <Sparkles size={13} strokeWidth={2.5} />
-          </div>
-          <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">Social Feed</span>
-          <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
-            MỚI
-          </span>
         </button>
 
         <div className="mx-1 my-1 h-px bg-border" />
 
         <div className="space-y-0.5">
-          {menuItems.map(({ label, Icon, bg, color, path }) => (
+          {menuItems.map(({ label, Icon, path }) => (
             <button
               key={path}
               onClick={() => router.push(path)}
-              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted group"
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted group"
             >
-              <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${bg} ${color}`}>
-                <Icon size={13} strokeWidth={2.5} />
-              </div>
-              <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">{label}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="mx-1 my-1 h-px bg-border" />
-
-        <div className="grid grid-cols-4 gap-1 px-1 py-1">
-          {quickItems.map(({ label, Icon, bg, color }) => (
-            <button
-              key={label}
-              onClick={() => {
-                if (label === 'Thông báo') router.push('/space/notifications');
-                else if (label === 'Trợ giúp') router.push('/space/help');
-                else if (label === 'Ngôn ngữ') router.push('/space/settings?tab=language');
-                else if (label === 'Dark mode') {
-                  if (typeof document !== 'undefined') {
-                    document.documentElement.classList.toggle('dark');
-                  }
-                }
-              }}
-              className="flex flex-col items-center gap-1 rounded-xl py-2 transition-colors hover:bg-muted group"
-              title={label}
-            >
-              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${bg} ${color}`}>
-                <Icon size={15} strokeWidth={2.5} />
-              </div>
-              <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground">
+              <Icon
+                size={16}
+                strokeWidth={2}
+                className="shrink-0 text-muted-foreground group-hover:text-primary-brand transition-colors"
+              />
+              <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
                 {label}
               </span>
             </button>
@@ -253,23 +191,36 @@ export function SpaceProfileDropdown() {
         <div className="mx-1 my-1 h-px bg-border" />
 
         <button
-          onClick={() => router.push('/space/me/edit')}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted group"
+          onClick={() => router.push('/space/feed')}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted group"
         >
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-cyan-100 text-cyan-600">
-            <FileText size={13} strokeWidth={2.5} />
-          </div>
-          <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">Chỉnh sửa hồ sơ</span>
+          <Sparkles
+            size={16}
+            strokeWidth={2}
+            className="shrink-0 text-muted-foreground group-hover:text-primary-brand transition-colors"
+          />
+          <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
+            Social Feed
+          </span>
+          <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
+            MỚI
+          </span>
         </button>
+
+        <div className="mx-1 my-1 h-px bg-border" />
 
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-destructive/5 group"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-destructive/5 group"
         >
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-destructive/10 text-destructive">
-            <LogOut size={13} strokeWidth={2.5} />
-          </div>
-          <span className="text-sm font-medium text-destructive">Đăng xuất</span>
+          <LogOut
+            size={16}
+            strokeWidth={2}
+            className="shrink-0 text-muted-foreground group-hover:text-destructive transition-colors"
+          />
+          <span className="text-sm font-medium text-foreground/80 group-hover:text-destructive">
+            Đăng xuất
+          </span>
         </button>
       </DropdownMenuContent>
     </DropdownMenu>

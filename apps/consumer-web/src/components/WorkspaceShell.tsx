@@ -12,7 +12,7 @@ import {
   LogOut,
   MessageCircle,
   Search,
-  Settings,
+  UserCheck,
   User,
   Users,
 } from 'lucide-react';
@@ -143,11 +143,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
                     </button>
                     <button
-                      onClick={() => router.push('/consumer/settings')}
+                      onClick={() => router.push('/consumer/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
-                      <Settings size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">{t('workspace.nav.settings')}</span>
+                      <UserCheck size={14} className="text-muted-foreground" />
+                      <span className="text-sm font-medium">Đang theo dõi</span>
                     </button>
                     <button
                       onClick={() => router.push('/consumer/classroom')}

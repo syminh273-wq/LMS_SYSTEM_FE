@@ -86,6 +86,9 @@ class CommunityApiClient extends BaseRestApiClient {
   async getOrCreateDirect(targetUserId: string): Promise<{ conversation_uid: string; created: boolean }> {
     return this.post('/api/v1/chat/direct/conversations/', { target_user_id: targetUserId });
   }
+  async lookupDirectByTarget(targetUserId: string): Promise<{ conversation_uid: string | null; other_user?: any }> {
+    return this.post('/api/v1/chat/direct/conversations/lookup-by-target/', { target_user_id: targetUserId });
+  }
   async sendMessageHTTP(payload: {
     conversation_uid: string;
     content: string;
