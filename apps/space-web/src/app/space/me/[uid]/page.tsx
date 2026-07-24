@@ -10,8 +10,10 @@ import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { portfolioApi, type Portfolio, type PortfolioEntry } from '@/lib/api/portfolio';
 import { accountService } from '@/lib/api/account';
+import { classroomApi, type Classroom } from '@/lib/api/classroom';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import type { RootState } from '@/lib/redux/store';
+import { TeachingClassesCard } from '@shared/components/profile/TeachingClassesCard';
 
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { BioCard } from '@/components/Me/BioCard';
@@ -19,6 +21,7 @@ import { EducationSection } from '@/components/Me/EducationSection';
 import { ExperienceSection } from '@/components/Me/ExperienceSection';
 import { FeaturesSection } from '@/components/Me/FeaturesSection';
 import { MeProfileLayout } from '@shared/components/profile/MeProfileLayout';
+import { ProfileHeaderInfo } from '@shared/components/address';
 
 const EMPTY_PORTFOLIO: Portfolio & { education: PortfolioEntry[] } = {
   intro: null,
@@ -47,6 +50,8 @@ export default function PublicProfilePage() {
   const [profile, setProfile] = useState<SpaceProfile | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
+  const [teachingLoading, setTeachingLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isOwner, setIsOwner] = useState(false);
@@ -56,10 +61,11 @@ export default function PublicProfilePage() {
     (async () => {
       setLoading(true);
       try {
-        const [pf, me, ws] = await Promise.all([
+        const [pf, me, ws, classes] = await Promise.all([
           portfolioApi.getPublic('space', targetUid).catch(() => null),
           isAuthed ? accountService.getProfile().catch(() => null) : Promise.resolve(null),
           communityApi.getPublicProfile(targetUid).catch(() => null),
+          classroomApi.getByTeacher(targetUid).catch(() => [] as Classroom[]),
         ]);
         setPortfolio(pf ?? EMPTY_PORTFOLIO);
         if (me) {
@@ -79,11 +85,13 @@ export default function PublicProfilePage() {
             avatar_url: '',
           });
         }
+        setTeachingClasses(Array.isArray(classes) ? classes : []);
       } catch (err) {
         console.error(err);
         setError(t('portfolio.labels.portfolio_not_found'));
       } finally {
         setLoading(false);
+        setTeachingLoading(false);
       }
     })();
   }, [targetUid, t, isAuthed]);
@@ -138,6 +146,13 @@ export default function PublicProfilePage() {
         renderBio={({ profile: ws, isOwner: owner, onSaved }) => (
           <BioCard profile={ws as WorkspaceProfile} isOwner={owner} onSaved={onSaved as (next: WorkspaceProfile) => void} />
         )}
+        renderTeachingClasses={() => (
+          <TeachingClassesCard
+            classes={teachingClasses}
+            loading={teachingLoading}
+            detailHrefBase="/space/classroom/preview"
+          />
+        )}
         renderEducation={({ items, isOwner: owner, onChanged }) => (
           <EducationSection
             items={items as Portfolio['education']}
@@ -157,6 +172,13 @@ export default function PublicProfilePage() {
             items={items as Portfolio['achievement']}
             isOwner={owner}
             onChanged={onChanged as (next: Portfolio['achievement']) => void}
+          />
+        )}
+        renderHeaderInfo={({ isOwner: owner, uid }) => (
+          <ProfileHeaderInfo
+            uid={uid}
+            createdAt={(workspace as { created_at?: string } | null)?.created_at}
+            isOwner={owner}
           />
         )}
       />

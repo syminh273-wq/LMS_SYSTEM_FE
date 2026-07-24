@@ -56,6 +56,7 @@ export default function TeacherPublicPage() {
   const [following, setFollowing] = useState(false);
   const [followBusy, setFollowBusy] = useState(false);
   const [messageBusy, setMessageBusy] = useState(false);
+  const [followerDelta, setFollowerDelta] = useState(0);
 
   useEffect(() => {
     if (!targetUid) return;
@@ -116,12 +117,21 @@ export default function TeacherPublicPage() {
     setFollowBusy(true);
     const next = !following;
     setFollowing(next);
+    setFollowerDelta((d) => d + (next ? 1 : -1));
     try {
       const res = await socialApi.toggleFollow(targetUid);
       setFollowing(Boolean(res.following));
+      try {
+        const ws = await communityApi.getPublicProfile(targetUid);
+        setWorkspace(ws);
+        setFollowerDelta(0);
+      } catch {
+        /* keep optimistic delta if refetch fails */
+      }
     } catch (err) {
       console.error(err);
       setFollowing(!next);
+      setFollowerDelta((d) => d - (next ? 1 : -1));
       toast.error('Không thể cập nhật trạng thái theo dõi');
     } finally {
       setFollowBusy(false);
@@ -161,7 +171,9 @@ export default function TeacherPublicPage() {
             coverUrl={teacher.cover_url || workspace.cover_url}
             name={displayName}
             tagline={teacher.description || workspace.major || workspace.department}
-            connections={workspace.followers_count}
+            connections={Math.max(0, workspace.followers_count + followerDelta)}
+            isFollowing={following}
+            isConnecting={followBusy}
             isOwner={false}
             onConnect={handleFollow}
             onMessage={handleMessage}

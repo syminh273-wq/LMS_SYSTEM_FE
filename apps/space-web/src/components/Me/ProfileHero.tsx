@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera } from 'lucide-react';
+import { Camera, Loader2, UserCheck, UserPlus } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 
@@ -11,6 +11,8 @@ type ProfileHeroProps = {
   tagline?: string;
   location?: string;
   connections?: number;
+  isFollowing?: boolean;
+  isConnecting?: boolean;
   onEditCover?: () => void;
   onEditAvatar?: () => void;
   onConnect?: () => void;
@@ -25,6 +27,8 @@ export function ProfileHero({
   tagline,
   location,
   connections,
+  isFollowing = false,
+  isConnecting = false,
   onEditCover,
   onEditAvatar,
   onConnect,
@@ -99,9 +103,28 @@ export function ProfileHero({
             {!isOwner && onConnect && (
               <Button
                 onClick={onConnect}
-                className="bg-[#0a66c2] hover:bg-[#004182] text-white font-bold rounded-full"
+                disabled={isConnecting}
+                aria-pressed={isFollowing}
+                aria-label={isFollowing ? t('portfolio.me.following') : t('portfolio.me.connect')}
+                className={
+                  isFollowing
+                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-full border border-slate-200'
+                    : 'bg-[#0a66c2] hover:bg-[#004182] text-white font-bold rounded-full'
+                }
               >
-                + {t('portfolio.me.connect')}
+                {isConnecting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : isFollowing ? (
+                  <>
+                    <UserCheck className="size-4" />
+                    {t('portfolio.me.following')}
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="size-4" />
+                    {t('portfolio.me.connect')}
+                  </>
+                )}
               </Button>
             )}
             {!isOwner && onMessage && (

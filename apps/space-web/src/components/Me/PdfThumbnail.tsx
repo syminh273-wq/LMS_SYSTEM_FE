@@ -9,7 +9,10 @@ const PDFJS_WORKER = '/pdfjs/pdf.worker.min.js';
 
 type PdfJs = {
   GlobalWorkerOptions: { workerSrc: string };
-  getDocument: (params: { url: string }) => { promise: Promise<PdfDocument> };
+  getDocument: (params: { url: string }) => {
+    promise: Promise<PdfDocument>;
+    destroy?: () => Promise<void>;
+  };
 };
 
 type PdfDocument = {
@@ -23,8 +26,10 @@ type PdfPage = {
     canvasContext: CanvasRenderingContext2D;
     viewport: { width: number; height: number };
     canvas: HTMLCanvasElement;
-  }) => { promise: Promise<void> };
+  }) => { promise: Promise<void>; cancel: () => void };
 };
+
+type PdfLoadError = Error & { name?: string };
 
 declare global {
   interface Window {
@@ -95,6 +100,8 @@ export function PdfThumbnail({ url, className = '', title }: Props) {
   useEffect(() => {
     let cancelled = false;
     let doc: PdfDocument | null = null;
+    let renderTask: { promise: Promise<void>; cancel: () => void } | null = null;
+    let loadTask: { destroy?: () => Promise<void> } | null = null;
 
     (async () => {
       try {
@@ -104,9 +111,13 @@ export function PdfThumbnail({ url, className = '', title }: Props) {
         if (cancelled) return;
 
         const task = pdfjs.getDocument({ url: proxiedUrl(url) });
+        loadTask = task;
         const loaded = await task.promise;
+        if (cancelled) {
+          await loaded.destroy?.();
+          return;
+        }
         doc = loaded;
-        if (cancelled) return;
 
         const page = await doc.getPage(1);
         if (cancelled) return;
@@ -134,20 +145,36 @@ export function PdfThumbnail({ url, className = '', title }: Props) {
         if (!ctx) throw new Error('No 2D context');
         ctx.scale(dpr, dpr);
 
-        await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+        renderTask = page.render({ canvasContext: ctx, viewport, canvas });
+        try {
+          await renderTask.promise;
+        } catch (err) {
+          const e = err as PdfLoadError;
+          if (e?.name === 'RenderingCancelledException' || cancelled) {
+            return;
+          }
+          throw err;
+        }
         if (!cancelled) setState('ready');
       } catch (err) {
+        if (cancelled) return;
+        const e = err as PdfLoadError;
+        if (e?.name === 'RenderingCancelledException') return;
         console.error('[PdfThumbnail]', url, err);
-        if (!cancelled) {
-          setErrorMsg(err instanceof Error ? err.message : String(err));
-          setState('error');
-        }
+        setErrorMsg(err instanceof Error ? err.message : String(err));
+        setState('error');
       }
     })();
 
     return () => {
       cancelled = true;
+      try {
+        renderTask?.cancel();
+      } catch {
+        // ignore — already settled
+      }
       if (doc?.destroy) void doc.destroy();
+      else if (loadTask?.destroy) void loadTask.destroy();
     };
   }, [url]);
 

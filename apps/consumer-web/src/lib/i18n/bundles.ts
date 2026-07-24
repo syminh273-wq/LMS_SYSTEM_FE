@@ -4,6 +4,8 @@ import commonEn from '@/locales/common/en.json';
 import commonVi from '@/locales/common/vi.json';
 import authEn from '@/locales/auth/en.json';
 import authVi from '@/locales/auth/vi.json';
+import addressEn from '@/locales/address/en.json';
+import addressVi from '@/locales/address/vi.json';
 import calendarEn from '@/locales/calendar/en.json';
 import calendarVi from '@/locales/calendar/vi.json';
 import classroomEn from '@/locales/classroom/en.json';
@@ -54,6 +56,7 @@ export const consumerWebBundles: LocaleBundles = {
   en: {
     common: commonEn,
     auth: authEn,
+    address: addressEn,
     calendar: calendarEn,
     classroom: classroomEn,
     dashboard: dashboardEn,
@@ -80,6 +83,7 @@ export const consumerWebBundles: LocaleBundles = {
   vi: {
     common: commonVi,
     auth: authVi,
+    address: addressVi,
     calendar: calendarVi,
     classroom: classroomVi,
     dashboard: dashboardVi,

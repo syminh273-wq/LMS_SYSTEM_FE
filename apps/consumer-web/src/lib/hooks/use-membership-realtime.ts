@@ -28,7 +28,10 @@ export function useMembershipRealtime({ userId, onApproved }: Options) {
   useEffect(() => {
     if (!firebaseApp || !userId) return;
 
-    const db = getDatabase(firebaseApp);
+    const databaseURL = firebaseApp.options.databaseURL;
+    if (!databaseURL) return;
+
+    const db = getDatabase(firebaseApp, databaseURL);
     const membershipRef = ref(db, `membership_events/${userId}`);
     initializedRef.current = false;
 

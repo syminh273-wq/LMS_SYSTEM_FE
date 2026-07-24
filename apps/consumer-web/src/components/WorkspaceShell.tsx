@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import {
   BookOpen,
+  Bell,
   ChevronDown,
+  Home,
   LogOut,
   MessageCircle,
-  Pencil,
   Search,
   Settings,
   User,
@@ -31,10 +32,13 @@ import { clearProfile } from '@/lib/redux/userSlice';
 
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [authed, setAuthed] = useState(false);
+
+  const isHome = pathname === '/consumer/feed';
 
   useEffect(() => {
     setAuthed(Boolean(localStorage.getItem('accessToken')));
@@ -59,7 +63,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
+        <div className="max-w-[90vw] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
           <Link href={authed ? '/consumer/feed' : '/auth/login'} className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md">
               <Users size={16} strokeWidth={2.5} />
@@ -72,7 +76,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           <div className="flex-1 max-w-md mx-auto relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
             <Input
-              placeholder="Tìm kiếm..."
+              placeholder="Tìm kiếm tài liệu, bạn bè..."
               className="h-9 pl-9 rounded-full bg-slate-100 dark:bg-slate-800 border-transparent text-sm"
             />
           </div>
@@ -80,6 +84,19 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-1">
             {authed ? (
               <>
+                <button
+                  onClick={() => router.push('/consumer/feed')}
+                  className={
+                    'hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors ' +
+                    (isHome
+                      ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100'
+                      : 'text-slate-700 hover:bg-slate-100')
+                  }
+                  aria-label="Trang chủ"
+                >
+                  <Home size={14} />
+                  Trang chủ
+                </button>
                 <LanguageSwitcher />
                 <ThemeToggle />
                 <Button
@@ -90,6 +107,15 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                   title={t('workspace.nav.messages')}
                 >
                   <MessageCircle size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => router.push('/consumer/notifications')}
+                  className="h-9 w-9 rounded-full relative"
+                  title="Thông báo"
+                >
+                  <Bell size={16} />
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -115,13 +141,6 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     >
                       <User size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
-                    </button>
-                    <button
-                      onClick={() => router.push('/consumer/profile')}
-                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
-                    >
-                      <Pencil size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">{t('workspace.profile.edit_profile')}</span>
                     </button>
                     <button
                       onClick={() => router.push('/consumer/settings')}

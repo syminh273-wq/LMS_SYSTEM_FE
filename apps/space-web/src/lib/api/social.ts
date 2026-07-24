@@ -1,5 +1,5 @@
 import BaseRestApiClient from './client';
-import type { Post, PostComment, CreatePostRequest } from './types';
+import type { Post, PostComment, CreatePostRequest, SuggestionsResponse } from './types';
 
 class SocialApiClient extends BaseRestApiClient {
   // ── Feed ────────────────────────────────────────────────────────────────────
@@ -77,6 +77,11 @@ class SocialApiClient extends BaseRestApiClient {
 
   public async getFollowingFeed(limit = 20): Promise<Post[]> {
     return this.get(`/api/v1/consumer/social/feed/following/?limit=${limit}`);
+  }
+
+  // ── Suggestions ────────────────────────────────────────────────────────────
+  public async getSuggestions(limit = 6): Promise<SuggestionsResponse> {
+    return this.get(`/api/v1/space/social/suggestions/?limit=${limit}`);
   }
 }
 

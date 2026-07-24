@@ -8,11 +8,13 @@ import { useSelector } from 'react-redux';
 import { Button } from '@shared/components/ui/button';
 
 import { accountService, type UserProfile } from '@/lib/api/account';
+import { classroomApi, type Classroom } from '@/lib/api/classroom';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio, type PortfolioEntry } from '@/lib/api/portfolio';
 import { socialApi } from '@/lib/api/social';
 import type { RootState } from '@/lib/redux/store';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { TeachingClassesCard } from '@shared/components/profile/TeachingClassesCard';
 
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { BioCard } from '@/components/Me/BioCard';
@@ -23,6 +25,7 @@ import { FeaturesSection } from '@/components/Me/FeaturesSection';
 import { PublicProfileSidebar } from '@/components/Me/PublicProfileSidebar';
 import { UserPostsSection } from '@/components/Me/UserPostsSection';
 import { MeProfileLayout } from '@shared/components/profile/MeProfileLayout';
+import { ProfileHeaderInfo } from '@shared/components/address';
 
 const EMPTY_PORTFOLIO: Portfolio = {
   intro: null,
@@ -43,6 +46,10 @@ export default function PublicProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio>(EMPTY_PORTFOLIO);
+  const [publicAddress, setPublicAddress] = useState<string>('');
+  const [publicShowAddress, setPublicShowAddress] = useState<boolean>(true);
+  const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
+  const [teachingLoading, setTeachingLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -51,16 +58,18 @@ export default function PublicProfilePage() {
 
   const isOwner = Boolean(currentUser?.uid && targetUid && currentUser.uid === targetUid);
   const isAuthed = Boolean(currentUser?.uid);
+  const isSpaceProfile = workspace?.owner_type === 'space';
 
   useEffect(() => {
     if (!targetUid) return;
     (async () => {
       setLoading(true);
       try {
-        const [accountData, wsData, pfData] = await Promise.all([
+        const [accountData, wsData, pfData, classesData] = await Promise.all([
           accountService.getPublicProfile(targetUid).catch(() => null),
           communityApi.getPublicProfile(targetUid).catch(() => null),
           portfolioApi.getPublic('consumer', targetUid).catch(() => EMPTY_PORTFOLIO),
+          classroomApi.getByTeacher(targetUid).catch(() => [] as Classroom[]),
         ]);
         if (accountData) {
           const consumer = (accountData as { consumer?: UserProfile | null }).consumer;
@@ -69,22 +78,32 @@ export default function PublicProfilePage() {
           } else {
             setProfile({ uid: targetUid, full_name: '', username: '' } as UserProfile);
           }
+          const addr = (accountData as { address?: string | null }).address;
+          const show = (accountData as { show_address?: boolean }).show_address;
+          if (typeof addr === 'string') setPublicAddress(addr);
+          if (typeof show === 'boolean') setPublicShowAddress(show);
         } else {
           setProfile({ uid: targetUid, full_name: '', username: '' } as UserProfile);
         }
         setWorkspace(wsData);
         setPortfolio(pfData ?? EMPTY_PORTFOLIO);
+        setTeachingClasses(Array.isArray(classesData) ? classesData : []);
       } catch (err) {
         console.error(err);
         setError(t('portfolio.labels.portfolio_not_found'));
       } finally {
         setLoading(false);
+        setTeachingLoading(false);
       }
     })();
   }, [targetUid, t]);
 
   useEffect(() => {
     if (!targetUid || isOwner || !isAuthed) return;
+    if (isSpaceProfile) {
+      setIsFollowing(false);
+      return;
+    }
     let cancelled = false;
     (async () => {
       try {
@@ -97,7 +116,7 @@ export default function PublicProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [targetUid, isOwner, isAuthed]);
+  }, [targetUid, isOwner, isAuthed, isSpaceProfile]);
 
   const handleFollowToggle = useCallback(async () => {
     if (isOwner) return;
@@ -205,6 +224,13 @@ export default function PublicProfilePage() {
           renderBio={({ profile: ws, isOwner: owner, onSaved }) => (
             <BioCard profile={ws as WorkspaceProfile} isOwner={owner} onSaved={onSaved as (next: WorkspaceProfile) => void} />
           )}
+          renderTeachingClasses={() => (
+            <TeachingClassesCard
+              classes={teachingClasses}
+              loading={teachingLoading}
+              detailHrefBase="/consumer/classroom/preview"
+            />
+          )}
           renderEducation={({ items, isOwner: owner, onChanged }) => (
             <EducationSection
               items={items as PortfolioEntry[]}
@@ -247,6 +273,20 @@ export default function PublicProfilePage() {
           renderHeaderActions={
             isOwner
               ? undefined
+              : isSpaceProfile
+              ? () => (
+                  <Button
+                    onClick={() => {
+                      const spaceBase =
+                        process.env.NEXT_PUBLIC_SPACE_WEB_URL || 'http://localhost:3001';
+                      window.location.href = `${spaceBase}/space/teachers/${targetUid}`;
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
+                  >
+                    <UserPlus className="size-4" />
+                    {t('portfolio.me.view_space_page', { defaultValue: 'Xem trang Space' })}
+                  </Button>
+                )
               : () => (
                   <>
                     <Button
@@ -254,7 +294,7 @@ export default function PublicProfilePage() {
                       disabled={followBusy}
                       className={
                         isFollowing
-                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200'
+                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 hover:border-slate-300'
                           : 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold'
                       }
                     >
@@ -291,7 +331,7 @@ export default function PublicProfilePage() {
                 )
           }
           renderRightActions={
-            isOwner
+            isOwner || isSpaceProfile
               ? undefined
               : () => (
                   <PublicProfileSidebar
@@ -301,6 +341,14 @@ export default function PublicProfilePage() {
                   />
                 )
           }
+          renderHeaderInfo={({ isOwner: owner, uid }) => (
+            <ProfileHeaderInfo
+              uid={uid}
+              createdAt={profile.created_at}
+              isOwner={owner}
+              addressText={publicShowAddress ? publicAddress : null}
+            />
+          )}
         />
       </div>
     </WorkspaceShell>

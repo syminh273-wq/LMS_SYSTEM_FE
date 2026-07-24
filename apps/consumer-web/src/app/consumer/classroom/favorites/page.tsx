@@ -5,33 +5,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, type ClassroomFavoriteItem } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useMe } from '@/lib/hooks/use-me';
+import { toast } from 'sonner';
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
+import { cn } from '@/lib/utils';
 import {
   Heart,
   Loader2,
   Search,
-  Crown,
-  Compass,
-  ArrowRight,
+  Hash,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-
-const COVER_GRADIENTS = [
-  'from-indigo-500 to-purple-600',
-  'from-emerald-500 to-teal-600',
-  'from-orange-400 to-pink-600',
-  'from-sky-500 to-indigo-600',
-  'from-rose-500 to-red-600',
-  'from-violet-500 to-fuchsia-600',
-  'from-amber-500 to-orange-600',
-  'from-cyan-500 to-blue-600',
-];
-
-function coverGradientFor(uid: string): string {
-  let h = 0;
-  for (let i = 0; i < uid.length; i++) h = (h * 31 + uid.charCodeAt(i)) | 0;
-  return COVER_GRADIENTS[Math.abs(h) % COVER_GRADIENTS.length];
-}
 
 const CATEGORY_LABELS: Record<string, { label: string; emoji: string }> = {
   math:        { label: 'Toán học',    emoji: '➗' },
@@ -51,6 +35,7 @@ const formatPrice = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + '�
 export default function FavoritesPage() {
   const router = useRouter();
   const { isAuthenticated, mounted } = useRequireAuth();
+  const { me } = useMe();
 
   const [items, setItems] = useState<ClassroomFavoriteItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -97,7 +82,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2">
@@ -112,14 +97,16 @@ export default function FavoritesPage() {
         </div>
       </div>
 
-      <div className="relative max-w-xl">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Tìm trong yêu thích..."
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium"
-        />
+      <div className="space-y-3">
+        <div className="relative max-w-xl">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm trong yêu thích..."
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium"
+          />
+        </div>
       </div>
 
       {loading && items.length === 0 ? (
@@ -138,7 +125,7 @@ export default function FavoritesPage() {
             onClick={() => router.push('/consumer/discover')}
             className="mt-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold gap-1.5"
           >
-            <Compass size={14} /> Khám phá lớp học
+            Khám phá lớp học
           </Button>
         </div>
       ) : filtered.length === 0 ? (
@@ -149,59 +136,60 @@ export default function FavoritesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered.map(({ classroom }) => {
             const isPaid = classroom.pricing_type === 'paid';
-            const grad = coverGradientFor(classroom.uid);
             const cat = CATEGORY_LABELS[classroom.category || 'other'] || CATEGORY_LABELS.other;
+            const isOwnClass = !!me && classroom.teacher_id === me.uid;
+            const handleClick = () => {
+              if (isOwnClass) {
+                toast.info('Đây là lớp học bạn đang giảng dạy. Đang chuyển sang trang quản lý.');
+                const base = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SPACE_WEB_URL) || 'http://localhost:3003';
+                window.location.href = `${base.replace(/\/+$/, '')}/space/classrooms/${classroom.uid}`;
+              } else {
+                router.push(`/consumer/classroom/preview/${classroom.uid}`);
+              }
+            };
             return (
               <div
                 key={classroom.uid}
-                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden card-elevated hover:shadow-lg transition-all flex flex-col"
+                onClick={handleClick}
+                aria-disabled={isOwnClass}
+                className={cn(
+                  "group bg-white border border-slate-200 rounded-2xl flex flex-col transition-colors",
+                  isOwnClass
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer hover:border-slate-300"
+                )}
               >
-                <div className={`h-28 bg-gradient-to-br ${grad} relative flex items-end p-3`}>
-                  <div className="absolute top-3 right-3">
-                    <ClassroomFavoriteButton
-                      classroomUid={classroom.uid}
-                      initialIsFavorited={true}
-                      initialCount={classroom.favorite_count || 0}
-                      variant="overlay"
-                      onChange={onFavoriteChange(classroom.uid)}
-                    />
-                  </div>
-                  <div className="absolute top-3 left-3 flex flex-col gap-1 items-start">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white bg-black/30 backdrop-blur px-2 py-0.5 rounded">
+                <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground truncate">
                       {cat.emoji} {cat.label}
                     </span>
-                    {isPaid ? (
-                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-900 bg-amber-100/90 backdrop-blur px-2 py-0.5 rounded inline-flex items-center gap-1">
-                        <Crown size={10} /> {classroom.price_vnd ? formatPrice(classroom.price_vnd) : 'PAID'}
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-900 bg-emerald-100/90 backdrop-blur px-2 py-0.5 rounded">
-                        Free
-                      </span>
-                    )}
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-white/95 text-slate-800 flex items-center justify-center text-base font-black shadow-md">
-                    {classroom.name?.[0]?.toUpperCase() || '?'}
-                  </div>
+                  <ClassroomFavoriteButton
+                    classroomUid={classroom.uid}
+                    initialIsFavorited={true}
+                    initialCount={classroom.favorite_count || 0}
+                    variant="overlay"
+                    onChange={onFavoriteChange(classroom.uid)}
+                  />
                 </div>
 
-                <div className="p-4 flex-1 flex flex-col gap-2">
+                <div className="px-4 pb-4 flex-1 flex flex-col gap-1.5">
                   <h3 className="font-bold text-foreground text-[15px] leading-tight line-clamp-2 group-hover:text-rose-600 transition-colors">
                     {classroom.name}
                   </h3>
-                  <p className="text-[12px] text-slate-500 line-clamp-2 min-h-[2.4em]">
-                    {classroom.description || 'Lớp học này chưa có mô tả.'}
-                  </p>
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
+                    <Hash size={10} /> {classroom.pid}
+                  </div>
                 </div>
 
-                <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/50">
-                  <button
-                    type="button"
-                    onClick={() => router.push(`/consumer/classroom/preview/${classroom.uid}`)}
-                    className="w-full h-10 rounded-xl bg-rose-500 text-white text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 hover:bg-rose-600 transition active:scale-95"
-                  >
-                    <ArrowRight size={14} /> Xem trước
-                  </button>
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                  <span className="text-sm font-bold text-foreground">
+                    {classroom.price_vnd ? formatPrice(classroom.price_vnd) : (isPaid ? '—' : 'Miễn phí')}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded group-hover:text-rose-700">
+                    Yêu thích
+                  </span>
                 </div>
               </div>
             );

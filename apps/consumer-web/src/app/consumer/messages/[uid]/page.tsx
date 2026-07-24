@@ -24,6 +24,10 @@ export default function DirectChatPage() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
 
+  useEffect(() => {
+    console.log('[DirectChatPage] currentUser =', currentUser);
+  }, [currentUser]);
+
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef(0);
 
@@ -148,6 +152,9 @@ export default function DirectChatPage() {
                 conversationUid={conv?.conversation_uid || ''}
                 messages={messages}
                 currentUserId={currentUser?.uid ?? null}
+                currentUserPid={(currentUser as any)?.pid ?? null}
+                currentUserName={currentUser?.full_name || currentUser?.username || null}
+                currentUserUsername={currentUser?.username || null}
                 status={status}
               />
               <MessageInput onSend={handleSend} disabled={!conv} />

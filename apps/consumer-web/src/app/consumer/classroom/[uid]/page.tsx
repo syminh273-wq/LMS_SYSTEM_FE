@@ -55,6 +55,7 @@ import {
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useMe } from '@/lib/hooks/use-me';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
@@ -199,6 +200,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isAuthenticated, mounted } = useRequireAuth();
+  const { status: meStatus, me } = useMe();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -530,6 +532,35 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   }, [isAuthenticated, uid, activeTab]);
 
   if (!mounted) return null;
+
+  if (meStatus === 'loading') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
+        <p className="text-slate-500 font-medium text-sm">Đang xác thực...</p>
+      </div>
+    );
+  }
+
+  if (classroom && me && classroom.teacher_id === me.uid) {
+    if (typeof window !== 'undefined') {
+      const base =
+        (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SPACE_WEB_URL) ||
+        'http://localhost:3003';
+      window.location.replace(`${base.replace(/\/+$/, '')}/space/classrooms/${uid}/details`);
+    }
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+          <div className="text-3xl">🔒</div>
+          <h2 className="text-xl font-bold text-slate-900">Đây là lớp học bạn đang giảng dạy</h2>
+          <p className="text-slate-500 text-sm">
+            Đang chuyển sang trang quản lý lớp học...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

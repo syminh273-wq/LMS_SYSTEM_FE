@@ -93,11 +93,50 @@ export type Classroom = {
   is_joined?: boolean;
   join_required?: boolean;
   has_access?: boolean;
-  has_paid?: boolean;
   is_paid_classroom?: boolean;
   resolve_link?: SharingLink;
+  is_favorited?: boolean;
+  favorite_count?: number;
   created_at: string;
   updated_at: string;
+};
+
+export type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
+
+export type ClassroomPreviewResponse = {
+  classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
+  preview: {
+    folder: { uid: string; name: string } | null;
+    items: Array<
+      | {
+          type: 'folder';
+          uid: string;
+          name: string;
+          parent_folder_id: string | null;
+          is_preview_only: boolean;
+          depth: number;
+        }
+      | {
+          type: 'doc';
+          uid: string;
+          name: string;
+          url: string;
+          file_type: string;
+          size: number;
+          folder_id: string;
+          depth: number;
+        }
+    >;
+  };
+  actions: {
+    type: ClassroomPreviewActionType;
+    requires_payment: boolean;
+    membership_status: 'pending' | 'approved' | null;
+    pay_url: string | null;
+    amount: number;
+  };
+  is_favorited: boolean;
+  favorite_count: number;
 };
 
 export type PaginatedResponse<T> = {
@@ -914,4 +953,22 @@ export type CreatePostRequest = {
   image_urls?: string[];
   visibility: PostVisibility;
   classroom_tags?: string[];
+};
+
+export type SuggestedUser = {
+  consumer_uid: string;
+  name: string;
+  username: string;
+  avatar: string;
+  role: string;
+  kind: 'consumer' | 'space';
+  bio: string;
+  major: string;
+  department: string;
+  followers_count: number;
+};
+
+export type SuggestionsResponse = {
+  count: number;
+  results: SuggestedUser[];
 };

@@ -11,6 +11,7 @@ export type MeProfileLite = {
   username?: string | null;
   email?: string | null;
   avatar_url?: string | null;
+  created_at?: string | null;
 };
 
 export type MeWorkspaceProfile = {
@@ -57,6 +58,7 @@ export type MeProfileLayoutProps = {
     isOwner: boolean;
     onSaved: (next: MeWorkspaceProfile) => void;
   }) => React.ReactNode;
+  renderTeachingClasses?: () => React.ReactNode;
   renderCertificates?: (props: {
     data: MePortfolio;
     isOwner: boolean;
@@ -87,6 +89,8 @@ export type MeProfileLayoutProps = {
   }) => React.ReactNode;
   renderRightActions?: () => React.ReactNode;
   renderHeaderActions?: () => React.ReactNode;
+  renderAddress?: (props: { isOwner: boolean }) => React.ReactNode;
+  renderHeaderInfo?: (props: { isOwner: boolean; uid: string }) => React.ReactNode;
 
   initialTab?: MeTab;
 };
@@ -103,6 +107,7 @@ export function MeProfileLayout(props: MeProfileLayoutProps) {
     onEditCover,
     onEditAvatar,
     renderBio,
+    renderTeachingClasses,
     renderCertificates,
     renderEducation,
     renderExperience,
@@ -111,6 +116,8 @@ export function MeProfileLayout(props: MeProfileLayoutProps) {
     renderRightAnalytics,
     renderRightActions,
     renderHeaderActions,
+    renderAddress,
+    renderHeaderInfo,
     initialTab = 'about',
   } = props;
 
@@ -181,12 +188,14 @@ export function MeProfileLayout(props: MeProfileLayoutProps) {
                 </div>
                 <div className="sm:pb-2 min-w-0 flex-1">
                   <h1 className="text-2xl font-bold text-slate-900 truncate">{displayName}</h1>
-                  <p className="text-xs text-slate-500 font-medium mt-1">{profile.email}</p>
+                  {renderHeaderInfo && (
+                    <div className="mt-2">
+                      {renderHeaderInfo({ isOwner, uid: profile.uid })}
+                    </div>
+                  )}
                 </div>
-                {isOwner ? (
-                  onEditProfile && <PencilEditButton onClick={onEditProfile} />
-                ) : (
-                  renderHeaderActions && <div className="flex flex-wrap gap-2 sm:pb-2">{renderHeaderActions()}</div>
+                {isOwner ? null : renderHeaderActions && (
+                  <div className="flex flex-wrap gap-2 sm:pb-2">{renderHeaderActions()}</div>
                 )}
               </div>
             </div>
@@ -197,6 +206,10 @@ export function MeProfileLayout(props: MeProfileLayoutProps) {
             isOwner,
             onSaved: updateWorkspace,
           })}
+
+          {renderTeachingClasses && renderTeachingClasses()}
+
+          {renderAddress && renderAddress({ isOwner })}
 
           {isOwner ? (
             <MeTabBar
@@ -278,21 +291,6 @@ export function MeProfileLayout(props: MeProfileLayoutProps) {
         )}
       </div>
     </div>
-  );
-}
-
-function PencilEditButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="sm:mb-2 inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-colors"
-      title="Chỉnh sửa"
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-        <path d="m15 5 4 4" />
-      </svg>
-    </button>
   );
 }
 

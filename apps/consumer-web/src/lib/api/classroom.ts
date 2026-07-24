@@ -169,6 +169,10 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.patch<UploadedResource>(`/api/v1/resource/${resourceUid}/reupload/`, data);
   }
 
+  public async getByTeacher(teacherId: string): Promise<Classroom[]> {
+    return this.get<Classroom[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
+  }
+
   // ── Chat ───────────────────────────────────────────────────────────────────
   public async getMessages(conversationUid: string, limit = 10, beforeUid?: string): Promise<{ results: Message[]; has_more: boolean }> {
     const params = new URLSearchParams({ conversation_uid: conversationUid, limit: String(limit) });

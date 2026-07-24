@@ -47,6 +47,13 @@ function timeAgo(iso: string) {
   return `${Math.floor(h / 24)} ngày trước`;
 }
 
+function formatFullDateTime(iso: string) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
 export function PostCard({
   post,
   currentUserId,
@@ -233,7 +240,7 @@ export function PostCard({
             return (
               <a
                 key={uid}
-                href={`/space/classrooms/${uid}`}
+                href={`/space/classroom/preview/${uid}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-semibold border border-emerald-200 hover:bg-emerald-100 transition-colors"
@@ -298,22 +305,32 @@ export function PostCard({
           ) : comments.length === 0 ? (
             <p className="text-center text-xs text-slate-500 py-2">Chưa có bình luận nào.</p>
           ) : (
-            comments.map(c => (
-              <div key={c.uid} className="flex items-start gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
-                  {c.author_avatar
-                    ? <img src={c.author_avatar} alt="" className="w-full h-full object-cover" />
-                    : (c.author_name || '??').slice(0, 2).toUpperCase()
-                  }
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 inline-block max-w-full">
-                    <p className="text-xs font-semibold text-slate-900 leading-none mb-1">{c.author_name}</p>
-                    <p className="text-[13px] text-slate-800 break-words">{c.content}</p>
+            comments.map(c => {
+              const isMine = currentUserId !== null && c.consumer_uid === currentUserId;
+              return (
+                <div key={c.uid} className={`flex items-start gap-2.5 ${isMine ? 'flex-row-reverse' : ''}`}>
+                  <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
+                    {c.author_avatar
+                      ? <img src={c.author_avatar} alt="" className="w-full h-full object-cover" />
+                      : (c.author_name || '??').slice(0, 2).toUpperCase()
+                    }
+                  </div>
+                  <div className={`flex-1 min-w-0 ${isMine ? 'flex flex-col items-end' : ''}`}>
+                    <div className={`rounded-2xl px-3 py-2 inline-block max-w-full ${
+                      isMine
+                        ? 'bg-indigo-600 text-white border border-indigo-600'
+                        : 'bg-white border border-slate-200'
+                    }`}>
+                      <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-indigo-100' : 'text-slate-900'}`}>{c.author_name}</p>
+                      <p className={`text-[13px] break-words ${isMine ? 'text-white' : 'text-slate-800'}`}>{c.content}</p>
+                    </div>
+                    <p className={`text-[10px] text-slate-400 mt-1 px-1 ${isMine ? 'text-right' : 'text-left'}`}>
+                      {formatFullDateTime(c.created_at)}
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
 
           <form onSubmit={handleComment} className="flex items-center gap-2 pt-1">
@@ -349,9 +366,25 @@ function AuthorLink({ post, children, className }: {
   className?: string;
 }) {
   const isSpace = post.author_type === 'space' && post.space_uid;
-  const href = isSpace ? `/space/me/${post.space_uid}` : `/consumer/profile/${post.consumer_uid}`;
+  const consumerWebBase =
+    process.env.NEXT_PUBLIC_CONSUMER_WEB_URL || 'http://localhost:3000';
+  const href = isSpace
+    ? `/space/me/${post.space_uid}`
+    : `${consumerWebBase}/consumer/profile/${post.consumer_uid}`;
+  const isExternal = !isSpace;
+  if (isExternal) {
+    return (
+      <a
+        href={href}
+        className={cn('block shrink-0', className)}
+        aria-label="Xem trang cá nhân"
+      >
+        {children}
+      </a>
+    );
+  }
   return (
-    <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label={isSpace ? 'Xem trang giáo viên' : 'Xem trang cá nhân'}>
+    <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label="Xem trang giáo viên">
       {children}
     </Link>
   );

@@ -18,6 +18,7 @@ export default function DirectChatPage() {
   const router = useRouter();
   const targetUid = String(params?.uid ?? '');
   const currentUser = useSelector((s: RootState) => s.user.profile);
+  const [workspaceOwnerId, setWorkspaceOwnerId] = useState<string | null>(null);
 
   const [conv, setConv] = useState<DirectConversation | null>(null);
   const [messages, setMessages] = useState<WorkspaceMessage[]>([]);
@@ -26,6 +27,19 @@ export default function DirectChatPage() {
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef(0);
+
+  useEffect(() => {
+    let mounted = true;
+    communityApi
+      .getMyProfile()
+      .then((p) => {
+        if (mounted) setWorkspaceOwnerId(p?.owner_id ?? null);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!targetUid) return;
@@ -147,10 +161,11 @@ export default function DirectChatPage() {
               <ChatPanel
                 conversationUid={conv?.conversation_uid || ''}
                 messages={messages}
-                currentUserId={currentUser?.uid ?? null}
+                currentUserId={currentUser?.uid ?? workspaceOwnerId}
+                currentUserPid={(currentUser as any)?.pid ?? workspaceOwnerId}
                 status={status}
               />
-              <MessageInput onSend={handleSend} disabled={!conv} />
+              <MessageInput onSend={handleSend} disabled={!conv} conversationUid={conv?.conversation_uid} />
             </>
           )}
         </div>

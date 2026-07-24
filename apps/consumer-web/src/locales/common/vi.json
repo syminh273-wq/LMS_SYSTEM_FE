@@ -3,7 +3,16 @@
     "welcome": "Chào mừng",
     "get_started": "Bắt đầu",
     "learn_more": "Tìm hiểu thêm",
-    "read_more": "Đọc thêm"
+    "read_more": "Đọc thêm",
+    "loading": "Đang tải...",
+    "edit": "Sửa",
+    "delete": "Xoá",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "deleting": "Đang xoá...",
+    "cancel": "Huỷ",
+    "optional": "tuỳ chọn",
+    "no_results": "Không có kết quả"
   },
   "messages": {
     "coming_soon": "Sắp ra mắt"

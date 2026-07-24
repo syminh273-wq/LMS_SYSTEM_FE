@@ -3,7 +3,16 @@
     "welcome": "Welcome",
     "get_started": "Get started",
     "learn_more": "Learn more",
-    "read_more": "Read more"
+    "read_more": "Read more",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "optional": "optional",
+    "no_results": "No results"
   },
   "messages": {
     "coming_soon": "Coming soon"

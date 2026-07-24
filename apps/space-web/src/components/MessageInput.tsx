@@ -20,9 +20,10 @@ const EMOJIS = [
 type Props = {
   onSend: (payload: { content: string; attachment_url?: string }) => void;
   disabled?: boolean;
+  conversationUid?: string;
 };
 
-export function MessageInput({ onSend, disabled }: Props) {
+export function MessageInput({ onSend, disabled, conversationUid }: Props) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const [showEmoji, setShowEmoji] = useState(false);
@@ -44,10 +45,13 @@ export function MessageInput({ onSend, disabled }: Props) {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
+    if (!conversationUid) {
+      throw new Error('Missing conversationUid');
+    }
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('owner_id', 'dm');
-    fd.append('owner_type', 'dm');
+    fd.append('owner_id', conversationUid);
+    fd.append('owner_type', 'conversation');
     const token = localStorage.getItem('accessToken');
     const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
     const res = await fetch(`${apiBase}/api/v1/resource/upload/`, {

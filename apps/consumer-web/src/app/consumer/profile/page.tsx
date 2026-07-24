@@ -22,6 +22,7 @@ import { FeaturesSection } from '@/components/Me/FeaturesSection';
 import { MyPostsSection } from '@/components/Me/MyPostsSection';
 import { MeRightAnalytics } from '@/components/Me/RightAnalytics';
 import { MeProfileLayout } from '@shared/components/profile/MeProfileLayout';
+import { AddressSection, ProfileHeaderInfo } from '@shared/components/address';
 
 export default function MePage() {
   const { t } = useTranslation();
@@ -143,6 +144,14 @@ export default function MePage() {
           <MeRightAnalytics
             profile={ws as WorkspaceProfile}
             onUpdated={onUpdated as (next: WorkspaceProfile) => void}
+          />
+        )}
+        renderAddress={({ isOwner }) => <AddressSection isOwner={isOwner} />}
+        renderHeaderInfo={({ isOwner: owner, uid }) => (
+          <ProfileHeaderInfo
+            uid={uid}
+            createdAt={profile.created_at}
+            isOwner={owner}
           />
         )}
       />

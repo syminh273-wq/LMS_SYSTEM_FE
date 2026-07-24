@@ -6,13 +6,15 @@ import { useRouter } from 'next/navigation';
 import { socialApi } from '@/lib/api/social';
 import { accountService } from '@/lib/api/account';
 import { communityApi } from '@/lib/api/community';
+import { portfolioApi } from '@/lib/api/portfolio';
 import type { Post } from '@/lib/api/types';
 import { Loader2, ChevronDown, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { CreatePost } from './CreatePost';
 import { PostCard } from './PostCard';
-import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import { ConnectSuggestions } from './ConnectSuggestions';
 import { WorkspaceShell } from '@/components/WorkspaceShell';
+import { FeedLeftSidebar } from './FeedLeftSidebar';
 
 export default function FeedPage() {
   const router = useRouter();
@@ -40,9 +42,10 @@ export default function FeedPage() {
     if (!localStorage.getItem('accessToken')) { router.push('/space/login'); return; }
     const init = async () => {
       try {
-        const [prof, workspace] = await Promise.all([
+        const [prof, workspace, portfolio] = await Promise.all([
           accountService.getProfile(),
           communityApi.getMyProfile().catch(() => null),
+          portfolioApi.getMine().catch(() => null),
         ]);
         setProfile({
           full_name: prof.full_name,
@@ -91,36 +94,10 @@ export default function FeedPage() {
 
   return (
     <WorkspaceShell>
-      <div className="mx-auto w-full max-w-[75vw] grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 py-6 sm:py-8">
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          {profile && (
-            <div className="bg-white border border-slate-200 rounded-xl p-5 card-elevated">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={profile.avatar_url || ''} alt={profile.full_name} />
-                  <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-violet-600 text-sm font-black text-white">
-                    {profile.full_name.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-bold text-slate-900 truncate">{profile.full_name}</p>
-                  <p className="text-[12px] text-slate-500 truncate">@{profile.username}</p>
-                </div>
-              </div>
-              {profile.email && (
-                <p className="text-[12px] text-slate-500 mt-3 truncate">{profile.email}</p>
-              )}
-              {profile.created_at && (
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Tham gia {new Date(profile.created_at).toLocaleDateString('vi-VN')}
-                </p>
-              )}
-            </div>
-          )}
+      <div className="mx-auto w-full max-w-[90vw] grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_300px] gap-6 py-6 sm:py-8">
+        {profile && <FeedLeftSidebar profile={profile} />}
 
-        </aside>
-
-        <div className="space-y-4 sm:space-y-5">
+        <div className="space-y-4 sm:space-y-5 min-w-0">
           <CreatePost profile={profile} onCreated={handleCreated} />
 
           {loading ? (
@@ -167,6 +144,8 @@ export default function FeedPage() {
             </div>
           )}
         </div>
+
+        <ConnectSuggestions />
       </div>
     </WorkspaceShell>
   );

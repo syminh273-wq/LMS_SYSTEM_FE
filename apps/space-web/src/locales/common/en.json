@@ -2,7 +2,16 @@
   "labels": {
     "welcome": "Welcome",
     "overview": "Overview",
-    "untitled": "Untitled"
+    "untitled": "Untitled",
+    "loading": "Loading...",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "cancel": "Cancel",
+    "optional": "optional",
+    "no_results": "No results"
   },
   "messages": {
     "coming_soon": "Coming soon"

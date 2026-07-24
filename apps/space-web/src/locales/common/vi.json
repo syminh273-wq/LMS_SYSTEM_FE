@@ -2,7 +2,16 @@
   "labels": {
     "welcome": "Chào mừng",
     "overview": "Tổng quan",
-    "untitled": "Chưa có tiêu đề"
+    "untitled": "Chưa có tiêu đề",
+    "loading": "Đang tải...",
+    "edit": "Sửa",
+    "delete": "Xoá",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "deleting": "Đang xoá...",
+    "cancel": "Huỷ",
+    "optional": "tuỳ chọn",
+    "no_results": "Không có kết quả"
   },
   "messages": {
     "coming_soon": "Sắp ra mắt"

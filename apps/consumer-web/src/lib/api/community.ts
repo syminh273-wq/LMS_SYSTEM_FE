@@ -42,8 +42,11 @@ export type WorkspaceMessage = {
   msg_type: string;
   content: string;
   sender_id: string | null;
+  sender_pid?: string | null;
   sender_type: string;
   sender_name: string;
+  sender_username?: string | null;
+  sender_avatar?: string | null;
   attachment: {
     uid: string | null;
     url: string;
@@ -52,6 +55,7 @@ export type WorkspaceMessage = {
     type: string;
   } | null;
   created_at: string | null;
+  is_mine?: boolean;
 };
 
 class CommunityApiClient extends BaseRestApiClient {

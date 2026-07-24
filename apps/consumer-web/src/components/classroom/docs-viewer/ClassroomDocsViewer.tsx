@@ -91,6 +91,7 @@ function NodeRow({
   onSelect,
   isPreview,
   locked,
+  paidLocked,
 }: {
   node: FolderNode;
   depth: number;
@@ -98,6 +99,7 @@ function NodeRow({
   onSelect: (id: string) => void;
   isPreview?: boolean;
   locked?: boolean;
+  paidLocked: boolean;
 }) {
   const [open, setOpen] = useState(true);
   const hasChildren = node.children.length > 0;
@@ -137,6 +139,7 @@ function NodeRow({
               onSelect={onSelect}
               isPreview={Boolean((c as any).is_preview_only)}
               locked={paidLocked && !(c as any).is_preview_only}
+              paidLocked={paidLocked}
             />
           ))}
         </div>
@@ -354,6 +357,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
               onSelect={setSelectedFolderId}
               isPreview={Boolean((node as any).is_preview_only)}
               locked={paidLocked && !(node as any).is_preview_only}
+              paidLocked={paidLocked}
             />
           ))}
         </div>

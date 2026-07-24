@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import {
   ChevronDown,
@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   LogOut,
   MessageCircle,
-  Pencil,
   Search,
   Settings,
   User,
@@ -36,10 +35,13 @@ type ShellProfile = UserProfile & { workspace_avatar_url?: string };
 
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [profile, setProfile] = useState<ShellProfile | null>(null);
   const [authed, setAuthed] = useState(false);
+
+  const isHome = pathname === '/space/feed';
 
   useEffect(() => {
     setAuthed(Boolean(localStorage.getItem('accessToken')));
@@ -103,7 +105,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-[75vw] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
+        <div className="max-w-[90vw] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
           <Link href={authed ? '/space/feed' : '/space/login'} className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md">
               <Users size={16} strokeWidth={2.5} />
@@ -113,29 +115,30 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          <div className="relative w-48 sm:w-64">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
             <Input
-              placeholder="Tìm kiếm..."
+              placeholder="Tìm kiếm tài liệu, bạn bè..."
               className="h-9 pl-9 rounded-full bg-slate-100 dark:bg-slate-800 border-transparent text-sm"
             />
           </div>
 
-          <div className="flex-1" />
-
           <div className="flex items-center gap-1">
             {authed ? (
               <>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={() => router.push('/space/feed')}
-                  className="h-9 px-3 rounded-full gap-1.5"
-                  title="Trang chủ"
+                  className={
+                    'hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors ' +
+                    (isHome
+                      ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100'
+                      : 'text-slate-700 hover:bg-slate-100')
+                  }
+                  aria-label="Trang chủ"
                 >
-                  <Home size={15} />
-                  <span className="hidden sm:inline text-sm font-semibold">Home</span>
-                </Button>
+                  <Home size={14} />
+                  Trang chủ
+                </button>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -185,13 +188,6 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
                     </button>
                     <button
-                      onClick={() => router.push('/space/me')}
-                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
-                    >
-                      <Pencil size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">{t('workspace.profile.edit_profile')}</span>
-                    </button>
-                    <button
                       onClick={() => router.push('/space/settings')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -218,7 +214,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="max-w-[75vw] mx-auto px-4 md:px-6 py-6">
+      <main className="max-w-[90vw] mx-auto px-4 md:px-6 py-6">
         {children}
       </main>
     </div>

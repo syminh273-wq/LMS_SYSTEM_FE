@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, Classroom } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useMe } from '@/lib/hooks/use-me';
 import { toast } from 'sonner';
 import {
   Search,
@@ -22,6 +23,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
+import { cn } from '@/lib/utils';
 
 type CategoryValue = NonNullable<Classroom['category']>;
 type PricingFilter = 'all' | 'free' | 'paid';
@@ -69,6 +71,7 @@ const formatPrice = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + '�
 export default function DiscoverPage() {
   const router = useRouter();
   const { isAuthenticated, mounted } = useRequireAuth();
+  const { me } = useMe();
 
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
@@ -264,10 +267,30 @@ export default function DiscoverPage() {
             const hasPaid = !!c.has_paid;
             const isPaidPending = isPaid && (isPending || hasPaid);
             const grad = coverGradientFor(c.uid);
+            // Mute the link only when the visitor is the teacher who owns
+            // this classroom — everyone else (other teachers + students) can
+            // still preview it normally.
+            const isOwnClass = !!me && c.teacher_id === me.uid;
+            const handleClick = () => {
+              if (isOwnClass) {
+                toast.info('Đây là lớp học bạn đang giảng dạy. Đang chuyển sang trang quản lý.');
+                const base = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SPACE_WEB_URL) || 'http://localhost:3003';
+                window.location.href = `${base.replace(/\/+$/, '')}/space/classrooms/${c.uid}`;
+              } else {
+                router.push(`/consumer/classroom/preview/${c.uid}`);
+              }
+            };
             return (
               <div
                 key={c.uid}
-                onClick={() => router.push(`/consumer/classroom/preview/${c.uid}`)}
+                onClick={handleClick}
+                aria-disabled={isOwnClass}
+                className={cn(
+                  "group bg-white border border-slate-200 rounded-2xl flex flex-col transition-colors",
+                  isOwnClass
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer hover:border-slate-300"
+                )}
                 className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300"
               >
                 <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2">

@@ -9,7 +9,7 @@ const ConsumerShell = dynamic(() => import("@/components/layout/consumer-shell")
   loading: () => <div className="min-h-screen bg-[#F8FAFF]" />
 });
 
-const WORKSPACE_ROUTES = ['/consumer/feed', '/consumer/profile'];
+const WORKSPACE_ROUTES = ['/consumer/feed', '/consumer/profile', '/consumer/messages'];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() || '';

@@ -555,6 +555,24 @@ export type CreatePostRequest = {
   classroom_tag?: string;
 };
 
+export type SuggestedUser = {
+  consumer_uid: string;
+  name: string;
+  username: string;
+  avatar: string;
+  role: string;
+  kind: 'consumer' | 'space';
+  bio: string;
+  major: string;
+  department: string;
+  followers_count: number;
+};
+
+export type SuggestionsResponse = {
+  count: number;
+  results: SuggestedUser[];
+};
+
 export type QuizCollectionItem = {
   quiz_id: string;
   order: number;

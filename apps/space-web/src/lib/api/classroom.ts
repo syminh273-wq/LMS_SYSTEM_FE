@@ -2,6 +2,7 @@ import BaseRestApiClient from './client';
 import type {
   Classroom,
   ClassroomMember,
+  ClassroomPreviewResponse,
   StudentExamRecord,
   PaginatedResponse,
   CreateClassroomRequest,
@@ -11,6 +12,8 @@ import type {
   StudentPublicProfile,
   BlacklistEntry,
 } from './types';
+
+export type { Classroom };
 
 export class ClassroomApiClient extends BaseRestApiClient {
   constructor() {
@@ -98,6 +101,32 @@ export class ClassroomApiClient extends BaseRestApiClient {
   // Consumer side
   public async mine(page: number = 1): Promise<PaginatedResponse<Classroom>> {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/space/course/classrooms/?page=${page}`);
+  }
+
+  public async getByTeacher(teacherId: string): Promise<Classroom[]> {
+    return this.get<Classroom[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
+  }
+
+  public async preview(uid: string): Promise<ClassroomPreviewResponse> {
+    return this.get<ClassroomPreviewResponse>(`/api/v1/consumer/course/classrooms/${uid}/preview/`);
+  }
+
+  public async quickJoin(uid: string): Promise<{
+    joined: boolean;
+    requires_payment: boolean;
+    membership_status: string;
+    classroom_uid: string;
+    amount?: number;
+    order_id?: string;
+    pay_url?: string;
+    deeplink?: string;
+    qr_code_url?: string;
+  }> {
+    return this.post('/api/v1/consumer/course/classrooms/quick-join/', { classroom_uid: uid });
+  }
+
+  public async favoriteToggle(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
+    return this.post(`/api/v1/consumer/social/classrooms/${uid}/favorite/`);
   }
 
   public async getActivity(

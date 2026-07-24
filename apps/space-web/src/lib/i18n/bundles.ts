@@ -12,6 +12,8 @@ import dashboardEn from '@/locales/dashboard/en.json';
 import dashboardVi from '@/locales/dashboard/vi.json';
 import authEn from '@/locales/auth/en.json';
 import authVi from '@/locales/auth/vi.json';
+import addressEn from '@/locales/address/en.json';
+import addressVi from '@/locales/address/vi.json';
 import adminEn from '@/locales/admin/en.json';
 import adminVi from '@/locales/admin/vi.json';
 import studentEn from '@/locales/student/en.json';
@@ -69,6 +71,7 @@ import sharedWorkspaceVi from '@shared/locales/workspace/vi.json';
 export const spaceWebBundles: LocaleBundles = {
   en: {
     common: commonEn,
+    address: addressEn,
     classroom: classroomEn,
     validation: validationEn,
     layout: layoutEn,
@@ -103,6 +106,7 @@ export const spaceWebBundles: LocaleBundles = {
   },
   vi: {
     common: commonVi,
+    address: addressVi,
     classroom: classroomVi,
     validation: validationVi,
     layout: layoutVi,

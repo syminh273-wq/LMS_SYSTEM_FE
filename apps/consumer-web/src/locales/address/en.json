@@ -1,0 +1,46 @@
+{
+  "title": "Address",
+  "add": "Add address",
+  "add_title": "Add new address",
+  "edit_title": "Edit address",
+  "dialog_desc": "Select your province/ward according to the 2025 administrative model.",
+  "empty": "No address yet.",
+  "empty_cta": "Click to add your address",
+  "subtitle_saved": "Your contact information",
+  "subtitle_empty": "Add an address to complete your profile",
+  "confirm_delete": "Are you sure you want to delete this address?",
+  "confirm_delete_desc": "This action cannot be undone. The address will be removed from your profile.",
+  "delete_failed": "Could not delete the address. Please try again.",
+  "action": {
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "type": {
+    "home": "Home",
+    "work": "Work",
+    "billing": "Billing",
+    "other": "Other"
+  },
+  "field": {
+    "type": "Type",
+    "label": "Label",
+    "line1": "Street address",
+    "line2": "Apartment / building / floor",
+    "province": "Province / City",
+    "ward": "Ward / Commune",
+    "country": "Country"
+  },
+  "placeholder": {
+    "label": "E.g. Home, HCM office...",
+    "line1": "E.g. 12 Nguyen Hue Street",
+    "province": "Select a province/city",
+    "ward": "Select a ward/commune",
+    "ward_first": "Select a province first",
+    "search": "Search..."
+  },
+  "error": {
+    "province_required": "Please select a province/city.",
+    "ward_required": "Please select a ward/commune.",
+    "save_failed": "Could not save. Please try again."
+  }
+}

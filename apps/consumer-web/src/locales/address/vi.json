@@ -1,0 +1,46 @@
+{
+  "title": "Địa chỉ",
+  "add": "Thêm địa chỉ",
+  "add_title": "Thêm địa chỉ mới",
+  "edit_title": "Sửa địa chỉ",
+  "dialog_desc": "Chọn tỉnh/thành và xã/phường theo mô hình hành chính 2025.",
+  "empty": "Chưa có địa chỉ.",
+  "empty_cta": "Nhấn để thêm địa chỉ của bạn",
+  "subtitle_saved": "Thông tin liên hệ của bạn",
+  "subtitle_empty": "Cập nhật địa chỉ để hoàn thiện hồ sơ",
+  "confirm_delete": "Bạn có chắc muốn xoá địa chỉ này?",
+  "confirm_delete_desc": "Hành động này không thể hoàn tác. Địa chỉ sẽ bị xoá khỏi hồ sơ của bạn.",
+  "delete_failed": "Không thể xoá địa chỉ. Vui lòng thử lại.",
+  "action": {
+    "cancel": "Huỷ",
+    "delete": "Xoá"
+  },
+  "type": {
+    "home": "Nhà riêng",
+    "work": "Cơ quan",
+    "billing": "Thanh toán",
+    "other": "Khác"
+  },
+  "field": {
+    "type": "Loại",
+    "label": "Nhãn",
+    "line1": "Số nhà, đường",
+    "line2": "Căn hộ / toà nhà / tầng",
+    "province": "Tỉnh / Thành phố",
+    "ward": "Xã / Phường",
+    "country": "Quốc gia"
+  },
+  "placeholder": {
+    "label": "Vd: Nhà riêng, VP HCM...",
+    "line1": "Vd: 12 Nguyễn Huệ",
+    "province": "Chọn tỉnh/thành",
+    "ward": "Chọn xã/phường",
+    "ward_first": "Chọn tỉnh/thành trước",
+    "search": "Tìm kiếm..."
+  },
+  "error": {
+    "province_required": "Vui lòng chọn tỉnh/thành.",
+    "ward_required": "Vui lòng chọn xã/phường.",
+    "save_failed": "Không thể lưu. Vui lòng thử lại."
+  }
+}

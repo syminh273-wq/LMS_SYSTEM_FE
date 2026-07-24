@@ -7,10 +7,12 @@ import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 
 import { accountService, type UserProfile } from '@/lib/api/account';
+import { classroomApi, type Classroom } from '@/lib/api/classroom';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
 import { setProfile } from '@/lib/redux/userSlice';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { TeachingClassesCard } from '@shared/components/profile/TeachingClassesCard';
 
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { BioCard } from '@/components/Me/BioCard';
@@ -21,6 +23,7 @@ import { FeaturesSection } from '@/components/Me/FeaturesSection';
 import { MyPostsSection } from '@/components/Me/MyPostsSection';
 import { MeRightAnalytics } from '@/components/Me/RightAnalytics';
 import { MeProfileLayout } from '@shared/components/profile/MeProfileLayout';
+import { AddressSection, ProfileHeaderInfo } from '@shared/components/address';
 
 export default function MePage() {
   const { t } = useTranslation();
@@ -30,6 +33,8 @@ export default function MePage() {
   const [profile, setLocalProfile] = useState<UserProfile | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
+  const [teachingLoading, setTeachingLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
 
@@ -50,9 +55,22 @@ export default function MePage() {
         setWorkspace(ws);
         setPortfolio(pf);
         dispatch(setProfile(me));
+        if (me?.uid) {
+          try {
+            const list = await classroomApi.getByTeacher(me.uid);
+            setTeachingClasses(list);
+          } catch {
+            setTeachingClasses([]);
+          } finally {
+            setTeachingLoading(false);
+          }
+        } else {
+          setTeachingLoading(false);
+        }
       } catch (err) {
         console.error(err);
         toast.error(t('workspace.common.error'));
+        setTeachingLoading(false);
       } finally {
         setLoading(false);
       }
@@ -107,6 +125,13 @@ export default function MePage() {
         renderBio={({ profile: ws, isOwner, onSaved }) => (
           <BioCard profile={ws as WorkspaceProfile} isOwner={isOwner} onSaved={onSaved as (next: WorkspaceProfile) => void} />
         )}
+        renderTeachingClasses={() => (
+          <TeachingClassesCard
+            classes={teachingClasses}
+            loading={teachingLoading}
+            detailHrefBase="/space/classroom/preview"
+          />
+        )}
         renderCertificates={({ data, isOwner, onChanged }) => (
           <CertificatesCard
             data={data as unknown as Portfolio}
@@ -145,6 +170,15 @@ export default function MePage() {
           <MeRightAnalytics
             profile={ws as WorkspaceProfile}
             onUpdated={onUpdated as (next: WorkspaceProfile) => void}
+          />
+        )}
+        renderAddress={({ isOwner }) => <AddressSection isOwner={isOwner} />}
+        renderHeaderInfo={({ isOwner: owner, uid }) => (
+          <ProfileHeaderInfo
+            uid={uid}
+            createdAt={profile.created_at}
+            isOwner={owner}
+            email={profile.email}
           />
         )}
       />
