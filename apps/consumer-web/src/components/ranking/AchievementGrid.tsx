@@ -1,6 +1,6 @@
 'use client';
 
-import { Award, CheckCircle2, Lock, Star, Trophy, Medal, Sparkles, School, Verified, PlayCircle, EventAvailable, EventNote, Explore, Dashboard, MilitaryTech, WorkspacePremium, EmojiEvents, LocalFireDepartment } from 'lucide-react';
+import { Award, CheckCircle2, Lock, Star, Trophy, Medal, Sparkles, School, Verified, PlayCircle, EventAvailable, EventNote, Explore, LayoutDashboard, MilitaryTech, WorkspacePremium, EmojiEvents, LocalFireDepartment } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { Achievement } from '@/lib/api';
@@ -22,7 +22,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   event_available: EventAvailable,
   event_note: EventNote,
   explore: Explore,
-  dashboard: Dashboard,
+  dashboard: LayoutDashboard,
   military_tech: MilitaryTech,
   workspace_premium: WorkspacePremium,
   emoji_events: EmojiEvents,
