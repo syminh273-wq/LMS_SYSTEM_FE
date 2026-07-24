@@ -174,6 +174,13 @@ export class ClassroomApiClient extends BaseRestApiClient {
   }
 
   // ── Chat ───────────────────────────────────────────────────────────────────
+  public async getConversation(classroomUid: string): Promise<Conversation> {
+    const list = await this.get<Conversation[]>(
+      `/api/v1/chat/conversations/?classroom_uid=${classroomUid}`
+    );
+    return list[0];
+  }
+
   public async getMessages(conversationUid: string, limit = 10, beforeUid?: string): Promise<{ results: Message[]; has_more: boolean }> {
     const params = new URLSearchParams({ conversation_uid: conversationUid, limit: String(limit) });
     if (beforeUid) params.set('before_uid', beforeUid);

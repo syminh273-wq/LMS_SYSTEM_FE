@@ -39,8 +39,31 @@ function getUserProfile(): UserProfile | null {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem('userProfile');
-    if (!raw) return null;
-    return JSON.parse(raw) as UserProfile;
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<UserProfile> & { id?: string; user_id?: string };
+      const uid = parsed.uid || parsed.user_id || parsed.id;
+      if (uid) return { uid, full_name: parsed.full_name || '', email: parsed.email || '' };
+    }
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      const payload = decodeJwt(token);
+      if (payload?.user_id) {
+        return { uid: payload.user_id, full_name: '', email: '' };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function decodeJwt(token: string): { user_id?: string; user_type?: string } | null {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const padded = part.replace(/-/g, '+').replace(/_/g, '/');
+    const json = typeof atob === 'function' ? atob(padded) : Buffer.from(padded, 'base64').toString();
+    return JSON.parse(json);
   } catch {
     return null;
   }
@@ -188,33 +211,40 @@ function MessageBubble({
     : '??';
 
   return (
-    <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-      {!isMe && (
-        <div className="flex items-center gap-2 mb-1 ml-1">
-          <div className="w-5 h-5 rounded-full bg-muted text-[8px] font-bold flex items-center justify-center">
-            {initials}
-          </div>
-          <span className="text-[10px] font-bold text-muted-foreground">
-            {msg.sender_name}
-          </span>
+    <div className={`flex gap-2 ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
+      {isMe && (
+        <div className="w-8 h-8 shrink-0 rounded-full bg-primary-brand-muted text-primary-brand text-[10px] font-black flex items-center justify-center mt-1">
+          {initials}
         </div>
       )}
-      <div
-        className={`max-w-[70%] rounded-2xl text-sm font-medium shadow-sm overflow-hidden ${
-          isMe
-            ? 'bg-primary-brand text-white rounded-br-none'
-            : 'bg-card border border-border text-foreground rounded-bl-none'
-        }`}
-      >
-        {msg.attachment && (
-          <AttachmentView attachment={msg.attachment} isMe={isMe} />
+      <div className={`flex flex-col gap-1 max-w-[75%] ${isMe ? 'items-start' : 'items-end'}`}>
+        {isMe && (
+          <div className="flex items-baseline gap-2 px-1">
+            <span className="text-[11px] font-bold text-foreground">
+              {msg.sender_name || 'Ẩn danh'}
+            </span>
+            <span className="text-[10px] text-muted-foreground">{timeStr}</span>
+          </div>
         )}
-        {msg.content ? (
-          <div className="px-4 py-3">{msg.content}</div>
-        ) : null}
-      </div>
-      <div className="text-[9px] font-bold text-muted-foreground mt-1.5 px-1 uppercase">
-        {timeStr}
+        <div
+          className={`rounded-2xl text-sm font-medium shadow-sm overflow-hidden ${
+            isMe
+              ? 'bg-primary-brand text-white rounded-bl-md'
+              : 'bg-card border border-border text-foreground rounded-br-md'
+          }`}
+        >
+          {msg.attachment && (
+            <AttachmentView attachment={msg.attachment} isMe={isMe} />
+          )}
+          {msg.content ? (
+            <div className="px-4 py-2.5 break-words whitespace-pre-wrap">
+              {msg.content}
+            </div>
+          ) : null}
+        </div>
+        {!isMe && (
+          <span className="text-[10px] text-muted-foreground px-1">{timeStr}</span>
+        )}
       </div>
     </div>
   );

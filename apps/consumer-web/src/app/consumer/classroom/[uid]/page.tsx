@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { classroomApi, meetingRoomApi, examSessionApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
+import { classroomApi, examSessionApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
@@ -31,6 +31,7 @@ import {
   Hash,
   Wifi,
   WifiOff,
+  PhoneOff,
   FileDown,
   ClipboardList,
   Clock,
@@ -58,6 +59,7 @@ import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useMe } from '@/lib/hooks/use-me';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
+import { useMeetingPresence } from '@/lib/hooks/use-meeting-presence';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
 import { ClassroomDocsViewer } from '@/components/classroom/docs-viewer/ClassroomDocsViewer';
 import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClassroomCalendarTab';
@@ -67,8 +69,10 @@ import { consumerCalendarApi, consumerLeaveRequestApi } from '@/lib/api';
 
 type ClassroomTab = 'discussion' | 'docs' | 'assignments' | 'exams' | 'quiz' | 'meeting' | 'ai' | 'collections' | 'calendar' | 'leave_request' | 'leaderboard';
 
-function MessageBubble({ msg }: { msg: ChatMessage }) {
+function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId: string | null }) {
+  const isMe = !!currentUserId && msg.sender_id === currentUserId;
   const time = new Date(msg.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+  const initials = (msg.sender_name || "?").trim().slice(0, 2).toUpperCase();
 
   const renderAttachment = () => {
     if (!msg.attachment) return null;
@@ -78,7 +82,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
       return (
         <a href={url} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt={name} className="max-w-[240px] rounded-xl mt-1 border border-slate-200 object-cover" />
+          <img src={url} alt={name} className={`max-w-[240px] rounded-xl mt-1 object-cover ${isMe ? 'border border-indigo-300/60' : 'border border-slate-200'}`} />
         </a>
       );
     }
@@ -88,7 +92,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
           key={url}
           controls
           src={url}
-          className="max-w-[280px] rounded-xl mt-1 border border-slate-200"
+          className={`max-w-[280px] rounded-xl mt-1 ${isMe ? 'border border-indigo-300/60' : 'border border-slate-200'}`}
           onError={(e) => {
             const err = (e.currentTarget.error as MediaError | null)?.message ?? "unknown";
             if (err.toLowerCase().includes("aborted")) return;
@@ -108,27 +112,45 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 mt-1 bg-white border border-slate-200 rounded-xl px-3 py-2 hover:bg-slate-50 transition max-w-[280px] cursor-pointer"
+        className={`flex items-center gap-2 mt-1 rounded-xl px-3 py-2 transition max-w-[280px] cursor-pointer ${
+          isMe ? 'bg-indigo-500/30 border border-indigo-300/60 hover:bg-indigo-500/40' : 'bg-white border border-slate-200 hover:bg-slate-50'
+        }`}
       >
-        <Icon size={18} className="text-indigo-500 shrink-0" />
-        <span className="text-xs font-medium text-slate-700 truncate">{name}</span>
+        <Icon size={18} className={`shrink-0 ${isMe ? 'text-white' : 'text-indigo-500'}`} />
+        <span className={`text-xs font-medium truncate ${isMe ? 'text-white' : 'text-slate-700'}`}>{name}</span>
       </a>
     );
   };
 
   return (
-    <div className="flex flex-col gap-0.5">
-      <div className="flex items-baseline gap-2">
-        <span className="text-xs font-bold text-indigo-600">{msg.sender_name || "Ẩn danh"}</span>
-        <span className="text-[10px] text-slate-400">{time}</span>
-      </div>
-      <div className="max-w-[85%]">
-        {msg.content && (
-          <div className="bg-slate-50 rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm text-slate-700 font-medium">
-            {msg.content}
+    <div className={`flex gap-2 ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
+      {isMe && (
+        <div className="w-8 h-8 shrink-0 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center mt-1">
+          {initials}
+        </div>
+      )}
+      <div className={`flex flex-col gap-1 max-w-[75%] ${isMe ? 'items-start' : 'items-end'}`}>
+        {isMe && (
+          <div className="flex items-baseline gap-2 px-1">
+            <span className="text-[11px] font-bold text-slate-700">{msg.sender_name || "Ẩn danh"}</span>
+            <span className="text-[10px] text-slate-400">{time}</span>
           </div>
         )}
-        {renderAttachment()}
+        <div
+          className={`rounded-2xl text-sm font-medium shadow-sm ${
+            isMe
+              ? 'bg-indigo-600 text-white rounded-bl-md'
+              : 'bg-slate-100 text-slate-800 rounded-br-md'
+          }`}
+        >
+          {msg.content && (
+            <div className="px-4 py-2.5 break-words whitespace-pre-wrap">{msg.content}</div>
+          )}
+          {renderAttachment()}
+        </div>
+        {!isMe && (
+          <span className="text-[10px] text-slate-400 px-1">{time}</span>
+        )}
       </div>
     </div>
   );
@@ -257,6 +279,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [loadingCollectionDetailUid, setLoadingCollectionDetailUid] = useState<string | null>(null);
   const [activeRoom, setActiveRoom] = useState<any>(null);
   const [loadingRoom, setLoadingRoom] = useState(false);
+  const [joiningMeeting, setJoiningMeeting] = useState(false);
+  const { marker: liveMarker, room: liveRoomFromPresence } = useMeetingPresence({
+    classroomUid: isAuthenticated && activeTab === 'meeting' ? uid : null,
+  });
+  const {
+    localStream,
+    remoteStream,
+    localSource,
+    isConnected: rtcConnected,
+    isJoined: rtcJoined,
+    joinRoom,
+    leave: leaveMeeting,
+    startMediaShare,
+    stopMediaShare,
+    renegotiate,
+  } = useRTC(activeRoom?.uid ?? null);
 
   // AI Bot state
   type AiMsg = { role: 'user' | 'assistant'; text: string; loading?: boolean; sources?: Array<{ document: string; metadata: Record<string, string>; score: number }> };
@@ -270,7 +308,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     messages, hasMore, loadingMore, connected, loading: chatLoading,
     sendMessage, scrollContainerRef, topSentinelRef,
   } = useClassroomChat(isAuthenticated ? uid : null);
-  const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare } = useRTC(uid);
 
 
   useEffect(() => {
@@ -515,21 +552,27 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
   useEffect(() => {
     if (isAuthenticated && uid && activeTab === 'meeting') {
-      const fetchRoom = async () => {
-        try {
-          setLoadingRoom(true);
-          const rooms = await meetingRoomApi.getByClassroom(uid);
-          const active = rooms.find(r => r.status === 'active');
-          setActiveRoom(active || null);
-        } catch (err) {
-          console.error('Failed to fetch meeting room:', err);
-        } finally {
-          setLoadingRoom(false);
-        }
-      };
-      void fetchRoom();
+      setActiveRoom(liveRoomFromPresence || null);
+      setLoadingRoom(Boolean(uid) && activeTab === 'meeting' && !liveMarker && !liveRoomFromPresence);
+    } else if (activeTab !== 'meeting') {
+      setActiveRoom(null);
     }
-  }, [isAuthenticated, uid, activeTab]);
+  }, [isAuthenticated, uid, activeTab, liveMarker, liveRoomFromPresence]);
+
+  useEffect(() => {
+    const onPeerJoined = (event: Event) => {
+      const peer = (event as CustomEvent<{ user_type?: string }>).detail;
+      if (!peer || !rtcJoined) return;
+      if (peer.user_type !== 'space') return;
+      if (!localStream) {
+        void startMediaShare('camera').catch((err) => {
+          console.warn('[consumer] auto-start camera for new peer failed:', err);
+        });
+      }
+    };
+    window.addEventListener('rtc:peer-joined', onPeerJoined);
+    return () => window.removeEventListener('rtc:peer-joined', onPeerJoined);
+  }, [rtcJoined, localStream, startMediaShare]);
 
   if (!mounted) return null;
 
@@ -750,7 +793,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     </div>
                   )}
 
-                  {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} />)}
+                  {messages.map((msg: ChatMessage) => <MessageBubble key={msg.uid} msg={msg} currentUserId={me?.uid ?? null} />)}
                 </div>
 
                 {/* Input */}
@@ -1020,18 +1063,32 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Phòng họp trực tuyến</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-bold">
-                    {rtcConnected ? (
-                      <><Wifi size={13} className="text-emerald-500" /><span className="text-emerald-500">Đã kết nối tín hiệu</span></>
+                    {rtcJoined ? (
+                      rtcConnected ? (
+                        <><Wifi size={13} className="text-emerald-500" /><span className="text-emerald-500">Đã kết nối tín hiệu</span></>
+                      ) : (
+                        <><Loader2 size={13} className="animate-spin text-amber-500" /><span className="text-amber-500">Đang kết nối...</span></>
+                      )
                     ) : (
-                      <><WifiOff size={13} className="text-slate-400" /><span className="text-slate-400">Đang chờ tín hiệu...</span></>
+                      <><WifiOff size={13} className="text-slate-400" /><span className="text-slate-400">Chưa tham gia</span></>
                     )}
                   </div>
                 </div>
 
-                <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto relative">
+                  <div className="flex-1 min-h-0">
                     {remoteStream ? (
                       <ScreenShareViewer stream={remoteStream} label="Giảng viên" />
+                    ) : rtcJoined && activeRoom ? (
+                      <div className="aspect-video bg-indigo-900/20 rounded-2xl flex flex-col items-center justify-center text-indigo-600 gap-4 border-2 border-indigo-200 border-dashed">
+                        <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+                          <Video size={32} />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm font-black uppercase tracking-widest">Đang chờ giảng viên chia sẻ</p>
+                          <p className="text-xs font-medium opacity-80 mt-1">Bạn đã vào lớp, vui lòng chờ...</p>
+                        </div>
+                      </div>
                     ) : activeRoom ? (
                       <div className="aspect-video bg-indigo-900/20 rounded-2xl flex flex-col items-center justify-center text-indigo-600 gap-4 border-2 border-indigo-200 border-dashed animate-pulse">
                         <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -1039,50 +1096,87 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                         </div>
                         <div className="text-center">
                           <p className="text-sm font-black uppercase tracking-widest">Lớp học đang diễn ra!</p>
-                          <p className="text-xs font-medium opacity-80 mt-1">Bấm nút bên dưới để tham gia</p>
+                          <p className="text-xs font-medium opacity-80 mt-1">Bấm "Tham gia" để vào lớp của giáo viên</p>
                         </div>
                       </div>
                     ) : (
                       <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center text-slate-500 gap-3 border-2 border-dashed border-slate-800">
                         <Video size={48} className="opacity-20" />
                         <p className="text-sm font-bold uppercase tracking-widest">Chưa có buổi học nào...</p>
+                        <p className="text-xs font-medium opacity-70">Giáo viên sẽ mở lớp, thông báo sẽ hiện tại đây</p>
                       </div>
-                    )}
-
-                    {localStream && (
-                      <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Camera của bạn' : 'Màn hình của bạn'} />
                     )}
                   </div>
 
-                  <div className="mt-auto flex justify-center gap-4">
-                    {!localStream ? (
-                      <>
+                  {localStream && (
+                    <div className="absolute bottom-24 right-6 w-44 md:w-56 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl shadow-black/40 z-10">
+                      <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Bạn' : 'Màn hình của bạn'} />
+                    </div>
+                  )}
+
+                  <div className="mt-auto flex flex-col items-center gap-3">
+                    {!rtcJoined && activeRoom ? (
+                      <Button
+                        onClick={async () => {
+                          if (!activeRoom?.uid) return;
+                          try {
+                            setJoiningMeeting(true);
+                            await joinRoom(activeRoom.uid);
+                            await startMediaShare('camera');
+                          } catch (err) {
+                            toast.error(err instanceof Error ? err.message : 'Không thể tham gia lớp học');
+                          } finally {
+                            setJoiningMeeting(false);
+                          }
+                        }}
+                        disabled={joiningMeeting}
+                        className="bg-indigo-600 hover:bg-indigo-700 font-bold px-10 h-12 rounded-xl gap-2 shadow-lg shadow-indigo-100"
+                      >
+                        {joiningMeeting ? (
+                          <Loader2 size={18} className="animate-spin" />
+                        ) : (
+                          <Video size={18} />
+                        )}
+                        THAM GIA
+                      </Button>
+                    ) : rtcJoined ? (
+                      <div className="flex flex-wrap justify-center gap-3">
                         <Button
                           onClick={() => void startMediaShare('screen')}
-                          className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 h-12 rounded-xl gap-2 shadow-lg shadow-indigo-100"
+                          variant="outline"
+                          className="font-bold px-6 h-11 rounded-xl gap-2"
                         >
-                          <MonitorUp size={18} />
-                          CHIA SẺ MÀN HÌNH
+                          <MonitorUp size={16} />
+                          Chia sẻ màn hình
                         </Button>
                         <Button
                           onClick={() => void startMediaShare('camera')}
                           variant="outline"
-                          className="font-bold px-8 h-12 rounded-xl gap-2"
+                          className="font-bold px-6 h-11 rounded-xl gap-2"
+                          disabled={Boolean(localStream)}
                         >
-                          <Camera size={18} />
-                          BẬT CAMERA
+                          <Camera size={16} />
+                          Bật camera
                         </Button>
-                      </>
-                    ) : (
-                      <Button
-                        onClick={stopMediaShare}
-                        variant="destructive"
-                        className="font-bold px-8 h-12 rounded-xl gap-2 shadow-lg shadow-rose-100"
-                      >
-                        <WifiOff size={18} />
-                        DỪNG CHIA SẺ
-                      </Button>
-                    )}
+                        <Button
+                          onClick={() => void stopMediaShare()}
+                          variant="outline"
+                          className="font-bold px-6 h-11 rounded-xl gap-2"
+                          disabled={!localStream}
+                        >
+                          <WifiOff size={16} />
+                          Dừng chia sẻ
+                        </Button>
+                        <Button
+                          onClick={() => void leaveMeeting()}
+                          variant="destructive"
+                          className="font-bold px-6 h-11 rounded-xl gap-2 shadow-lg shadow-rose-100"
+                        >
+                          <PhoneOff size={16} />
+                          RỜI PHÒNG
+                        </Button>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 

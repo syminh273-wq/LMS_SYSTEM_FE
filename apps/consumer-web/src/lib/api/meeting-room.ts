@@ -16,6 +16,26 @@ export interface MeetingRoom {
   created_at: string;
 }
 
+export interface LiveRoomMarker {
+  room_uid: string;
+  classroom_uid: string;
+  title: string;
+  host_id: string;
+  host_name: string;
+  started_at: string;
+}
+
+export interface LiveRoomResponse {
+  live_room: LiveRoomMarker | null;
+  room: MeetingRoom | null;
+}
+
+export interface JoinRoomResponse {
+  room: MeetingRoom;
+  participant_id: string;
+  camera_required: boolean;
+}
+
 export class MeetingRoomApiClient extends BaseRestApiClient {
   constructor() {
     super();
@@ -23,6 +43,20 @@ export class MeetingRoomApiClient extends BaseRestApiClient {
 
   public async getByClassroom(classroomUid: string): Promise<MeetingRoom[]> {
     return this.get<MeetingRoom[]>(`/api/v1/consumer/course/meeting-rooms/?classroom_uid=${classroomUid}`);
+  }
+
+  public async getLiveRoom(classroomUid: string): Promise<LiveRoomResponse> {
+    return this.get<LiveRoomResponse>(
+      `/api/v1/consumer/course/meeting-rooms/live/?classroom_uid=${classroomUid}`,
+    );
+  }
+
+  public async join(roomUid: string): Promise<JoinRoomResponse> {
+    return this.post<JoinRoomResponse>(`/api/v1/consumer/course/meeting-rooms/${roomUid}/join/`);
+  }
+
+  public async leave(roomUid: string): Promise<void> {
+    await this.post(`/api/v1/consumer/course/meeting-rooms/${roomUid}/leave/`);
   }
 }
 

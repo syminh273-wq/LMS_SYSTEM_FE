@@ -274,7 +274,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [showOpenExamModal, setShowOpenExamModal] = useState(false);
   const [unassigningUid, setUnassigningUid] = useState<string | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
-  const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare, stopScreenShare } = useRTC(uid);
+  const activeMeeting = meetingRooms.find(room => room.status === 'active') || null;
+  const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare, stopScreenShare, renegotiate } = useRTC(activeMeeting?.uid ?? null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -380,6 +381,21 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       void fetchMeetingRooms();
     }
   }, [activeTab, fetchMeetingRooms]);
+
+  useEffect(() => {
+    const onPeerJoined = (event: Event) => {
+      const peer = (event as CustomEvent<{ user_type?: string }>).detail;
+      if (!peer || !activeMeeting) return;
+      if (peer.user_type !== 'consumer') return;
+      if (!localStream) {
+        void startMediaShare('camera').catch((err) => {
+          console.warn('[space] auto-start camera for new peer failed:', err);
+        });
+      }
+    };
+    window.addEventListener('rtc:peer-joined', onPeerJoined);
+    return () => window.removeEventListener('rtc:peer-joined', onPeerJoined);
+  }, [activeMeeting, localStream, startMediaShare]);
 
   const fetchAssignedQuizzes = React.useCallback(async () => {
     setLoadingQuizzes(true);
@@ -848,10 +864,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     }
   };
 
-  const activeMeeting = meetingRooms.find(room => room.status === 'active') || null;
   const latestMeeting = meetingRooms[0] || null;
 
   const handleStartMeeting = async (source: 'screen' | 'camera') => {
+    if (!classroom || meetingAction) return;
     if (!classroom || meetingAction) return;
 
     setMeetingAction('start');
@@ -1669,14 +1685,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       {!localStream ? (
                         <>
                           <Button
-                            onClick={() => void handleStartMeeting('screen')}
-                            disabled={meetingAction !== null}
-                            className="h-12 rounded-2xl bg-primary-brand px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
-                          >
-                            {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
-                            {t('classroom.ui.meeting_share_screen')}
-                          </Button>
-                          <Button
                             onClick={() => void handleStartMeeting('camera')}
                             disabled={meetingAction !== null}
                             variant="outline"
@@ -1684,6 +1692,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
                             {t('classroom.ui.meeting_enable_camera')}
+                          </Button>
+                          <Button
+                            onClick={() => void handleStartMeeting('screen')}
+                            disabled={meetingAction !== null}
+                            variant="outline"
+                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-border hover:bg-muted uppercase tracking-widest"
+                          >
+                            {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
+                            {t('classroom.ui.meeting_share_screen')}
                           </Button>
                         </>
                       ) : (
@@ -1710,12 +1727,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ) : (
                     <div className="flex items-center gap-3">
                       <Button
-                        onClick={() => void handleStartMeeting('screen')}
+                        onClick={() => void handleStartMeeting('camera')}
                         disabled={meetingAction !== null}
-                        className="h-12 rounded-2xl bg-primary-brand px-6 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest"
+                        className="h-12 rounded-2xl bg-primary-brand px-8 gap-2.5 text-xs font-bold text-white shadow-lg shadow-primary-brand/20 hover:bg-primary-brand-dark uppercase tracking-widest transition-all"
                       >
-                        {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
-                        {t('classroom.ui.meeting_start')}
+                        {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <Video size={18} />}
+                        {t('classroom.ui.meeting_open_class')}
                       </Button>
                     </div>
                   )}
@@ -1729,7 +1746,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   </div>
                 ) : (
                   <>
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
                       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_status_label')}</div>
                         <div className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -1742,6 +1759,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         </div>
                         <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">
                           {activeMeeting ? `${t('classroom.ui.meeting_started_at', undefined, { time: formatDateTime(activeMeeting.started_at || activeMeeting.created_at) })}` : t('classroom.ui.meeting_ready_desc')}
+                        </div>
+                      </div>
+                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Học viên đang tham gia</div>
+                        <div className="flex items-center gap-3 text-lg font-bold text-foreground">
+                          <Users size={20} className="text-indigo-500" />
+                          {activeMeeting ? `${activeMeeting.participant_count || 0}` : '0'}
+                        </div>
+                        <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">
+                          {activeMeeting ? 'Sinh viên đang ở trong phòng' : 'Mở lớp để học viên tham gia'}
                         </div>
                       </div>
                       <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
@@ -1764,13 +1791,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     </div>
 
                     <div className="rounded-[40px] border border-border bg-slate-950 p-6 shadow-2xl shadow-primary-brand/10">
-                      {localStream ? (
-                        <div className="rounded-[24px] overflow-hidden border border-slate-800">
-                          <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? t('classroom.ui.meeting_camera_streaming') : t('classroom.ui.meeting_screen_sharing')} />
-                        </div>
-                      ) : remoteStream ? (
+                      {remoteStream ? (
                         <div className="rounded-[24px] overflow-hidden border border-slate-800">
                           <ScreenShareViewer stream={remoteStream} label={t('classroom.ui.meeting_remote_stream')} />
+                        </div>
+                      ) : localStream ? (
+                        <div className="rounded-[24px] overflow-hidden border border-slate-800">
+                          <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? t('classroom.ui.meeting_camera_streaming') : t('classroom.ui.meeting_screen_sharing')} />
                         </div>
                       ) : (
                         <div className="flex aspect-video flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-800 text-center text-muted-foreground bg-slate-900/50">
