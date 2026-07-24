@@ -202,9 +202,9 @@ export default function TaskCenterPanel({ onClose }: Props) {
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {visible.map(task => (
+            {visible.map((task, idx) => (
               <TaskRow
-                key={task.id}
+                key={task.id ? `task-${task.id}` : `task-idx-${idx}`}
                 task={task}
                 now={now}
                 busy={busyTaskId === task.id}

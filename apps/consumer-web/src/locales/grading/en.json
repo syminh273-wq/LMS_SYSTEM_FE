@@ -1,0 +1,77 @@
+{
+  "title": "Score Conversion",
+  "subtitle": "Current point conversion table and XP rules applied across the system",
+  "intro": "This page helps you understand how Quiz/Exam scores and XP are awarded, plus the level milestones you can reach.",
+  "last_updated": "Mirrors backend configuration",
+  "nav": {
+    "quiz": "Quiz Score",
+    "exam": "Exam Score",
+    "xp": "XP Table (Ranking)",
+    "level": "Levels",
+    "leaderboard": "Classroom Leaderboard Weights"
+  },
+  "quiz": {
+    "card_title": "Quiz Score (multiple choice)",
+    "card_subtitle": "Each quiz has 4-option multiple-choice questions; score is calculated as ratio of correct answers × grade scale",
+    "max_grade_label": "Maximum grade",
+    "max_grade_value": "{{value}} points (default; teacher can configure 1-10)",
+    "passing_label": "Passing score",
+    "passing_value": "≥ {{pct}}% (default; configured via QuizAssignment.passing_score_pct)",
+    "perfect_label": "Perfect score",
+    "perfect_value": "100% — awards bonus XP (quiz_perfect)",
+    "formula_label": "Formula",
+    "formula_value": "score = (correct / total) × max_grade"
+  },
+  "exam": {
+    "card_title": "Exam Score",
+    "card_subtitle": "Exams can be multiple-choice, file upload, essay, or proctored online",
+    "max_grade_label": "Grade scale",
+    "max_grade_value": "{{value}} points (default; teacher can configure {{min}}-{{max}})",
+    "passing_label": "Passing score (MC)",
+    "passing_value": "≥ {{pct}}% (fixed for MC/online)",
+    "ai_label": "AI Grading Rubric (file / essay)",
+    "ai_value": "Accuracy 30% + Completeness 20% + Critical Thinking 20% + Terminology 15% + Form 15% = 100%",
+    "formula_label": "MC / online formula",
+    "formula_value": "score = (correct / total) × max_grade"
+  },
+  "xp": {
+    "card_title": "XP Table (Ranking)",
+    "card_subtitle": "Each action in the system grants XP. XP accumulates and is used to compute level and global ranking.",
+    "table_action": "Action",
+    "table_xp": "XP",
+    "table_trigger": "Trigger",
+    "table_counter": "Achievement counter"
+  },
+  "level": {
+    "card_title": "Levels",
+    "card_subtitle": "Level grows with accumulated XP. Higher levels need more XP (power curve).",
+    "formula_label": "Formula",
+    "formula_value": "required_xp(level N) = 100 × (N - 1)^1.5",
+    "max_level": "Maximum level: {{max}}",
+    "example_label": "XP required to reach",
+    "table_level": "Level",
+    "table_required_xp": "Required XP"
+  },
+  "level_titles_label": "Level titles",
+  "leaderboard": {
+    "card_title": "Classroom Leaderboard Weights",
+    "card_subtitle": "Applied to the per-classroom leaderboard. Not applied to global ranking (XP).",
+    "formula_label": "Formula",
+    "formula_value": "total_score = quiz_avg × {{quizWeight}} + exam_avg × {{examWeight}}",
+    "quiz_weight_label": "Quiz weight",
+    "exam_weight_label": "Exam weight",
+    "scale_label": "Scale",
+    "scale_value": "0-100"
+  },
+  "actions": {
+    "classroom_joined": "Join a classroom",
+    "attendance_present": "Marked present",
+    "exam_submitted": "Submit an exam",
+    "exam_passed": "Pass an exam",
+    "quiz_submitted": "Submit a quiz",
+    "quiz_passed": "Pass a quiz",
+    "quiz_perfect": "Perfect quiz score",
+    "doc_completed": "Complete a document",
+    "certificate_issued": "Receive a certificate"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "title": "Quy đổi điểm",
+  "subtitle": "Bảng quy đổi điểm và XP hiện đang áp dụng trong hệ thống",
+  "intro": "Trang này hiển thị các công thức tính điểm và bảng quy đổi XP đang được áp dụng. Giáo viên dùng để tham khảo khi tạo đề; học viên dùng để hiểu cách điểm và XP được tính.",
+  "last_updated": "Cập nhật theo cấu hình backend",
+  "nav": {
+    "quiz": "Điểm Quiz",
+    "exam": "Điểm Exam",
+    "xp": "Bảng XP (Ranking)",
+    "level": "Cấp bậc (Level)",
+    "leaderboard": "Trọng số Leaderboard lớp"
+  },
+  "quiz": {
+    "card_title": "Điểm Quiz (trắc nghiệm)",
+    "card_subtitle": "Mỗi câu hỏi trắc nghiệm 4 đáp án; điểm được tính theo tỉ lệ đúng × thang điểm",
+    "max_grade_label": "Thang điểm tối đa",
+    "max_grade_value": "{{value}} điểm (mặc định; giáo viên cấu hình 1-10)",
+    "passing_label": "Điểm đạt (passing)",
+    "passing_value": "≥ {{pct}}% (mặc định; cấu hình qua QuizAssignment.passing_score_pct)",
+    "perfect_label": "Điểm hoàn hảo",
+    "perfect_value": "100% — cộng thêm XP quiz_perfect",
+    "formula_label": "Công thức",
+    "formula_value": "score = (số câu đúng / tổng câu) × max_grade"
+  },
+  "exam": {
+    "card_title": "Điểm Exam (bài kiểm tra)",
+    "card_subtitle": "Bài kiểm tra có thể là trắc nghiệm, file, essay hoặc online có giám sát",
+    "max_grade_label": "Thang điểm",
+    "max_grade_value": "{{value}} điểm (mặc định; giáo viên cấu hình {{min}}-{{max}})",
+    "passing_label": "Điểm đạt (trắc nghiệm)",
+    "passing_value": "≥ {{pct}}% (cố định cho MC/online)",
+    "ai_label": "Rubric chấm AI (file / essay)",
+    "ai_value": "Độ chính xác 30% + Tính đầy đủ 20% + Tư duy phản biện 20% + Thuật ngữ 15% + Hình thức 15% = 100%",
+    "formula_label": "Công thức MC / online",
+    "formula_value": "score = (số câu đúng / tổng câu) × max_grade"
+  },
+  "xp": {
+    "card_title": "Bảng XP (Ranking)",
+    "card_subtitle": "Mỗi hành động trong hệ thống sẽ cộng XP tương ứng. XP cộng dồn, dùng để tính cấp bậc và ranking tổng.",
+    "table_action": "Hành động",
+    "table_xp": "XP",
+    "table_trigger": "Điều kiện",
+    "table_counter": "Bộ đếm thành tích"
+  },
+  "level": {
+    "card_title": "Cấp bậc (Level)",
+    "card_subtitle": "Level tăng theo XP tích lũy. Level càng cao cần nhiều XP hơn (đường cong lũy thừa).",
+    "formula_label": "Công thức",
+    "formula_value": "required_xp(level N) = 100 × (N - 1)^1.5",
+    "max_level": "Cấp tối đa: {{max}}",
+    "example_label": "Ví dụ XP cần để đạt",
+    "table_level": "Level",
+    "table_required_xp": "XP yêu cầu"
+  },
+  "level_titles_label": "Danh xưng theo cấp",
+  "leaderboard": {
+    "card_title": "Trọng số Leaderboard lớp",
+    "card_subtitle": "Áp dụng cho bảng xếp hạng nội bộ từng lớp học. Không áp dụng cho ranking tổng (XP).",
+    "formula_label": "Công thức",
+    "formula_value": "total_score = quiz_avg × {{quizWeight}} + exam_avg × {{examWeight}}",
+    "quiz_weight_label": "Trọng số Quiz",
+    "exam_weight_label": "Trọng số Exam",
+    "scale_label": "Thang điểm",
+    "scale_value": "0-100"
+  },
+  "actions": {
+    "classroom_joined": "Tham gia lớp",
+    "attendance_present": "Điểm danh có mặt",
+    "exam_submitted": "Nộp bài thi",
+    "exam_passed": "Đạt bài thi",
+    "quiz_submitted": "Nộp quiz",
+    "quiz_passed": "Đạt quiz",
+    "quiz_perfect": "Quiz hoàn hảo",
+    "doc_completed": "Hoàn thành tài liệu",
+    "certificate_issued": "Nhận chứng chỉ"
+  }
+}
