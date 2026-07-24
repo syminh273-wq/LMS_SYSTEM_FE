@@ -25,6 +25,7 @@ import {
   Inbox,
   Compass,
   Heart,
+  Trophy,
 } from 'lucide-react';
 import {
   Avatar,
@@ -111,6 +112,7 @@ const utilityNavItems: NavItem[] = [
   { name: 'Feed', href: '/consumer/feed', icon: Sparkles },
   { name: 'Lịch học', href: '/consumer/calendar', icon: CalendarIcon },
   { name: 'Bảng điểm', href: '/consumer/grades', icon: GraduationCap },
+  { name: 'Xếp hạng', href: '/consumer/me', icon: Trophy },
   { name: 'Chứng chỉ', href: '/consumer/certificate', icon: Award },
 ];
 
