@@ -26,15 +26,15 @@ import {
   User as UserIcon,
   Users,
 } from 'lucide-react';
-import { Card, CardContent } from '@shared/components/ui/card';
-import { Button } from '@shared/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@shared/components/ui/dialog';
-import { cn } from '@shared/lib/utils';
+import { Card, CardContent } from '../ui/card';
+import { Button } from '../ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { cn } from '../../lib/utils';
 import {
   MONTHS,
   formatEducationPeriod,
   monthLabelLookup,
-} from '@shared/lib/portfolio/education';
+} from '../../lib/portfolio/education';
 
 export type ThemeColor = 'indigo' | 'rose' | 'emerald' | 'amber' | 'violet';
 export type CoverStyle = 'mesh' | 'gradient';

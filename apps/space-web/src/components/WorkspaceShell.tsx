@@ -41,7 +41,8 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<ShellProfile | null>(null);
   const [authed, setAuthed] = useState(false);
 
-  const isHome = pathname === '/space/feed';
+  const isHome = pathname === '/space' || pathname === '/space/';
+  const isFeed = pathname === '/space/feed' || pathname?.startsWith('/space/feed');
 
   useEffect(() => {
     setAuthed(Boolean(localStorage.getItem('accessToken')));
@@ -106,7 +107,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-[90vw] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
-          <Link href={authed ? '/space/feed' : '/space/login'} className="flex items-center gap-2 shrink-0">
+          <Link href={authed ? '/space' : '/space/login'} className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md">
               <Users size={16} strokeWidth={2.5} />
             </div>
@@ -118,17 +119,30 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           {authed && (
             <nav className="hidden md:flex items-center gap-1 ml-2">
               <button
-                onClick={() => router.push('/space/feed')}
+                onClick={() => router.push('/space')}
                 className={
                   'inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-bold transition-colors ' +
                   (isHome
                     ? 'bg-indigo-50 text-indigo-700'
                     : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900')
                 }
-                aria-label="Trang chủ"
+                aria-label={t('feed.workspace_nav.home')}
               >
                 <Home size={14} />
-                Trang chủ
+                {t('feed.workspace_nav.home')}
+              </button>
+              <button
+                onClick={() => router.push('/space/feed')}
+                className={
+                  'inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-bold transition-colors ' +
+                  (isFeed
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900')
+                }
+                aria-label={t('feed.workspace_nav.feed')}
+              >
+                <User size={14} />
+                {t('feed.workspace_nav.feed')}
               </button>
               <Button
                 variant="ghost"
@@ -147,7 +161,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           <div className="hidden md:flex relative w-72 lg:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
             <Input
-              placeholder="Tìm kiếm tài liệu, bạn bè..."
+              placeholder={t('feed.workspace_nav.search_placeholder')}
               className="h-9 pl-9 rounded-full bg-slate-100 dark:bg-slate-800 border-transparent text-sm"
             />
           </div>
@@ -185,21 +199,21 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <LayoutDashboard size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">Quay về trang chính</span>
+                      <span className="text-sm font-medium">{t('feed.workspace_nav.back_to_dashboard')}</span>
                     </button>
                     <button
                       onClick={() => router.push('/space/me')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <User size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
+                      <span className="text-sm font-medium">{t('feed.workspace_nav.profile')}</span>
                     </button>
                     <button
                       onClick={() => router.push('/space/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <UserCheck size={14} className="text-muted-foreground" />
-                      <span className="text-sm font-medium">Đang theo dõi</span>
+                      <span className="text-sm font-medium">{t('feed.workspace_nav.following')}</span>
                     </button>
                     <div className="h-px bg-border my-1" />
                     <button
@@ -207,14 +221,14 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-destructive/5"
                     >
                       <LogOut size={14} className="text-destructive" />
-                      <span className="text-sm font-medium text-destructive">Đăng xuất</span>
+                      <span className="text-sm font-medium text-destructive">{t('feed.workspace_nav.logout')}</span>
                     </button>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
             ) : (
               <Button size="sm" onClick={() => router.push('/auth/login')} className="rounded-full h-9 px-4">
-                Đăng nhập
+                {t('feed.workspace_nav.login')}
               </Button>
             )}
           </div>

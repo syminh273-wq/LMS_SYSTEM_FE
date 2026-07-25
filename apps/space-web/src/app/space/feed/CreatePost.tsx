@@ -22,32 +22,31 @@ import {
 } from '@shared/components/ui/dropdown-menu';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@shared/lib/utils';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
-const EMOTIONS: { key: PostEmotion; emoji: string; label: string }[] = [
-  { key: 'happy',       emoji: '😊', label: 'Đang vui' },
-  { key: 'sad',         emoji: '😢', label: 'Buồn' },
-  { key: 'motivated',   emoji: '💪', label: 'Cố lên' },
-  { key: 'excited',     emoji: '🔥', label: 'Hào hứng' },
-  { key: 'tired',       emoji: '😴', label: 'Mệt mỏi' },
-  { key: 'thinking',    emoji: '🤔', label: 'Suy nghĩ' },
-  { key: 'confident',   emoji: '😎', label: 'Tự tin' },
-  { key: 'celebrating', emoji: '🎉', label: 'Ăn mừng' },
-  { key: 'stressed',    emoji: '😤', label: 'Căng thẳng' },
-  { key: 'loved',       emoji: '❤️', label: 'Yêu thương' },
+const EMOTION_KEYS = [
+  { key: 'happy' as const, emoji: '😊' },
+  { key: 'sad' as const, emoji: '😢' },
+  { key: 'motivated' as const, emoji: '💪' },
+  { key: 'excited' as const, emoji: '🔥' },
+  { key: 'tired' as const, emoji: '😴' },
+  { key: 'thinking' as const, emoji: '🤔' },
+  { key: 'confident' as const, emoji: '😎' },
+  { key: 'celebrating' as const, emoji: '🎉' },
+  { key: 'stressed' as const, emoji: '😤' },
+  { key: 'loved' as const, emoji: '❤️' },
 ];
 
-const EMOTION_MAP = Object.fromEntries(EMOTIONS.map(e => [e.key, e]));
+const EMOTION_MAP_KEYS = Object.fromEntries(EMOTION_KEYS.map(e => [e.key, e]));
 
-const VISIBILITY_OPTIONS: { key: PostVisibility; icon: React.ElementType; label: string }[] = [
-  { key: 'public',  icon: Globe,  label: 'Công khai' },
-  { key: 'friends', icon: Users,  label: 'Bạn bè' },
-  { key: 'private', icon: Lock,   label: 'Chỉ mình tôi' },
-];
+const VISIBILITY_KEYS = ['public', 'friends', 'private'] as const;
+const VISIBILITY_ICONS: Record<string, React.ElementType> = { public: Globe, friends: Users, private: Lock };
 
 export function CreatePost({ profile, onCreated }: {
   profile: { full_name: string; avatar_url: string } | null;
   onCreated: (post: Post) => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [emotion, setEmotion] = useState<PostEmotion>('');
   const [visibility, setVisibility] = useState<PostVisibility>('public');
@@ -75,7 +74,7 @@ export function CreatePost({ profile, onCreated }: {
         const items = Array.isArray(res) ? (res as unknown as Classroom[]) : res.results || [];
         setClassrooms(items);
       })
-      .catch(() => toast.error('Không thể tải danh sách lớp học'))
+      .catch(() => toast.error(t('feed.create_post.load_classrooms_error')))
       .finally(() => setClassroomsLoading(false));
   }, [open, classrooms.length]);
 
@@ -98,7 +97,7 @@ export function CreatePost({ profile, onCreated }: {
   const filteredClassrooms = useMemo(() => {
     const q = classroomSearch.trim().toLowerCase();
     if (!q) return classrooms;
-    return classrooms.filter((c) => (c.name || c.title || '').toLowerCase().includes(q));
+    return classrooms.filter((c) => (c.name || '').toLowerCase().includes(q));
   }, [classrooms, classroomSearch]);
 
   const selectedClassrooms = useMemo(
@@ -122,8 +121,10 @@ export function CreatePost({ profile, onCreated }: {
   const content = watch('content');
 
   const initials = (profile?.full_name || '?').slice(0, 2).toUpperCase();
-  const selectedVis = VISIBILITY_OPTIONS.find(v => v.key === visibility)!;
-  const selectedEmotion = emotion ? EMOTION_MAP[emotion] : null;
+  const VisIcon = VISIBILITY_ICONS[visibility] ?? Globe;
+  const visLabel = t(`feed.visibility.${visibility}`);
+  const selectedEmotion = emotion ? EMOTION_MAP_KEYS[emotion] : null;
+  const selectedEmotionLabel = emotion ? t(`feed.emotions.${emotion}`) : null;
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -131,7 +132,7 @@ export function CreatePost({ profile, onCreated }: {
     const remaining = MAX_IMAGES - imageFiles.length;
     const accepted = files.slice(0, remaining);
     if (files.length > remaining) {
-      toast.warning(`Chỉ có thể đính kèm tối đa ${MAX_IMAGES} ảnh.`);
+      toast.warning(t('feed.create_post.max_images_warning', undefined, { max: MAX_IMAGES }));
     }
     setImageFiles((prev) => [...prev, ...accepted]);
     setImagePreviews((prev) => [...prev, ...accepted.map((f) => URL.createObjectURL(f))]);
@@ -156,7 +157,7 @@ export function CreatePost({ profile, onCreated }: {
         const result = await socialApi.uploadPostImages(imageFiles);
         imageUrls = result.urls || [];
         if (result.errors && result.errors.length > 0) {
-          toast.warning(`Một số ảnh tải lên thất bại (${result.errors.length}/${imageFiles.length})`);
+          toast.warning(t('feed.create_post.upload_partial_fail', undefined, { failed: result.errors.length, total: imageFiles.length }));
         }
       }
       const post = await socialApi.createPost({
@@ -176,8 +177,8 @@ export function CreatePost({ profile, onCreated }: {
       setSelectedClassroomUids([]);
       setShowClassroomPicker(false);
       setOpen(false);
-      toast.success('Đã đăng bài!');
-    } catch { toast.error('Đăng bài thất bại'); }
+      toast.success(t('feed.create_post.success'));
+    } catch { toast.error(t('feed.create_post.error')); }
     finally { setSubmitting(false); }
   };
 
@@ -192,14 +193,14 @@ export function CreatePost({ profile, onCreated }: {
             onClick={() => setOpen(true)}
             className="flex-1 text-left px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-full text-[13.5px] text-slate-500 transition-colors"
           >
-            {profile?.full_name ? `${profile.full_name} ơi, bạn đang nghĩ gì?` : 'Bạn đang nghĩ gì?'}
+            {profile?.full_name ? t('feed.create_post.placeholder_with_name', undefined, { name: profile.full_name }) : t('feed.create_post.placeholder')}
           </button>
           <button
             onClick={() => setOpen(true)}
             className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-[12.5px] font-semibold text-slate-700 transition-colors"
           >
             <ImageIcon size={14} />
-            Ảnh
+            {t('feed.create_post.photo')}
           </button>
         </div>
       </div>
@@ -216,26 +217,29 @@ export function CreatePost({ profile, onCreated }: {
                 {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : initials}
               </div>
               <div className="min-w-0">
-                <p className="text-[13.5px] font-semibold text-slate-900 truncate">{profile?.full_name || 'Bạn'}</p>
+                <p className="text-[13.5px] font-semibold text-slate-900 truncate">{profile?.full_name || t('feed.post.anonymous')}</p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full hover:bg-indigo-100 transition-colors">
-                      <selectedVis.icon size={10} strokeWidth={2.5} />
-                      {selectedVis.label}
+                      <VisIcon size={10} strokeWidth={2.5} />
+                      {visLabel}
                       <ChevronDown size={9} />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="bg-white border-slate-200">
-                    {VISIBILITY_OPTIONS.map((opt) => (
-                      <DropdownMenuItem
-                        key={opt.key}
-                        onClick={() => setVisibility(opt.key)}
-                        className="flex items-center gap-2 text-[12.5px] font-medium cursor-pointer"
-                      >
-                        <opt.icon size={13} />
-                        {opt.label}
-                      </DropdownMenuItem>
-                    ))}
+                    {VISIBILITY_KEYS.map((key) => {
+                      const Icon = VISIBILITY_ICONS[key];
+                      return (
+                        <DropdownMenuItem
+                          key={key}
+                          onClick={() => setVisibility(key)}
+                          className="flex items-center gap-2 text-[12.5px] font-medium cursor-pointer"
+                        >
+                          <Icon size={13} />
+                          {t(`feed.visibility.${key}`)}
+                        </DropdownMenuItem>
+                      );
+                    })}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -243,7 +247,7 @@ export function CreatePost({ profile, onCreated }: {
             <button
               onClick={() => setOpen(false)}
               className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
-              aria-label="Đóng"
+              aria-label={t('feed.create_post.close')}
             >
               <X size={16} />
             </button>
@@ -252,14 +256,14 @@ export function CreatePost({ profile, onCreated }: {
           {selectedEmotion && (
             <div className="flex items-center gap-1.5 text-[13px] text-slate-600 animate-fade-down">
               <Sparkles size={12} className="text-amber-500" />
-              <span>đang cảm thấy</span>
+              <span>{t('feed.create_post.feeling')}</span>
               <span className="font-semibold text-indigo-700">
-                {selectedEmotion.emoji} {selectedEmotion.label}
+                {selectedEmotion.emoji} {selectedEmotionLabel}
               </span>
               <button
                 onClick={() => setEmotion('')}
                 className="text-slate-400 hover:text-slate-600 ml-1"
-                aria-label="Bỏ cảm xúc"
+                aria-label={t('feed.create_post.close')}
               >
                 <X size={12} />
               </button>
@@ -268,18 +272,18 @@ export function CreatePost({ profile, onCreated }: {
 
           {selectedClassrooms.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 animate-fade-down">
-              <span className="text-[12px] text-slate-500 font-medium">đang chia sẻ với</span>
+              <span className="text-[12px] text-slate-500 font-medium">{t('feed.create_post.sharing_with')}</span>
               {selectedClassrooms.map((c) => (
                 <span
                   key={c.uid}
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-semibold border border-emerald-200"
                 >
                   <BookOpen size={11} />
-                  {c.name || c.title}
+                  {c.name}
                   <button
                     onClick={() => toggleClassroom(c.uid)}
                     className="ml-0.5 text-emerald-500 hover:text-emerald-700"
-                    aria-label={`Bỏ tag ${c.name || c.title}`}
+                    aria-label={`Bỏ tag ${c.name}`}
                   >
                     <X size={11} />
                   </button>
@@ -292,7 +296,7 @@ export function CreatePost({ profile, onCreated }: {
             control={control}
             name="content"
             minHeight="100px"
-            placeholder={profile?.full_name ? `${profile.full_name} đang nghĩ gì?` : 'Bạn đang nghĩ gì?'}
+            placeholder={profile?.full_name ? t('feed.create_post.placeholder_with_name', undefined, { name: profile.full_name }) : t('feed.create_post.placeholder')}
           />
 
           {imagePreviews.length > 0 && (
@@ -315,7 +319,7 @@ export function CreatePost({ profile, onCreated }: {
 
           {showEmotions && (
             <div className="grid grid-cols-5 sm:grid-cols-10 gap-1 p-2.5 bg-slate-50 rounded-lg border border-slate-200 animate-fade-down">
-              {EMOTIONS.map(e => (
+              {EMOTION_KEYS.map(e => (
                 <button
                   key={e.key}
                   onClick={() => { setEmotion(e.key); setShowEmotions(false); }}
@@ -327,7 +331,7 @@ export function CreatePost({ profile, onCreated }: {
                   )}
                 >
                   <span className="text-xl">{e.emoji}</span>
-                  <span className="text-[9.5px] text-slate-500 mt-1 truncate w-full text-center">{e.label}</span>
+                  <span className="text-[9.5px] text-slate-500 mt-1 truncate w-full text-center">{t(`feed.emotions.${e.key}`)}</span>
                 </button>
               ))}
             </div>
@@ -342,7 +346,7 @@ export function CreatePost({ profile, onCreated }: {
               >
                 <ImageIcon size={15} />
                 <span className="hidden sm:inline">
-                  Ảnh{imageFiles.length > 0 ? ` (${imageFiles.length}/${MAX_IMAGES})` : ''}
+                  {imageFiles.length > 0 ? t('feed.create_post.photo_count', undefined, { count: imageFiles.length, max: MAX_IMAGES }) : t('feed.create_post.photo')}
                 </span>
               </button>
               <input
@@ -358,7 +362,7 @@ export function CreatePost({ profile, onCreated }: {
                 className="p-2 rounded-lg text-amber-700 hover:bg-amber-50 transition-colors flex items-center gap-1.5 text-[12.5px] font-semibold"
               >
                 <Smile size={15} />
-                <span className="hidden sm:inline">Cảm xúc</span>
+                <span className="hidden sm:inline">{t('feed.create_post.emotion')}</span>
               </button>
               <div ref={classroomButtonRef} className="relative">
                 <button
@@ -373,7 +377,7 @@ export function CreatePost({ profile, onCreated }: {
                 >
                   <BookOpen size={15} />
                   <span className="hidden sm:inline">
-                    Lớp học{selectedClassroomUids.length > 0 ? ` (${selectedClassroomUids.length})` : ''}
+                    {selectedClassroomUids.length > 0 ? t('feed.create_post.classroom_count', undefined, { count: selectedClassroomUids.length }) : t('feed.create_post.classroom')}
                   </span>
                 </button>
               </div>
@@ -384,7 +388,7 @@ export function CreatePost({ profile, onCreated }: {
               className="px-5 h-9 rounded-lg text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1.5"
             >
               {submitting && <Loader2 size={13} className="animate-spin" />}
-              Đăng bài
+              {t('feed.create_post.submit')}
             </button>
           </div>
         </div>
@@ -402,7 +406,7 @@ export function CreatePost({ profile, onCreated }: {
                 autoFocus
                 value={classroomSearch}
                 onChange={(e) => setClassroomSearch(e.target.value)}
-                placeholder="Tìm lớp học..."
+                placeholder={t('feed.create_post.search_classroom')}
                 className="w-full h-8 pl-8 pr-2 text-[13px] bg-slate-50 border border-transparent rounded-lg focus:bg-white focus:border-indigo-300 outline-none"
               />
             </div>
@@ -410,11 +414,11 @@ export function CreatePost({ profile, onCreated }: {
           <div className="max-h-64 overflow-y-auto p-1">
             {classroomsLoading ? (
               <div className="flex items-center justify-center py-6 text-[12px] text-slate-500">
-                <Loader2 size={13} className="animate-spin mr-1.5" /> Đang tải...
+                <Loader2 size={13} className="animate-spin mr-1.5" /> {t('feed.create_post.loading_classrooms')}
               </div>
             ) : filteredClassrooms.length === 0 ? (
               <div className="py-6 text-center text-[12px] text-slate-500">
-                {classroomSearch ? 'Không tìm thấy lớp phù hợp' : 'Chưa có lớp học nào'}
+                {classroomSearch ? t('feed.create_post.no_classroom_found') : t('feed.create_post.no_classrooms')}
               </div>
             ) : (
               filteredClassrooms.map((c) => {
@@ -436,7 +440,7 @@ export function CreatePost({ profile, onCreated }: {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-semibold text-slate-900 truncate">
-                        {c.name || c.title || 'Lớp học'}
+                        {c.name || 'Lớp học'}
                       </p>
                       {c.description && (
                         <p className="text-[11px] text-slate-500 truncate">{c.description}</p>
@@ -450,13 +454,13 @@ export function CreatePost({ profile, onCreated }: {
           {selectedClassroomUids.length > 0 && (
             <div className="border-t border-slate-100 p-2 flex items-center justify-between">
               <span className="text-[11.5px] text-slate-500 font-medium">
-                Đã chọn {selectedClassroomUids.length} lớp
+                {t('feed.create_post.selected_count', undefined, { count: selectedClassroomUids.length })}
               </span>
               <button
                 onClick={() => setSelectedClassroomUids([])}
                 className="text-[11.5px] font-semibold text-slate-500 hover:text-rose-600"
               >
-                Bỏ chọn tất cả
+                {t('feed.create_post.deselect_all')}
               </button>
             </div>
           )}

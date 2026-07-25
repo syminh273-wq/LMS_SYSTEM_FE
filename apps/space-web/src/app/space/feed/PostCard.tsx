@@ -15,36 +15,37 @@ import parse from 'html-react-parser';
 import { cn } from '@shared/lib/utils';
 import { useImageLightbox, getPostImages } from '@shared/components/ui/image-lightbox';
 import { PostImageGallery } from '@shared/components/ui/post-image-gallery';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 const EMOTIONS = [
-  { key: 'happy',       emoji: '😊', label: 'Đang vui' },
-  { key: 'sad',         emoji: '😢', label: 'Buồn' },
-  { key: 'motivated',   emoji: '💪', label: 'Cố lên' },
-  { key: 'excited',     emoji: '🔥', label: 'Hào hứng' },
-  { key: 'tired',       emoji: '😴', label: 'Mệt mỏi' },
-  { key: 'thinking',    emoji: '🤔', label: 'Suy nghĩ' },
-  { key: 'confident',   emoji: '😎', label: 'Tự tin' },
-  { key: 'celebrating', emoji: '🎉', label: 'Ăn mừng' },
-  { key: 'stressed',    emoji: '😤', label: 'Căng thẳng' },
-  { key: 'loved',       emoji: '❤️', label: 'Yêu thương' },
+  { key: 'happy',       emoji: '😊' },
+  { key: 'sad',         emoji: '😢' },
+  { key: 'motivated',   emoji: '💪' },
+  { key: 'excited',     emoji: '🔥' },
+  { key: 'tired',       emoji: '😴' },
+  { key: 'thinking',    emoji: '🤔' },
+  { key: 'confident',   emoji: '😎' },
+  { key: 'celebrating', emoji: '🎉' },
+  { key: 'stressed',    emoji: '😤' },
+  { key: 'loved',       emoji: '❤️' },
 ] as const;
 
 const EMOTION_MAP = Object.fromEntries(EMOTIONS.map(e => [e.key, e]));
 
 const VISIBILITY_OPTIONS = [
-  { key: 'public',  icon: Globe,  label: 'Công khai' },
-  { key: 'friends', icon: Users,  label: 'Bạn bè' },
-  { key: 'private', icon: Lock,   label: 'Chỉ mình tôi' },
+  { key: 'public',  icon: Globe },
+  { key: 'friends', icon: Users },
+  { key: 'private', icon: Lock },
 ] as const;
 
-function timeAgo(iso: string) {
+function timeAgo(iso: string, t: (key: string, fb?: string, values?: Record<string, string | number>) => string) {
   const d = Date.now() - new Date(iso).getTime();
   const m = Math.floor(d / 60000);
-  if (m < 1) return 'Vừa xong';
-  if (m < 60) return `${m} phút trước`;
+  if (m < 1) return t('feed.post.time_just_now');
+  if (m < 60) return t('feed.post.time_minutes', undefined, { count: m });
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h} giờ trước`;
-  return `${Math.floor(h / 24)} ngày trước`;
+  if (h < 24) return t('feed.post.time_hours', undefined, { count: h });
+  return t('feed.post.time_days', undefined, { count: Math.floor(h / 24) });
 }
 
 function formatFullDateTime(iso: string) {
@@ -67,6 +68,7 @@ export function PostCard({
   onDelete: (uid: string) => void;
   embedded?: boolean;
 }) {
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<PostComment[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -87,7 +89,7 @@ export function PostCard({
       missing.map((u) =>
         classroomApi
           .retrieve(u)
-          .then((c) => [u, c.name || c.title || 'Lớp học'] as const)
+          .then((c) => [u, c.name || t('feed.create_post.classroom')] as const)
           .catch(() => [u, 'Lớp học'] as const)
       )
     ).then((entries) => {
@@ -97,6 +99,7 @@ export function PostCard({
     return () => { cancelled = true; };
   }, [post.classroom_tags, classroomNames]);
   const emotion = post.emotion ? EMOTION_MAP[post.emotion as keyof typeof EMOTION_MAP] : null;
+  const emotionLabel = emotion ? t(`feed.emotions.${post.emotion}`) : null;
   const VisIcon = VISIBILITY_OPTIONS.find(v => v.key === post.visibility)?.icon ?? Globe;
 
   const loadComments = async () => {
@@ -105,7 +108,7 @@ export function PostCard({
     try {
       const data = await socialApi.getComments(post.uid);
       setComments(data);
-    } catch { toast.error('Không thể tải bình luận'); }
+    } catch { toast.error(t('feed.post.comments_load_error')); }
     finally { setLoadingComments(false); }
   };
 
@@ -120,7 +123,7 @@ export function PostCard({
     try {
       const res = await socialApi.toggleLike(post.uid);
       onLike(post.uid, res.liked, res.likes_count);
-    } catch { toast.error('Thao tác thất bại'); }
+    } catch { toast.error(t('feed.post.like_error')); }
   };
 
   const handleComment = async (e: React.FormEvent) => {
@@ -131,17 +134,17 @@ export function PostCard({
       const c = await socialApi.addComment(post.uid, newComment.trim());
       setComments(prev => [...prev, c]);
       setNewComment('');
-    } catch { toast.error('Không thể gửi bình luận'); }
+    } catch { toast.error(t('feed.post.comment_error')); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Xóa bài đăng này?')) return;
+    if (!confirm(t('feed.post.delete_confirm'))) return;
     try {
       await socialApi.deletePost(post.uid);
       onDelete(post.uid);
-      toast.success('Đã xóa bài đăng');
-    } catch { toast.error('Không thể xóa'); }
+      toast.success(t('feed.post.delete_success'));
+    } catch { toast.error(t('feed.post.delete_error')); }
   };
 
   return (
@@ -168,21 +171,21 @@ export function PostCard({
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               <AuthorLink post={post} className="min-w-0 max-w-full">
-                <p className="text-[13.5px] font-semibold text-slate-900 leading-none truncate hover:underline">{post.author_name || 'Ẩn danh'}</p>
+                <p className="text-[13.5px] font-semibold text-slate-900 leading-none truncate hover:underline">{post.author_name || t('feed.post.anonymous')}</p>
               </AuthorLink>
               {post.author_type === 'space' && (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-                  Giáo viên
+                  {t('feed.post.teacher_badge')}
                 </span>
               )}
               {emotion && (
                 <span className="text-[11.5px] text-slate-500 inline-flex items-center gap-0.5">
-                  đang {emotion.label.toLowerCase()} <span>{emotion.emoji}</span>
+                  {t('feed.post.feeling_prefix')} {emotionLabel?.toLowerCase()} <span>{emotion.emoji}</span>
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[11px] text-slate-500">{timeAgo(post.created_at)}</span>
+              <span className="text-[11px] text-slate-500">{timeAgo(post.created_at, t)}</span>
               <span className="text-slate-300">·</span>
               <VisIcon size={11} className="text-slate-500" />
             </div>
@@ -194,7 +197,7 @@ export function PostCard({
             <button
               onClick={() => setMenuOpen(p => !p)}
               className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-              aria-label="Tùy chọn"
+              aria-label={t('feed.post.options')}
             >
               <MoreHorizontal size={16} />
             </button>
@@ -206,7 +209,7 @@ export function PostCard({
                     onClick={() => { setMenuOpen(false); handleDelete(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
                   >
-                    <Trash2 size={13} /> Xóa bài
+                    <Trash2 size={13} /> {t('feed.post.delete')}
                   </button>
                 </div>
               </>
@@ -233,7 +236,7 @@ export function PostCard({
       {(post.classroom_tags || []).length > 0 && (
         <div className="px-4 sm:px-5 pb-3 flex flex-wrap items-center gap-1.5">
           <span className="text-[11.5px] text-slate-500 font-medium inline-flex items-center gap-1">
-            <BookOpen size={11} /> Chia sẻ với
+            <BookOpen size={11} /> {t('feed.post.shared_with')}
           </span>
           {(post.classroom_tags || []).map((uid) => {
             const name = classroomNames[uid] || 'Đang tải…';
@@ -266,7 +269,7 @@ export function PostCard({
           )}
           {post.comments_count > 0 && (
             <button onClick={toggleComments} className="hover:text-slate-900 hover:underline ml-auto transition-colors">
-              {post.comments_count} bình luận
+              {t('feed.post.comments_count', undefined, { count: post.comments_count })}
             </button>
           )}
         </div>
@@ -274,9 +277,9 @@ export function PostCard({
 
       <div className="grid grid-cols-3 border-t border-slate-200">
         {[
-          { key: 'like', icon: Heart, label: 'Thích', onClick: handleLike, active: post.liked_by_me, activeColor: 'text-rose-600' },
-          { key: 'comment', icon: MessageCircle, label: 'Bình luận', onClick: toggleComments, active: false, activeColor: '' },
-          { key: 'share', icon: Share2, label: 'Chia sẻ', onClick: () => {}, active: false, activeColor: '' },
+          { key: 'like', icon: Heart, label: t('feed.post.like'), onClick: handleLike, active: post.liked_by_me, activeColor: 'text-rose-600' },
+          { key: 'comment', icon: MessageCircle, label: t('feed.post.comment'), onClick: toggleComments, active: false, activeColor: '' },
+          { key: 'share', icon: Share2, label: t('feed.post.share'), onClick: () => {}, active: false, activeColor: '' },
         ].map(({ key, icon: Icon, label, onClick, active, activeColor }) => (
           <button
             key={key}
@@ -303,7 +306,7 @@ export function PostCard({
               <Loader2 size={18} className="animate-spin text-indigo-600" />
             </div>
           ) : comments.length === 0 ? (
-            <p className="text-center text-xs text-slate-500 py-2">Chưa có bình luận nào.</p>
+            <p className="text-center text-xs text-slate-500 py-2">{t('feed.post.no_comments')}</p>
           ) : (
             comments.map(c => {
               const isMine = currentUserId !== null && c.consumer_uid === currentUserId;
@@ -341,14 +344,14 @@ export function PostCard({
               <input
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
-                placeholder="Viết bình luận..."
+                placeholder={t('feed.post.comment_placeholder')}
                 className="w-full text-[13px] bg-white border border-slate-200 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 placeholder:text-slate-400"
               />
               <button
                 type="submit"
                 disabled={!newComment.trim() || submitting}
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center disabled:opacity-30 hover:bg-indigo-700 transition-colors"
-                aria-label="Gửi bình luận"
+                aria-label={t('feed.post.comment_submit')}
               >
                 {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
               </button>
@@ -365,6 +368,7 @@ function AuthorLink({ post, children, className }: {
   children: React.ReactNode;
   className?: string;
 }) {
+  const { t } = useTranslation();
   const isSpace = post.author_type === 'space' && post.space_uid;
   const consumerWebBase =
     process.env.NEXT_PUBLIC_CONSUMER_WEB_URL || 'http://localhost:3000';
@@ -377,14 +381,14 @@ function AuthorLink({ post, children, className }: {
       <a
         href={href}
         className={cn('block shrink-0', className)}
-        aria-label="Xem trang cá nhân"
+        aria-label={t('feed.post.view_profile')}
       >
         {children}
       </a>
     );
   }
   return (
-    <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label="Xem trang giáo viên">
+    <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label={t('feed.post.view_teacher_profile')}>
       {children}
     </Link>
   );
