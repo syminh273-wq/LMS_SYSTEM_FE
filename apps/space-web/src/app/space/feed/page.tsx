@@ -15,9 +15,11 @@ import { PostCard } from './PostCard';
 import { ConnectSuggestions } from './ConnectSuggestions';
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { FeedLeftSidebar } from './FeedLeftSidebar';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 export default function FeedPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,12 +35,11 @@ export default function FeedPage() {
       const feed = await socialApi.getFeed(PAGE);
       setPosts(feed);
       setHasMore(feed.length === PAGE);
-    } catch { toast.error('Không thể tải feed'); }
+    } catch { toast.error(t('feed.error_load')); }
     finally { setLoading(false); }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (!localStorage.getItem('accessToken')) { router.push('/space/login'); return; }
     const init = async () => {
@@ -58,10 +59,10 @@ export default function FeedPage() {
         });
         setFollowingCount(workspace?.following_count ?? 0);
         await fetchFeed();
-      } catch { toast.error('Lỗi khởi tạo'); }
+      } catch { toast.error(t('feed.error_init')); }
     };
     init();
-  }, [router, fetchFeed]);
+  }, [router, fetchFeed, t]);
 
   useEffect(() => {
     const onProfileUpdated = (e: Event) => {
@@ -105,15 +106,15 @@ export default function FeedPage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Loader2 size={28} className="animate-spin text-indigo-600" />
-              <p className="text-[12.5px] text-slate-500">Đang tải bảng tin...</p>
+              <p className="text-[12.5px] text-slate-500">{t('feed.loading')}</p>
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-20 bg-white border-2 border-dashed border-slate-200 rounded-xl">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
                 <Sparkles size={28} className="text-slate-400" />
               </div>
-              <p className="font-semibold text-slate-900 text-[15px]">Chưa có bài đăng nào</p>
-              <p className="text-[13px] text-slate-500 mt-1">Hãy là người đầu tiên chia sẻ!</p>
+              <p className="font-semibold text-slate-900 text-[15px]">{t('feed.empty_title')}</p>
+              <p className="text-[13px] text-slate-500 mt-1">{t('feed.empty_subtitle')}</p>
             </div>
           ) : (
             <div className="space-y-3 sm:space-y-4">
@@ -139,7 +140,7 @@ export default function FeedPage() {
                     className="inline-flex items-center gap-1.5 px-5 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-60"
                   >
                     {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
-                    Xem thêm
+                    {t('feed.load_more')}
                   </button>
                 </div>
               )}

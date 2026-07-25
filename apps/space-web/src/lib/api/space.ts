@@ -5,6 +5,17 @@ import type {
   UpdateSpaceRequest 
 } from './types';
 
+export type SpaceUsage = {
+  storage_used_bytes: number;
+  storage_limit_bytes: number;
+  storage_used_percent: number;
+  api_calls_this_month: number;
+  api_calls_limit: number;
+  api_calls_percent: number;
+  active_classrooms: number;
+  plan: string;
+};
+
 export class SpaceApiClient extends BaseRestApiClient {
   constructor() {
     super();
@@ -44,6 +55,10 @@ export class SpaceApiClient extends BaseRestApiClient {
 
   public async updateSettings(data: Record<string, any>): Promise<Record<string, any>> {
     return this.patch<Record<string, any>>('/api/v1/space/account/settings/', data);
+  }
+
+  public async getUsage(): Promise<SpaceUsage> {
+    return this.get<SpaceUsage>('/api/v1/space/account/usage/');
   }
 }
 

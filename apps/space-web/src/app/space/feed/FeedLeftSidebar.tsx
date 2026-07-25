@@ -12,6 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import { ProfileHeaderInfo } from '@shared/components/address';
 import { cn } from '@shared/lib/utils';
+import { useTranslation } from '@shared/components/LocaleProvider';
 
 type Profile = {
   full_name: string;
@@ -32,13 +33,14 @@ type NavItem = {
 export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Profile; followingCount?: number }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
   const initials = (profile.full_name || '?').slice(0, 2).toUpperCase();
 
   const NAV_ITEMS: NavItem[] = [
-    { label: 'Trang cá nhân', icon: UserIcon,      path: '/space/me' },
-    { label: 'Bảng tin',      icon: Newspaper,     path: '/space/feed' },
-    { label: 'Tin nhắn',      icon: MessageCircle, path: '/space/messages' },
-    { label: 'Đang theo dõi', icon: UserCheck,     path: '/space/following', badge: followingCount },
+    { label: t('feed.sidebar.my_profile'), icon: UserIcon,      path: '/space/me' },
+    { label: t('feed.sidebar.feed'),       icon: Newspaper,     path: '/space/feed' },
+    { label: t('feed.sidebar.messages'),   icon: MessageCircle, path: '/space/messages' },
+    { label: t('feed.sidebar.following'),  icon: UserCheck,     path: '/space/following', badge: followingCount },
   ];
 
   return (
@@ -108,7 +110,7 @@ export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Prof
         className="w-full inline-flex items-center justify-center gap-2 h-11 bg-white border border-slate-200 rounded-xl text-[13.5px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors card-elevated"
       >
         <PenLine size={14} />
-        Chỉnh sửa hồ sơ
+        {t('feed.sidebar.edit_profile')}
       </button>
     </aside>
   );

@@ -16,13 +16,12 @@ import { spaceLeaveRequestApi } from './leaveRequest';
 import { courseApi } from './course';
 import { portfolioApi } from './portfolio';
 import { spaceRankingApi } from './ranking';
-import { dashboardApi } from './dashboard';
 
 export * from './types';
 export * from './exceptions';
 export * from './calendar';
 export * from './leaveRequest';
-export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi, courseApi, portfolioApi, spaceRankingApi, dashboardApi };
+export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi, courseApi, portfolioApi, spaceRankingApi };
 
 // For backward compatibility and centralized access
 export const api = {
@@ -43,7 +42,6 @@ export const api = {
   courses: courseApi,
   portfolio: portfolioApi,
   ranking: spaceRankingApi,
-  dashboard: dashboardApi,
 };
 
 // Re-export specific instances
@@ -81,5 +79,5 @@ export const spaceApi = {
   },
   getSettings: spaceApiInstance.getSettings.bind(spaceApiInstance),
   updateSettings: spaceApiInstance.updateSettings.bind(spaceApiInstance),
-  dashboard: dashboardApi,
+  getUsage: spaceApiInstance.getUsage.bind(spaceApiInstance),
 };
