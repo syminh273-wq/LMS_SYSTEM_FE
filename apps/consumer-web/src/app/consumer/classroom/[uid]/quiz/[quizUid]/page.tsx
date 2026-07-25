@@ -7,6 +7,7 @@ import { consumerQuizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
 import { CertificateCelebration } from '@/components/quiz/certificate-celebration';
+import QuizLeaderboardModal from '@/components/quiz/QuizLeaderboardModal';
 import type { QuizPublicDetail, QuizQuestionPublic, QuizResult, QuizAttemptRecord, IssuedCertificate } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, CheckCircle2, XCircle, Trophy,
@@ -43,6 +44,7 @@ export default function QuizGamePage({ params }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [celebrateCerts, setCelebrateCerts] = useState<IssuedCertificate[] | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // timer
   const [timeLeft, setTimeLeft] = useState(0);
@@ -102,6 +104,9 @@ export default function QuizGamePage({ params }: Props) {
   const maxAttempts = quiz?.max_attempts ?? 0;
   const isBlocked = maxAttempts > 0 && attemptCount >= maxAttempts;
   const attemptsRemaining = maxAttempts > 0 ? maxAttempts - attemptCount : null;
+  const isClosed = quiz?.is_closed === true || quiz?.is_expired === true;
+  const isOpen = quiz?.is_open !== false;
+  const canStart = isOpen && !isClosed && !isBlocked;
 
   const doSubmit = useCallback(async (finalAnswers: Record<string, Answer>) => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -256,6 +261,22 @@ export default function QuizGamePage({ params }: Props) {
             )}
           </div>
 
+          {/* Closed banner */}
+          {isClosed && (
+            <div className="bg-rose-500/20 backdrop-blur-sm border-2 border-rose-300/50 rounded-2xl p-4 flex items-center gap-3">
+              <Lock size={24} className="text-rose-200 shrink-0" />
+              <div>
+                <p className="font-black text-sm">Bài quiz đã đóng</p>
+                <p className="text-xs text-rose-100 font-medium">
+                  {quiz.is_closed
+                    ? 'Giáo viên đã đóng bài quiz này.'
+                    : 'Đã quá thời gian cho phép.'}
+                  {' '}Bạn có thể xem bảng vàng.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Quiz info */}
           <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 space-y-3">
             <div className="flex justify-between text-sm font-bold">
@@ -307,8 +328,23 @@ export default function QuizGamePage({ params }: Props) {
             </div>
           )}
 
-          {/* Start / blocked */}
-          {isBlocked ? (
+          {/* Leaderboard button — always visible */}
+          {pastAttempts.length > 0 && (
+            <Button
+              type="button"
+              onClick={() => setShowLeaderboard(true)}
+              className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-black text-sm rounded-2xl gap-2 shadow-lg shadow-amber-900/30"
+            >
+              <Trophy size={18} /> XEM BẢNG VÀNG
+            </Button>
+          )}
+
+          {/* Start / blocked / closed */}
+          {isClosed ? (
+            <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
+              <p className="text-xs text-indigo-200 font-medium">Không thể làm bài khi quiz đã đóng.</p>
+            </div>
+          ) : isBlocked ? (
             <div className="bg-white/10 border border-white/20 rounded-2xl p-5 text-center space-y-2">
               <Lock size={28} className="mx-auto text-indigo-300" />
               <p className="font-black text-sm">Bạn đã dùng hết {maxAttempts} lần làm bài</p>
@@ -324,7 +360,7 @@ export default function QuizGamePage({ params }: Props) {
             </Button>
           )}
 
-          {attemptsRemaining !== null && !isBlocked && (
+          {attemptsRemaining !== null && !isBlocked && !isClosed && (
             <p className="text-center text-xs text-indigo-300 font-bold">
               Còn {attemptsRemaining} lần làm
             </p>
@@ -339,6 +375,14 @@ export default function QuizGamePage({ params }: Props) {
             Quay lại lớp học
           </button>
         </div>
+
+        {showLeaderboard && (
+          <QuizLeaderboardModal
+            quizUid={quizUid}
+            classroomId={classroomUid}
+            onClose={() => setShowLeaderboard(false)}
+          />
+        )}
       </div>
     );
   }
@@ -512,12 +556,20 @@ export default function QuizGamePage({ params }: Props) {
           )}
 
           {/* Actions */}
-          <div className="flex gap-3">
-            {!examUid && (result.attempts_remaining === null || result.attempts_remaining > 0) && (
+          <div className="flex flex-wrap gap-3">
+            <Button
+              type="button"
+              onClick={() => setShowLeaderboard(true)}
+              className="h-12 px-5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white rounded-2xl font-bold gap-2"
+            >
+              <Trophy size={16} />
+              Bảng vàng
+            </Button>
+            {!examUid && (result.attempts_remaining === null || result.attempts_remaining > 0) && !isClosed && (
               <Button
                 onClick={handleRestart}
                 variant="outline"
-                className="flex-1 h-12 rounded-2xl font-bold gap-2"
+                className="flex-1 h-12 rounded-2xl font-bold gap-2 min-w-[120px]"
               >
                 <RotateCcw size={16} />
                 Làm lại
@@ -525,7 +577,7 @@ export default function QuizGamePage({ params }: Props) {
             )}
             <Button
               onClick={() => router.push(`/consumer/classroom/${classroomUid}`)}
-              className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold gap-2"
+              className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold gap-2 min-w-[120px]"
             >
               <ArrowLeft size={16} />
               Về lớp học
@@ -577,6 +629,14 @@ export default function QuizGamePage({ params }: Props) {
             ))}
           </div>
         </div>
+
+        {showLeaderboard && (
+          <QuizLeaderboardModal
+            quizUid={quizUid}
+            classroomId={classroomUid}
+            onClose={() => setShowLeaderboard(false)}
+          />
+        )}
       </div>
     );
   }

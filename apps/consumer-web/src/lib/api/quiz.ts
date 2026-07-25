@@ -1,5 +1,8 @@
 import BaseRestApiClient from './client';
-import type { QuizSummary, QuizPublicDetail, QuizSubmitRequest, QuizResult, QuizAttemptRecord } from './types';
+import type {
+  QuizSummary, QuizPublicDetail, QuizSubmitRequest, QuizResult, QuizAttemptRecord,
+  QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
+} from './types';
 
 export class ConsumerQuizApiClient extends BaseRestApiClient {
   public async listByClassroom(classroomId: string): Promise<QuizSummary[]> {
@@ -22,6 +25,26 @@ export class ConsumerQuizApiClient extends BaseRestApiClient {
   public async listAttempts(uid: string, classroomId: string): Promise<QuizAttemptRecord[]> {
     return this.get<QuizAttemptRecord[]>(
       `/api/v1/consumer/quiz/${uid}/attempts/?classroom_id=${encodeURIComponent(classroomId)}`
+    );
+  }
+
+  public async getLeaderboard(
+    uid: string,
+    classroomId: string,
+    limit = 20,
+  ): Promise<QuizLeaderboardResponse> {
+    return this.get<QuizLeaderboardResponse>(
+      `/api/v1/consumer/quiz/${uid}/leaderboard/?classroom_id=${encodeURIComponent(classroomId)}&limit=${limit}`,
+    );
+  }
+
+  public async getStudentLeaderboard(
+    uid: string,
+    classroomId: string,
+    studentUid: string,
+  ): Promise<QuizLeaderboardStudentDetail> {
+    return this.get<QuizLeaderboardStudentDetail>(
+      `/api/v1/consumer/quiz/${uid}/leaderboard/${studentUid}/?classroom_id=${encodeURIComponent(classroomId)}`,
     );
   }
 }

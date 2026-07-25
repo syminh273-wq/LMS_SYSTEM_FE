@@ -3,6 +3,7 @@ import type {
   Quiz, QuizDetail, QuizTypeOption, GenerateQuizRequest,
   UpdateQuizRequest, UpdateAssignmentRequest, UpdateQuestionRequest,
   QuizQuestion, QuizStreamEvent, QuizAttemptRecord, QuizAssignment,
+  QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
 } from './types';
 
 export class QuizApiClient extends BaseRestApiClient {
@@ -97,6 +98,24 @@ export class QuizApiClient extends BaseRestApiClient {
     return this.patch<QuizAssignment>(`/api/v1/space/quiz/${uid}/assign/${classroomId}/`, data);
   }
 
+  public async closeAssignment(
+    uid: string,
+    classroomId: string,
+    closesAt?: string | null,
+  ): Promise<QuizAssignment> {
+    const body: Record<string, unknown> = {};
+    if (closesAt) body.closes_at = closesAt;
+    return this.post<QuizAssignment>(`/api/v1/space/quiz/${uid}/assign/${classroomId}/close/`, body);
+  }
+
+  public async reopenAssignment(
+    uid: string,
+    classroomId: string,
+    opts: { opens_at?: string | null; closes_at?: string | null } = {},
+  ): Promise<QuizAssignment> {
+    return this.post<QuizAssignment>(`/api/v1/space/quiz/${uid}/assign/${classroomId}/reopen/`, opts);
+  }
+
   public async unassignFromClassroom(uid: string, classroomId: string): Promise<void> {
     return super.delete<void>(`/api/v1/space/quiz/${uid}/unassign/${classroomId}/`);
   }
@@ -104,6 +123,26 @@ export class QuizApiClient extends BaseRestApiClient {
   public async getAttempts(uid: string, classroomId: string): Promise<QuizAttemptRecord[]> {
     return this.get<QuizAttemptRecord[]>(
       `/api/v1/space/quiz/${uid}/attempts/?classroom_id=${encodeURIComponent(classroomId)}`
+    );
+  }
+
+  public async getLeaderboard(
+    uid: string,
+    classroomId: string,
+    limit = 20,
+  ): Promise<QuizLeaderboardResponse> {
+    return this.get<QuizLeaderboardResponse>(
+      `/api/v1/space/quiz/${uid}/assign/${classroomId}/leaderboard/?limit=${limit}`,
+    );
+  }
+
+  public async getStudentLeaderboard(
+    uid: string,
+    classroomId: string,
+    studentUid: string,
+  ): Promise<QuizLeaderboardStudentDetail> {
+    return this.get<QuizLeaderboardStudentDetail>(
+      `/api/v1/space/quiz/${uid}/assign/${classroomId}/leaderboard/${studentUid}/`,
     );
   }
 

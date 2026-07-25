@@ -377,6 +377,74 @@ export type QuizAttemptRecord = QuizPlayRecord;
 
 export type QuizPublicDetail = QuizSummary & {
   questions: QuizQuestionPublic[];
+  time_limit_seconds?: number;
+  max_attempts?: number;
+  shuffle_questions?: boolean;
+  shuffle_options?: boolean;
+  show_explanation?: boolean;
+  passing_score_pct?: number;
+  is_closed?: boolean;
+  is_open?: boolean;
+  is_expired?: boolean;
+  opens_at?: string | null;
+  closes_at?: string | null;
+  closed_at?: string | null;
+};
+
+export type QuizLeaderboardEntry = {
+  rank: number;
+  student_id: string;
+  student_name: string;
+  student_avatar: string;
+  best_score_pct: number;
+  best_score: number;
+  best_total_questions: number;
+  best_time_taken_seconds: number;
+  best_attempt_uid: string | null;
+  best_attempt_number: number;
+  best_submitted_at: string | null;
+  attempts_count: number;
+};
+
+export type QuizLeaderboardMe = {
+  rank: number;
+  best_score_pct: number;
+  best_time_taken_seconds: number;
+  best_attempt_uid: string | null;
+  attempts_count: number;
+};
+
+export type QuizLeaderboardResponse = {
+  quiz_id: string;
+  classroom_id: string;
+  total_students: number;
+  top_3: QuizLeaderboardEntry[];
+  entries: QuizLeaderboardEntry[];
+  me: QuizLeaderboardMe | null;
+  closed_at?: string | null;
+  closes_at?: string | null;
+};
+
+export type QuizLeaderboardAttempt = {
+  attempt_uid: string | null;
+  attempt_number: number;
+  score: number;
+  total_questions: number;
+  score_pct: number;
+  time_taken_seconds: number;
+  submitted_at: string | null;
+};
+
+export type QuizLeaderboardStudentDetail = {
+  student_id: string;
+  student_name: string;
+  student_avatar: string;
+  rank: number | null;
+  best_score_pct: number;
+  best_time_taken_seconds: number;
+  best_attempt_uid: string | null;
+  attempts_count: number;
+  attempts: QuizLeaderboardAttempt[];
 };
 
 export type QuizSubmitRequest = {
