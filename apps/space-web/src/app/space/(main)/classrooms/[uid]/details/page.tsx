@@ -70,6 +70,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { quizApi } from '@/lib/api/quiz';
+import QuizLeaderboardModal from '@/components/quiz/QuizLeaderboardModal';
 import type { Quiz } from '@/lib/api/types';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import { Button } from '@shared/components/ui/button';
@@ -274,6 +275,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [showOpenExamModal, setShowOpenExamModal] = useState(false);
   const [unassigningUid, setUnassigningUid] = useState<string | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+  const [leaderboardQuiz, setLeaderboardQuiz] = useState<Quiz | null>(null);
   const activeMeeting = meetingRooms.find(room => room.status === 'active') || null;
   const { localStream, remoteStream, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare, stopScreenShare, renegotiate } = useRTC(activeMeeting?.uid ?? null);
 
@@ -2190,6 +2192,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           </div>
                           <div className="flex items-center gap-2">
                             <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-10 rounded-xl px-4 gap-2 text-xs font-black uppercase tracking-wider text-amber-600 border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                              onClick={() => setLeaderboardQuiz(quiz)}
+                            >
+                              <Trophy size={14} />
+                              Bảng vàng
+                            </Button>
+                            <Button
                               variant="ghost"
                               size="icon"
                               className="h-11 w-11 rounded-xl text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100"
@@ -2206,6 +2217,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 )}
               </div>
             </div>
+          )}
+
+          {leaderboardQuiz && (
+            <QuizLeaderboardModal
+              quizUid={leaderboardQuiz.uid}
+              classroomId={uid}
+              onClose={() => setLeaderboardQuiz(null)}
+            />
           )}
 
           {activeTab === 'blacklist' && (

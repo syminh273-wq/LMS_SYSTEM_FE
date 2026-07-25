@@ -386,9 +386,11 @@ export type QuizPublicDetail = QuizSummary & {
   is_closed?: boolean;
   is_open?: boolean;
   is_expired?: boolean;
+  is_not_yet_open?: boolean;
   opens_at?: string | null;
   closes_at?: string | null;
   closed_at?: string | null;
+  server_now?: string | null;
 };
 
 export type QuizLeaderboardEntry = {
@@ -472,6 +474,8 @@ export type QuizResult = {
   }>;
   show_explanation?: boolean;
   certificate_issued?: IssuedCertificate[];
+  force_submitted?: boolean;
+  force_submit_reason?: string;
 };
 
 export type FaceClassroomSessionResponse = {

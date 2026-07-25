@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { parseVnDate } from '@shared/lib/datetime';
 import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
 import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment, QuizQuestion } from '@/lib/api/types';
@@ -31,7 +32,7 @@ function fmtSeconds(s: number): string {
 }
 
 function fmtTime(iso: string): string {
-  return new Date(iso).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+  return parseVnDate(iso)?.toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }) ?? '';
 }
 
 export default function QuizDetailPage({ params }: Props) {
@@ -594,13 +595,30 @@ function EditAssignmentModal({
   onClose: () => void;
   onUpdated: (a: QuizAssignment) => void;
 }) {
+  const toLocalInput = (iso: string | null | undefined): string => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const toIso = (local: string): string | null => {
+    if (!local) return null;
+    const d = new Date(local);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
   const [timeLimitMin, setTimeLimitMin] = useState(assignment.time_limit_seconds ? Math.round(assignment.time_limit_seconds / 60) : 0);
   const [maxAttempts, setMaxAttempts] = useState(assignment.max_attempts ?? 0);
   const [shuffleQuestions, setShuffleQuestions] = useState(assignment.shuffle_questions ?? false);
   const [shuffleOptions, setShuffleOptions] = useState(assignment.shuffle_options ?? false);
   const [showExplanation, setShowExplanation] = useState(assignment.show_explanation ?? true);
   const [passingScore, setPassingScore] = useState(assignment.passing_score_pct ?? 50);
+  const [opensAt, setOpensAt] = useState<string>(toLocalInput(assignment.opens_at));
+  const [closesAt, setClosesAt] = useState<string>(toLocalInput(assignment.closes_at));
   const [saving, setSaving] = useState(false);
+
+  const isClosed = !!assignment.is_closed;
 
   const handleSave = async () => {
     setSaving(true);
@@ -612,6 +630,8 @@ function EditAssignmentModal({
         shuffle_options: shuffleOptions,
         show_explanation: showExplanation,
         passing_score_pct: passingScore,
+        opens_at: toIso(opensAt),
+        closes_at: toIso(closesAt),
       });
       onUpdated(updated);
       toast.success('Đã cập nhật cài đặt');
@@ -668,6 +688,47 @@ function EditAssignmentModal({
                   className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
               </label>
             ))}
+          </div>
+
+          <div className="space-y-3 pt-2 border-t border-border">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                <Settings size={12} /> Trạng thái lớp học
+              </span>
+              <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
+                isClosed
+                  ? 'text-rose-600 bg-rose-50'
+                  : 'text-emerald-600 bg-emerald-50'
+              }`}>
+                {isClosed ? 'ĐÃ ĐÓNG' : 'ĐANG MỞ'}
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                <Clock size={12} /> Thời gian mở (tùy chọn)
+              </label>
+              <input
+                type="datetime-local"
+                value={opensAt}
+                onChange={e => setOpensAt(e.target.value)}
+                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                <Clock size={12} /> Thời gian đóng (tùy chọn)
+              </label>
+              <input
+                type="datetime-local"
+                value={closesAt}
+                onChange={e => setClosesAt(e.target.value)}
+                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
+              />
+              <p className="text-[10px] text-muted-foreground font-medium">
+                Để trống = mở vĩnh viễn. Khi tới giờ đóng, hệ thống tự khóa nộp bài.
+              </p>
+            </div>
           </div>
         </div>
 

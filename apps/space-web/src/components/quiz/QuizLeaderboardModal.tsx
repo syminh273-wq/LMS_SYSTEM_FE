@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Loader2, Trophy, X, Medal, Award, Clock, Crown, Users, Sparkles, Lock } from 'lucide-react';
-import { consumerQuizApi } from '@/lib/api/quiz';
+import { Loader2, Trophy, X, Medal, Award, Clock, Crown, Users, Sparkles } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { quizApi } from '@/lib/api/quiz';
 import type { QuizLeaderboardResponse, QuizLeaderboardEntry, QuizLeaderboardStudentDetail } from '@/lib/api/types';
 
 interface Props {
@@ -58,7 +58,7 @@ function avatarFor(name: string, avatarUrl: string | undefined, size: 'sm' | 'lg
     // eslint-disable-next-line @next/next/no-img-element
     <img src={avatarUrl} alt="" className={`${dim} rounded-full object-cover`} />
   ) : (
-    <div className={`${dim} rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white font-black flex items-center justify-center`}>
+    <div className={`${dim} rounded-full bg-gradient-to-br from-primary-brand to-fuchsia-500 text-white font-black flex items-center justify-center`}>
       {name?.[0]?.toUpperCase() ?? '?'}
     </div>
   );
@@ -75,7 +75,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    consumerQuizApi.getLeaderboard(quizUid, classroomId, 50)
+    quizApi.getLeaderboard(quizUid, classroomId, 50)
       .then(d => { if (!cancelled) setData(d); })
       .catch(err => {
         if (cancelled) return;
@@ -90,7 +90,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
   const openDetail = async (entry: QuizLeaderboardEntry) => {
     setLoadingDetail(true);
     try {
-      const d = await consumerQuizApi.getStudentLeaderboard(quizUid, classroomId, entry.student_id);
+      const d = await quizApi.getStudentLeaderboard(quizUid, classroomId, entry.student_id);
       setDetail(d);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Lỗi tải chi tiết');
@@ -146,30 +146,12 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
           ) : error ? (
             <div className="flex-1 flex flex-col items-center justify-center py-20 gap-3 text-center px-8">
               <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center">
-                <Lock size={28} className="text-rose-500" />
+                <X size={28} className="text-rose-500" />
               </div>
               <p className="text-sm font-bold text-foreground">{error}</p>
             </div>
           ) : !data ? null : (
             <div className="p-7 space-y-7">
-              {/* Me banner */}
-              {data.me && (
-                <div className="rounded-3xl border-2 border-indigo-200 bg-gradient-to-r from-indigo-50 via-violet-50 to-fuchsia-50 p-5 flex items-center gap-4 shadow-sm">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-indigo-500/30 ring-2 ring-white">
-                    #{data.me.rank}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">Vị trí của bạn</div>
-                    <div className="text-base font-black text-indigo-900 mt-0.5">
-                      {data.me.best_score_pct}% trong {data.total_students} học sinh
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/70 text-xs font-black text-indigo-700 ring-1 ring-indigo-100">
-                    <Clock size={12} /> {fmtSeconds(data.me.best_time_taken_seconds)}
-                  </div>
-                </div>
-              )}
-
               {/* Stat strip */}
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-sm">
@@ -193,7 +175,6 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[...data.top_3].sort((a, b) => a.rank - b.rank).map((e) => {
                       const isFirst = e.rank === 1;
-                      const isMe = data.me && data.me.rank === e.rank;
                       return (
                         <button
                           key={e.student_id}
@@ -211,13 +192,6 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                               <div className="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-amber-500/30 ring-2 ring-amber-200">
                                 Quán quân
-                              </div>
-                            </div>
-                          )}
-                          {isMe && (
-                            <div className="absolute top-3 right-3">
-                              <div className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[9px] font-black uppercase tracking-wider shadow-sm">
-                                Bạn
                               </div>
                             </div>
                           )}
@@ -346,7 +320,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => void openDetail(e)}
-                                    className="text-[10px] font-black text-indigo-600 hover:bg-indigo-50 h-8 px-3 rounded-lg"
+                                    className="text-[10px] font-black text-primary-brand hover:bg-primary-brand-light h-8 px-3 rounded-lg"
                                   >
                                     CHI TIẾT
                                   </Button>
@@ -385,7 +359,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
               className="bg-card rounded-3xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
               onClick={e => e.stopPropagation()}
             >
-              <div className="relative p-6 bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 text-white">
+              <div className="relative p-6 bg-gradient-to-br from-primary-brand to-fuchsia-500 text-white">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -438,7 +412,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                       className="flex items-center justify-between bg-muted/40 rounded-2xl p-3.5 ring-1 ring-border"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 rounded-lg px-2.5 py-1">
+                        <span className="text-[10px] font-black text-primary-brand bg-primary-brand-light rounded-lg px-2.5 py-1">
                           Lần #{a.attempt_number}
                         </span>
                         <span className={`text-lg font-black ${scoreColor(a.score_pct)}`}>{a.score_pct}%</span>
