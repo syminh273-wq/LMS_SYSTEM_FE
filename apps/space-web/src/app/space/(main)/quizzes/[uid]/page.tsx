@@ -3,23 +3,26 @@
 import * as React from 'react';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { parseVnDate } from '@shared/lib/datetime';
 import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
 import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, BookOpen, CheckCircle2,
   Plus, X, Link2, BarChart2, Clock, RotateCcw, Settings,
-  Shuffle, HelpCircle, Target
+  Shuffle, HelpCircle, Target, Lock, Trophy
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import EditQuestionModal from '@/components/quiz/EditQuestionModal';
+import CloseScheduleDialog from '@/components/quiz/CloseScheduleDialog';
+import LeaderboardTab from '@/components/quiz/LeaderboardTab';
 
 interface Props {
   params: Promise<{ uid: string }>;
 }
 
-type Tab = 'questions' | 'attempts';
+type Tab = 'questions' | 'attempts' | 'leaderboard';
 
 function fmtSeconds(s: number): string {
   if (!s) return '–';
@@ -29,7 +32,7 @@ function fmtSeconds(s: number): string {
 }
 
 function fmtTime(iso: string): string {
-  return new Date(iso).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+  return parseVnDate(iso)?.toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }) ?? '';
 }
 
 export default function QuizDetailPage({ params }: Props) {
@@ -39,6 +42,7 @@ export default function QuizDetailPage({ params }: Props) {
   const [loading, setLoading] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<QuizAssignment | null>(null);
+  const [closeScheduleAssignment, setCloseScheduleAssignment] = useState<QuizAssignment | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('questions');
 
@@ -118,6 +122,7 @@ export default function QuizDetailPage({ params }: Props) {
   const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'questions', label: 'Câu hỏi', icon: <BookOpen size={14} /> },
     { key: 'attempts', label: 'Lượt làm', icon: <BarChart2 size={14} /> },
+    { key: 'leaderboard', label: 'Bảng vàng', icon: <Trophy size={14} /> },
   ];
 
   return (
@@ -150,31 +155,46 @@ export default function QuizDetailPage({ params }: Props) {
         </div>
       )}
 
-      {/* Assigned classrooms — each shows its settings + edit button */}
+      {/* Assigned classrooms — each shows its settings + edit + close buttons */}
       {assignments.length > 0 && (
         <div className="bg-primary-brand-light rounded-2xl p-4 border border-primary-brand-light">
           <div className="text-[10px] font-black uppercase text-primary-brand mb-3 tracking-wider">Đã phân công cho</div>
           <div className="flex flex-wrap gap-2">
-            {assignments.map(a => (
-              <div key={a.classroom_id}
-                className="flex items-center gap-2 bg-card rounded-xl px-3 py-2 border border-primary-brand-light text-xs font-bold text-primary-brand-dark">
-                <BookOpen size={12} />
-                <span className="font-mono">{a.classroom_id.slice(0, 8)}…</span>
-                {a.time_limit_seconds > 0 && (
-                  <span className="flex items-center gap-0.5 text-muted-foreground font-medium">
-                    <Clock size={11} />{Math.round(a.time_limit_seconds / 60)}p
-                  </span>
-                )}
-                <button type="button" onClick={() => setEditingAssignment(a)}
-                  className="text-muted-foreground/60 hover:text-primary-brand transition-colors">
-                  <Settings size={12} />
-                </button>
-                <button type="button" onClick={() => void handleUnassign(a.classroom_id)}
-                  className="text-muted-foreground/60 hover:text-rose-500 transition-colors">
-                  <X size={12} />
-                </button>
-              </div>
-            ))}
+            {assignments.map(a => {
+              const closed = !!a.is_closed;
+              return (
+                <div key={a.classroom_id}
+                  className="flex items-center gap-2 bg-card rounded-xl px-3 py-2 border border-primary-brand-light text-xs font-bold text-primary-brand-dark">
+                  <BookOpen size={12} />
+                  <span className="font-mono">{a.classroom_id.slice(0, 8)}…</span>
+                  {a.time_limit_seconds > 0 && (
+                    <span className="flex items-center gap-0.5 text-muted-foreground font-medium">
+                      <Clock size={11} />{Math.round(a.time_limit_seconds / 60)}p
+                    </span>
+                  )}
+                  {closed && (
+                    <span className="flex items-center gap-0.5 text-rose-600 bg-rose-50 rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase">
+                      <Lock size={9} /> Đã đóng
+                    </span>
+                  )}
+                  <button type="button" onClick={() => setEditingAssignment(a)}
+                    className="text-muted-foreground/60 hover:text-primary-brand transition-colors"
+                    title="Cài đặt">
+                    <Settings size={12} />
+                  </button>
+                  <button type="button" onClick={() => setCloseScheduleAssignment(a)}
+                    className={`transition-colors ${closed ? 'text-emerald-500 hover:text-emerald-700' : 'text-rose-500 hover:text-rose-700'}`}
+                    title={closed ? 'Mở lại / đặt lịch' : 'Đóng / đặt thời gian'}>
+                    {closed ? <RotateCcw size={12} /> : <Lock size={12} />}
+                  </button>
+                  <button type="button" onClick={() => void handleUnassign(a.classroom_id)}
+                    className="text-muted-foreground/60 hover:text-rose-500 transition-colors"
+                    title="Hủy phân công">
+                    <X size={12} />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -305,6 +325,38 @@ export default function QuizDetailPage({ params }: Props) {
         </div>
       )}
 
+      {/* ── Tab: Leaderboard ── */}
+      {activeTab === 'leaderboard' && (
+        <div className="space-y-4">
+          {assignments.length > 1 && (
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-black text-muted-foreground">Lớp học:</span>
+              <div className="flex gap-2 flex-wrap">
+                {assignments.map(a => (
+                  <button key={a.classroom_id} type="button"
+                    onClick={() => setSelectedClassroomId(a.classroom_id)}
+                    className={`text-xs font-black rounded-xl px-3 py-1.5 transition-all ${
+                      selectedClassroomId === a.classroom_id
+                        ? 'bg-primary-brand text-white'
+                        : 'bg-muted text-muted-foreground hover:bg-muted'
+                    }`}>
+                    {a.classroom_id.slice(0, 8)}…
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {!selectedClassroomId ? (
+            <div className="bg-card rounded-2xl border border-border p-16 text-center text-muted-foreground">
+              <Trophy size={40} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm font-medium">Chọn lớp học để xem bảng vàng</p>
+            </div>
+          ) : (
+            <LeaderboardTab quizUid={quiz.uid} classroomId={selectedClassroomId} />
+          )}
+        </div>
+      )}
+
       {showAssignModal && (
         <AssignToClassroomModal
           quizUid={quiz.uid}
@@ -319,6 +371,15 @@ export default function QuizDetailPage({ params }: Props) {
           quizUid={quiz.uid}
           assignment={editingAssignment}
           onClose={() => setEditingAssignment(null)}
+          onUpdated={handleAssignmentUpdated}
+        />
+      )}
+
+      {closeScheduleAssignment && (
+        <CloseScheduleDialog
+          quizUid={quiz.uid}
+          assignment={closeScheduleAssignment}
+          onClose={() => setCloseScheduleAssignment(null)}
           onUpdated={handleAssignmentUpdated}
         />
       )}
@@ -354,6 +415,15 @@ function AssignToClassroomModal({
   const [shuffleOptions, setShuffleOptions] = useState(false);
   const [showExplanation, setShowExplanation] = useState(true);
   const [passingScore, setPassingScore] = useState(50);
+  const [opensAt, setOpensAt] = useState<string>('');
+  const [closesAt, setClosesAt] = useState<string>('');
+
+  const toIso = (local: string): string | null => {
+    if (!local) return null;
+    const d = new Date(local);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString();
+  };
 
   useEffect(() => {
     classroomApi.list()
@@ -372,6 +442,8 @@ function AssignToClassroomModal({
         shuffle_options: shuffleOptions,
         show_explanation: showExplanation,
         passing_score_pct: passingScore,
+        opens_at: toIso(opensAt),
+        closes_at: toIso(closesAt),
       });
       onAssigned(assignment);
       toast.success('Đã phân công quiz cho lớp học');
@@ -447,6 +519,34 @@ function AssignToClassroomModal({
                   </div>
                 </label>
               </div>
+
+              <div className="space-y-3 pt-2 border-t border-border">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                    <Clock size={12} /> Thời gian mở (tùy chọn)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={opensAt}
+                    onChange={e => setOpensAt(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                    <Clock size={12} /> Thời gian đóng (tùy chọn)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={closesAt}
+                    onChange={e => setClosesAt(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
+                  />
+                  <p className="text-[10px] text-muted-foreground font-medium">
+                    Để trống = mở vĩnh viễn. Khi tới giờ đóng, hệ thống tự khóa nộp bài và mở bảng vàng cho học sinh.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -495,13 +595,30 @@ function EditAssignmentModal({
   onClose: () => void;
   onUpdated: (a: QuizAssignment) => void;
 }) {
+  const toLocalInput = (iso: string | null | undefined): string => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const toIso = (local: string): string | null => {
+    if (!local) return null;
+    const d = new Date(local);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  };
+
   const [timeLimitMin, setTimeLimitMin] = useState(assignment.time_limit_seconds ? Math.round(assignment.time_limit_seconds / 60) : 0);
   const [maxAttempts, setMaxAttempts] = useState(assignment.max_attempts ?? 0);
   const [shuffleQuestions, setShuffleQuestions] = useState(assignment.shuffle_questions ?? false);
   const [shuffleOptions, setShuffleOptions] = useState(assignment.shuffle_options ?? false);
   const [showExplanation, setShowExplanation] = useState(assignment.show_explanation ?? true);
   const [passingScore, setPassingScore] = useState(assignment.passing_score_pct ?? 50);
+  const [opensAt, setOpensAt] = useState<string>(toLocalInput(assignment.opens_at));
+  const [closesAt, setClosesAt] = useState<string>(toLocalInput(assignment.closes_at));
   const [saving, setSaving] = useState(false);
+
+  const isClosed = !!assignment.is_closed;
 
   const handleSave = async () => {
     setSaving(true);
@@ -513,6 +630,8 @@ function EditAssignmentModal({
         shuffle_options: shuffleOptions,
         show_explanation: showExplanation,
         passing_score_pct: passingScore,
+        opens_at: toIso(opensAt),
+        closes_at: toIso(closesAt),
       });
       onUpdated(updated);
       toast.success('Đã cập nhật cài đặt');
@@ -569,6 +688,47 @@ function EditAssignmentModal({
                   className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
               </label>
             ))}
+          </div>
+
+          <div className="space-y-3 pt-2 border-t border-border">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                <Settings size={12} /> Trạng thái lớp học
+              </span>
+              <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
+                isClosed
+                  ? 'text-rose-600 bg-rose-50'
+                  : 'text-emerald-600 bg-emerald-50'
+              }`}>
+                {isClosed ? 'ĐÃ ĐÓNG' : 'ĐANG MỞ'}
+              </span>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                <Clock size={12} /> Thời gian mở (tùy chọn)
+              </label>
+              <input
+                type="datetime-local"
+                value={opensAt}
+                onChange={e => setOpensAt(e.target.value)}
+                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                <Clock size={12} /> Thời gian đóng (tùy chọn)
+              </label>
+              <input
+                type="datetime-local"
+                value={closesAt}
+                onChange={e => setClosesAt(e.target.value)}
+                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
+              />
+              <p className="text-[10px] text-muted-foreground font-medium">
+                Để trống = mở vĩnh viễn. Khi tới giờ đóng, hệ thống tự khóa nộp bài.
+              </p>
+            </div>
           </div>
         </div>
 

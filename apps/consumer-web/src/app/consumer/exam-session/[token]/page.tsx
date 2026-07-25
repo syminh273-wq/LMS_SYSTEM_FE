@@ -32,6 +32,7 @@ import { examSessionApi, type ProctoringEventType } from '@/lib/api/exam-session
 import { classroomApi } from '@/lib/api/classroom';
 import { FaceMonitorWidget, type FaceEventType, type MonitorResult } from '@/components/face/face-monitor-widget';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { parseVnDate } from '@shared/lib/datetime';
 import type { Exam, ExamSessionInfo } from '@/lib/api/types';
 
 interface Props {
@@ -66,7 +67,7 @@ export default function ExamSessionPage({ params }: Props) {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timeExpired, setTimeExpired] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const autoSubmittedRef = useRef(false);
 
   // Camera enforcement
@@ -651,12 +652,12 @@ export default function ExamSessionPage({ params }: Props) {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
                     <span className="font-bold text-slate-600">Thời gian nộp</span>
-                    <span className="font-black text-slate-900">{sub?.submitted_at ? new Date(sub.submitted_at).toLocaleString('vi-VN') : '—'}</span>
+                    <span className="font-black text-slate-900">{sub?.submitted_at ? parseVnDate(sub.submitted_at)?.toLocaleString('vi-VN') : '—'}</span>
                   </div>
                   {sub?.force_submitted_at && (
                     <div className="flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
                       <span className="font-bold text-rose-600">Bị nộp bắt buộc lúc</span>
-                      <span className="font-black text-rose-700">{new Date(sub.force_submitted_at).toLocaleString('vi-VN')}</span>
+                      <span className="font-black text-rose-700">{parseVnDate(sub.force_submitted_at)?.toLocaleString('vi-VN')}</span>
                     </div>
                   )}
                   {sub?.quiz_result && (
@@ -957,6 +958,13 @@ export default function ExamSessionPage({ params }: Props) {
             </div>
           )}
 
+          {exam.due_date && (
+            <div className="hidden md:flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-700">
+              <Clock size={13} />
+              Hạn: {parseVnDate(exam.due_date)?.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
+            </div>
+          )}
+
           {isOnline && (
             exam.camera_required ? (
               <div className={`flex items-center gap-1.5 rounded-xl px-3 py-2 ${cameraStatus?.recognized ? 'bg-emerald-50' : cameraStatus?.camera_open ? 'bg-amber-50' : 'bg-rose-50'}`}>
@@ -1045,7 +1053,7 @@ export default function ExamSessionPage({ params }: Props) {
             {exam.due_date && (
               <span className="flex items-center gap-1.5">
                 <Clock size={13} className="text-indigo-500" />
-                Hạn nộp: {new Date(exam.due_date).toLocaleString('vi-VN')}
+                Hạn nộp: {parseVnDate(exam.due_date)?.toLocaleString('vi-VN')}
               </span>
             )}
             {exam.duration_seconds && exam.duration_seconds > 0 && (

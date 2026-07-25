@@ -395,3 +395,15 @@ input:-webkit-autofill:active {
     transition-duration: 0.01ms !important;
   }
 }
+
+@keyframes timer-shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-2px) rotate(-1.5deg); }
+  40% { transform: translateX(2px) rotate(1.5deg); }
+  60% { transform: translateX(-1.5px) rotate(-1deg); }
+  80% { transform: translateX(1.5px) rotate(1deg); }
+}
+
+.timer-shake {
+  animation: timer-shake 0.6s ease-in-out infinite;
+}
