@@ -86,7 +86,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
+        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800">
           <DialogTitle>
             {initial ? t('portfolio.labels.edit_education') : t('portfolio.labels.add_education')}
           </DialogTitle>
@@ -122,7 +122,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <p className="text-xs font-bold text-slate-700 mb-1">{t('portfolio.labels.start_year_month')}</p>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">{t('portfolio.labels.start_year_month')}</p>
             <div className="grid grid-cols-2 gap-2">
               <select
                 value={form.start_month}
@@ -153,10 +153,10 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-bold text-slate-700">
-                {t('portfolio.labels.end_year_month')} <span className="font-normal text-slate-500">({t('portfolio.labels.end_expected')})</span>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                {t('portfolio.labels.end_year_month')} <span className="font-normal text-slate-500 dark:text-slate-400">({t('portfolio.labels.end_expected')})</span>
               </p>
-              <label className="flex items-center gap-1.5 text-xs text-slate-600">
+              <label className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
                 <input
                   type="checkbox"
                   checked={form.is_current}
@@ -234,13 +234,13 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
           </Field>
 
           <div>
-            <p className="text-xs font-bold text-slate-700 mb-1">{t('portfolio.me.skills')}</p>
-            <p className="text-[11px] text-slate-500 mb-2">{t('portfolio.labels.skills_helper')}</p>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">{t('portfolio.me.skills')}</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">{t('portfolio.labels.skills_helper')}</p>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {form.skills.map((skill) => (
                 <span
                   key={skill}
-                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-100 text-xs text-slate-700"
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-xs text-slate-700 dark:text-slate-300"
                 >
                   {skill}
                   <button
@@ -276,7 +276,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
             )}
           </div>
         </div>
-        <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+        <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-6 py-3 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             {t('portfolio.me.cancel')}
           </Button>
@@ -295,7 +295,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
 }
 
 const inputCls =
-  'w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none disabled:bg-slate-50 disabled:text-slate-400';
+  'w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none disabled:bg-slate-50 dark:bg-slate-900/50 disabled:text-slate-400';
 
 function Field({
   label,
@@ -308,7 +308,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="block text-xs font-bold text-slate-700 mb-1">
+      <span className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </span>

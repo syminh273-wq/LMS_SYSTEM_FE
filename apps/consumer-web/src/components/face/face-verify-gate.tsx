@@ -119,7 +119,7 @@ export function FaceVerifyGate({ examUid, children }: Props) {
 
   if (gateState === 'checking') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900/50">
         <Loader2 size={32} className="animate-spin text-indigo-500" />
       </div>
     );
@@ -127,14 +127,14 @@ export function FaceVerifyGate({ examUid, children }: Props) {
 
   if (gateState === 'not_enrolled') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
-        <div className="w-full max-w-sm space-y-5 rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 p-4">
+        <div className="w-full max-w-sm space-y-5 rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 text-center shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-600">
             <UserX size={32} />
           </div>
           <div>
-            <h2 className="text-xl font-black text-slate-900">Chưa đăng ký khuôn mặt</h2>
-            <p className="mt-2 text-sm font-medium text-slate-500">
+            <h2 className="text-xl font-black text-slate-900 dark:text-slate-100">Chưa đăng ký khuôn mặt</h2>
+            <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
               Bạn cần đăng ký khuôn mặt trước khi làm bài kiểm tra.
             </p>
           </div>
@@ -162,14 +162,14 @@ export function FaceVerifyGate({ examUid, children }: Props) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 px-6 py-5 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 p-4">
+      <div className="w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+        <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-5 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
             <ScanFace size={24} />
           </div>
-          <h2 className="text-lg font-black text-slate-900">Xác minh danh tính</h2>
-          <p className="mt-1 text-sm font-medium text-slate-500">
+          <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">Xác minh danh tính</h2>
+          <p className="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
             Nhìn thẳng vào camera rồi nhấn xác minh để vào làm bài
           </p>
         </div>
@@ -182,7 +182,7 @@ export function FaceVerifyGate({ examUid, children }: Props) {
               <video ref={videoRef} className="h-72 w-full object-cover" autoPlay muted playsInline />
 
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <div className="h-56 w-44 rounded-[50%] border-4 border-white/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.38)]" />
+                <div className="h-56 w-44 rounded-[50%] border-4 border-white dark:border-slate-900/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.38)]" />
               </div>
 
               {gateState === 'verifying' && (

@@ -30,11 +30,11 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-[440px] animate-fade-up">
         <Link
           href="/consumer/login"
-          className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 hover:text-slate-900 font-semibold mb-8 transition-colors group"
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 font-semibold mb-8 transition-colors group"
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
           Quay lại đăng nhập
@@ -44,17 +44,17 @@ export default function ForgotPasswordPage() {
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-md mb-5">
             <ShieldCheck size={22} strokeWidth={2.2} />
           </div>
-          <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 mb-1.5 tracking-tight text-balance">
+          <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 dark:text-slate-100 mb-1.5 tracking-tight text-balance">
             Quên mật khẩu?
           </h1>
-          <p className="text-slate-500 text-[14px]">
+          <p className="text-slate-500 dark:text-slate-400 text-[14px]">
             Nhập email tài khoản, chúng tôi sẽ gửi mã OTP để xác thực.
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[12px] font-semibold text-slate-700">
+            <label className="text-[12px] font-semibold text-slate-700 dark:text-slate-300">
               Địa chỉ Email
             </label>
             <div className="relative">
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
                 {...register('email', { required: 'Vui lòng nhập email' })}
                 type="email"
                 placeholder="name@company.com"
-                className="h-11 pl-10 text-[14px] bg-white border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors"
+                className="h-11 pl-10 text-[14px] bg-white dark:bg-slate-900 border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors"
               />
             </div>
             {errors.email && (
@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
           >
             {loading ? (
               <>
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-white dark:border-slate-900/30 border-t-white rounded-full animate-spin" />
                 Đang gửi...
               </>
             ) : (

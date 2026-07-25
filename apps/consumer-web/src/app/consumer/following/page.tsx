@@ -91,25 +91,25 @@ export default function FollowingPage() {
         <div className="mb-4 flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors"
+            className="h-9 w-9 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900/50 transition-colors"
             aria-label="Quay lại"
           >
             <ArrowLeft size={16} />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="text-[20px] font-bold text-slate-900 flex items-center gap-2">
+            <h1 className="text-[20px] font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <UserCheck size={18} className="text-indigo-600" />
               Đang theo dõi
             </h1>
-            <p className="text-[12.5px] text-slate-500">
+            <p className="text-[12.5px] text-slate-500 dark:text-slate-400">
               {me ? `${me.full_name || me.username || 'Bạn'} · ` : ''}
               {count} người
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl card-elevated overflow-hidden">
-          <div className="p-3 border-b border-slate-200">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl card-elevated overflow-hidden">
+          <div className="p-3 border-b border-slate-200 dark:border-slate-700">
             <div className="relative">
               <Search
                 size={14}
@@ -119,12 +119,12 @@ export default function FollowingPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tìm trong danh sách..."
-                className="w-full h-10 pl-9 pr-9 rounded-lg bg-slate-50 border border-slate-200 text-[13.5px] outline-none focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-colors"
+                className="w-full h-10 pl-9 pr-9 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-[13.5px] outline-none focus:bg-white dark:bg-slate-900 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-colors"
               />
               {query && (
                 <button
                   onClick={() => setQuery('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full text-slate-400 hover:text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center"
                   aria-label="Xóa"
                 >
                   <X size={12} />
@@ -136,11 +136,11 @@ export default function FollowingPage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
               <Loader2 size={24} className="animate-spin text-indigo-600" />
-              <p className="text-[12.5px] text-slate-500">Đang tải...</p>
+              <p className="text-[12.5px] text-slate-500 dark:text-slate-400">Đang tải...</p>
             </div>
           ) : error ? (
             <div className="py-16 text-center">
-              <p className="text-[13.5px] text-slate-600 mb-3">{error}</p>
+              <p className="text-[13.5px] text-slate-600 dark:text-slate-400 mb-3">{error}</p>
               <button
                 onClick={() => window.location.reload()}
                 className="inline-flex items-center h-9 px-4 rounded-full bg-indigo-600 text-white text-[12.5px] font-semibold hover:bg-indigo-700"
@@ -150,11 +150,11 @@ export default function FollowingPage() {
             </div>
           ) : users.length === 0 ? (
             <div className="py-16 text-center px-6">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                 <UserCheck size={28} className="text-slate-400" />
               </div>
-              <p className="font-semibold text-slate-900 text-[15px]">Bạn chưa theo dõi ai</p>
-              <p className="text-[13px] text-slate-500 mt-1 mb-4">
+              <p className="font-semibold text-slate-900 dark:text-slate-100 text-[15px]">Bạn chưa theo dõi ai</p>
+              <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1 mb-4">
                 Khám phá những người bạn có thể quan tâm.
               </p>
               <Link
@@ -165,7 +165,7 @@ export default function FollowingPage() {
               </Link>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="py-12 text-center text-[13px] text-slate-500">
+            <div className="py-12 text-center text-[13px] text-slate-500 dark:text-slate-400">
               Không tìm thấy kết quả cho &ldquo;{query}&rdquo;
             </div>
           ) : (
@@ -176,23 +176,23 @@ export default function FollowingPage() {
                 return (
                   <li
                     key={u.consumer_uid}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:bg-slate-900/50 transition-colors"
                   >
                     <Link
                       href={`/consumer/profile/${u.consumer_uid}`}
                       className="flex items-center gap-3 flex-1 min-w-0"
                     >
-                      <Avatar className="h-11 w-11 ring-2 ring-white shadow-sm shrink-0">
+                      <Avatar className="h-11 w-11 ring-2 ring-white dark:ring-slate-900 shadow-sm shrink-0">
                         <AvatarImage src={u.avatar || ''} alt={u.name} />
                         <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-violet-600 text-[12px] font-black text-white">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[14px] font-semibold text-slate-900 truncate">
+                        <p className="text-[14px] font-semibold text-slate-900 dark:text-slate-100 truncate">
                           {u.name || 'Người dùng'}
                         </p>
-                        <p className="text-[11.5px] text-slate-500 truncate">
+                        <p className="text-[11.5px] text-slate-500 dark:text-slate-400 truncate">
                           Học sinh
                         </p>
                       </div>
@@ -200,7 +200,7 @@ export default function FollowingPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => handleMessage(u.consumer_uid)}
-                        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-slate-200 text-[12.5px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
+                        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-slate-200 dark:border-slate-700 text-[12.5px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:bg-slate-900/50 hover:text-indigo-600 transition-colors"
                         title="Nhắn tin"
                       >
                         <Mail size={13} />

@@ -122,7 +122,7 @@ export function ConsumerProfileDropdown() {
   }> = [
     { label: 'Thông báo',  Icon: Bell,        bg: 'bg-sky-100',     color: 'text-sky-600' },
     { label: 'Ngôn ngữ',   Icon: Globe,       bg: 'bg-teal-100',    color: 'text-teal-600' },
-    { label: 'Dark mode',  Icon: Moon,        bg: 'bg-slate-100',   color: 'text-slate-600' },
+    { label: 'Dark mode',  Icon: Moon,        bg: 'bg-slate-100 dark:bg-slate-800',   color: 'text-slate-600 dark:text-slate-400' },
     { label: 'Trợ giúp',   Icon: HelpCircle,  bg: 'bg-orange-100',  color: 'text-orange-600' },
   ];
 
@@ -154,7 +154,7 @@ export function ConsumerProfileDropdown() {
         align="end"
         sideOffset={8}
         style={{ width: '280px', minWidth: '280px' }}
-        className="rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl"
+        className="rounded-2xl border border-gray-100 bg-white dark:bg-slate-900 p-1.5 shadow-xl"
       >
         <button
           onClick={goToProfile}

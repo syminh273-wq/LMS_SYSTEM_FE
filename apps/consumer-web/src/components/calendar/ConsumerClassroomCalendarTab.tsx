@@ -132,8 +132,8 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
             <CalendarDays size={18} />
           </div>
           <div>
-            <h3 className="text-[15px] font-bold text-slate-900">{t('calendar.labels.title', 'Academic Calendar')}</h3>
-            <p className="text-[12px] text-slate-500">
+            <h3 className="text-[15px] font-bold text-slate-900 dark:text-slate-100">{t('calendar.labels.title', 'Academic Calendar')}</h3>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400">
               {classroomName ?? t('calendar.labels.subtitle', 'Classroom events')}
             </p>
           </div>
@@ -143,7 +143,7 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as CalendarEventType | 'all')}
-            className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12.5px] font-semibold text-slate-700 outline-none focus:border-indigo-500"
+            className="h-9 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 text-[12.5px] font-semibold text-slate-700 dark:text-slate-300 outline-none focus:border-indigo-500"
           >
             {TYPE_FILTERS.map((f) => (
               <option key={f.key} value={f.key}>
@@ -156,11 +156,11 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
+        <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
           <button
             type="button"
             onClick={goPrev}
-            className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+            className="p-1.5 hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 transition-colors"
             aria-label="Previous"
           >
             <ChevronLeft size={14} />
@@ -169,7 +169,7 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
           <button
             type="button"
             onClick={goNext}
-            className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+            className="p-1.5 hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 transition-colors"
             aria-label="Next"
           >
             <ChevronRight size={14} />
@@ -178,11 +178,11 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
         <button
           type="button"
           onClick={goToday}
-          className="h-9 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12px] font-semibold hover:bg-slate-50"
+          className="h-9 px-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[12px] font-semibold hover:bg-slate-50 dark:bg-slate-900/50"
         >
           {locale === 'vi' ? 'Hôm nay' : 'Today'}
         </button>
-        <span className="text-[14px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
+        <span className="text-[14px] font-bold text-slate-900 dark:text-slate-100 capitalize ml-2">{headerLabel}</span>
       </div>
 
       {error && (
@@ -194,7 +194,7 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 relative">
           {loading && (
-            <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 text-[11px] text-slate-500">
+            <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400">
               <Clock size={11} className="animate-spin" />
               {t('calendar.labels.loading', 'Loading...')}
             </div>

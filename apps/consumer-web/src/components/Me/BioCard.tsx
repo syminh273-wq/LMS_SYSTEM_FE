@@ -28,13 +28,13 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
   const isLong = text.length > 220;
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xl font-bold text-slate-900">{t('workspace.profile.section_bio')}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{t('workspace.profile.section_bio')}</h2>
         {isOwner && (
           <button
             onClick={() => setOpen(true)}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400"
             aria-label={t('workspace.common.edit')}
           >
             <Pencil className="size-4" />
@@ -44,7 +44,7 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
       {bioHtml ? (
         <>
           <div
-            className="text-sm text-slate-800 leading-relaxed prose prose-sm max-w-none dark:prose-invert transition-[max-height] duration-300 ease-out"
+            className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed prose prose-sm max-w-none dark:prose-invert transition-[max-height] duration-300 ease-out"
             style={
               isLong && !expanded
                 ? {
@@ -75,7 +75,7 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
       )}
 
       {profile.skills && profile.skills.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-slate-100">
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">
             {t('workspace.profile.section_skills')}
           </h3>

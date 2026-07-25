@@ -88,7 +88,7 @@ export function XpLevelCard({ profile, t }: XpLevelCardProps) {
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
                 <div
-                  className="h-full rounded-full bg-white transition-all"
+                  className="h-full rounded-full bg-white dark:bg-slate-900 transition-all"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -125,14 +125,14 @@ export function XpCounters({ profile, t }: XpLevelCardProps) {
             return (
               <div
                 key={it.key}
-                className="flex items-center gap-2.5 rounded-lg border border-slate-200/70 bg-slate-50/50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/40"
+                className="flex items-center gap-2.5 rounded-lg border border-slate-200 dark:border-slate-700/70 bg-slate-50 dark:bg-slate-900/50/50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/40"
               >
                 <Icon className={cn('h-4 w-4 shrink-0', it.color)} />
                 <div className="min-w-0">
                   <div className="text-base font-black text-slate-900 dark:text-white">
                     {it.value}
                   </div>
-                  <div className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                  <div className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     {t(`ranking.counter_${it.key}`, it.key)}
                   </div>
                 </div>

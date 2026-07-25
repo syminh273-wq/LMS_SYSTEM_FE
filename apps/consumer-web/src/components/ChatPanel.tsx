@@ -87,13 +87,13 @@ function Avatar({ name, url, side }: { name: string; url?: string; side: 'left' 
       <img
         src={url}
         alt={name}
-        className="w-7 h-7 rounded-full object-cover ring-2 ring-white shadow-sm shrink-0"
+        className="w-7 h-7 rounded-full object-cover ring-2 ring-white dark:ring-slate-900 shadow-sm shrink-0"
       />
     );
   }
   return (
     <div
-      className={`w-7 h-7 rounded-full bg-gradient-to-br ${grad} text-white text-xs font-bold flex items-center justify-center ring-2 ring-white shadow-sm shrink-0`}
+      className={`w-7 h-7 rounded-full bg-gradient-to-br ${grad} text-white text-xs font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900 shadow-sm shrink-0`}
     >
       {initials}
     </div>
@@ -154,8 +154,8 @@ export function ChatPanel({
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-white">
-      <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-white/80 backdrop-blur">
+    <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-slate-900">
+      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 bg-white/80 backdrop-blur">
         <StatusIcon status={status} />
         <span className="font-mono text-[10px] text-slate-400">#{conversationUid.slice(0, 8)}</span>
       </div>
@@ -169,14 +169,14 @@ export function ChatPanel({
             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center">
               <ImageIcon size={22} className="text-indigo-400" />
             </div>
-            <p className="font-medium text-slate-500">Chưa có tin nhắn nào</p>
+            <p className="font-medium text-slate-500 dark:text-slate-400">Chưa có tin nhắn nào</p>
             <p className="text-xs">Hãy gửi tin nhắn đầu tiên để bắt đầu cuộc trò chuyện</p>
           </div>
         ) : (
           grouped.map((group, gi) => (
             <div key={gi} className="space-y-2">
               <div className="flex items-center justify-center">
-                <span className="px-3 py-0.5 text-[10px] font-semibold text-slate-500 bg-slate-100 rounded-full uppercase tracking-wide">
+                <span className="px-3 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-full uppercase tracking-wide">
                   {group.day}
                 </span>
               </div>
@@ -204,7 +204,7 @@ export function ChatPanel({
 
                     <div className={`max-w-[75%] sm:max-w-[65%] flex flex-col ${me ? 'items-start' : 'items-end'}`}>
                       {!me && isFirstInGroup && m.sender_name && (
-                        <span className="text-[11px] font-semibold text-slate-600 mb-0.5 px-1">
+                        <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5 px-1">
                           {m.sender_name}
                         </span>
                       )}
@@ -213,7 +213,7 @@ export function ChatPanel({
                         className={
                           me
                             ? `bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 ${bubbleRadius} px-3.5 py-2`
-                            : `bg-white border border-slate-200 text-slate-900 shadow-sm ${bubbleRadius} px-3.5 py-2`
+                            : `bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 shadow-sm ${bubbleRadius} px-3.5 py-2`
                         }
                       >
                         {m.attachment?.url && (

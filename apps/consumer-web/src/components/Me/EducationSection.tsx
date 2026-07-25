@@ -46,13 +46,13 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
   };
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-slate-900">{t('portfolio.me.education')}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{t('portfolio.me.education')}</h2>
         {isOwner && (
           <button
             onClick={() => setAdding(true)}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400"
             aria-label={t('portfolio.me.add')}
           >
             <Plus className="size-4" />
@@ -70,7 +70,7 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
             return (
               <div
                 key={item.uid}
-                className={`flex gap-4 group ${!isLast ? 'border-b border-slate-100 pb-5' : ''}`}
+                className={`flex gap-4 group ${!isLast ? 'border-b border-slate-100 dark:border-slate-800 pb-5' : ''}`}
               >
                 <div className="w-12 h-12 rounded bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 text-xl">
                   <GraduationCap className="size-5" />
@@ -79,9 +79,9 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                   <CollapsibleItem
                     summary={
                       <>
-                        <p className="text-base font-semibold text-slate-900">{v.school}</p>
+                        <p className="text-base font-semibold text-slate-900 dark:text-slate-100">{v.school}</p>
                         {(v.degree || v.field_of_study) && (
-                          <p className="text-sm text-slate-700">
+                          <p className="text-sm text-slate-700 dark:text-slate-300">
                             {[v.degree, v.field_of_study].filter(Boolean).join(', ')}
                           </p>
                         )}
@@ -91,25 +91,25 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                     details={
                       <>
                         {v.grade && (
-                          <p className="text-xs text-slate-600">
-                            <span className="text-slate-500">{t('portfolio.labels.grade')}:</span> {v.grade}
+                          <p className="text-xs text-slate-600 dark:text-slate-400">
+                            <span className="text-slate-500 dark:text-slate-400">{t('portfolio.labels.grade')}:</span> {v.grade}
                           </p>
                         )}
                         {v.activities_and_societies && (
-                          <p className="text-xs text-slate-600 mt-1">
-                            <span className="text-slate-500">{t('portfolio.labels.activities_and_societies')}:</span>{' '}
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                            <span className="text-slate-500 dark:text-slate-400">{t('portfolio.labels.activities_and_societies')}:</span>{' '}
                             {v.activities_and_societies}
                           </p>
                         )}
                         {v.description && (
-                          <p className="text-sm text-slate-700 mt-2 whitespace-pre-line">{v.description}</p>
+                          <p className="text-sm text-slate-700 dark:text-slate-300 mt-2 whitespace-pre-line">{v.description}</p>
                         )}
                         {v.skills.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {v.skills.map((s) => (
                               <span
                                 key={s}
-                                className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-[11px] text-slate-700"
+                                className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-700 dark:text-slate-300"
                               >
                                 {s}
                               </span>
@@ -122,7 +122,7 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                 </div>
                 {isOwner && (
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100">
+                    <DropdownMenuTrigger className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100">
                       <MoreHorizontal className="size-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -182,5 +182,5 @@ function PeriodLine({ v, monthLabel }: { v: EducationValue; monthLabel: (m: stri
   }
   if (!start && !end) return null;
   const text = start && end ? `${start} – ${end}` : start || end;
-  return <p className="text-xs text-slate-500 mt-0.5">{text}</p>;
+  return <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{text}</p>;
 }

@@ -94,10 +94,10 @@ export default function RegisterPage() {
               </div>
 
               <div className="mb-7 text-center">
-                <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2 tracking-tight dark:text-white text-balance">
                   Đăng Ký
                 </h2>
-                <p className="text-slate-600 text-[15px] dark:text-slate-400">
+                <p className="text-slate-600 dark:text-slate-400 text-[15px] dark:text-slate-400">
                   Trở thành học viên của LMS System ngay hôm nay.
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function RegisterPage() {
                     <Input
                       {...register('last_name', { required: 'Bắt buộc' })}
                       placeholder="Nguyễn"
-                      className="h-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                      className="h-11 text-sm bg-white dark:bg-slate-900 border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                     />
                     {errors.last_name && <p className="text-rose-600 text-xs font-medium">{errors.last_name.message}</p>}
                   </div>
@@ -132,7 +132,7 @@ export default function RegisterPage() {
                     <Input
                       {...register('first_name', { required: 'Bắt buộc' })}
                       placeholder="An"
-                      className="h-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                      className="h-11 text-sm bg-white dark:bg-slate-900 border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                     />
                     {errors.first_name && <p className="text-rose-600 text-xs font-medium">{errors.first_name.message}</p>}
                   </div>
@@ -147,7 +147,7 @@ export default function RegisterPage() {
                       type="email"
                       autoComplete="email"
                       placeholder="name@company.com"
-                      className="h-11 pl-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                      className="h-11 pl-10 text-sm bg-white dark:bg-slate-900 border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                     />
                   </div>
                   {errors.email && <p className="text-rose-600 text-xs font-medium">{errors.email.message}</p>}
@@ -163,12 +163,12 @@ export default function RegisterPage() {
                         autoComplete="new-password"
                         {...register('password', { required: 'Bắt buộc', minLength: { value: 8, message: 'Tối thiểu 8 ký tự' } })}
                         placeholder="••••••••"
-                        className="h-11 pl-10 pr-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                        className="h-11 pl-10 pr-10 text-sm bg-white dark:bg-slate-900 border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-300 rounded-md transition-colors"
                       >
                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
@@ -188,12 +188,12 @@ export default function RegisterPage() {
                           validate: (val) => val === password || 'Mật khẩu không khớp',
                         })}
                         placeholder="••••••••"
-                        className="h-11 pl-10 pr-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                        className="h-11 pl-10 pr-10 text-sm bg-white dark:bg-slate-900 border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:text-slate-300 rounded-md transition-colors"
                       >
                         {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
@@ -209,7 +209,7 @@ export default function RegisterPage() {
                         key={c.label}
                         className={cn(
                           "flex items-center gap-1.5 text-xs font-medium",
-                          c.ok ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500"
+                          c.ok ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500 dark:text-slate-400"
                         )}
                       >
                         <span
@@ -233,7 +233,7 @@ export default function RegisterPage() {
                 >
                   {loading ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-white dark:border-slate-900/30 border-t-white rounded-full animate-spin" />
                       Đang khởi tạo...
                     </>
                   ) : (
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                   <div className="w-full border-t border-slate-200 dark:border-slate-800" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold dark:bg-slate-950">
+                  <span className="bg-white dark:bg-slate-900 px-3 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold dark:bg-slate-950">
                     Hoặc
                   </span>
                 </div>
@@ -262,7 +262,7 @@ export default function RegisterPage() {
                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
                   window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
                 }}
-                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-300 hover:bg-slate-50 dark:bg-slate-900/50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 <GoogleIcon />
                 Tiếp tục với Google
@@ -270,7 +270,7 @@ export default function RegisterPage() {
 
               <Link
                 href="/consumer/login"
-                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
+                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white dark:bg-slate-900 border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
               >
                 Đã có tài khoản? Đăng nhập
               </Link>

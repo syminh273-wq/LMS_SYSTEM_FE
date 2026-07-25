@@ -27,7 +27,7 @@ type FormState = {
 };
 
 const inputCls =
-  'w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none';
+  'w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
@@ -138,15 +138,15 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-lg p-0 gap-0">
-        <DialogHeader className="px-5 py-4 border-b border-slate-100">
-          <DialogTitle className="text-base font-bold text-slate-900">
+        <DialogHeader className="px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <DialogTitle className="text-base font-bold text-slate-900 dark:text-slate-100">
             {initial ? 'Chỉnh sửa feature' : 'Thêm feature'}
           </DialogTitle>
         </DialogHeader>
 
         <div className="p-5 space-y-3">
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">Tiêu đề</label>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">Tiêu đề</label>
             <input
               type="text"
               value={form.title}
@@ -158,7 +158,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">
               Mô tả <span className="text-slate-400 font-normal">(tuỳ chọn)</span>
             </label>
             <textarea
@@ -172,7 +172,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">
               Link <span className="text-slate-400 font-normal">(tuỳ chọn)</span>
             </label>
             <input
@@ -185,7 +185,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 block">
               File <span className="text-slate-400 font-normal">(tuỳ chọn, ảnh/PDF ≤ 10MB, sẽ upload cùng lúc khi lưu)</span>
             </label>
             <input
@@ -225,7 +225,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
               )}
             </div>
             {form.image ? (
-              <div className="mt-2 relative aspect-[16/9] w-full overflow-hidden rounded-md border border-slate-200 bg-slate-50">
+              <div className="mt-2 relative aspect-[16/9] w-full overflow-hidden rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
                 {showImagePreview ? (
                   <img
                     src={form.image}
@@ -244,7 +244,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
                 ) : existingFileMeta?.type === 'application/pdf' && form.image ? (
                   <PdfThumbnail url={form.image} title={form.title} />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 gap-1">
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 gap-1">
                     <FileText className="size-10 text-slate-400" />
                     <p className="text-xs font-semibold truncate max-w-[90%]">{fileName}</p>
                     <a
@@ -265,7 +265,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
                 )}
               </div>
             ) : (
-              <div className="mt-2 aspect-[16/9] w-full rounded-md border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300">
+              <div className="mt-2 aspect-[16/9] w-full rounded-md border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center text-slate-300">
                 <ImageIcon className="size-10" />
               </div>
             )}
@@ -276,7 +276,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </p>
         </div>
 
-        <div className="px-5 py-3 border-t border-slate-100 flex justify-end gap-2">
+        <div className="px-5 py-3 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={saving}>
             Huỷ
           </Button>

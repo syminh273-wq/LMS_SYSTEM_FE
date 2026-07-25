@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { socialApi } from '@/lib/api/social';
 import { classroomApi } from '@/lib/api/classroom';
@@ -12,47 +12,19 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import parse from 'html-react-parser';
+import { useTranslation } from '@shared/components/LocaleProvider';
 import { cn } from '@shared/lib/utils';
 import { useImageLightbox, getPostImages } from '@shared/components/ui/image-lightbox';
 import { PostImageGallery } from '@shared/components/ui/post-image-gallery';
 
-const EMOTIONS = [
-  { key: 'happy',       emoji: '😊', label: 'Đang vui' },
-  { key: 'sad',         emoji: '😢', label: 'Buồn' },
-  { key: 'motivated',   emoji: '💪', label: 'Cố lên' },
-  { key: 'excited',     emoji: '🔥', label: 'Hào hứng' },
-  { key: 'tired',       emoji: '😴', label: 'Mệt mỏi' },
-  { key: 'thinking',    emoji: '🤔', label: 'Suy nghĩ' },
-  { key: 'confident',   emoji: '😎', label: 'Tự tin' },
-  { key: 'celebrating', emoji: '🎉', label: 'Ăn mừng' },
-  { key: 'stressed',    emoji: '😤', label: 'Căng thẳng' },
-  { key: 'loved',       emoji: '❤️', label: 'Yêu thương' },
-] as const;
+const EMOTION_EMOJIS: Record<string, string> = {
+  happy: '😊', sad: '😢', motivated: '💪', excited: '🔥', tired: '😴',
+  thinking: '🤔', confident: '😎', celebrating: '🎉', stressed: '😤', loved: '❤️',
+};
 
-const EMOTION_MAP = Object.fromEntries(EMOTIONS.map(e => [e.key, e]));
-
-const VISIBILITY_OPTIONS = [
-  { key: 'public',  icon: Globe,  label: 'Công khai' },
-  { key: 'friends', icon: Users,  label: 'Bạn bè' },
-  { key: 'private', icon: Lock,   label: 'Chỉ mình tôi' },
-] as const;
-
-function timeAgo(iso: string) {
-  const d = Date.now() - new Date(iso).getTime();
-  const m = Math.floor(d / 60000);
-  if (m < 1) return 'Vừa xong';
-  if (m < 60) return `${m} phút trước`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} giờ trước`;
-  return `${Math.floor(h / 24)} ngày trước`;
-}
-
-function formatFullDateTime(iso: string) {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-}
+const VISIBILITY_ICONS: Record<string, React.ElementType> = {
+  public: Globe, friends: Users, private: Lock,
+};
 
 export function PostCard({
   post,
@@ -67,6 +39,7 @@ export function PostCard({
   onDelete: (uid: string) => void;
   embedded?: boolean;
 }) {
+  const { t } = useTranslation();
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<PostComment[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -87,17 +60,42 @@ export function PostCard({
       missing.map((u) =>
         classroomApi
           .retrieve(u)
-          .then((c) => [u, c.name || c.title || 'Lớp học'] as const)
-          .catch(() => [u, 'Lớp học'] as const)
+          .then((c) => [u, c.name || c.title || t('feed.create_post.classroom')] as const)
+          .catch(() => [u, t('feed.create_post.classroom')] as const)
       )
     ).then((entries) => {
       if (cancelled) return;
       setClassroomNames((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
     });
     return () => { cancelled = true; };
-  }, [post.classroom_tags, classroomNames]);
-  const emotion = post.emotion ? EMOTION_MAP[post.emotion as keyof typeof EMOTION_MAP] : null;
-  const VisIcon = VISIBILITY_OPTIONS.find(v => v.key === post.visibility)?.icon ?? Globe;
+  }, [post.classroom_tags, classroomNames, t]);
+
+  const emotionData = useMemo(() => {
+    if (!post.emotion) return null;
+    return {
+      emoji: EMOTION_EMOJIS[post.emotion] || '',
+      label: t(`feed.emotions.${post.emotion}`),
+    };
+  }, [post.emotion, t]);
+
+  const VisIcon = VISIBILITY_ICONS[post.visibility as string] ?? Globe;
+
+  function timeAgo(iso: string) {
+    const d = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(d / 60000);
+    if (m < 1) return t('feed.time.just_now');
+    if (m < 60) return t('feed.time.minutes_ago', undefined, { count: m });
+    const h = Math.floor(m / 60);
+    if (h < 24) return t('feed.time.hours_ago', undefined, { count: h });
+    return t('feed.time.days_ago', undefined, { count: Math.floor(h / 24) });
+  }
+
+  function formatFullDateTime(iso: string) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
 
   const loadComments = async () => {
     if (loadingComments) return;
@@ -105,7 +103,7 @@ export function PostCard({
     try {
       const data = await socialApi.getComments(post.uid);
       setComments(data);
-    } catch { toast.error('Không thể tải bình luận'); }
+    } catch { toast.error(t('feed.messages.load_comments_error')); }
     finally { setLoadingComments(false); }
   };
 
@@ -120,7 +118,7 @@ export function PostCard({
     try {
       const res = await socialApi.toggleLike(post.uid);
       onLike(post.uid, res.liked, res.likes_count);
-    } catch { toast.error('Thao tác thất bại'); }
+    } catch { toast.error(t('feed.messages.action_failed')); }
   };
 
   const handleComment = async (e: React.FormEvent) => {
@@ -131,30 +129,30 @@ export function PostCard({
       const c = await socialApi.addComment(post.uid, newComment.trim());
       setComments(prev => [...prev, c]);
       setNewComment('');
-    } catch { toast.error('Không thể gửi bình luận'); }
+    } catch { toast.error(t('feed.messages.send_comment_error')); }
     finally { setSubmitting(false); }
   };
 
   const handleDelete = async () => {
-    if (!confirm('Xóa bài đăng này?')) return;
+    if (!confirm(t('feed.messages.delete_post_confirm'))) return;
     try {
       await socialApi.deletePost(post.uid);
       onDelete(post.uid);
-      toast.success('Đã xóa bài đăng');
-    } catch { toast.error('Không thể xóa'); }
+      toast.success(t('feed.messages.post_deleted'));
+    } catch { toast.error(t('feed.messages.delete_error')); }
   };
 
   return (
     <article
       className={
         embedded
-          ? 'bg-white rounded-xl overflow-hidden'
-          : 'bg-white border border-slate-200 rounded-xl overflow-hidden card-elevated'
+          ? 'bg-white dark:bg-slate-900 rounded-xl overflow-hidden'
+          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden card-elevated'
       }
     >
       <div className="flex items-start justify-between p-4 sm:p-5 pb-3">
         <div className="flex items-center gap-3 min-w-0">
-          <AuthorLink post={post}>
+          <AuthorLink post={post} t={t}>
             <div className="relative shrink-0">
               <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-[12px] overflow-hidden">
                 {post.author_avatar
@@ -162,29 +160,29 @@ export function PostCard({
                   : (post.author_name || '??').slice(0, 2).toUpperCase()
                 }
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
             </div>
           </AuthorLink>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <AuthorLink post={post} className="min-w-0 max-w-full">
-                <p className="text-[13.5px] font-semibold text-slate-900 leading-none truncate hover:underline">{post.author_name || 'Ẩn danh'}</p>
+              <AuthorLink post={post} t={t} className="min-w-0 max-w-full">
+                <p className="text-[13.5px] font-semibold text-slate-900 dark:text-slate-100 leading-none truncate hover:underline">{post.author_name || t('feed.labels.anonymous')}</p>
               </AuthorLink>
               {post.author_type === 'space' && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-                  Giáo viên
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800">
+                  {t('feed.suggestions.role_teacher')}
                 </span>
               )}
-              {emotion && (
-                <span className="text-[11.5px] text-slate-500 inline-flex items-center gap-0.5">
-                  đang {emotion.label.toLowerCase()} <span>{emotion.emoji}</span>
+              {emotionData && (
+                <span className="text-[11.5px] text-slate-500 dark:text-slate-400 inline-flex items-center gap-0.5">
+                  {t('feed.labels.feeling')} {emotionData.label.toLowerCase()} <span>{emotionData.emoji}</span>
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[11px] text-slate-500">{timeAgo(post.created_at)}</span>
-              <span className="text-slate-300">·</span>
-              <VisIcon size={11} className="text-slate-500" />
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">{timeAgo(post.created_at)}</span>
+              <span className="text-slate-300 dark:text-slate-600">·</span>
+              <VisIcon size={11} className="text-slate-500 dark:text-slate-400" />
             </div>
           </div>
         </div>
@@ -193,20 +191,20 @@ export function PostCard({
           <div className="relative shrink-0">
             <button
               onClick={() => setMenuOpen(p => !p)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-              aria-label="Tùy chọn"
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+              aria-label={t('feed.labels.delete_post')}
             >
               <MoreHorizontal size={16} />
             </button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
+                <div className="absolute right-0 top-9 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
                   <button
                     onClick={() => { setMenuOpen(false); handleDelete(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
                   >
-                    <Trash2 size={13} /> Xóa bài
+                    <Trash2 size={13} /> {t('feed.labels.delete_post')}
                   </button>
                 </div>
               </>
@@ -216,7 +214,7 @@ export function PostCard({
       </div>
 
       {post.content && (
-        <div className="px-4 sm:px-5 pb-3 text-[14px] text-slate-800 leading-relaxed prose prose-sm max-w-none">
+        <div className="px-4 sm:px-5 pb-3 text-[14px] text-slate-800 dark:text-slate-200 leading-relaxed prose prose-sm dark:prose-invert max-w-none">
           {parse(post.content)}
         </div>
       )}
@@ -232,11 +230,11 @@ export function PostCard({
 
       {(post.classroom_tags || []).length > 0 && (
         <div className="px-4 sm:px-5 pb-3 flex flex-wrap items-center gap-1.5">
-          <span className="text-[11.5px] text-slate-500 font-medium inline-flex items-center gap-1">
-            <BookOpen size={11} /> Chia sẻ với
+          <span className="text-[11.5px] text-slate-500 dark:text-slate-400 font-medium inline-flex items-center gap-1">
+            <BookOpen size={11} /> {t('feed.create_post.sharing_with')}
           </span>
           {(post.classroom_tags || []).map((uid) => {
-            const name = classroomNames[uid] || 'Đang tải…';
+            const name = classroomNames[uid] || '...';
             return (
               <a
                 key={uid}
@@ -255,7 +253,7 @@ export function PostCard({
       )}
 
       {(post.likes_count > 0 || post.comments_count > 0) && (
-        <div className="flex items-center justify-between px-4 sm:px-5 py-2 text-xs text-slate-500 border-t border-slate-100">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-2 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800">
           {post.likes_count > 0 && (
             <span className="flex items-center gap-1.5">
               <span className="w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[9px]">
@@ -265,18 +263,18 @@ export function PostCard({
             </span>
           )}
           {post.comments_count > 0 && (
-            <button onClick={toggleComments} className="hover:text-slate-900 hover:underline ml-auto transition-colors">
-              {post.comments_count} bình luận
+            <button onClick={toggleComments} className="hover:text-slate-900 dark:hover:text-slate-200 hover:underline ml-auto transition-colors">
+              {post.comments_count} {t('feed.labels.comments')}
             </button>
           )}
         </div>
       )}
 
-      <div className="grid grid-cols-3 border-t border-slate-200">
+      <div className="grid grid-cols-3 border-t border-slate-200 dark:border-slate-700">
         {[
-          { key: 'like', icon: Heart, label: 'Thích', onClick: handleLike, active: post.liked_by_me, activeColor: 'text-rose-600' },
-          { key: 'comment', icon: MessageCircle, label: 'Bình luận', onClick: toggleComments, active: false, activeColor: '' },
-          { key: 'share', icon: Share2, label: 'Chia sẻ', onClick: () => {}, active: false, activeColor: '' },
+          { key: 'like', icon: Heart, label: t('feed.labels.like'), onClick: handleLike, active: post.liked_by_me, activeColor: 'text-rose-600' },
+          { key: 'comment', icon: MessageCircle, label: t('feed.labels.comment'), onClick: toggleComments, active: false, activeColor: '' },
+          { key: 'share', icon: Share2, label: t('feed.labels.share'), onClick: () => {}, active: false, activeColor: '' },
         ].map(({ key, icon: Icon, label, onClick, active, activeColor }) => (
           <button
             key={key}
@@ -285,7 +283,7 @@ export function PostCard({
               "flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-medium transition-colors",
               active
                 ? activeColor
-                : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
             )}
           >
             <Icon size={16} strokeWidth={2} fill={active ? 'currentColor' : 'none'} />
@@ -297,13 +295,13 @@ export function PostCard({
       {lightbox.element}
 
       {showComments && (
-        <div className="border-t border-slate-200 bg-slate-50 p-4 sm:p-5 space-y-3 animate-fade-down">
+        <div className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4 sm:p-5 space-y-3 animate-fade-down">
           {loadingComments ? (
             <div className="flex justify-center py-3">
               <Loader2 size={18} className="animate-spin text-indigo-600" />
             </div>
           ) : comments.length === 0 ? (
-            <p className="text-center text-xs text-slate-500 py-2">Chưa có bình luận nào.</p>
+            <p className="text-center text-xs text-slate-500 dark:text-slate-400 py-2">{t('feed.post.no_comments')}</p>
           ) : (
             comments.map(c => {
               const isMine = currentUserId !== null && c.consumer_uid === currentUserId;
@@ -319,10 +317,10 @@ export function PostCard({
                     <div className={`rounded-2xl px-3 py-2 inline-block max-w-full ${
                       isMine
                         ? 'bg-indigo-600 text-white border border-indigo-600'
-                        : 'bg-white border border-slate-200'
+                        : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
                     }`}>
-                      <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-indigo-100' : 'text-slate-900'}`}>{c.author_name}</p>
-                      <p className={`text-[13px] break-words ${isMine ? 'text-white' : 'text-slate-800'}`}>{c.content}</p>
+                      <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-indigo-100' : 'text-slate-900 dark:text-slate-100'}`}>{c.author_name}</p>
+                      <p className={`text-[13px] break-words ${isMine ? 'text-white' : 'text-slate-800 dark:text-slate-200'}`}>{c.content}</p>
                     </div>
                     <p className={`text-[10px] text-slate-400 mt-1 px-1 ${isMine ? 'text-right' : 'text-left'}`}>
                       {formatFullDateTime(c.created_at)}
@@ -341,14 +339,14 @@ export function PostCard({
               <input
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
-                placeholder="Viết bình luận..."
-                className="w-full text-[13px] bg-white border border-slate-200 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 placeholder:text-slate-400"
+                placeholder={t('feed.labels.write_comment')}
+                className="w-full text-[13px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500"
               />
               <button
                 type="submit"
                 disabled={!newComment.trim() || submitting}
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center disabled:opacity-30 hover:bg-indigo-700 transition-colors"
-                aria-label="Gửi bình luận"
+                aria-label={t('feed.labels.comment')}
               >
                 {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
               </button>
@@ -360,15 +358,16 @@ export function PostCard({
   );
 }
 
-function AuthorLink({ post, children, className }: {
+function AuthorLink({ post, t, children, className }: {
   post: Post;
+  t: (key: string) => string;
   children: React.ReactNode;
   className?: string;
 }) {
   const isSpace = post.author_type === 'space' && post.space_uid;
   const href = isSpace ? `/consumer/profile/${post.space_uid}` : `/consumer/profile/${post.consumer_uid}`;
   return (
-    <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label={isSpace ? 'Xem trang giáo viên' : 'Xem trang cá nhân'}>
+    <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label={isSpace ? t('feed.post.view_teacher_profile') : t('feed.post.view_profile')}>
       {children}
     </Link>
   );

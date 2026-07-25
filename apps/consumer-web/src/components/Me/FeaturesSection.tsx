@@ -112,11 +112,11 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
   };
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6 overflow-hidden">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6 overflow-hidden">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Globe className="size-4 text-slate-400" />
-          <h2 className="text-xl font-bold text-slate-900">Features</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Features</h2>
           <span className="text-xs text-slate-400 font-semibold">{features.length}</span>
         </div>
         <div className="flex items-center gap-1">
@@ -126,7 +126,7 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
                 type="button"
                 onClick={() => scrollBy(-320)}
                 disabled={!canScrollLeft}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 disabled:opacity-30 disabled:hover:bg-transparent"
+                className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent"
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="size-4" />
@@ -135,7 +135,7 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
                 type="button"
                 onClick={() => scrollBy(320)}
                 disabled={!canScrollRight}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 disabled:opacity-30 disabled:hover:bg-transparent"
+                className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 disabled:opacity-30 disabled:hover:bg-transparent"
                 aria-label="Scroll right"
               >
                 <ChevronRight className="size-4" />
@@ -145,7 +145,7 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
           {isOwner && (
             <button
               onClick={() => setAdding(true)}
-              className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+              className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400"
               aria-label={t('portfolio.me.add')}
             >
               <Plus className="size-4" />
@@ -259,10 +259,10 @@ function FeatureCard({
   })();
 
   return (
-    <div className="group snap-start shrink-0 w-64 rounded-xl border border-slate-200 overflow-hidden hover:border-indigo-300 hover:shadow-md transition-all bg-white relative">
+    <div className="group snap-start shrink-0 w-64 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:border-indigo-300 hover:shadow-md transition-all bg-white dark:bg-slate-900 relative">
       {isOwner && (
         <DropdownMenu>
-          <DropdownMenuTrigger className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur hover:bg-white flex items-center justify-center text-slate-500 shadow-sm opacity-0 group-hover:opacity-100">
+          <DropdownMenuTrigger className="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur hover:bg-white dark:bg-slate-900 flex items-center justify-center text-slate-500 dark:text-slate-400 shadow-sm opacity-0 group-hover:opacity-100">
             <MoreHorizontal className="size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -275,7 +275,7 @@ function FeatureCard({
         </DropdownMenu>
       )}
 
-      <div className="relative aspect-[16/9] bg-slate-50 overflow-hidden">
+      <div className="relative aspect-[16/9] bg-slate-50 dark:bg-slate-900/50 overflow-hidden">
         {feature.image ? (
           feature.fileType === 'application/pdf' ? (
             <a href={feature.image} target="_blank" rel="noreferrer" className="block w-full h-full">
@@ -315,7 +315,7 @@ function FeatureCard({
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur hover:bg-white text-slate-600 hover:text-indigo-600 flex items-center justify-center shadow-sm"
+            className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur hover:bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-indigo-600 flex items-center justify-center shadow-sm"
             title="Mở link"
           >
             <ExternalLink className="size-3.5" />
@@ -324,9 +324,9 @@ function FeatureCard({
       </div>
 
       <div className="px-3 py-2.5">
-        <p className="text-[13px] font-semibold text-slate-900 truncate">{feature.title}</p>
+        <p className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{feature.title}</p>
         {feature.description && (
-          <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">{feature.description}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{feature.description}</p>
         )}
         {hostname && (
           <p className="text-[10.5px] text-slate-400 truncate mt-1">{hostname}</p>

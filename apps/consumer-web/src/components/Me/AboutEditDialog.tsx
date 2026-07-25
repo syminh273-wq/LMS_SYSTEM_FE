@@ -47,11 +47,11 @@ export function AboutEditDialog({ initial, introUid, onClose, onSaved }: AboutEd
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
+        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800">
           <DialogTitle className="text-xl font-bold">
             {t('portfolio.labels.edit_intro')}
           </DialogTitle>
-          <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             {t('workspace.profile.edit_about_desc')}
           </p>
         </DialogHeader>
@@ -65,7 +65,7 @@ export function AboutEditDialog({ initial, introUid, onClose, onSaved }: AboutEd
           />
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+        <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-6 py-3 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             {t('portfolio.me.cancel')}
           </Button>

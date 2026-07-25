@@ -98,7 +98,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
         <Card className="border-border">
           <CardContent className="p-12 text-center space-y-3">
             <AlertCircle size={48} className="mx-auto text-slate-300" />
-            <p className="text-slate-500">{t('course.preview.not_found', 'Course not found')}</p>
+            <p className="text-slate-500 dark:text-slate-400">{t('course.preview.not_found', 'Course not found')}</p>
           </CardContent>
         </Card>
       </div>

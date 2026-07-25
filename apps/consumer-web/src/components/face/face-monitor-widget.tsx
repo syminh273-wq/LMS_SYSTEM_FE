@@ -202,7 +202,7 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
       )}
 
       <div className="fixed bottom-24 right-4 z-40 sm:bottom-8">
-        <div className="w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="w-44 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
           <div className="relative">
             <video
               ref={videoRef}
@@ -228,7 +228,7 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
             </div>
           </div>
 
-          <div className="flex h-9 w-full items-center justify-center gap-1.5 bg-slate-50 text-xs font-bold text-slate-600">
+          <div className="flex h-9 w-full items-center justify-center gap-1.5 bg-slate-50 dark:bg-slate-900/50 text-xs font-bold text-slate-600 dark:text-slate-400">
             <ShieldCheck size={14} className="text-slate-400" />
             <span>Camera</span>
           </div>

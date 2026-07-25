@@ -37,17 +37,17 @@ export default function MeHistoryPage() {
   }, [router, t]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50">
       <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-6 sm:py-8">
         <div className="flex items-center gap-3">
           <Link
             href="/consumer/me"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 transition hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="flex items-center gap-2 text-xl font-black text-slate-900 sm:text-2xl dark:text-white">
+            <h1 className="flex items-center gap-2 text-xl font-black text-slate-900 dark:text-slate-100 sm:text-2xl dark:text-white">
               <HistoryIcon className="h-5 w-5 text-indigo-500" />
               {t('ranking.history_title', 'XP history')}
             </h1>

@@ -51,13 +51,13 @@ export function SkillsSection({ items, isOwner = true, onChanged }: Props) {
   };
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-slate-900">{t('portfolio.me.skills')}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{t('portfolio.me.skills')}</h2>
         {isOwner && (
           <button
             onClick={() => setAdding(true)}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400"
             aria-label={t('portfolio.me.add')}
           >
             <Plus className="size-4" />
@@ -76,13 +76,13 @@ export function SkillsSection({ items, isOwner = true, onChanged }: Props) {
             return (
               <span
                 key={item.uid}
-                className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold"
+                className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold"
               >
                 {title}
                 {isOwner && (
                   <button
                     onClick={() => handleRemove(item.uid)}
-                    className="w-4 h-4 rounded-full hover:bg-slate-300 flex items-center justify-center text-slate-500"
+                    className="w-4 h-4 rounded-full hover:bg-slate-300 flex items-center justify-center text-slate-500 dark:text-slate-400"
                     aria-label={t('portfolio.me.delete')}
                   >
                     <X className="size-3" />
@@ -129,7 +129,7 @@ function AddSkillDialog({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
+          className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
           placeholder={t('portfolio.placeholders.certificate_title')}
         />
         <div className="flex justify-end gap-2 pt-2">

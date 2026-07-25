@@ -164,7 +164,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="relative z-[100] inline-flex items-center justify-center w-9 h-9 text-slate-900 bg-white hover:bg-slate-100 rounded-lg transition-colors dark:text-white dark:bg-slate-800 dark:hover:bg-slate-700 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700"
+          className="relative z-[100] inline-flex items-center justify-center w-9 h-9 text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors dark:text-white dark:bg-slate-800 dark:hover:bg-slate-700 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700"
           aria-label="Notifications"
         >
           {unreadCount > 0 ? <BellRing size={18} strokeWidth={2.2} /> : <Bell size={18} strokeWidth={2.2} />}
@@ -178,7 +178,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="z-[100] w-[360px] p-0 overflow-hidden bg-white border border-slate-200 shadow-xl opacity-100 dark:bg-slate-900 dark:border-slate-700"
+        className="z-[100] w-[360px] p-0 overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-xl opacity-100"
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
           <div>
@@ -260,7 +260,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
                         >
                           {item.content}
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-1 font-medium">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
                           {relativeTime(item.created_at)}
                           {hasLink && (
                             <span className="ml-2 text-indigo-600 dark:text-indigo-400 font-semibold">· Xem lớp →</span>
@@ -371,7 +371,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                       "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                       active
                         ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:text-slate-100 dark:hover:bg-slate-800"
                     )}
                   >
                     <Icon size={15} strokeWidth={2.2} />
@@ -387,8 +387,8 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                       <button
                         className={cn(
                           "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none",
-                          "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800",
-                          "data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-100"
+                          "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:text-slate-100 dark:hover:bg-slate-800",
+                          "data-[state=open]:bg-slate-100 dark:bg-slate-800 data-[state=open]:text-slate-900 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-100"
                         )}
                       >
                         <Sparkles size={15} strokeWidth={2.2} />
@@ -407,7 +407,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     <DropdownMenuContent
                       align="end"
                       sideOffset={8}
-                      className="w-[220px] rounded-xl shadow-xl border border-slate-200 bg-white p-1.5 animate-fade-down dark:bg-slate-900 dark:border-slate-700"
+                      className="w-[220px] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5 animate-fade-down"
                     >
                       {utilityNavItems.map((item) => {
                         const active = isActive(item.href);
@@ -421,10 +421,10 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                               "w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left transition-colors",
                               active
                                 ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
-                                : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                                : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                             )}
                           >
-                            <span className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center dark:bg-slate-800">
+                            <span className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                               <Icon size={14} className="text-slate-500 dark:text-slate-400" />
                             </span>
                             <span className="text-sm font-medium flex-1">{item.name}</span>
@@ -448,7 +448,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
 
           <div className="flex items-center gap-1 sm:gap-2">
             <button
-              className="hidden md:flex items-center gap-2 h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400 dark:hover:text-slate-100"
+              className="hidden md:flex items-center gap-2 h-9 px-3 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 transition-colors text-sm font-medium dark:hover:bg-slate-700 dark:hover:text-slate-100"
               aria-label="Search"
             >
               <Search size={15} strokeWidth={2.2} />
@@ -456,7 +456,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
             </button>
 
             <button
-              className="md:hidden p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              className="md:hidden p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:text-slate-100 rounded-lg transition-colors dark:hover:bg-slate-800 dark:hover:text-slate-100"
               aria-label="Search"
             >
               <Search size={18} strokeWidth={2} />
@@ -466,7 +466,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
               <ThemeToggle />
               <NotificationBell userId={mounted ? userProfile?.uid : null} />
               <button
-                className="p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
+                className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:text-slate-100 rounded-lg transition-colors dark:hover:text-slate-100 dark:hover:bg-slate-800"
                 aria-label="Help"
               >
                 <HelpCircle size={17} strokeWidth={2} />
@@ -478,7 +478,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
-                  className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors outline-none dark:hover:bg-slate-800"
+                  className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 dark:bg-slate-800 transition-colors outline-none dark:hover:bg-slate-800"
                   aria-label="Open user menu"
                 >
                   <div className="relative">
@@ -501,7 +501,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
               <DropdownMenuContent
                 align="end"
                 sideOffset={10}
-                className="w-[280px] rounded-xl shadow-xl border border-slate-200 bg-white p-1.5 animate-fade-down dark:bg-slate-900 dark:border-slate-700"
+                className="w-[280px] rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1.5 animate-fade-down"
               >
                 <div className="px-3 py-3 mb-1 rounded-lg bg-slate-50 dark:bg-slate-800">
                   <div className="flex items-center gap-3">
@@ -532,12 +532,12 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     <button
                       key={path}
                       onClick={() => router.push(path)}
-                      className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left hover:bg-slate-100 transition-colors group dark:hover:bg-slate-800"
+                      className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left hover:bg-slate-100 dark:bg-slate-800 transition-colors group dark:hover:bg-slate-800"
                     >
-                      <span className="w-7 h-7 rounded-md bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center transition-colors dark:bg-slate-800 dark:group-hover:bg-indigo-500/20">
-                        <Icon size={14} className="text-slate-500 group-hover:text-indigo-600 transition-colors dark:text-slate-400 dark:group-hover:text-indigo-300" />
+                      <span className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-100 flex items-center justify-center transition-colors dark:group-hover:bg-indigo-500/20">
+                        <Icon size={14} className="text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 transition-colors dark:group-hover:text-indigo-300" />
                       </span>
-                      <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-slate-100">
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-slate-100">
                         {label}
                       </span>
                     </button>

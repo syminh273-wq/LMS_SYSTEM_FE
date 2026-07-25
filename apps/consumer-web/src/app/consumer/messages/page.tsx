@@ -46,21 +46,21 @@ export default function MessagesPage() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-2 mb-4">
           <MessageCircle size={22} className="text-indigo-600" />
-          <h1 className="text-2xl font-bold text-slate-900">{t('workspace.messages.title')}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('workspace.messages.title')}</h1>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Loader2 className="animate-spin text-indigo-600" size={28} />
             </div>
           ) : list.length === 0 ? (
             <div className="text-center py-16 px-4">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-slate-100 flex items-center justify-center">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                 <MessageCircle size={28} className="text-slate-400" />
               </div>
-              <p className="font-semibold text-slate-900 text-[15px]">{t('workspace.messages.empty_list')}</p>
-              <p className="text-[13px] text-slate-500 mt-1">{t('workspace.messages.empty_list_desc')}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100 text-[15px]">{t('workspace.messages.empty_list')}</p>
+              <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1">{t('workspace.messages.empty_list_desc')}</p>
             </div>
           ) : (
             <ul>
@@ -68,7 +68,7 @@ export default function MessagesPage() {
                 <li
                   key={c.conversation_uid}
                   onClick={() => router.push(`/consumer/messages/${c.other_user.uid}`)}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:bg-slate-900/50 cursor-pointer border-b border-slate-100 dark:border-slate-800 last:border-b-0 transition-colors"
                 >
                   {c.other_user.avatar ? (
                     <img
@@ -83,7 +83,7 @@ export default function MessagesPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-[14px] text-slate-900 truncate">
+                      <p className="font-semibold text-[14px] text-slate-900 dark:text-slate-100 truncate">
                         {c.other_user.name || 'User'}
                       </p>
                       {c.last_msg?.at && (
@@ -95,7 +95,7 @@ export default function MessagesPage() {
                     <div className="flex items-center justify-between gap-2 mt-0.5">
                       <p className={cn(
                         "text-[12.5px] truncate",
-                        c.unread_count > 0 ? "text-slate-900 font-semibold" : "text-slate-500"
+                        c.unread_count > 0 ? "text-slate-900 dark:text-slate-100 font-semibold" : "text-slate-500 dark:text-slate-400"
                       )}>
                         {c.last_msg?.text || 'Chưa có tin nhắn'}
                       </p>

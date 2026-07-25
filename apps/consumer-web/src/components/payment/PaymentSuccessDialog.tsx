@@ -99,7 +99,7 @@ export function PaymentSuccessDialog({
           {!isClassroom && courseName ? (
             <div className="text-sm font-bold text-foreground">{courseName}</div>
           ) : null}
-          <DialogDescription className="text-center text-slate-500 leading-relaxed">
+          <DialogDescription className="text-center text-slate-500 dark:text-slate-400 leading-relaxed">
             {body}
           </DialogDescription>
         </DialogHeader>

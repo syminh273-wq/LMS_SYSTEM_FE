@@ -148,7 +148,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
               <>
                 <CheckCircle2 size={64} className="mx-auto text-emerald-500" />
                 <h2 className="text-xl font-bold">Thanh toán thành công!</h2>
-                <p className="text-slate-500 text-sm">Đang mở khóa nội dung lớp học...</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Đang mở khóa nội dung lớp học...</p>
               </>
             )}
 
@@ -156,7 +156,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
               <>
                 <XCircle size={64} className="mx-auto text-rose-500" />
                 <h2 className="text-xl font-bold">Thanh toán thất bại</h2>
-                <p className="text-slate-500 text-sm">{errorMsg}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{errorMsg}</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
                     onClick={() => {
@@ -183,7 +183,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
               <>
                 <AlertTriangle size={64} className="mx-auto text-amber-500" />
                 <h2 className="text-xl font-bold">Đang xử lý</h2>
-                <p className="text-slate-500 text-sm">Vui lòng quay lại lớp học sau vài phút để kiểm tra.</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">Vui lòng quay lại lớp học sau vài phút để kiểm tra.</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
                     onClick={() => router.push(`/consumer/classroom/${uid}`)}

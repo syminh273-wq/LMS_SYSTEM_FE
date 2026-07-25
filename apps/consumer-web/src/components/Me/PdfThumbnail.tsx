@@ -182,7 +182,7 @@ export function PdfThumbnail({ url, className = '', title }: Props) {
     <div className={`relative w-full h-full flex items-center justify-center bg-slate-200 ${className}`}>
       <canvas
         ref={canvasRef}
-        className={`max-w-full max-h-full object-contain bg-white shadow-sm transition-opacity ${
+        className={`max-w-full max-h-full object-contain bg-white dark:bg-slate-900 shadow-sm transition-opacity ${
           state === 'ready' ? 'opacity-100' : 'opacity-0'
         }`}
         aria-label={title ?? 'PDF thumbnail'}
@@ -194,7 +194,7 @@ export function PdfThumbnail({ url, className = '', title }: Props) {
               <FileText className="size-10 text-slate-400" />
               <span className="text-[10px] font-bold uppercase tracking-wider">PDF</span>
               {errorMsg && (
-                <span className="text-[9px] text-slate-500 max-w-[80%] text-center truncate">
+                <span className="text-[9px] text-slate-500 dark:text-slate-400 max-w-[80%] text-center truncate">
                   {errorMsg}
                 </span>
               )}

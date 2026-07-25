@@ -106,12 +106,12 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
   };
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Award size={18} className="text-amber-500" />
-          <h2 className="text-xl font-bold text-slate-900">Chứng chỉ & Giải thưởng</h2>
-          <span className="text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded-full">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Chứng chỉ & Giải thưởng</h2>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
             {items.length}
           </span>
         </div>
@@ -146,9 +146,9 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                     <CollapsibleItem
                       summary={
                         <>
-                          <p className="text-sm font-bold text-slate-900 line-clamp-2">{v.title}</p>
+                          <p className="text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-2">{v.title}</p>
                           {v.issuer && (
-                            <p className="text-[11px] text-slate-600 mt-0.5">{v.issuer}</p>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">{v.issuer}</p>
                           )}
                           {v.year && (
                             <p className="text-[10px] text-slate-400 mt-0.5">{v.year}</p>
@@ -157,7 +157,7 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                       }
                       details={
                         v.description ? (
-                          <p className="text-[11px] text-slate-600 whitespace-pre-line">{v.description}</p>
+                          <p className="text-[11px] text-slate-600 dark:text-slate-400 whitespace-pre-line">{v.description}</p>
                         ) : null
                       }
                     />
@@ -177,13 +177,13 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                   <div className="absolute top-2 right-2 flex gap-1">
                     <button
                       onClick={() => startEdit(it)}
-                      className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50"
+                      className="w-6 h-6 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900/50"
                     >
                       <Pencil size={11} />
                     </button>
                     <button
                       onClick={() => handleDelete(it)}
-                      className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-rose-600 hover:bg-rose-50"
+                      className="w-6 h-6 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-rose-600 hover:bg-rose-50"
                     >
                       <Trash2 size={11} />
                     </button>
@@ -198,48 +198,48 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
       {open && (
         <Dialog open onOpenChange={(o) => !o && setOpen(false)}>
           <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-            <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
+            <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800">
               <DialogTitle>{editing ? 'Sửa chứng chỉ' : 'Thêm chứng chỉ'}</DialogTitle>
             </DialogHeader>
             <div className="px-6 py-5 space-y-3">
               <label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">Tên chứng chỉ *</span>
+                <span className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Tên chứng chỉ *</span>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="VD: AWS Solutions Architect"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm outline-none focus:border-amber-500"
                 />
               </label>
               <label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">Nơi cấp</span>
+                <span className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nơi cấp</span>
                 <input
                   value={issuer}
                   onChange={(e) => setIssuer(e.target.value)}
                   placeholder="VD: Amazon Web Services"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm outline-none focus:border-amber-500"
                 />
               </label>
               <label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">Năm</span>
+                <span className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Năm</span>
                 <input
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                   placeholder="VD: 2024"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm outline-none focus:border-amber-500"
                 />
               </label>
               <label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">URL file đính kèm (tùy chọn)</span>
+                <span className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">URL file đính kèm (tùy chọn)</span>
                 <input
                   value={fileUrl}
                   onChange={(e) => setFileUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm outline-none focus:border-amber-500"
                 />
               </label>
             </div>
-            <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+            <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-6 py-3 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
                 Huỷ
               </Button>

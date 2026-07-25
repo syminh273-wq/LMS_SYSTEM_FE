@@ -26,7 +26,7 @@ function rankBadge(rank: number) {
   if (rank === 2) {
     return (
       <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
-        <Medal size={18} className="text-slate-500" />
+        <Medal size={18} className="text-slate-500 dark:text-slate-400" />
       </div>
     );
   }
@@ -38,7 +38,7 @@ function rankBadge(rank: number) {
     );
   }
   return (
-    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500 font-black text-sm">
+    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-500 dark:text-slate-400 font-black text-sm">
       {rank}
     </div>
   );
@@ -117,7 +117,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
             <div className="text-xs font-black uppercase tracking-widest text-indigo-500">
               Bảng xếp hạng
             </div>
-            <div className="text-base font-black text-slate-900 truncate">
+            <div className="text-base font-black text-slate-900 dark:text-slate-100 truncate">
               {totalStudents > 0
                 ? `${totalStudents} thành viên đang cạnh tranh`
                 : 'Chưa có dữ liệu xếp hạng'}
@@ -145,7 +145,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
         <Card>
           <CardContent className="p-12 text-center">
             <Trophy size={40} className="mx-auto text-slate-300 mb-3" />
-            <div className="text-sm font-bold text-slate-500">
+            <div className="text-sm font-bold text-slate-500 dark:text-slate-400">
               Chưa có ai nộp bài trong lớp này.
             </div>
             <div className="text-xs text-slate-400 mt-1">
@@ -154,7 +154,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm divide-y divide-slate-100">
           {entries.map((e) => {
             const isMe = currentUserId && e.student_id === currentUserId;
             return (
@@ -169,12 +169,12 @@ export function LeaderboardTab({ classroomUid }: Props) {
                   {e.student_avatar ? (
                     <AvatarImage src={e.student_avatar} alt={e.student_name} />
                   ) : null}
-                  <AvatarFallback className="bg-slate-100 text-slate-600 text-xs font-black">
+                  <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-black">
                     {initials(e.student_name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-slate-900 truncate flex items-center gap-1.5">
+                  <div className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate flex items-center gap-1.5">
                     {e.student_name}
                     {isMe && (
                       <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">
@@ -191,7 +191,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-base font-black text-slate-900 leading-none">
+                  <div className="text-base font-black text-slate-900 dark:text-slate-100 leading-none">
                     {e.total_score.toFixed(1)}
                   </div>
                   <div className="text-[10px] font-bold text-slate-400 mt-1">
@@ -212,8 +212,8 @@ export function LeaderboardTab({ classroomUid }: Props) {
               <User size={16} className="text-indigo-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-slate-900 truncate">Bạn</div>
-              <div className="text-[11px] text-slate-500">Hạng {myRank}</div>
+              <div className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">Bạn</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">Hạng {myRank}</div>
             </div>
             <div className="text-right shrink-0">
               <div className="text-base font-black text-indigo-600">

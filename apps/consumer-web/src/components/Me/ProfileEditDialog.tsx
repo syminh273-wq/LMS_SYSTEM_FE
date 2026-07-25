@@ -53,11 +53,11 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
+        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100 dark:border-slate-800">
           <DialogTitle className="text-xl font-bold">
             {t('workspace.profile.edit_about')}
           </DialogTitle>
-          <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             {t('workspace.profile.edit_about_desc')}
           </p>
         </DialogHeader>
@@ -73,10 +73,10 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1">
               {t('workspace.profile.fields.skills')}
             </h3>
-            <p className="text-sm text-slate-500 mb-3 leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
               {t('workspace.profile.fields.skills_desc')}
             </p>
             <div className="flex flex-wrap gap-1.5 mb-2">
@@ -107,7 +107,7 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
                   if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
                 }}
                 placeholder={t('workspace.profile.fields.skills_placeholder')}
-                className="flex-1 px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
               />
               <Button
                 type="button"
@@ -128,7 +128,7 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+        <div className="sticky bottom-0 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-6 py-3 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             {t('workspace.common.cancel')}
           </Button>

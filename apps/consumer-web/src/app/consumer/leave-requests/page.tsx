@@ -123,10 +123,10 @@ export default function ConsumerLeaveRequestsPage() {
             <ClipboardList size={11} />
             {t('leave_request.page.title_student')}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
             {t('leave_request.page.title_student')}
           </h1>
-          <p className="text-slate-600 text-[14px] mt-1">
+          <p className="text-slate-600 dark:text-slate-400 text-[14px] mt-1">
             {t('leave_request.page.subtitle_student')}
           </p>
         </div>
@@ -157,7 +157,7 @@ export default function ConsumerLeaveRequestsPage() {
               'h-8 px-3 rounded-lg text-[12px] font-semibold border transition-colors',
               filter === f.key
                 ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-slate-300'
             )}
           >
             {t(f.labelKey, f.key)}
@@ -195,7 +195,7 @@ function StatCard({
   tone: 'slate' | 'amber' | 'emerald' | 'rose';
 }) {
   const TONES: Record<typeof tone, string> = {
-    slate: 'bg-slate-50 text-slate-700 border-slate-200',
+    slate: 'bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
     amber: 'bg-amber-50 text-amber-700 border-amber-200',
     emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     rose: 'bg-rose-50 text-rose-700 border-rose-200',

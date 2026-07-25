@@ -457,10 +457,10 @@ export default function ExamSessionPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900/50">
         <div className="text-center">
           <Loader2 size={40} className="mx-auto mb-4 animate-spin text-indigo-600" />
-          <p className="text-sm font-bold text-slate-500">Đang xác thực phiên thi...</p>
+          <p className="text-sm font-bold text-slate-500 dark:text-slate-400">Đang xác thực phiên thi...</p>
         </div>
       </div>
     );
@@ -468,12 +468,12 @@ export default function ExamSessionPage({ params }: Props) {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-        <div className="w-full max-w-md rounded-2xl border border-rose-100 bg-white p-8 text-center shadow-sm">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900/50 p-6">
+        <div className="w-full max-w-md rounded-2xl border border-rose-100 bg-white dark:bg-slate-900 p-8 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
             <AlertCircle size={28} className="text-rose-500" />
           </div>
-          <h1 className="text-xl font-black text-slate-900">Không thể vào phòng thi</h1>
+          <h1 className="text-xl font-black text-slate-900 dark:text-slate-100">Không thể vào phòng thi</h1>
           <p className="mt-2 text-sm font-bold text-rose-600">{error}</p>
           <p className="mt-1 text-xs text-slate-400">Link đã hết hạn hoặc không hợp lệ. Liên hệ giáo viên để được hỗ trợ.</p>
         </div>
@@ -507,11 +507,11 @@ export default function ExamSessionPage({ params }: Props) {
     const isForceSub = sub?.force_submitted === true || forced;
 
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50">
         <div className="mx-auto max-w-3xl space-y-4 p-6">
           {/* Header card */}
           <div className={`rounded-2xl border p-6 shadow-sm ${
-            isForceSub ? 'border-rose-200 bg-white' : 'border-emerald-200 bg-white'
+            isForceSub ? 'border-rose-200 bg-white dark:bg-slate-900' : 'border-emerald-200 bg-white dark:bg-slate-900'
           }`}>
             <div className="flex items-start gap-4">
               <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${
@@ -524,10 +524,10 @@ export default function ExamSessionPage({ params }: Props) {
                 )}
               </div>
               <div className="flex-1">
-                <h1 className="text-xl font-black text-slate-900">
+                <h1 className="text-xl font-black text-slate-900 dark:text-slate-100">
                   {isForceSub ? 'Bài đã bị nộp bắt buộc' : 'Nộp bài thành công!'}
                 </h1>
-                <p className="mt-1 text-sm font-bold text-slate-500">
+                <p className="mt-1 text-sm font-bold text-slate-500 dark:text-slate-400">
                   {isForceSub
                     ? 'Bạn đã vi phạm quy chế thi quá số lần cho phép. Bài làm đã được hệ thống ghi nhận và chờ giáo viên xét duyệt.'
                     : 'Bài làm của bạn đã được ghi nhận. Chờ giáo viên chấm điểm.'}
@@ -546,32 +546,32 @@ export default function ExamSessionPage({ params }: Props) {
               </div>
             ) : sub ? (
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Điểm</p>
-                  <p className="mt-1 text-2xl font-black text-slate-900 tabular-nums">
+                <div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Điểm</p>
+                  <p className="mt-1 text-2xl font-black text-slate-900 dark:text-slate-100 tabular-nums">
                     {sub.grade != null ? sub.grade : '—'}
-                    <span className="text-sm font-bold text-slate-500">/{sub.max_grade ?? exam.max_grade}</span>
+                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400">/{sub.max_grade ?? exam.max_grade}</span>
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Trạng thái</p>
+                <div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Trạng thái</p>
                   <p className={`mt-1 text-sm font-black ${
                     sub.status === 'graded' ? 'text-emerald-600'
                     : sub.status === 'late' ? 'text-amber-600'
-                    : 'text-slate-600'
+                    : 'text-slate-600 dark:text-slate-400'
                   }`}>
                     {sub.status === 'graded' ? 'Đã chấm' : sub.status === 'late' ? 'Trễ hạn' : 'Đã nộp'}
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Hiệu lực</p>
+                <div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Hiệu lực</p>
                   <p className={`mt-1 text-sm font-black ${isEffective ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {isEffective ? 'Có hiệu lực' : 'Chờ duyệt'}
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Loại</p>
-                  <p className="mt-1 text-sm font-black text-slate-700">
+                <div className="rounded-xl bg-slate-50 dark:bg-slate-900/50 p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Loại</p>
+                  <p className="mt-1 text-sm font-black text-slate-700 dark:text-slate-300">
                     {stType === 'online_quiz' || stType === 'multiple_choice' ? 'Trắc nghiệm'
                       : stType === 'essay' ? 'Tự luận'
                       : 'File'}
@@ -583,15 +583,15 @@ export default function ExamSessionPage({ params }: Props) {
             {sub?.feedback && (
               <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Nhận xét từ giáo viên</p>
-                <p className="mt-1 text-sm font-bold text-slate-800">{sub.feedback}</p>
+                <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">{sub.feedback}</p>
               </div>
             )}
           </div>
 
           {/* Counters card */}
           {resultCounters && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-sm font-black text-slate-900">Tổng quan vi phạm</h2>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
+              <h2 className="text-sm font-black text-slate-900 dark:text-slate-100">Tổng quan vi phạm</h2>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
                   <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Rời màn hình</p>
@@ -610,15 +610,15 @@ export default function ExamSessionPage({ params }: Props) {
           )}
 
           {/* Tabs */}
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex border-b border-slate-200">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+            <div className="flex border-b border-slate-200 dark:border-slate-700">
               <button
                 type="button"
                 onClick={() => setResultView('overview')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
                   resultView === 'overview'
                     ? 'border-b-2 border-indigo-500 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                 }`}
               >
                 Tổng quan
@@ -629,7 +629,7 @@ export default function ExamSessionPage({ params }: Props) {
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
                   resultView === 'answers'
                     ? 'border-b-2 border-indigo-500 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                 }`}
               >
                 Bài làm của tôi
@@ -640,7 +640,7 @@ export default function ExamSessionPage({ params }: Props) {
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
                   resultView === 'audit'
                     ? 'border-b-2 border-indigo-500 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-700'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300'
                 }`}
               >
                 Lịch sử ({resultAuditEvents.length})
@@ -650,9 +650,15 @@ export default function ExamSessionPage({ params }: Props) {
             <div className="p-5">
               {resultView === 'overview' && (
                 <div className="space-y-3 text-sm">
+<<<<<<< Updated upstream
                   <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
                     <span className="font-bold text-slate-600">Thời gian nộp</span>
                     <span className="font-black text-slate-900">{sub?.submitted_at ? parseVnDate(sub.submitted_at)?.toLocaleString('vi-VN') : '—'}</span>
+=======
+                  <div className="flex items-center justify-between rounded-xl bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
+                    <span className="font-bold text-slate-600 dark:text-slate-400">Thời gian nộp</span>
+                    <span className="font-black text-slate-900 dark:text-slate-100">{sub?.submitted_at ? new Date(sub.submitted_at).toLocaleString('vi-VN') : '—'}</span>
+>>>>>>> Stashed changes
                   </div>
                   {sub?.force_submitted_at && (
                     <div className="flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
@@ -669,10 +675,10 @@ export default function ExamSessionPage({ params }: Props) {
                     </div>
                   )}
                   {resultAuditEvents.length > 0 && (
-                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sự kiện ghi nhận</p>
-                      <p className="mt-1 text-sm font-bold text-slate-800">
-                        Tổng cộng <span className="font-black text-slate-900">{resultAuditEvents.length}</span> sự kiện đã được ghi lại trong phiên thi này.
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Sự kiện ghi nhận</p>
+                      <p className="mt-1 text-sm font-bold text-slate-800 dark:text-slate-200">
+                        Tổng cộng <span className="font-black text-slate-900 dark:text-slate-100">{resultAuditEvents.length}</span> sự kiện đã được ghi lại trong phiên thi này.
                       </p>
                       <button
                         type="button"
@@ -690,11 +696,11 @@ export default function ExamSessionPage({ params }: Props) {
                 <div className="space-y-3">
                   {stType === 'online_quiz' || stType === 'multiple_choice' ? (
                     <div className="space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Đáp án đã chọn</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Đáp án đã chọn</p>
                       {sub?.quiz_result?.results && sub.quiz_result.results.length > 0 ? (
                         <ol className="space-y-2">
                           {sub.quiz_result.results.map((r, i) => (
-                            <li key={String(r.question_uid ?? i)} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                            <li key={String(r.question_uid ?? i)} className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
                               <div className="flex items-start gap-3">
                                 <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black ${
                                   r.is_correct ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
@@ -702,14 +708,14 @@ export default function ExamSessionPage({ params }: Props) {
                                   {r.is_correct ? '✓' : '✗'}
                                 </span>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-black text-slate-900">{String(r.question_text ?? `Câu ${i + 1}`)}</p>
-                                  <p className="mt-1 text-xs text-slate-600">
-                                    Bạn chọn: <span className="font-black text-slate-800">{String(r.chosen ?? '(bỏ trống)').toUpperCase()}</span>
+                                  <p className="text-sm font-black text-slate-900 dark:text-slate-100">{String(r.question_text ?? `Câu ${i + 1}`)}</p>
+                                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+                                    Bạn chọn: <span className="font-black text-slate-800 dark:text-slate-200">{String(r.chosen ?? '(bỏ trống)').toUpperCase()}</span>
                                     {' · '}
                                     Đáp án đúng: <span className="font-black text-emerald-700">{String(r.correct_answer ?? '').toUpperCase()}</span>
                                   </p>
                                   {r.explanation && (
-                                    <p className="mt-1 text-xs italic text-slate-500">{String(r.explanation)}</p>
+                                    <p className="mt-1 text-xs italic text-slate-500 dark:text-slate-400">{String(r.explanation)}</p>
                                   )}
                                 </div>
                               </div>
@@ -721,8 +727,8 @@ export default function ExamSessionPage({ params }: Props) {
                       )}
                     </div>
                   ) : stType === 'file' ? (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">File đã nộp</p>
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">File đã nộp</p>
                       {sub?.resource_url ? (
                         <a
                           href={String(sub.resource_url)}
@@ -738,9 +744,9 @@ export default function ExamSessionPage({ params }: Props) {
                       )}
                     </div>
                   ) : (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bài làm tự luận</p>
-                      <p className="mt-2 whitespace-pre-wrap text-sm font-bold text-slate-800">{sub?.content || '(trống)'}</p>
+                    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Bài làm tự luận</p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm font-bold text-slate-800 dark:text-slate-200">{sub?.content || '(trống)'}</p>
                     </div>
                   )}
                 </div>
@@ -751,7 +757,7 @@ export default function ExamSessionPage({ params }: Props) {
                   {resultAuditEvents.length === 0 ? (
                     <p className="py-6 text-center text-sm text-slate-400">Chưa có sự kiện nào được ghi nhận.</p>
                   ) : (
-                    <ol className="relative space-y-2 border-l-2 border-slate-200 pl-5">
+                    <ol className="relative space-y-2 border-l-2 border-slate-200 dark:border-slate-700 pl-5">
                       {resultAuditEvents.map((ev) => {
                         const violation = isAuditViolation(ev.event_type);
                         const limit = isAuditLimit(ev.event_type);
@@ -764,15 +770,15 @@ export default function ExamSessionPage({ params }: Props) {
                         return (
                           <li key={ev.uid} className="relative">
                             <span className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dotColor}`} />
-                            <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                            <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/60 px-4 py-2.5">
                               <div className="min-w-0 flex-1">
                                 <p className={`text-sm font-black ${
-                                  force || limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800'
+                                  force || limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800 dark:text-slate-200'
                                 }`}>
                                   {humanizeAuditEvent(ev.event_type)}
                                 </p>
                                 {ev.event_data && Object.keys(ev.event_data).length > 0 && (
-                                  <p className="mt-0.5 text-[11px] font-bold text-slate-500">
+                                  <p className="mt-0.5 text-[11px] font-bold text-slate-500 dark:text-slate-400">
                                     {formatAuditEventData(ev.event_type, ev.event_data)}
                                   </p>
                                 )}
@@ -804,7 +810,7 @@ export default function ExamSessionPage({ params }: Props) {
   const canSubmit = !submitting && !timeExpired && session.token_status === 'active' && cameraValid;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50">
       {/* Camera monitor for online + camera_required exams */}
       {isOnline && exam.camera_required && (
         <FaceMonitorWidget
@@ -818,7 +824,7 @@ export default function ExamSessionPage({ params }: Props) {
       {warning && (
         <div
           key={`${warning.severity}-${warning.count}-${warning.rule ?? 'none'}-${warning.message}`}
-          className={`fixed right-4 top-4 z-[200] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border bg-white shadow-2xl animate-in slide-in-from-top-2 fade-in duration-300 ${
+          className={`fixed right-4 top-4 z-[200] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border bg-white dark:bg-slate-900 shadow-2xl animate-in slide-in-from-top-2 fade-in duration-300 ${
             warning.severity === 'danger'
               ? 'border-rose-300'
               : warning.severity === 'warning'
@@ -873,12 +879,12 @@ export default function ExamSessionPage({ params }: Props) {
                     ? 'Cảnh báo'
                     : 'Thông báo'}
               </p>
-              <p className="mt-0.5 text-sm font-bold text-slate-800">{warning.message}</p>
+              <p className="mt-0.5 text-sm font-bold text-slate-800 dark:text-slate-200">{warning.message}</p>
             </div>
             <button
               type="button"
               onClick={() => setWarning(null)}
-              className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+              className="text-slate-400 hover:text-slate-600 dark:text-slate-400 text-lg leading-none"
               aria-label="Đóng"
             >
               ×
@@ -887,7 +893,7 @@ export default function ExamSessionPage({ params }: Props) {
           {warning.rule && warning.max > 0 && (
             <div className="flex items-center justify-between gap-3 px-4 py-2.5">
               <div className="flex-1">
-                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   <span>
                     {warning.rule === 'visibility_breaks'
                       ? 'Rời tab/cửa sổ'
@@ -897,7 +903,7 @@ export default function ExamSessionPage({ params }: Props) {
                     {warning.count}/{warning.max}
                   </span>
                 </div>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       warning.remaining !== null && warning.remaining <= 0
@@ -918,7 +924,7 @@ export default function ExamSessionPage({ params }: Props) {
                         ? 'text-rose-600'
                         : warning.remaining === 1
                           ? 'text-amber-600'
-                          : 'text-slate-500'
+                          : 'text-slate-500 dark:text-slate-400'
                     }`}
                   >
                     {warning.remaining <= 0
@@ -939,20 +945,20 @@ export default function ExamSessionPage({ params }: Props) {
       )}
 
       {/* Sticky header with timer */}
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white shadow-sm">
+      <header className="sticky top-0 z-20 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
               <FileText size={12} />
               {isOnline ? 'Thi Trực Tuyến' : 'Bài Kiểm Tra'}
             </div>
-            <h1 className="truncate text-lg font-black text-slate-900">{exam.title}</h1>
+            <h1 className="truncate text-lg font-black text-slate-900 dark:text-slate-100">{exam.title}</h1>
           </div>
 
           {timeLeft !== null && (
-            <div className={`flex items-center gap-2 rounded-xl px-4 py-2 ${timeLeft <= 300 ? 'bg-rose-50' : 'bg-slate-100'}`}>
-              <Timer size={16} className={timeLeft <= 300 ? 'text-rose-500' : 'text-slate-500'} />
-              <span className={`text-lg font-black tabular-nums ${timeLeft <= 300 ? 'text-rose-600' : 'text-slate-800'}`}>
+            <div className={`flex items-center gap-2 rounded-xl px-4 py-2 ${timeLeft <= 300 ? 'bg-rose-50' : 'bg-slate-100 dark:bg-slate-800'}`}>
+              <Timer size={16} className={timeLeft <= 300 ? 'text-rose-500' : 'text-slate-500 dark:text-slate-400'} />
+              <span className={`text-lg font-black tabular-nums ${timeLeft <= 300 ? 'text-rose-600' : 'text-slate-800 dark:text-slate-200'}`}>
                 {formatTime(timeLeft)}
               </span>
             </div>
@@ -974,7 +980,7 @@ export default function ExamSessionPage({ params }: Props) {
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-2">
+              <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 px-3 py-2">
                 <Camera size={14} className="text-slate-400" />
                 <span className="text-xs font-black text-slate-400">Camera không bắt buộc</span>
               </div>
@@ -988,10 +994,10 @@ export default function ExamSessionPage({ params }: Props) {
                 setAuditOpen(true);
                 void fetchAuditLog();
               }}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-700 transition-all hover:bg-slate-100"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-3 py-2 text-xs font-black text-slate-700 dark:text-slate-300 transition-all hover:bg-slate-100 dark:bg-slate-800"
               title="Xem lịch sử giám sát"
             >
-              <Activity size={14} className="text-slate-500" />
+              <Activity size={14} className="text-slate-500 dark:text-slate-400" />
               <span className="hidden sm:inline">Lịch sử</span>
             </button>
           )}
@@ -1001,22 +1007,22 @@ export default function ExamSessionPage({ params }: Props) {
       {/* Camera Enforcement Overlay */}
       {cameraEnforced && !cameraValid && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-md animate-in fade-in duration-500">
-          <div className="w-full max-w-md p-8 text-center bg-white rounded-[32px] shadow-2xl border border-indigo-100">
+          <div className="w-full max-w-md p-8 text-center bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl border border-indigo-100">
             <div className="mx-auto w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
               <Camera size={40} className="text-indigo-600 animate-pulse" />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 mb-2">Bắt buộc mở Camera</h2>
-            <p className="text-slate-500 font-medium mb-8">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-2">Bắt buộc mở Camera</h2>
+            <p className="text-slate-500 dark:text-slate-400 font-medium mb-8">
               Để đảm bảo tính công bằng, bài thi này yêu cầu bạn phải bật camera và giữ khuôn mặt trong khung hình suốt thời gian thi.
             </p>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-left">
+              <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-left">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${cameraStatus?.camera_open ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                   {cameraStatus?.camera_open ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-slate-800">Trạng thái Camera</p>
-                  <p className="text-xs text-slate-500">{cameraStatus?.camera_open ? 'Đã bật' : 'Chưa bật hoặc bị chặn'}</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Trạng thái Camera</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{cameraStatus?.camera_open ? 'Đã bật' : 'Chưa bật hoặc bị chặn'}</p>
                 </div>
               </div>
 
@@ -1026,8 +1032,8 @@ export default function ExamSessionPage({ params }: Props) {
                     <Monitor size={16} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-slate-800">Xác thực khuôn mặt</p>
-                    <p className="text-xs text-slate-500">Vui lòng hướng mặt về phía camera</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Xác thực khuôn mặt</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Vui lòng hướng mặt về phía camera</p>
                   </div>
                 </div>
               )}
@@ -1048,8 +1054,8 @@ export default function ExamSessionPage({ params }: Props) {
 
       <main className={`mx-auto max-w-4xl space-y-6 p-6 transition-all duration-500 ${(!cameraValid && cameraEnforced) ? 'blur-sm pointer-events-none' : ''}`}>
         {/* Exam info */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <div className="flex flex-wrap gap-3 text-xs font-bold text-slate-500 dark:text-slate-400">
             {exam.due_date && (
               <span className="flex items-center gap-1.5">
                 <Clock size={13} className="text-indigo-500" />
@@ -1065,16 +1071,16 @@ export default function ExamSessionPage({ params }: Props) {
           </div>
 
           {exam.description && (
-            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600">{exam.description}</p>
+            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">{exam.description}</p>
           )}
         </div>
 
         {exam.content_type === 'quiz' && (
-          <div className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-indigo-100 bg-white dark:bg-slate-900 p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Bài thi trắc nghiệm</div>
-                <h2 className="mt-1 text-lg font-black text-slate-900">{quizQuestions.length} câu hỏi</h2>
+                <h2 className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{quizQuestions.length} câu hỏi</h2>
               </div>
               <div className="rounded-xl bg-indigo-50 px-3 py-2 text-xs font-black text-indigo-600">
                 {Object.keys(quizAnswers).length}/{quizQuestions.length}
@@ -1082,8 +1088,8 @@ export default function ExamSessionPage({ params }: Props) {
             </div>
             <div className="space-y-5">
               {quizQuestions.map((question, index) => (
-                <div key={question.uid} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                  <div className="mb-3 text-sm font-black leading-relaxed text-slate-900">
+                <div key={question.uid} className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-4">
+                  <div className="mb-3 text-sm font-black leading-relaxed text-slate-900 dark:text-slate-100">
                     Câu {index + 1}. {question.question_text}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1099,7 +1105,7 @@ export default function ExamSessionPage({ params }: Props) {
                           className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition-all disabled:opacity-60 ${
                             selected
                               ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50'
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-200 hover:bg-indigo-50'
                           }`}
                         >
                           <span className="mr-2 text-xs font-black uppercase">{letter}.</span>
@@ -1116,17 +1122,17 @@ export default function ExamSessionPage({ params }: Props) {
 
         {/* Exam content */}
         {exam.content_type === 'markdown' && exam.body && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
             <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
               <FileText size={12} />
               Đề bài
             </div>
-            <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">{exam.body}</div>
+            <div className="prose prose-sm max-w-none text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{exam.body}</div>
           </div>
         )}
 
         {(exam.content_type === 'pdf' || exam.content_type === 'image' || exam.content_type === 'file') && exam.meta?.url && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
             <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
               <File size={12} />
               Tài liệu đề thi
@@ -1148,7 +1154,7 @@ export default function ExamSessionPage({ params }: Props) {
         )}
 
         {/* Answer form */}
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <div className="mb-4 text-[10px] font-black uppercase tracking-widest text-indigo-500">Bài làm của bạn</div>
 
           {exam.content_type === 'markdown' && (
@@ -1157,15 +1163,15 @@ export default function ExamSessionPage({ params }: Props) {
               onChange={e => setAnswerContent(e.target.value)}
               rows={10}
               disabled={timeExpired || submitted}
-              className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-50"
+              className="w-full resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100 outline-none transition-all focus:border-indigo-500 focus:bg-white dark:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-50"
               placeholder="Nhập bài làm của bạn tại đây..."
             />
           )}
 
           {needsFile && (
-            <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
-                <div className="truncate text-sm font-bold text-slate-800">
+                <div className="truncate text-sm font-bold text-slate-800 dark:text-slate-200">
                   {answerFile?.name || 'Chưa chọn file bài làm'}
                 </div>
                 <div className="text-[11px] font-bold uppercase text-slate-400">
@@ -1232,23 +1238,23 @@ export default function ExamSessionPage({ params }: Props) {
           onClick={() => setAuditOpen(false)}
         >
           <div
-            className="flex h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:h-[80vh] sm:rounded-3xl"
+            className="flex h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-white dark:bg-slate-900 shadow-2xl sm:h-[80vh] sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between border-b border-slate-200 bg-gradient-to-br from-indigo-50 to-white px-6 py-4">
+            <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-700 bg-gradient-to-br from-indigo-50 to-white px-6 py-4">
               <div>
                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
                   <Activity size={12} />
                   Lịch sử giám sát
                 </div>
-                <h2 className="mt-1 text-lg font-black text-slate-900">
+                <h2 className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">
                   {auditCounters && (
                     <>
                       {auditCounters.visibility_breaks.count}/{auditCounters.visibility_breaks.max}
-                      <span className="ml-1 text-xs font-bold text-slate-500">rời màn hình</span>
+                      <span className="ml-1 text-xs font-bold text-slate-500 dark:text-slate-400">rời màn hình</span>
                       <span className="mx-2 text-slate-300">·</span>
                       {auditCounters.face_warnings.count}/{auditCounters.face_warnings.max}
-                      <span className="ml-1 text-xs font-bold text-slate-500">cảnh báo khuôn mặt</span>
+                      <span className="ml-1 text-xs font-bold text-slate-500 dark:text-slate-400">cảnh báo khuôn mặt</span>
                     </>
                   )}
                 </h2>
@@ -1256,7 +1262,7 @@ export default function ExamSessionPage({ params }: Props) {
               <button
                 type="button"
                 onClick={() => setAuditOpen(false)}
-                className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-600 dark:text-slate-400"
                 aria-label="Đóng"
               >
                 <X size={18} />
@@ -1273,7 +1279,7 @@ export default function ExamSessionPage({ params }: Props) {
                   <p className="text-sm font-bold text-slate-400">Chưa có sự kiện nào.</p>
                 </div>
               ) : (
-                <ol className="relative space-y-3 border-l-2 border-slate-200 pl-5">
+                <ol className="relative space-y-3 border-l-2 border-slate-200 dark:border-slate-700 pl-5">
                   {auditEvents.map((ev) => {
                     const violation = isAuditViolation(ev.event_type);
                     const limit = isAuditLimit(ev.event_type);
@@ -1290,15 +1296,15 @@ export default function ExamSessionPage({ params }: Props) {
                         <span
                           className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dotColor}`}
                         />
-                        <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                        <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/60 px-4 py-2.5">
                           <div className="min-w-0 flex-1">
                             <p className={`text-sm font-black ${
-                              force ? 'text-rose-700' : limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800'
+                              force ? 'text-rose-700' : limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800 dark:text-slate-200'
                             }`}>
                               {humanizeAuditEvent(ev.event_type)}
                             </p>
                             {ev.event_data && Object.keys(ev.event_data).length > 0 && (
-                              <p className="mt-0.5 text-[11px] font-bold text-slate-500">
+                              <p className="mt-0.5 text-[11px] font-bold text-slate-500 dark:text-slate-400">
                                 {formatAuditEventData(ev.event_type, ev.event_data)}
                               </p>
                             )}

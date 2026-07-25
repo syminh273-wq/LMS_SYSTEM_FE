@@ -45,7 +45,7 @@ function rankBadge(rank: number) {
     );
   }
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
       {rank}
     </div>
   );
@@ -83,7 +83,7 @@ export function GlobalLeaderboardList({
             {t('ranking.leaderboard_title', 'Global leaderboard')}
           </h2>
           {myRank?.rank && (
-            <p className="mt-0.5 text-sm text-slate-500">
+            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
               {t('ranking.my_rank', 'Your rank: #{{rank}}', { rank: myRank.rank })}
               <span className="ml-2 text-xs text-slate-400">
                 · {myRank.total_xp.toLocaleString()} XP · Lv {myRank.level}
@@ -92,7 +92,7 @@ export function GlobalLeaderboardList({
           )}
         </div>
 
-        <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="inline-flex rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           {PERIODS.map((p) => (
             <button
               key={p.key}
@@ -102,7 +102,7 @@ export function GlobalLeaderboardList({
                 'rounded-full px-3.5 py-1.5 text-xs font-bold transition',
                 activePeriod === p.key
                   ? 'bg-indigo-600 text-white shadow'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
               )}
             >
               {t(`ranking.${p.label}`, p.key)}
@@ -114,7 +114,7 @@ export function GlobalLeaderboardList({
       {loading ? (
         <SkeletonList />
       ) : data.entries.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 p-12 text-center text-sm text-slate-500 dark:border-slate-700">
+        <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-12 text-center text-sm text-slate-500 dark:border-slate-700">
           {t('ranking.no_leaderboard_data', 'No students ranked yet.')}
         </div>
       ) : (
@@ -160,7 +160,7 @@ function LeaderboardRow({
         {entry.student_avatar ? (
           <AvatarImage src={entry.student_avatar} alt={entry.student_name} />
         ) : null}
-        <AvatarFallback className="bg-slate-100 text-xs font-black text-slate-600 dark:bg-slate-700 dark:text-slate-200">
+        <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-xs font-black text-slate-600 dark:bg-slate-700 dark:text-slate-200">
           {initials(entry.student_name)}
         </AvatarFallback>
       </Avatar>
@@ -175,7 +175,7 @@ function LeaderboardRow({
             </span>
           )}
         </div>
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-slate-500 dark:text-slate-400">
           {entry.total_xp.toLocaleString()} XP
         </div>
       </div>

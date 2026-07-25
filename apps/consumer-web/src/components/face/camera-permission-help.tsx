@@ -12,12 +12,12 @@ export function CameraPermissionHelp({ reason, onRetry }: Props) {
   if (reason === 'not_found') {
     return (
       <div className="flex flex-col items-center gap-3 px-4 py-5 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
           <VideoOff size={22} />
         </div>
         <div>
-          <p className="text-sm font-bold text-slate-800">Không tìm thấy camera</p>
-          <p className="mt-1 text-xs font-medium text-slate-500">
+          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Không tìm thấy camera</p>
+          <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
             Thiết bị của bạn không có camera hoặc camera chưa được kết nối.
           </p>
         </div>
@@ -37,7 +37,7 @@ export function CameraPermissionHelp({ reason, onRetry }: Props) {
     <div className="flex flex-col gap-4 px-4 py-5">
       {/* Address bar mock */}
       <div className="relative">
-        <div className="flex items-center gap-2 rounded-xl border-2 border-amber-300 bg-amber-50 px-3 py-2.5 text-xs font-medium text-slate-600">
+        <div className="flex items-center gap-2 rounded-xl border-2 border-amber-300 bg-amber-50 px-3 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-400">
           <Lock size={13} className="shrink-0 text-amber-600" />
           <span className="flex-1 truncate text-slate-400">localhost:3000</span>
           <span className="rounded bg-amber-200 px-1.5 py-0.5 text-[10px] font-black text-amber-800">
@@ -51,7 +51,7 @@ export function CameraPermissionHelp({ reason, onRetry }: Props) {
         </div>
       </div>
 
-      <ol className="space-y-2 text-xs font-medium text-slate-600">
+      <ol className="space-y-2 text-xs font-medium text-slate-600 dark:text-slate-400">
         <Step n={1} text='Nhấn vào biểu tượng 🔒 trên thanh địa chỉ trình duyệt' />
         <Step n={2} text='Tìm mục "Camera" và chọn "Cho phép"' />
         <Step n={3} text='Nhấn "Thử lại" bên dưới' />

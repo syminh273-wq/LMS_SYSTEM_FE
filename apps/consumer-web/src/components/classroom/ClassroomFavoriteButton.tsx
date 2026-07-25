@@ -57,13 +57,13 @@ export function ClassroomFavoriteButton({
     'inline-flex items-center justify-center gap-1.5 transition active:scale-95 disabled:opacity-60';
   const variants: Record<Variant, string> = {
     overlay:
-      'h-9 w-9 rounded-full bg-white/90 backdrop-blur shadow-sm hover:bg-white text-slate-700',
+      'h-9 w-9 rounded-full bg-white/90 backdrop-blur shadow-sm hover:bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300',
     inline:
       'h-8 px-3 rounded-full border text-xs font-bold',
   };
   const activeCls = isFavorited
     ? 'border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100'
-    : 'border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500';
+    : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:border-rose-200 hover:text-rose-500';
 
   if (variant === 'overlay') {
     return (

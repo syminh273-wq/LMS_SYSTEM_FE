@@ -88,7 +88,7 @@ export function FeaturedEditDialog({ initial, onClose, onSaved }: Props) {
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
+              className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
               placeholder={t('portfolio.placeholders.achievement_title')}
             />
           </Field>
@@ -97,7 +97,7 @@ export function FeaturedEditDialog({ initial, onClose, onSaved }: Props) {
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
+              className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
               placeholder={t('portfolio.placeholders.description')}
             />
           </Field>
@@ -105,7 +105,7 @@ export function FeaturedEditDialog({ initial, onClose, onSaved }: Props) {
             <input
               value={form.tag}
               onChange={(e) => setForm({ ...form, tag: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
+              className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
               placeholder="e.g. Hàn Lâm · 2023"
             />
           </Field>
@@ -115,7 +115,7 @@ export function FeaturedEditDialog({ initial, onClose, onSaved }: Props) {
                 <img
                   src={form.file_url}
                   alt="preview"
-                  className="w-20 h-14 object-cover rounded border border-slate-200"
+                  className="w-20 h-14 object-cover rounded border border-slate-200 dark:border-slate-700"
                 />
                 <label className="text-xs font-bold text-[#0a66c2] cursor-pointer hover:underline">
                   {t('portfolio.labels.replace_file')}
@@ -128,7 +128,7 @@ export function FeaturedEditDialog({ initial, onClose, onSaved }: Props) {
                 </label>
               </div>
             ) : (
-              <label className="flex items-center justify-center gap-2 px-3 py-3 border-2 border-dashed border-slate-200 rounded-md cursor-pointer hover:border-[#0a66c2] text-xs font-bold text-slate-500">
+              <label className="flex items-center justify-center gap-2 px-3 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-md cursor-pointer hover:border-[#0a66c2] text-xs font-bold text-slate-500 dark:text-slate-400">
                 {uploading ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
                 {t('portfolio.labels.upload_file')}
                 <input
@@ -162,7 +162,7 @@ export function FeaturedEditDialog({ initial, onClose, onSaved }: Props) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-xs font-bold text-slate-700 mb-1">{label}</span>
+      <span className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">{label}</span>
       {children}
     </label>
   );

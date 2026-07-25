@@ -120,7 +120,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
               <>
                 <Loader2 size={48} className="mx-auto text-indigo-600 animate-spin" />
                 <h2 className="text-xl font-bold">{t('course.checkout.processing_title', 'Processing payment')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.processing_desc', 'Redirecting to MoMo...')}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{t('course.checkout.processing_desc', 'Redirecting to MoMo...')}</p>
               </>
             )}
 
@@ -131,7 +131,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
                   <Loader2 size={20} className="absolute inset-0 m-auto animate-spin text-indigo-400" />
                 </div>
                 <h2 className="text-xl font-bold">{t('course.checkout.processing_title', 'Processing payment')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.processing_desc', 'Waiting for MoMo to confirm.')}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{t('course.checkout.processing_desc', 'Waiting for MoMo to confirm.')}</p>
               </>
             )}
 
@@ -139,7 +139,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
               <>
                 <CheckCircle2 size={64} className="mx-auto text-emerald-500" />
                 <h2 className="text-xl font-bold">{t('course.checkout.success_title', 'Payment successful!')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.success_desc', 'Redirecting to your classroom...')}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{t('course.checkout.success_desc', 'Redirecting to your classroom...')}</p>
               </>
             )}
 
@@ -147,7 +147,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
               <>
                 <XCircle size={64} className="mx-auto text-rose-500" />
                 <h2 className="text-xl font-bold">{t('course.checkout.failed_title', 'Payment failed')}</h2>
-                <p className="text-slate-500 text-sm">{errorMsg}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{errorMsg}</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
                     onClick={() => {
@@ -174,7 +174,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
               <>
                 <AlertTriangle size={64} className="mx-auto text-amber-500" />
                 <h2 className="text-xl font-bold">{t('course.checkout.timeout_title', 'Still processing')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.timeout_desc', 'Please check back in a few minutes.')}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{t('course.checkout.timeout_desc', 'Please check back in a few minutes.')}</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
                     onClick={() => router.push('/consumer/course')}

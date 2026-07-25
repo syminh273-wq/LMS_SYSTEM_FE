@@ -326,7 +326,7 @@ export default function QuizGamePage({ params }: Props) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-100 flex flex-col items-center justify-center p-4 text-center">
         <XCircle size={48} className="text-rose-400 mb-4" />
-        <p className="font-bold text-slate-700">{error}</p>
+        <p className="font-bold text-slate-700 dark:text-slate-300">{error}</p>
         <Button onClick={() => router.push(`/consumer/classroom/${classroomUid}`)} className="mt-6 rounded-xl bg-indigo-600 text-white">
           Quay lại lớp học
         </Button>
@@ -352,7 +352,7 @@ export default function QuizGamePage({ params }: Props) {
       <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-violet-700 flex flex-col items-center justify-center p-6 text-white">
         <div className="max-w-md w-full space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="text-center space-y-3">
-            <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto border border-white/30">
+            <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto border border-white dark:border-slate-900/30">
               <Trophy size={40} className="text-yellow-300" />
             </div>
             <h1 className="text-3xl font-black tracking-tight">{quiz.title}</h1>
@@ -393,7 +393,7 @@ export default function QuizGamePage({ params }: Props) {
           )}
 
           {/* Quiz info */}
-          <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 space-y-3">
+          <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white dark:border-slate-900/20 space-y-3">
             <div className="flex justify-between text-sm font-bold">
               <span className="text-indigo-200">Tổng câu hỏi</span>
               <span>{quiz.questions_count} câu</span>
@@ -434,7 +434,7 @@ export default function QuizGamePage({ params }: Props) {
 
           {/* Past attempts history */}
           {pastAttempts.length > 0 && (
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15 space-y-2">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white dark:border-slate-900/15 space-y-2">
               <div className="text-[10px] font-black uppercase text-indigo-300 tracking-wider mb-2">Lịch sử làm bài</div>
               {pastAttempts.slice(0, 3).map(a => (
                 <div key={a.uid} className="flex items-center justify-between text-xs font-bold">
@@ -455,6 +455,7 @@ export default function QuizGamePage({ params }: Props) {
             </div>
           )}
 
+<<<<<<< Updated upstream
           {/* Leaderboard button — visible to all classroom members, even if they haven't taken the quiz yet */}
           <Button
             type="button"
@@ -471,6 +472,11 @@ export default function QuizGamePage({ params }: Props) {
             </div>
           ) : isBlocked ? (
             <div className="bg-white/10 border border-white/20 rounded-2xl p-5 text-center space-y-2">
+=======
+          {/* Start / blocked */}
+          {isBlocked ? (
+            <div className="bg-white/10 border border-white dark:border-slate-900/20 rounded-2xl p-5 text-center space-y-2">
+>>>>>>> Stashed changes
               <Lock size={28} className="mx-auto text-indigo-300" />
               <p className="font-black text-sm">Bạn đã dùng hết {maxAttempts} lần làm bài</p>
               <p className="text-xs text-indigo-300 font-medium">Liên hệ giáo viên để được mở thêm lượt</p>
@@ -486,7 +492,7 @@ export default function QuizGamePage({ params }: Props) {
           ) : (
             <Button
               onClick={handleStartPlaying}
-              className="w-full h-14 bg-white text-indigo-700 hover:bg-indigo-50 font-black text-base rounded-2xl shadow-xl shadow-indigo-900/30 gap-3"
+              className="w-full h-14 bg-white dark:bg-slate-900 text-indigo-700 hover:bg-indigo-50 font-black text-base rounded-2xl shadow-xl shadow-indigo-900/30 gap-3"
             >
               {attemptCount > 0 ? 'LÀM LẠI' : 'BẮT ĐẦU CHƠI'}
               <ChevronRight size={20} />
@@ -539,6 +545,7 @@ export default function QuizGamePage({ params }: Props) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-violet-50 flex flex-col">
         {/* Header */}
+<<<<<<< Updated upstream
         <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
             <button
@@ -599,11 +606,38 @@ export default function QuizGamePage({ params }: Props) {
                   />
                 )}
               </div>
+=======
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-4 flex items-center gap-4">
+          <button type="button" onClick={handleRestart} className="text-slate-400 hover:text-slate-600 dark:text-slate-400 transition">
+            <ArrowLeft size={20} />
+          </button>
+          <div className="flex-1">
+            <div className="flex justify-between text-xs font-bold text-slate-400 mb-1.5">
+              <span>Câu {currentIdx + 1} / {totalQuestions}</span>
+              {quiz?.time_limit_seconds ? (
+                <span className={`flex items-center gap-1 font-black ${timerUrgent ? 'text-rose-500 animate-pulse' : 'text-slate-500 dark:text-slate-400'}`}>
+                  <Clock size={12} />
+                  {fmtSeconds(timeLeft)}
+                </span>
+              ) : (
+                <span>{Math.round(progress)}%</span>
+              )}
+            </div>
+            <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: quiz?.time_limit_seconds ? `${timePct}%` : `${progress}%`,
+                  backgroundColor: timerUrgent ? '#ef4444' : '#6366f1',
+                }}
+              />
+>>>>>>> Stashed changes
             </div>
           </div>
         </div>
 
         {/* Question */}
+<<<<<<< Updated upstream
         <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 max-w-2xl mx-auto w-full">
           <div className="w-full space-y-5 sm:space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300" key={currentQuestion.uid}>
             <div className="relative bg-white rounded-3xl border border-slate-200/80 shadow-lg shadow-indigo-100/40 p-6 sm:p-7 overflow-hidden">
@@ -620,6 +654,15 @@ export default function QuizGamePage({ params }: Props) {
                 )}
               </div>
               <p className="text-base sm:text-lg font-bold text-slate-900 leading-relaxed">{currentQuestion.question_text}</p>
+=======
+        <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-2xl mx-auto w-full">
+          <div className="w-full space-y-6 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
+              <div className="text-[10px] font-black uppercase text-indigo-500 tracking-wider mb-3">
+                Câu hỏi {currentIdx + 1}
+              </div>
+              <p className="text-lg font-black text-slate-900 dark:text-slate-100 leading-relaxed">{currentQuestion.question_text}</p>
+>>>>>>> Stashed changes
             </div>
 
             <div className="grid grid-cols-1 gap-3">
@@ -634,6 +677,7 @@ export default function QuizGamePage({ params }: Props) {
                     style={{ animationDelay: `${idx * 60}ms` }}
                     className={`group w-full flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all duration-200 focus:outline-none animate-in fade-in slide-in-from-left-2
                       ${selected === null
+<<<<<<< Updated upstream
                         ? 'border-slate-200 bg-white hover:border-indigo-400 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
                         : isSelected
                           ? 'border-indigo-500 bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-200 scale-[1.01]'
@@ -646,6 +690,16 @@ export default function QuizGamePage({ params }: Props) {
                         : selected === null
                           ? 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 group-hover:from-indigo-100 group-hover:to-violet-100 group-hover:text-indigo-600'
                           : 'bg-slate-100 text-slate-400'
+=======
+                        ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-indigo-300 hover:bg-indigo-50 hover:shadow-md active:scale-[0.98]'
+                        : isSelected
+                          ? 'border-indigo-500 bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                          : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-400 opacity-60'
+                      }`}
+                  >
+                    <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${
+                      isSelected ? 'bg-white dark:bg-slate-900 text-indigo-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+>>>>>>> Stashed changes
                     }`}>
                       {OPTION_LABELS[opt]}
                     </span>
@@ -793,7 +847,7 @@ export default function QuizGamePage({ params }: Props) {
             {result.results.map((item, idx) => (
               <div
                 key={item.question_uid}
-                className={`bg-white rounded-2xl border shadow-sm p-5 space-y-3 ${
+                className={`bg-white dark:bg-slate-900 rounded-2xl border shadow-sm p-5 space-y-3 ${
                   item.is_correct ? 'border-emerald-100' : 'border-rose-100'
                 }`}
               >
@@ -802,7 +856,7 @@ export default function QuizGamePage({ params }: Props) {
                     ? <CheckCircle2 size={20} className="text-emerald-500 shrink-0 mt-0.5" />
                     : <XCircle size={20} className="text-rose-500 shrink-0 mt-0.5" />
                   }
-                  <p className="text-sm font-bold text-slate-900 leading-relaxed">
+                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-relaxed">
                     <span className="text-slate-400 font-black mr-1">{idx + 1}.</span>
                     {item.question_text}
                   </p>
@@ -824,7 +878,7 @@ export default function QuizGamePage({ params }: Props) {
                 </div>
 
                 {item.explanation && (
-                  <div className="pl-8 text-xs text-slate-500 font-medium bg-amber-50 rounded-xl px-4 py-2 border border-amber-100">
+                  <div className="pl-8 text-xs text-slate-500 dark:text-slate-400 font-medium bg-amber-50 rounded-xl px-4 py-2 border border-amber-100">
                     <span className="font-black text-amber-600">Giải thích: </span>{item.explanation}
                   </div>
                 )}

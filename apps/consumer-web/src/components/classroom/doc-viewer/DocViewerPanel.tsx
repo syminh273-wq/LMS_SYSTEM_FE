@@ -288,13 +288,13 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
     >
       <div
         ref={panelRef}
-        className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top bar */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 bg-slate-50">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-slate-900 truncate" title={doc.name}>
+            <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate" title={doc.name}>
               {doc.name}
             </p>
             <div className="flex items-center gap-2 mt-1">
@@ -306,7 +306,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 {progressPct}% · {notes.length} note
               </span>
             </div>
@@ -370,7 +370,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
             href={doc.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
+            className="p-2 rounded-md hover:bg-slate-200 text-slate-600 dark:text-slate-400"
             title="Mở file gốc"
           >
             <Download size={14} />
@@ -378,7 +378,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
+            className="p-2 rounded-md hover:bg-slate-200 text-slate-600 dark:text-slate-400"
             title="Đóng"
           >
             <X size={16} />
@@ -393,7 +393,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
 
         <div className="flex-1 min-h-0 flex flex-col md:flex-row">
           {/* Viewer */}
-          <div className="flex-1 min-w-0 min-h-0 overflow-auto bg-slate-100 p-4 relative">
+          <div className="flex-1 min-w-0 min-h-0 overflow-auto bg-slate-100 dark:bg-slate-800 p-4 relative">
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10">
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
@@ -434,7 +434,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                             setEditingNote(n);
                             setPendingNote(null);
                           }}
-                          className={`absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full ${colorCls} text-[10px] font-black shadow-lg ring-2 ring-white pointer-events-auto cursor-pointer hover:scale-110 transition`}
+                          className={`absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full ${colorCls} text-[10px] font-black shadow-lg ring-2 ring-white dark:ring-slate-900 pointer-events-auto cursor-pointer hover:scale-110 transition`}
                           style={{ left, top }}
                           title={n.content}
                         >
@@ -453,7 +453,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
 
             {pdfable && (
               <div className="flex flex-col h-full min-h-0">
-                <div className="flex items-center gap-2 mb-2 text-xs text-slate-600">
+                <div className="flex items-center gap-2 mb-2 text-xs text-slate-600 dark:text-slate-400">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -467,7 +467,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                     <ChevronRight size={14} />
                   </Button>
                   {notes.length > 0 && (
-                    <span className="ml-2 text-[10px] text-slate-500 font-bold">
+                    <span className="ml-2 text-[10px] text-slate-500 dark:text-slate-400 font-bold">
                       {notes.length} note trên tài liệu
                     </span>
                   )}
@@ -499,7 +499,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                           e.stopPropagation();
                           jumpToNote(n);
                         }}
-                        className={`absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full ${colorCls} text-[10px] font-black shadow-lg ring-2 ring-white pointer-events-auto cursor-pointer hover:scale-110 transition z-10`}
+                        className={`absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full ${colorCls} text-[10px] font-black shadow-lg ring-2 ring-white dark:ring-slate-900 pointer-events-auto cursor-pointer hover:scale-110 transition z-10`}
                         style={{ left, top }}
                         title={`Trang ${n.page ?? 1} — ${n.content}`}
                       >
@@ -514,7 +514,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
             )}
 
             {!imageable && !pdfable && (
-              <div className="flex flex-col items-center justify-center h-full text-slate-500 text-sm">
+              <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400 text-sm">
                 <p className="mb-2 font-bold">{t('doc_viewer.no_viewer', 'File này không hỗ trợ xem trực tiếp.')}</p>
                 <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">
                   {t('doc_viewer.open_raw', 'Mở file gốc')}
@@ -525,8 +525,8 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
 
           {/* Notes side panel (image + pdf) */}
           {(imageable || pdfable) && (
-            <div className="w-full md:w-72 border-t md:border-t-0 md:border-l border-slate-200 bg-white flex flex-col max-h-[40vh] md:max-h-none">
-              <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+            <div className="w-full md:w-72 border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col max-h-[40vh] md:max-h-none">
+              <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                   {t('doc_viewer.notes_title', 'Ghi chú của tôi')} ({notes.length})
                 </span>
@@ -553,7 +553,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                         className={`w-full text-left p-2 rounded-lg border transition group ${
                           isCurrentPage
                             ? 'border-indigo-300 bg-indigo-50/40'
-                            : 'border-slate-200 hover:border-indigo-300'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300'
                         }`}
                       >
                         <div className="flex items-center gap-2 mb-1">
@@ -564,14 +564,14 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                               Trang {n.page}
                             </span>
                           )}
-                          <span className="text-[10px] font-bold text-slate-500">
+                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                             {Math.round((n.progress_at ?? 0) * 100)}%
                           </span>
                           <span className="ml-auto text-[10px] text-slate-400">
                             {n.created_at ? new Date(n.created_at).toLocaleDateString('vi-VN') : ''}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-700 line-clamp-3">{n.content}</p>
+                        <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-3">{n.content}</p>
                       </button>
                     );
                   })

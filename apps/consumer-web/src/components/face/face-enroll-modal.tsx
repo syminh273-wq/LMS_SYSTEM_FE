@@ -84,11 +84,11 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
-      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white dark:bg-slate-900 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-5 py-4">
           <div>
-            <h2 className="text-base font-black text-slate-900">Đăng ký khuôn mặt</h2>
-            <p className="text-xs font-medium text-slate-500">Nhìn thẳng vào camera rồi nhấn chụp</p>
+            <h2 className="text-base font-black text-slate-900 dark:text-slate-100">Đăng ký khuôn mặt</h2>
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Nhìn thẳng vào camera rồi nhấn chụp</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
             <X size={18} />
@@ -103,7 +103,7 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
               <video ref={videoRef} className="h-80 w-full object-cover" autoPlay muted playsInline />
 
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <div className="h-56 w-44 rounded-[50%] border-4 border-white/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.38)]" />
+                <div className="h-56 w-44 rounded-[50%] border-4 border-white dark:border-slate-900/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.38)]" />
               </div>
 
               {status === 'starting' && (

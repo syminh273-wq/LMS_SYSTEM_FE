@@ -49,7 +49,7 @@ export function MeRightAnalytics({ profile, isEditable = true, onUpdated }: Prop
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-      <div className="bg-white border border-slate-200 rounded-xl p-5 card-elevated">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 card-elevated">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Languages size={13} className="text-slate-400" />
@@ -74,7 +74,7 @@ export function MeRightAnalytics({ profile, isEditable = true, onUpdated }: Prop
                 }
               }}
               placeholder="VD. English"
-              className="flex-1 min-w-0 px-2.5 py-1.5 text-[12.5px] border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
+              className="flex-1 min-w-0 px-2.5 py-1.5 text-[12.5px] border border-slate-200 dark:border-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
               maxLength={40}
             />
             <button

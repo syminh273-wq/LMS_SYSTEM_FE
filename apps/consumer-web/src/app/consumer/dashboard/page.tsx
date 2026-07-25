@@ -128,7 +128,7 @@ export default function DashboardPage() {
 
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 border border-white/20 text-[11px] font-semibold tracking-wide mb-3">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 border border-white dark:border-slate-900/20 text-[11px] font-semibold tracking-wide mb-3">
                 <Sparkles size={11} />
                 Hôm nay là ngày tuyệt vời để học
               </div>
@@ -142,7 +142,7 @@ export default function DashboardPage() {
 
             <button
               onClick={() => router.push('/consumer/classroom')}
-              className="inline-flex items-center gap-1.5 px-4 h-10 rounded-lg bg-white text-indigo-700 text-[13px] font-semibold hover:bg-indigo-50 transition-colors shadow-md"
+              className="inline-flex items-center gap-1.5 px-4 h-10 rounded-lg bg-white dark:bg-slate-900 text-indigo-700 text-[13px] font-semibold hover:bg-indigo-50 transition-colors shadow-md"
             >
               <Plus size={15} strokeWidth={2.5} />
               Tham gia lớp mới
@@ -159,7 +159,7 @@ export default function DashboardPage() {
               <div
                 key={s.label}
                 style={{ animationDelay: `${i * 50}ms` }}
-                className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 card-elevated animate-fade-up"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 sm:p-5 card-elevated animate-fade-up"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm", s.color)}>
@@ -174,10 +174,10 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight tabular-nums">{s.value}</p>
-                  {s.suffix && <span className="text-sm text-slate-500 font-medium">{s.suffix}</span>}
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight tabular-nums">{s.value}</p>
+                  {s.suffix && <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">{s.suffix}</span>}
                 </div>
-                <p className="text-xs text-slate-600 mt-0.5 font-medium">{s.label}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-medium">{s.label}</p>
               </div>
             );
           })}
@@ -186,24 +186,24 @@ export default function DashboardPage() {
         {/* ── Performance + Schedule ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Performance chart */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 sm:p-6 card-elevated">
+          <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 sm:p-6 card-elevated">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <Activity size={15} className="text-indigo-600" />
                   Hiệu suất học tập
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">7 tuần gần nhất</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">7 tuần gần nhất</p>
               </div>
-              <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
                 {['Tuần', 'Tháng', 'Học kỳ'].map((v) => (
                   <button
                     key={v}
                     className={cn(
                       "px-2.5 py-1 text-[11px] font-semibold rounded-md transition-colors",
                       v === 'Tuần'
-                        ? "bg-white text-slate-900 shadow-sm"
-                        : "text-slate-500 hover:text-slate-900"
+                        ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm"
+                        : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100"
                     )}
                   >
                     {v}
@@ -235,7 +235,7 @@ export default function DashboardPage() {
                     </div>
                     <span className={cn(
                       "text-[11px] font-semibold",
-                      isLast ? "text-indigo-600" : "text-slate-500"
+                      isLast ? "text-indigo-600" : "text-slate-500 dark:text-slate-400"
                     )}>
                       {d.week}
                     </span>
@@ -246,9 +246,9 @@ export default function DashboardPage() {
           </div>
 
           {/* Today's schedule */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 card-elevated">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 sm:p-6 card-elevated">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <CalendarIcon size={15} className="text-indigo-600" />
                 Hôm nay
               </h3>
@@ -260,15 +260,15 @@ export default function DashboardPage() {
               {SCHEDULE.map((item) => (
                 <div
                   key={item.title}
-                  className="group flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors cursor-pointer"
+                  className="group flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors cursor-pointer"
                 >
-                  <div className="text-[11px] font-bold text-slate-500 tabular-nums w-10 shrink-0">
+                  <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 tabular-nums w-10 shrink-0">
                     {item.time}
                   </div>
                   <div className={cn("w-1 h-8 rounded-full shrink-0", item.color)} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-slate-900 truncate">{item.title}</p>
-                    <p className="text-[11px] text-slate-500">{item.type}</p>
+                    <p className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{item.title}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">{item.type}</p>
                   </div>
                   <ChevronRight size={14} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
                 </div>
@@ -278,14 +278,14 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Recent Grades ── */}
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden card-elevated">
-          <div className="flex items-center justify-between p-5 sm:p-6 border-b border-slate-200">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden card-elevated">
+          <div className="flex items-center justify-between p-5 sm:p-6 border-b border-slate-200 dark:border-slate-700">
             <div>
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <Award size={15} className="text-amber-500" />
                 Kết quả gần đây
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">5 bài đánh giá mới nhất</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">5 bài đánh giá mới nhất</p>
             </div>
             <button
               onClick={() => router.push('/consumer/grades')}
@@ -299,49 +299,49 @@ export default function DashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-5 sm:px-6 py-3">Môn học</th>
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-5 sm:px-6 py-3 hidden sm:table-cell">Bài</th>
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-5 sm:px-6 py-3">Điểm</th>
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 px-5 sm:px-6 py-3 hidden md:table-cell">Ngày</th>
-                  <th className="text-right text-[11px] font-bold uppercase tracking-wider text-slate-500 px-5 sm:px-6 py-3">Tiến độ</th>
+                <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-5 sm:px-6 py-3">Môn học</th>
+                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-5 sm:px-6 py-3 hidden sm:table-cell">Bài</th>
+                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-5 sm:px-6 py-3">Điểm</th>
+                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-5 sm:px-6 py-3 hidden md:table-cell">Ngày</th>
+                  <th className="text-right text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-5 sm:px-6 py-3">Tiến độ</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                 {MOCK_GRADES.map((g) => {
                   const pct = (g.score / g.total) * 100;
                   const isExcellent = pct >= 90;
                   return (
-                    <tr key={g.course} className="hover:bg-slate-50 transition-colors group">
+                    <tr key={g.course} className="hover:bg-slate-50 dark:bg-slate-900/50 transition-colors group">
                       <td className="px-5 sm:px-6 py-3.5">
                         <div className="flex items-center gap-3">
                           <div className={cn(
                             "w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0",
                             isExcellent
                               ? "bg-emerald-100 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
+                              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                           )}>
                             {g.grade}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-[13px] font-semibold text-slate-900 truncate">{g.course}</p>
-                            <p className="text-[11px] text-slate-500">{g.code}</p>
+                            <p className="text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate">{g.course}</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400">{g.code}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 sm:px-6 py-3.5 text-[13px] text-slate-600 hidden sm:table-cell">{g.assignment}</td>
+                      <td className="px-5 sm:px-6 py-3.5 text-[13px] text-slate-600 dark:text-slate-400 hidden sm:table-cell">{g.assignment}</td>
                       <td className="px-5 sm:px-6 py-3.5">
                         <div className="flex items-baseline gap-1">
                           <span className={cn(
                             "text-[14px] font-bold tabular-nums",
-                            isExcellent ? "text-emerald-600" : "text-slate-900"
+                            isExcellent ? "text-emerald-600" : "text-slate-900 dark:text-slate-100"
                           )}>
                             {g.score}
                           </span>
-                          <span className="text-[11px] text-slate-500">/{g.total}</span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400">/{g.total}</span>
                         </div>
                       </td>
-                      <td className="px-5 sm:px-6 py-3.5 text-[12px] text-slate-500 hidden md:table-cell">{g.date}</td>
+                      <td className="px-5 sm:px-6 py-3.5 text-[12px] text-slate-500 dark:text-slate-400 hidden md:table-cell">{g.date}</td>
                       <td className="px-5 sm:px-6 py-3.5">
                         <div className="flex items-center justify-end gap-2">
                           <div className="w-20 sm:w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                               style={{ width: `${pct}%` }}
                             />
                           </div>
-                          <span className="text-[11px] font-semibold text-slate-500 tabular-nums w-9 text-right">
+                          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 tabular-nums w-9 text-right">
                             {Math.round(pct)}%
                           </span>
                         </div>

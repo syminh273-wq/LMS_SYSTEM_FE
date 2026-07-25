@@ -104,7 +104,7 @@ export default function FavoritesPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Tìm trong yêu thích..."
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium"
+            className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 transition-all text-sm font-medium"
           />
         </div>
       </div>
@@ -115,7 +115,7 @@ export default function FavoritesPage() {
           <span className="text-sm font-medium">Đang tải danh sách yêu thích...</span>
         </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-dashed border-slate-200 rounded-3xl">
+        <div className="text-center py-20 bg-white dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-700 rounded-3xl">
           <Heart size={36} className="mx-auto text-slate-300 mb-3" />
           <div className="text-sm font-bold text-foreground">Chưa có lớp học yêu thích</div>
           <div className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -153,7 +153,7 @@ export default function FavoritesPage() {
                 onClick={handleClick}
                 aria-disabled={isOwnClass}
                 className={cn(
-                  "group bg-white border border-slate-200 rounded-2xl flex flex-col transition-colors",
+                  "group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col transition-colors",
                   isOwnClass
                     ? "cursor-not-allowed opacity-60"
                     : "cursor-pointer hover:border-slate-300"
@@ -183,7 +183,7 @@ export default function FavoritesPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 dark:border-slate-800">
                   <span className="text-sm font-bold text-foreground">
                     {classroom.price_vnd ? formatPrice(classroom.price_vnd) : (isPaid ? '—' : 'Miễn phí')}
                   </span>

@@ -160,7 +160,7 @@ export default function PublicProfilePage() {
         <div className="mx-auto w-full max-w-[75vw] py-6 sm:py-8">
           <button
             onClick={() => router.push('/consumer/classroom')}
-            className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 hover:text-slate-900 mb-4"
+            className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 mb-4"
           >
             <ArrowLeft size={16} />
             Trở lại
@@ -179,7 +179,7 @@ export default function PublicProfilePage() {
         <div className="mx-auto w-full max-w-[75vw] py-6 sm:py-8">
           <button
             onClick={() => router.push('/consumer/classroom')}
-            className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 hover:text-slate-900 mb-4"
+            className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 mb-4"
           >
             <ArrowLeft size={16} />
             Trở lại
@@ -277,7 +277,7 @@ export default function PublicProfilePage() {
                       disabled={followBusy}
                       className={
                         isFollowing
-                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 hover:border-slate-300'
+                          ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold border border-slate-200 dark:border-slate-700 hover:border-slate-300'
                           : 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold'
                       }
                     >
@@ -299,7 +299,7 @@ export default function PublicProfilePage() {
                       onClick={handleMessage}
                       disabled={messageBusy}
                       variant="outline"
-                      className="border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:text-indigo-600"
+                      className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:bg-slate-900/50 hover:text-indigo-600"
                     >
                       {messageBusy ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -319,7 +319,7 @@ export default function PublicProfilePage() {
                       disabled={followBusy}
                       className={
                         isFollowing
-                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 hover:border-slate-300'
+                          ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold border border-slate-200 dark:border-slate-700 hover:border-slate-300'
                           : 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold'
                       }
                     >
@@ -341,7 +341,7 @@ export default function PublicProfilePage() {
                       onClick={handleMessage}
                       disabled={messageBusy}
                       variant="outline"
-                      className="border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:text-indigo-600"
+                      className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:bg-slate-900/50 hover:text-indigo-600"
                     >
                       {messageBusy ? (
                         <Loader2 className="size-4 animate-spin" />

@@ -16,13 +16,13 @@ export function AboutCard({ about, isOwner = true, onSaved }: AboutCardProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xl font-bold text-slate-900">{t('portfolio.me.intro')}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{t('portfolio.me.intro')}</h2>
         {isOwner && (
           <button
             onClick={() => setOpen(true)}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+            className="w-8 h-8 rounded-full hover:bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400"
             aria-label={t('portfolio.me.edit')}
           >
             <Pencil className="size-4" />
@@ -31,7 +31,7 @@ export function AboutCard({ about, isOwner = true, onSaved }: AboutCardProps) {
       </div>
       {about ? (
         <div
-          className="text-sm text-slate-800 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
+          className="text-sm text-slate-800 dark:text-slate-200 leading-relaxed prose prose-sm max-w-none dark:prose-invert"
           dangerouslySetInnerHTML={{ __html: about }}
         />
       ) : (

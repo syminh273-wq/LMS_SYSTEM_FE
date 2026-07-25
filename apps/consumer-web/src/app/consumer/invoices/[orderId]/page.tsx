@@ -79,7 +79,7 @@ function InvoiceContent() {
     return (
       <Center>
         <Loader2 size={40} className="animate-spin text-indigo-600" />
-        <p className="mt-4 text-sm text-slate-500">Đang tải hóa đơn...</p>
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Đang tải hóa đơn...</p>
       </Center>
     );
   }
@@ -88,8 +88,8 @@ function InvoiceContent() {
     return (
       <Center>
         <AlertTriangle size={48} className="text-amber-500" />
-        <h2 className="mt-4 text-lg font-bold text-slate-900">Không tìm thấy hóa đơn</h2>
-        <p className="mt-2 text-sm text-slate-500 max-w-md">
+        <h2 className="mt-4 text-lg font-bold text-slate-900 dark:text-slate-100">Không tìm thấy hóa đơn</h2>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-md">
           Hóa đơn này không tồn tại hoặc bạn không có quyền truy cập. Vui lòng kiểm tra lại mã đơn hàng.
         </p>
         <div className="flex gap-2 mt-6">
@@ -119,7 +119,7 @@ function InvoiceContent() {
           variant="ghost"
           size="sm"
           onClick={() => router.back()}
-          className="text-slate-600 hover:text-slate-900 -ml-2"
+          className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 -ml-2"
         >
           <ArrowLeft size={15} className="mr-1" />
           Quay lại
@@ -138,7 +138,7 @@ function InvoiceContent() {
           teacherName={teacherName}
         />
 
-        <p className="text-center text-[12px] text-slate-500">
+        <p className="text-center text-[12px] text-slate-500 dark:text-slate-400">
           Mọi thắc mắc vui lòng liên hệ hỗ trợ qua trang{' '}
           <Link href="/consumer/settings" className="text-indigo-600 hover:underline font-semibold">
             Cài đặt

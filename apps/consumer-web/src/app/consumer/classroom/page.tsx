@@ -140,24 +140,24 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-fade-in">
       <div
-        className="w-full max-w-md rounded-xl bg-white shadow-2xl overflow-hidden animate-scale-in"
+        className="w-full max-w-md rounded-xl bg-white dark:bg-slate-900 shadow-2xl overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Tham gia lớp học</h2>
-            <p className="text-[12px] text-slate-500 mt-0.5">Nhập mã hoặc quét QR từ giáo viên</p>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">Tham gia lớp học</h2>
+            <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">Nhập mã hoặc quét QR từ giáo viên</p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
             aria-label="Đóng"
           >
             <X size={18} />
           </button>
         </div>
 
-        <div className="flex border-b border-slate-200 bg-slate-50">
+        <div className="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
           {[
             { key: 'code' as const, label: 'Nhập mã', icon: KeyRound },
             { key: 'qr' as const, label: 'Quét QR', icon: QrCode },
@@ -168,8 +168,8 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
               className={cn(
                 "flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold transition-colors",
                 tab === key
-                  ? "text-indigo-700 bg-white border-b-2 border-indigo-600 -mb-px"
-                  : "text-slate-500 hover:text-slate-900"
+                  ? "text-indigo-700 bg-white dark:bg-slate-900 border-b-2 border-indigo-600 -mb-px"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100"
               )}
             >
               <Icon size={14} />
@@ -182,7 +182,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
           {tab === 'code' && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-2">
+                <label className="block text-[12px] font-semibold text-slate-700 dark:text-slate-300 mb-2">
                   Mã lớp (PID)
                 </label>
                 <input
@@ -191,9 +191,9 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
                   onChange={e => setCode(e.target.value.toUpperCase())}
                   placeholder="AB1C2D"
                   maxLength={10}
-                  className="w-full h-14 rounded-lg border-2 border-slate-200 bg-white px-4 text-2xl font-mono font-bold tracking-[0.4em] text-center outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors uppercase"
+                  className="w-full h-14 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 text-2xl font-mono font-bold tracking-[0.4em] text-center outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors uppercase"
                 />
-                <p className="text-[11px] text-slate-500 mt-2 text-center">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 text-center">
                   Mã gồm 4-10 ký tự chữ và số
                 </p>
               </div>
@@ -225,7 +225,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
                   {cameraError}
                 </div>
               ) : (
-                <div className="relative rounded-lg overflow-hidden bg-black aspect-square border border-slate-200">
+                <div className="relative rounded-lg overflow-hidden bg-black aspect-square border border-slate-200 dark:border-slate-700">
                   <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
                   {!scanning && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 text-white">
@@ -245,7 +245,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
                   )}
                 </div>
               )}
-              <p className="text-[12px] text-center text-slate-500">
+              <p className="text-[12px] text-center text-slate-500 dark:text-slate-400">
                 Hướng camera vào mã QR của giáo viên
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function ClassroomPage() {
   const activeCount = classrooms.filter(c => c.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {showJoin && <JoinDialog onClose={() => setShowJoin(false)} onJoined={handleJoined} />}
 
@@ -314,15 +314,15 @@ export default function ClassroomPage() {
               <School size={11} />
               Lớp học
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Lớp học của tôi</h1>
-            <p className="text-slate-600 text-[14px] mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Lớp học của tôi</h1>
+            <p className="text-slate-600 dark:text-slate-400 text-[14px] mt-1">
               {loading ? 'Đang tải...' : `${classrooms.length} lớp · ${activeCount} đang hoạt động`}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             {classrooms.length > 0 && (
-              <div className="hidden sm:flex bg-white border border-slate-200 rounded-lg p-0.5">
+              <div className="hidden sm:flex bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-0.5">
                 {[
                   { key: 'all' as const, label: 'Tất cả' },
                   { key: 'active' as const, label: 'Đang học' },
@@ -334,7 +334,7 @@ export default function ClassroomPage() {
                       "px-3 py-1.5 text-[12.5px] font-semibold rounded-md transition-colors",
                       filter === key
                         ? "bg-slate-900 text-white"
-                        : "text-slate-600 hover:text-slate-900"
+                        : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100"
                     )}
                   >
                     {label}
@@ -361,17 +361,17 @@ export default function ClassroomPage() {
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-20 text-slate-500">
+          <div className="flex items-center justify-center gap-2 py-20 text-slate-500 dark:text-slate-400">
             <Loader2 size={20} className="animate-spin" />
             <span className="text-[13px]">Đang tải lớp học...</span>
           </div>
         ) : classrooms.length === 0 ? (
-          <div className="text-center py-20 px-6 bg-white border-2 border-dashed border-slate-200 rounded-2xl">
+          <div className="text-center py-20 px-6 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
             <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-indigo-50 flex items-center justify-center">
               <School size={36} className="text-indigo-600" />
             </div>
-            <h3 className="text-[17px] font-bold text-slate-900 mb-1">Chưa tham gia lớp học nào</h3>
-            <p className="text-[13.5px] text-slate-500 max-w-sm mx-auto mb-6">
+            <h3 className="text-[17px] font-bold text-slate-900 dark:text-slate-100 mb-1">Chưa tham gia lớp học nào</h3>
+            <p className="text-[13.5px] text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-6">
               Nhấn &ldquo;Tham gia lớp&rdquo; và nhập mã từ giáo viên hoặc quét QR code để bắt đầu.
             </p>
             <Button
@@ -392,7 +392,7 @@ export default function ClassroomPage() {
                   key={classroom.uid}
                   style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
                   onClick={() => router.push(`/consumer/classroom/${classroom.uid}`)}
-                  className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300 animate-fade-up"
+                  className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300 animate-fade-up"
                 >
                   <div className="flex items-center justify-end gap-2 px-4 pt-3.5 pb-2">
                     <ClassroomFavoriteButton
@@ -412,7 +412,7 @@ export default function ClassroomPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
                       <Users size={11} />
                       {classroom.member_count ?? '—'} thành viên
@@ -422,7 +422,7 @@ export default function ClassroomPage() {
                         "text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded",
                         isActive
                           ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
-                          : "text-slate-500 bg-slate-50 border border-slate-200"
+                          : "text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700"
                       )}
                     >
                       {isActive ? 'Đang học' : 'Đã đóng'}

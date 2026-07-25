@@ -42,11 +42,11 @@ export function NoteEditor({
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 w-72 space-y-2"
+      className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-3 w-72 space-y-2"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
           {mode === 'create' ? 'Take Note' : 'Edit Note'}
         </span>
         {existingNote && onDelete && (
@@ -68,7 +68,7 @@ export function NoteEditor({
         autoFocus
       />
       {positionHint && (
-        <p className="text-[10px] text-slate-500 font-medium">
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
           Vị trí: x={Math.round(positionHint.x_pct * 100)}% · y=
           {Math.round(positionHint.y_pct * 100)}%
           {positionHint.page != null ? ` · trang ${positionHint.page}` : ''}

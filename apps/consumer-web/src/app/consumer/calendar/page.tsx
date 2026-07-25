@@ -77,10 +77,10 @@ export default function ConsumerCalendarPage() {
             <CalendarDays size={11} />
             {t('calendar.labels.title', 'Academic Calendar')}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
             {t('calendar.labels.title', 'Academic Calendar')}
           </h1>
-          <p className="text-slate-600 text-[14px] mt-1">
+          <p className="text-slate-600 dark:text-slate-400 text-[14px] mt-1">
             {t('calendar.labels.subtitle', 'Manage your study schedule and upcoming deadlines.')}
           </p>
         </div>
@@ -90,11 +90,11 @@ export default function ConsumerCalendarPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden h-10">
+          <div className="flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden h-10">
             <button
               type="button"
               onClick={goPrev}
-              className="h-full px-2.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+              className="h-full px-2.5 hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 transition-colors"
               aria-label="Previous"
             >
               <ChevronLeft size={15} />
@@ -103,7 +103,7 @@ export default function ConsumerCalendarPage() {
             <button
               type="button"
               onClick={goNext}
-              className="h-full px-2.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+              className="h-full px-2.5 hover:bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 transition-colors"
               aria-label="Next"
             >
               <ChevronRight size={15} />
@@ -112,11 +112,11 @@ export default function ConsumerCalendarPage() {
           <button
             type="button"
             onClick={goToday}
-            className="h-10 px-3 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12.5px] font-semibold hover:bg-slate-50"
+            className="h-10 px-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[12.5px] font-semibold hover:bg-slate-50 dark:bg-slate-900/50"
           >
             {locale === 'vi' ? 'Hôm nay' : 'Today'}
           </button>
-          <span className="text-[15px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
+          <span className="text-[15px] font-bold text-slate-900 dark:text-slate-100 capitalize ml-2">{headerLabel}</span>
         </div>
       </div>
 
@@ -130,7 +130,7 @@ export default function ConsumerCalendarPage() {
 
           <div className={cn('relative')}>
             {loading && (
-              <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 text-[11px] text-slate-500">
+              <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 dark:text-slate-400">
                 <Clock size={11} className="animate-spin" />
                 {t('calendar.labels.loading', 'Loading...')}
               </div>

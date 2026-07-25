@@ -107,7 +107,7 @@ function NodeRow({
     <div>
       <div
         className={`flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium transition ${
-          selected ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100'
+          selected ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800'
         } ${locked ? 'opacity-60' : ''}`}
         style={{ paddingLeft: 8 + depth * 12 }}
         onClick={() => onSelect(node.uid)}
@@ -118,7 +118,7 @@ function NodeRow({
             e.stopPropagation();
             setOpen((v) => !v);
           }}
-          className="p-0.5 text-slate-400 hover:text-slate-700"
+          className="p-0.5 text-slate-400 hover:text-slate-700 dark:text-slate-300"
           aria-label={open ? 'Collapse' : 'Expand'}
         >
           {hasChildren ? open ? <ChevronDown size={14} /> : <ChevronRight size={14} /> : <span className="inline-block w-[14px]" />}
@@ -282,7 +282,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 space-y-4">
       {paidLocked && (
         <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl px-4 py-3">
           <div className="flex items-center gap-2">
@@ -302,12 +302,12 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
           )}
         </div>
       )}
-      <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
+      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 flex-wrap">
         <button
           type="button"
           onClick={() => setSelectedFolderId(null)}
           className={`px-2 py-1 rounded-md font-bold ${
-            selectedFolderId === null ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'
+            selectedFolderId === null ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100 dark:bg-slate-800'
           }`}
         >
           {t('classroom.docs.root_label', 'Tất cả tài liệu')}
@@ -319,7 +319,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
               type="button"
               onClick={() => setSelectedFolderId(f.uid)}
               className={`px-2 py-1 rounded-md font-bold ${
-                f.uid === selectedFolderId ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100'
+                f.uid === selectedFolderId ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-100 dark:bg-slate-800'
               }`}
             >
               <FolderIcon size={12} className="inline-block mr-1" />
@@ -330,13 +330,13 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
       </div>
 
       <div className="flex flex-col lg:flex-row gap-3">
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-2 flex flex-col gap-1 w-full lg:w-64 shrink-0">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-2 flex flex-col gap-1 w-full lg:w-64 shrink-0">
           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 pt-1 pb-2">
             {t('classroom.docs.folders_title', 'Thư mục')}
           </span>
           <div
             className={`flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium transition ${
-              selectedFolderId === null ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:bg-slate-100'
+              selectedFolderId === null ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800'
             }`}
             onClick={() => setSelectedFolderId(null)}
           >
@@ -344,7 +344,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
             <span className="truncate flex-1 ml-1">
               {t('classroom.docs.root_label', 'Tất cả tài liệu')}
             </span>
-            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 rounded px-1.5 py-0.5">
+            <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 rounded px-1.5 py-0.5">
               {rootDocs.length}
             </span>
           </div>
@@ -381,7 +381,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                   type="button"
                   onClick={() => handleSortChange(s.field)}
                   className={`text-xs font-bold px-2 py-1 rounded ${
-                    sortField === s.field ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:bg-slate-100'
+                    sortField === s.field ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800'
                   }`}
                 >
                   {s.label}
@@ -394,7 +394,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
           </div>
 
           {loading && currentDocs.length === 0 ? (
-            <div className="flex items-center justify-center py-12 text-slate-500">
+            <div className="flex items-center justify-center py-12 text-slate-500 dark:text-slate-400">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
               <span className="text-sm font-medium">{t('classroom.labels.docs_loading', 'Đang tải...')}</span>
             </div>
@@ -420,20 +420,20 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                     type="button"
                     key={d.uid}
                     onClick={() => setOpenDoc(d)}
-                    className="group relative text-left flex items-start gap-3 p-3 pr-10 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
+                    className="group relative text-left flex items-start gap-3 p-3 pr-10 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
                   >
                     <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-100">
                       {React.createElement(Icon, { size: 20 })}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <p className="text-sm font-bold text-slate-800 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
                         {completed && !media && (
                           <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />
                         )}
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex-wrap">
-                        {d.file_type && <span className="px-1.5 py-0.5 bg-slate-100 rounded">{d.file_type}</span>}
+                        {d.file_type && <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">{d.file_type}</span>}
                         {d.size ? <span>{formatSize(d.size)}</span> : null}
                         {d.created_at ? <span>{formatDate(d.created_at)}</span> : null}
                         {pct > 0 && (
@@ -443,7 +443,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                         )}
                       </div>
                       {pct > 0 && !completed && (
-                        <div className="mt-1 h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div className="mt-1 h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                           <div className="h-full bg-indigo-500" style={{ width: `${pct}%` }} />
                         </div>
                       )}

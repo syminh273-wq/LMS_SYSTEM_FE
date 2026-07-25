@@ -34,7 +34,7 @@ export function ProfileHero({
   const { t } = useTranslation();
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+    <section className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
       {/* Cover */}
       <div
         className="h-32 sm:h-44 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 relative bg-cover bg-center"
@@ -45,7 +45,7 @@ export function ProfileHero({
             variant="secondary"
             size="sm"
             onClick={onEditCover}
-            className="absolute top-3 right-3 bg-white/95 hover:bg-white text-slate-700 font-bold"
+            className="absolute top-3 right-3 bg-white/95 hover:bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-bold"
           >
             <Camera className="size-3.5" />
             {t('portfolio.me.edit_cover')}
@@ -62,17 +62,17 @@ export function ProfileHero({
                 <img
                   src={avatarUrl}
                   alt={name}
-                  className="w-32 h-32 rounded-full ring-4 ring-white object-cover"
+                  className="w-32 h-32 rounded-full ring-4 ring-white dark:ring-slate-900 object-cover"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-full ring-4 ring-white bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-500">
+                <div className="w-32 h-32 rounded-full ring-4 ring-white dark:ring-slate-900 bg-slate-200 flex items-center justify-center text-3xl font-bold text-slate-500 dark:text-slate-400">
                   {name?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
               )}
               {isOwner && onEditAvatar && (
                 <button
                   onClick={onEditAvatar}
-                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:bg-slate-50"
+                  className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 shadow-sm hover:bg-slate-50 dark:bg-slate-900/50"
                   aria-label={t('portfolio.me.edit_avatar')}
                 >
                   <Camera className="size-4" />
@@ -80,16 +80,16 @@ export function ProfileHero({
               )}
             </div>
             <div className="sm:pb-2 min-w-0">
-              <h1 className="text-2xl font-bold text-slate-900 truncate">{name}</h1>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 truncate">{name}</h1>
               {tagline && (
-                <p className="text-sm text-slate-700 font-medium mt-0.5">{tagline}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300 font-medium mt-0.5">{tagline}</p>
               )}
               {location && (
-                <p className="text-xs text-slate-500 font-medium mt-1">📍 {location}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">📍 {location}</p>
               )}
               {typeof connections === 'number' && (
-                <p className="text-xs text-slate-500 font-medium mt-1">
-                  <span className="text-slate-900 font-bold">{connections}+</span>{' '}
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                  <span className="text-slate-900 dark:text-slate-100 font-bold">{connections}+</span>{' '}
                   {t('portfolio.me.connections')}
                 </p>
               )}

@@ -82,7 +82,7 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
       return (
         <a href={url} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt={name} className={`max-w-[240px] rounded-xl mt-1 object-cover ${isMe ? 'border border-indigo-300/60' : 'border border-slate-200'}`} />
+          <img src={url} alt={name} className={`max-w-[240px] rounded-xl mt-1 object-cover ${isMe ? 'border border-indigo-300/60' : 'border border-slate-200 dark:border-slate-700'}`} />
         </a>
       );
     }
@@ -92,7 +92,7 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
           key={url}
           controls
           src={url}
-          className={`max-w-[280px] rounded-xl mt-1 ${isMe ? 'border border-indigo-300/60' : 'border border-slate-200'}`}
+          className={`max-w-[280px] rounded-xl mt-1 ${isMe ? 'border border-indigo-300/60' : 'border border-slate-200 dark:border-slate-700'}`}
           onError={(e) => {
             const err = (e.currentTarget.error as MediaError | null)?.message ?? "unknown";
             if (err.toLowerCase().includes("aborted")) return;
@@ -113,11 +113,11 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
         target="_blank"
         rel="noopener noreferrer"
         className={`flex items-center gap-2 mt-1 rounded-xl px-3 py-2 transition max-w-[280px] cursor-pointer ${
-          isMe ? 'bg-indigo-500/30 border border-indigo-300/60 hover:bg-indigo-500/40' : 'bg-white border border-slate-200 hover:bg-slate-50'
+          isMe ? 'bg-indigo-500/30 border border-indigo-300/60 hover:bg-indigo-500/40' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:bg-slate-900/50'
         }`}
       >
         <Icon size={18} className={`shrink-0 ${isMe ? 'text-white' : 'text-indigo-500'}`} />
-        <span className={`text-xs font-medium truncate ${isMe ? 'text-white' : 'text-slate-700'}`}>{name}</span>
+        <span className={`text-xs font-medium truncate ${isMe ? 'text-white' : 'text-slate-700 dark:text-slate-300'}`}>{name}</span>
       </a>
     );
   };
@@ -132,7 +132,7 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
       <div className={`flex flex-col gap-1 max-w-[75%] ${isMe ? 'items-start' : 'items-end'}`}>
         {isMe && (
           <div className="flex items-baseline gap-2 px-1">
-            <span className="text-[11px] font-bold text-slate-700">{msg.sender_name || "Ẩn danh"}</span>
+            <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">{msg.sender_name || "Ẩn danh"}</span>
             <span className="text-[10px] text-slate-400">{time}</span>
           </div>
         )}
@@ -140,7 +140,7 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
           className={`rounded-2xl text-sm font-medium shadow-sm ${
             isMe
               ? 'bg-indigo-600 text-white rounded-bl-md'
-              : 'bg-slate-100 text-slate-800 rounded-br-md'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-br-md'
           }`}
         >
           {msg.content && (
@@ -168,12 +168,12 @@ function JoinRequiredPage({
   const isPaid = classroom.pricing_type === 'paid';
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
         <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
           {isPaid ? <Crown size={32} /> : <Sparkles size={32} />}
         </div>
-        <h2 className="text-xl font-bold text-slate-900">{classroom.name}</h2>
-        <p className="text-slate-500 text-sm">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">{classroom.name}</h2>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           {classroom.description || 'Bạn cần tham gia lớp học này để xem nội dung bên trong.'}
         </p>
         <div className="flex items-center justify-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
@@ -188,7 +188,7 @@ function JoinRequiredPage({
             Miễn phí
           </div>
         )}
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           Yêu cầu của bạn sẽ được giáo viên duyệt sau khi {isPaid ? 'thanh toán thành công' : 'gửi yêu cầu'}.
         </p>
         <Button
@@ -578,9 +578,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
   if (meStatus === 'loading') {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-        <p className="text-slate-500 font-medium text-sm">Đang xác thực...</p>
+        <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Đang xác thực...</p>
       </div>
     );
   }
@@ -593,11 +593,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       window.location.replace(`${base.replace(/\/+$/, '')}/space/classrooms/${uid}/details`);
     }
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
           <div className="text-3xl">🔒</div>
-          <h2 className="text-xl font-bold text-slate-900">Đây là lớp học bạn đang giảng dạy</h2>
-          <p className="text-slate-500 text-sm">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Đây là lớp học bạn đang giảng dạy</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
             Đang chuyển sang trang quản lý lớp học...
           </p>
         </div>
@@ -607,22 +607,22 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center">
         <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mb-4" />
-        <p className="text-slate-500 font-medium text-sm">Đang tải dữ liệu lớp học...</p>
+        <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Đang tải dữ liệu lớp học...</p>
       </div>
     );
   }
 
   if (membershipStatus === 'pending') {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
           <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto">
             <Clock size={32} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Đang chờ phê duyệt</h2>
-          <p className="text-slate-500 text-sm">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Đang chờ phê duyệt</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
             Yêu cầu tham gia lớp học của bạn đang chờ giáo viên xem xét. Bạn sẽ có thể vào lớp sau khi được chấp thuận.
           </p>
           <Button onClick={() => router.push('/consumer/classroom')} className="w-full bg-indigo-600">
@@ -639,13 +639,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
   if (error || !classroom) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl max-w-md w-full text-center space-y-4">
           <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
             <Info size={32} />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Lỗi tải dữ liệu</h2>
-          <p className="text-slate-500 text-sm">{error || 'Không tìm thấy lớp học'}</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Lỗi tải dữ liệu</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">{error || 'Không tìm thấy lớp học'}</p>
           <Button onClick={() => router.push('/consumer/classroom')} className="w-full bg-indigo-600">
             Quay lại danh sách
           </Button>
@@ -684,13 +684,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col">
       {/* Hero Banner Section */}
       <div className="bg-indigo-600 h-48 md:h-64 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white" />
-          <div className="absolute bottom-[-20px] right-20 w-48 h-48 rounded-full bg-white" />
-          <div className="absolute top-1/2 left-1/3 w-16 h-16 rounded-lg bg-white rotate-12" />
+          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white dark:bg-slate-900" />
+          <div className="absolute bottom-[-20px] right-20 w-48 h-48 rounded-full bg-white dark:bg-slate-900" />
+          <div className="absolute top-1/2 left-1/3 w-16 h-16 rounded-lg bg-white dark:bg-slate-900 rotate-12" />
         </div>
         <div className="max-w-[1600px] mx-auto px-6 h-full flex flex-col justify-end pb-8 relative z-10">
           <div className="space-y-2">
@@ -712,7 +712,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
         <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] xl:grid-cols-[220px_1fr_320px] gap-4">
           {/* Left Sidebar - Nav */}
           <aside className="lg:sticky lg:top-20 lg:self-start">
-            <div className="bg-white rounded-2xl border border-slate-200 lg:p-1.5 p-2 shadow-sm flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 lg:p-1.5 p-2 shadow-sm flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
               {[
                 { key: 'discussion' as const, icon: MessageSquare, label: 'Thảo luận' },
                 { key: 'docs' as const, icon: FolderOpen, label: 'Tài liệu' },
@@ -735,7 +735,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-sm transition-all whitespace-nowrap cursor-pointer text-left w-full ${
                       isActive
                         ? 'bg-indigo-50 text-indigo-600 shadow-sm border border-indigo-100'
-                        : 'text-slate-500 hover:bg-slate-50 border border-transparent'
+                        : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900/50 border border-transparent'
                     }`}
                   >
                     <item.icon size={18} className="shrink-0" />
@@ -751,12 +751,12 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Chat Feed */}
             {activeTab === 'discussion' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col overflow-hidden" style={{ height: '520px' }}>
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden" style={{ height: '520px' }}>
                 {/* Chat header */}
-                <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <MessageSquare size={16} className="text-indigo-600" />
-                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Thảo luận chung</span>
+                    <span className="font-black text-slate-900 dark:text-slate-100 text-sm uppercase tracking-tighter">Thảo luận chung</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-bold">
                     {connected ? (
@@ -786,7 +786,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
                   {!chatLoading && messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-12">
-                      <div className="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                      <div className="w-14 h-14 bg-slate-50 dark:bg-slate-900/50 rounded-full flex items-center justify-center text-slate-300">
                         <MessageSquare size={28} />
                       </div>
                       <p className="text-slate-400 text-sm font-medium">Chưa có tin nhắn nào. Hãy bắt đầu thảo luận!</p>
@@ -797,9 +797,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 </div>
 
                 {/* Input */}
-                <div className="px-4 py-3 border-t border-slate-100 flex gap-2">
+                <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 flex gap-2">
                   <input
-                    className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-800 placeholder:text-slate-400 border border-slate-200 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
+                    className="flex-1 bg-slate-50 dark:bg-slate-900/50 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-200 dark:border-slate-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition"
                     placeholder="Nhập tin nhắn..."
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
@@ -824,11 +824,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Exam Quiz Tab */}
             {activeTab === 'quiz' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Trophy size={17} className="text-indigo-600" />
-                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Thi trắc nghiệm</span>
+                    <span className="font-black text-slate-900 dark:text-slate-100 text-sm uppercase tracking-tighter">Thi trắc nghiệm</span>
                   </div>
                   <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black uppercase text-indigo-600">
                     {quizzes.length} bài thi
@@ -852,15 +852,15 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           key={quiz.uid}
                           type="button"
                           onClick={() => router.push(`/consumer/classroom/${uid}/quiz/${quiz.uid}`)}
-                          className="w-full flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 cursor-pointer"
+                          className="w-full flex items-center gap-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 cursor-pointer"
                         >
                           <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-200">
                             <Trophy size={22} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-black text-slate-900 text-sm truncate">{quiz.title}</h4>
+                            <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm truncate">{quiz.title}</h4>
                             {quiz.description && (
-                              <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{quiz.description}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 line-clamp-1">{quiz.description}</p>
                             )}
                             <div className="mt-1 text-[10px] font-black uppercase text-indigo-500">
                               {quiz.questions_count} câu hỏi trắc nghiệm
@@ -877,11 +877,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Mission Collections Tab */}
             {activeTab === 'collections' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Layers size={17} className="text-indigo-600" />
-                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">{t('quizCollection.title')}</span>
+                    <span className="font-black text-slate-900 dark:text-slate-100 text-sm uppercase tracking-tighter">{t('quizCollection.title')}</span>
                   </div>
                   <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black uppercase text-indigo-600">
                     {collections.length} bộ
@@ -908,13 +908,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                         <div
                           key={c.uid}
                           className={`rounded-2xl border transition-all overflow-hidden ${
-                            isExpanded ? 'border-indigo-200 shadow-sm' : 'border-slate-100'
+                            isExpanded ? 'border-indigo-200 shadow-sm' : 'border-slate-100 dark:border-slate-800'
                           }`}
                         >
                           <button
                             type="button"
                             onClick={() => void handleToggleCollection(c)}
-                            className="w-full text-left p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                            className="w-full text-left p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-50 dark:bg-slate-900/50/50 transition-colors"
                           >
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
                               p?.is_completed ? 'bg-amber-100 text-amber-600' : 'bg-indigo-100 text-indigo-600'
@@ -922,13 +922,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                               {p?.is_completed ? <Trophy size={22} /> : <Layers size={22} />}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-black text-slate-900 text-sm truncate">{c.title}</h4>
+                              <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm truncate">{c.title}</h4>
                               {c.description && (
-                                <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">{c.description}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 line-clamp-1">{c.description}</p>
                               )}
                               {p && p.total > 0 && (
                                 <div className="mt-2 flex items-center gap-2">
-                                  <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                  <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div
                                       className={`h-full transition-all ${
                                         p.is_completed ? 'bg-amber-500' : 'bg-indigo-600'
@@ -936,7 +936,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                       style={{ width: `${p.percent}%` }}
                                     />
                                   </div>
-                                  <span className="text-[10px] font-black text-slate-500 shrink-0">
+                                  <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 shrink-0">
                                     {t('quizCollection.card_progress', undefined, { done: p.passed, total: p.total })}
                                   </span>
                                 </div>
@@ -946,7 +946,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           </button>
 
                           {isExpanded && (
-                            <div className="border-t border-slate-100 bg-slate-50/40 p-4 space-y-4">
+                            <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/40 p-4 space-y-4">
                               {isLoadingDetail ? (
                                 <div className="flex items-center justify-center py-8 text-slate-400">
                                   <Loader2 size={22} className="animate-spin" />
@@ -1009,7 +1009,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Calendar Tab */}
             {activeTab === 'calendar' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 sm:p-6">
                 <ConsumerClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
               </div>
             )}
@@ -1021,7 +1021,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Leave Request Tab */}
             {activeTab === 'leave_request' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 sm:p-6">
                 <LeaveRequestTab
                   role="student"
                   classroomId={uid}
@@ -1056,11 +1056,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Meeting Tab */}
             {activeTab === 'meeting' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col" style={{ height: '520px' }}>
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col" style={{ height: '520px' }}>
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Video size={17} className="text-indigo-600" />
-                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Phòng họp trực tuyến</span>
+                    <span className="font-black text-slate-900 dark:text-slate-100 text-sm uppercase tracking-tighter">Phòng họp trực tuyến</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs font-bold">
                     {rtcJoined ? (
@@ -1100,7 +1100,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                         </div>
                       </div>
                     ) : (
-                      <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center text-slate-500 gap-3 border-2 border-dashed border-slate-800">
+                      <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 gap-3 border-2 border-dashed border-slate-800">
                         <Video size={48} className="opacity-20" />
                         <p className="text-sm font-bold uppercase tracking-widest">Chưa có buổi học nào...</p>
                         <p className="text-xs font-medium opacity-70">Giáo viên sẽ mở lớp, thông báo sẽ hiện tại đây</p>
@@ -1109,7 +1109,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   </div>
 
                   {localStream && (
-                    <div className="absolute bottom-24 right-6 w-44 md:w-56 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl shadow-black/40 z-10">
+                    <div className="absolute bottom-24 right-6 w-44 md:w-56 rounded-2xl overflow-hidden border-2 border-white dark:border-slate-900/20 shadow-2xl shadow-black/40 z-10">
                       <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Bạn' : 'Màn hình của bạn'} />
                     </div>
                   )}
@@ -1180,7 +1180,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 text-center">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     WebRTC Peer-to-Peer Connection • Bảo mật đầu cuối
                   </p>
@@ -1189,18 +1189,18 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {activeTab === 'ai' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col" style={{ height: '540px' }}>
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col" style={{ height: '540px' }}>
                 {/* Header */}
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-indigo-50/60 to-violet-50/60">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-gradient-to-r from-indigo-50/60 to-violet-50/60">
                   <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md">
                     <Bot size={18} className="text-white" />
                   </div>
                   <div>
-                    <p className="font-black text-slate-900 text-sm">AI Trợ giảng</p>
+                    <p className="font-black text-slate-900 dark:text-slate-100 text-sm">AI Trợ giảng</p>
                     <p className="text-[11px] text-slate-400 font-medium">Hỏi đáp từ tài liệu lớp học</p>
                   </div>
                   {aiMessages.length > 0 && (
-                    <button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 font-medium cursor-pointer">Xoá</button>
+                    <button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 dark:text-slate-400 font-medium cursor-pointer">Xoá</button>
                   )}
                 </div>
                 {/* Messages */}
@@ -1208,7 +1208,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   {aiMessages.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-full text-center py-8">
                       <Sparkles size={28} className="text-indigo-300 mb-3" />
-                      <p className="text-sm font-bold text-slate-700">AI Trợ giảng</p>
+                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">AI Trợ giảng</p>
                       <p className="text-xs text-slate-400 mt-1 max-w-xs">Đặt câu hỏi về tài liệu của lớp học để nhận câu trả lời ngay!</p>
                     </div>
                   )}
@@ -1219,7 +1219,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           <Bot size={14} className="text-white" />
                         </div>
                       )}
-                      <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-slate-50 text-slate-800 border border-slate-100 rounded-bl-sm'}`}>
+                      <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-slate-50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-800 rounded-bl-sm'}`}>
                         <div className="text-sm font-medium leading-relaxed space-y-1">
                           {msg.text
                             ? msg.text.split('\n\n').map((para, pi) => (
@@ -1243,7 +1243,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           }
                         </div>
                         {msg.sources && msg.sources.length > 0 && (
-                          <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
+                          <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Nguồn tham khảo</p>
                             {msg.sources.slice(0, 3).map((src, j) => {
                               const docName = src.metadata?.doc_name ?? 'Tài liệu';
@@ -1252,7 +1252,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                 ?? null;
                               const score = (src.score * 100).toFixed(0);
                               return (
-                                <div key={j} className="text-[10px] text-slate-500 flex items-center justify-between gap-2">
+                                <div key={j} className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between gap-2">
                                   {docUrl ? (
                                     <a
                                       href={docUrl}
@@ -1278,7 +1278,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   ))}
                 </div>
                 {/* Input */}
-                <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/50">
+                <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/50">
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -1287,7 +1287,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                       onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
                       placeholder="Đặt câu hỏi về tài liệu lớp học..."
                       disabled={aiLoading}
-                      className="flex-1 h-10 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:opacity-60"
+                      className="flex-1 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:opacity-60"
                     />
                     <button
                       onClick={() => void handleAiAsk()}
@@ -1302,7 +1302,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && activeTab !== 'meeting' && activeTab !== 'ai' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
                 <div className="flex h-64 flex-col items-center justify-center text-center text-slate-400">
                   <FileText size={38} className="mb-3 opacity-30" />
                   <p className="text-sm font-medium">Nội dung đang được cập nhật.</p>
@@ -1313,11 +1313,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
             {/* Exams */}
             {activeTab === 'exams' && (
-              <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ClipboardList size={17} className="text-indigo-600" />
-                    <span className="font-black text-slate-900 text-sm uppercase tracking-tighter">Bài kiểm tra</span>
+                    <span className="font-black text-slate-900 dark:text-slate-100 text-sm uppercase tracking-tighter">Bài kiểm tra</span>
                   </div>
                   <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-black uppercase text-indigo-600">
                     {exams.length} bài
@@ -1348,15 +1348,15 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-100 ${
                             selectedExamGroup === group.key
                               ? 'border-indigo-200 bg-indigo-50 shadow-sm'
-                              : 'border-slate-100 bg-slate-50/60'
+                              : 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/60'
                           } cursor-pointer`}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
-                              <div className="truncate text-sm font-black text-slate-900">{group.label}</div>
+                              <div className="truncate text-sm font-black text-slate-900 dark:text-slate-100">{group.label}</div>
                               <div className="text-[10px] font-black uppercase text-slate-400">{group.items.length} bài</div>
                             </div>
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm ring-1 ring-slate-100">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white dark:bg-slate-900 text-indigo-600 shadow-sm ring-1 ring-slate-100">
                               <ClipboardList size={17} />
                             </div>
                           </div>
@@ -1366,11 +1366,11 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                 )}
 
                 {selectedGroup && (
-                  <div className="mt-5 rounded-2xl border border-slate-100 bg-slate-50 p-5">
+                  <div className="mt-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <div className="text-[10px] font-black uppercase tracking-wider text-indigo-500">Danh sách bài kiểm tra</div>
-                        <h4 className="mt-1 text-lg font-black text-slate-900">{selectedGroup.label}</h4>
+                        <h4 className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">{selectedGroup.label}</h4>
                       </div>
                       <Button variant="ghost" size="sm" onClick={() => setSelectedExamGroup(null)} className="rounded-lg text-xs font-bold">
                         Đóng
@@ -1378,7 +1378,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     </div>
 
                     {selectedGroup.items.length === 0 ? (
-                      <div className="mt-4 flex h-28 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-center text-slate-400">
+                      <div className="mt-4 flex h-28 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-center text-slate-400">
                         <ClipboardList size={24} className="mb-2 opacity-30" />
                         <p className="text-xs font-bold">Chưa có bài kiểm tra nào</p>
                       </div>
@@ -1392,19 +1392,19 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           return (
                             <div
                               key={exam.uid}
-                              className={`w-full rounded-2xl border bg-white p-4 shadow-sm ${deadline.cardClassName}`}
+                              className={`w-full rounded-2xl border bg-white dark:bg-slate-900 p-4 shadow-sm ${deadline.cardClassName}`}
                             >
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <h4 className="line-clamp-2 text-sm font-black leading-snug text-slate-900">{exam.title}</h4>
+                                    <h4 className="line-clamp-2 text-sm font-black leading-snug text-slate-900 dark:text-slate-100">{exam.title}</h4>
                                     {isOnline && (
                                       <span className="shrink-0 rounded-full bg-violet-50 px-2 py-0.5 text-[9px] font-black uppercase text-violet-600 ring-1 ring-violet-100">
                                         Online
                                       </span>
                                     )}
                                   </div>
-                                  <p className="mt-1 line-clamp-2 text-xs font-medium leading-relaxed text-slate-500">
+                                  <p className="mt-1 line-clamp-2 text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">
                                     {exam.description || 'Không có mô tả'}
                                   </p>
                                 </div>
@@ -1424,7 +1424,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                               </div>
 
                               <div className="mt-3 flex items-center justify-between gap-2">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-black uppercase text-slate-500 ring-1 ring-slate-100">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 dark:bg-slate-900/50 px-2.5 py-1 text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 ring-1 ring-slate-100">
                                   <ContentIcon size={12} />
                                   {getContentTypeLabel(exam.content_type)}
                                 </span>
@@ -1466,9 +1466,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
           {/* Right Column - Stats & Info */}
           <div className="space-y-6">
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
-                <h3 className="font-black text-slate-900 uppercase tracking-tighter flex items-center gap-2">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-tighter flex items-center gap-2">
                   <Info size={18} className="text-indigo-600" />
                   THÔNG TIN LỚP HỌC
                 </h3>
@@ -1481,7 +1481,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     </div>
                     <div>
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sĩ số tối đa</div>
-                      <div className="text-sm font-bold text-slate-700">{classroom.max_students} học sinh</div>
+                      <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{classroom.max_students} học sinh</div>
                     </div>
                   </div>
                   <ShieldCheck size={18} className="text-emerald-500" />
@@ -1493,20 +1493,20 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   </div>
                   <div>
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ngày khởi tạo</div>
-                    <div className="text-sm font-bold text-slate-700">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</div>
+                    <div className="text-sm font-bold text-slate-700 dark:text-slate-300">{new Date(classroom.created_at).toLocaleDateString('vi-VN')}</div>
                   </div>
                 </div>
 
                 <div className="pt-2">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Mô tả</div>
-                  <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                    <p className="text-xs text-slate-600 font-medium leading-relaxed italic">
+                  <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed italic">
                       "{classroom.description || 'Lớp học này chưa có mô tả chi tiết.'}"
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="p-4 bg-slate-50 border-t border-slate-100">
+              <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
                 <Button className="w-full bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-widest h-11 rounded-xl">
                   YÊU CẦU TRỢ GIÚP
                 </Button>
@@ -1548,9 +1548,9 @@ function getExamStatusClass(status: string) {
     return 'bg-amber-50 text-amber-600 border border-amber-100';
   }
   if (normalized === 'closed' || normalized === 'expired') {
-    return 'bg-slate-100 text-slate-500 border border-slate-200';
+    return 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700';
   }
-  return 'bg-slate-100 text-slate-600 border border-slate-200';
+  return 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700';
 }
 
 const EXAM_GROUPS = [
@@ -1607,8 +1607,8 @@ function getDeadlineMeta(value: string | null) {
   if (!value) {
     return {
       label: 'Chưa có hạn nộp',
-      cardClassName: 'border-slate-100 hover:border-indigo-200 focus:ring-indigo-100',
-      badgeClassName: 'border-slate-100 bg-slate-50 text-slate-500',
+      cardClassName: 'border-slate-100 dark:border-slate-800 hover:border-indigo-200 focus:ring-indigo-100',
+      badgeClassName: 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400',
     };
   }
 
@@ -1618,8 +1618,8 @@ function getDeadlineMeta(value: string | null) {
   if (Number.isNaN(due)) {
     return {
       label: 'Hạn nộp không hợp lệ',
-      cardClassName: 'border-slate-100 hover:border-indigo-200 focus:ring-indigo-100',
-      badgeClassName: 'border-slate-100 bg-slate-50 text-slate-500',
+      cardClassName: 'border-slate-100 dark:border-slate-800 hover:border-indigo-200 focus:ring-indigo-100',
+      badgeClassName: 'border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400',
     };
   }
 
@@ -1728,23 +1728,23 @@ function CollectionExpandedPanel({
   return (
     <>
       <div>
-        <h4 className="text-sm font-black text-slate-900">{detail.title}</h4>
+        <h4 className="text-sm font-black text-slate-900 dark:text-slate-100">{detail.title}</h4>
         {detail.description && (
-          <p className="text-[11px] text-slate-500 mt-0.5">{detail.description}</p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{detail.description}</p>
         )}
       </div>
 
       {progress && progress.total > 0 && (
-        <section className="bg-white border border-slate-100 rounded-xl p-3 space-y-1.5">
+        <section className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-3 space-y-1.5">
           <div className="flex items-center justify-between">
-            <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+            <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {t('quizCollection.progress_label')}
             </h5>
-            <span className="text-[11px] font-black text-slate-700">
+            <span className="text-[11px] font-black text-slate-700 dark:text-slate-300">
               {t('quizCollection.progress_percent', undefined, { percent: Math.round(progress.percent) })}
             </span>
           </div>
-          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all ${
                 progress.is_completed ? 'bg-amber-500' : 'bg-indigo-600'
@@ -1752,20 +1752,20 @@ function CollectionExpandedPanel({
               style={{ width: `${progress.percent}%` }}
             />
           </div>
-          <p className="text-[10px] text-slate-500 text-center">
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
             {t('quizCollection.card_progress', undefined, { done: progress.passed, total: progress.total })}
           </p>
         </section>
       )}
 
-      <div className="bg-white border border-slate-100 rounded-xl p-1 flex gap-1">
+      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl p-1 flex gap-1">
         <button
           type="button"
           onClick={() => handleSelectMode('game')}
           className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all ${
             mode === 'game'
               ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-500 hover:bg-slate-50'
+              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900/50'
           }`}
         >
           <Gamepad2 size={12} />
@@ -1779,7 +1779,7 @@ function CollectionExpandedPanel({
             mode === 'certificate'
               ? 'bg-amber-500 text-white shadow-sm'
               : certUnlocked
-              ? 'text-slate-500 hover:bg-slate-50'
+              ? 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900/50'
               : 'text-slate-400/60 cursor-not-allowed'
           }`}
         >
@@ -1790,11 +1790,11 @@ function CollectionExpandedPanel({
 
       {mode === 'game' && (
         <section className="space-y-2">
-          <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+          <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {t('quizCollection.items_section')}
           </h5>
           {detail.items.length === 0 ? (
-            <p className="text-[11px] text-slate-500 py-4 text-center">{t('quizCollection.items_empty')}</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 py-4 text-center">{t('quizCollection.items_empty')}</p>
           ) : (
             <div className="space-y-2">
               {detail.items.map((item, idx) => {
@@ -1817,7 +1817,7 @@ function CollectionExpandedPanel({
 
       {mode === 'certificate' && (
         <section className="space-y-2">
-          <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+          <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
             <Award size={11} className="text-amber-500" />
             {t('quizCollection.completion_section')}
           </h5>
@@ -1836,8 +1836,8 @@ function CollectionExpandedPanel({
                 <Trophy size={20} />
               </div>
               <div className="flex-1 min-w-0 space-y-0.5">
-                <p className="font-black text-slate-900 text-[12px]">{t('quizCollection.certificate_card_title')}</p>
-                <p className="text-[10px] text-slate-500">
+                <p className="font-black text-slate-900 dark:text-slate-100 text-[12px]">{t('quizCollection.certificate_card_title')}</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">
                   {t('quizCollection.certificate_card_issued_at', undefined, {
                     date: new Date(certificate.issued_at).toLocaleDateString('vi-VN'),
                   })}
@@ -1935,7 +1935,7 @@ function MissionAccordion({
   const isLocked = status === 'not_started';
 
   return (
-    <div className={`rounded-xl border transition-colors ${isOpen ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 bg-white'}`}>
+    <div className={`rounded-xl border transition-colors ${isOpen ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900'}`}>
       <div className="flex items-center gap-2 px-3 py-2.5">
         <button
           type="button"
@@ -1946,7 +1946,7 @@ function MissionAccordion({
           }`}
         >
           <div className={`w-6 h-6 rounded-md text-[10px] font-black flex items-center justify-center shrink-0 ${
-            isLocked ? 'bg-slate-100 text-slate-400' : 'bg-indigo-100 text-indigo-600'
+            isLocked ? 'bg-slate-100 dark:bg-slate-800 text-slate-400' : 'bg-indigo-100 text-indigo-600'
           }`}>
             {index}
           </div>
@@ -1958,10 +1958,10 @@ function MissionAccordion({
             <Circle size={15} className="text-amber-500 shrink-0" />
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-[12px] font-bold text-slate-900 truncate">
+            <p className="text-[12px] font-bold text-slate-900 dark:text-slate-100 truncate">
               {detail?.title ?? `Nhiệm vụ #${index}`}
             </p>
-            <p className="text-[9px] text-slate-500 mt-0.5">{t(statusLabelKey)}</p>
+            <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5">{t(statusLabelKey)}</p>
           </div>
           {!isLocked && (
             isOpen
@@ -1984,28 +1984,28 @@ function MissionAccordion({
       </div>
 
       {isOpen && !isLocked && (
-        <div className="border-t border-slate-100 bg-slate-50/30 px-3 py-2.5 space-y-1.5">
+        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/30 px-3 py-2.5 space-y-1.5">
           {loading ? (
             <div className="flex items-center justify-center py-3 text-slate-400">
               <Loader2 size={14} className="animate-spin" />
             </div>
           ) : (
             <>
-              <div className="text-[9px] font-black uppercase tracking-wider text-slate-500">
+              <div className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 {t('quizCollection.questions_list_title')} · {detail?.questions_count ?? 0}
               </div>
               {(detail?.questions ?? []).length === 0 ? (
-                <p className="text-[10px] text-slate-500 py-2 text-center">
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 py-2 text-center">
                   {t('quizCollection.questions_list_empty')}
                 </p>
               ) : (
                 <ol className="space-y-1">
                   {(detail?.questions ?? []).map((q, idx) => (
-                    <li key={q.uid} className="flex items-start gap-2 bg-white border border-slate-100 rounded-md px-2.5 py-1.5">
+                    <li key={q.uid} className="flex items-start gap-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-md px-2.5 py-1.5">
                       <span className="w-4 h-4 rounded bg-indigo-100 text-indigo-600 text-[8px] font-black flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
-                      <p className="text-[10px] font-bold text-slate-700 leading-relaxed line-clamp-2">{q.question_text}</p>
+                      <p className="text-[10px] font-bold text-slate-700 dark:text-slate-300 leading-relaxed line-clamp-2">{q.question_text}</p>
                     </li>
                   ))}
                 </ol>
@@ -2016,13 +2016,13 @@ function MissionAccordion({
       )}
 
       {isLocked && (
-        <div className="border-t border-slate-100 bg-slate-50/30 px-3 py-2.5 flex items-start gap-2">
+        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/30 px-3 py-2.5 flex items-start gap-2">
           <Lock size={12} className="text-slate-400 shrink-0 mt-0.5" />
           <div className="space-y-0.5">
-            <p className="text-[10px] font-black text-slate-700">
+            <p className="text-[10px] font-black text-slate-700 dark:text-slate-300">
               {t('quizCollection.questions_locked_title')}
             </p>
-            <p className="text-[9px] text-slate-500 leading-relaxed">
+            <p className="text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">
               {t('quizCollection.questions_locked_hint')}
             </p>
           </div>

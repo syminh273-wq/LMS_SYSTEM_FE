@@ -45,7 +45,7 @@ export default function MeRankingPage() {
 
   if (loading || !profile) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="h-48 shimmer rounded-2xl" />
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -66,11 +66,11 @@ export default function MeRankingPage() {
     <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 via-white to-slate-50">
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="flex flex-col gap-1">
-          <h1 className="flex items-center gap-2 text-2xl font-black text-slate-900 sm:text-3xl dark:text-white">
+          <h1 className="flex items-center gap-2 text-2xl font-black text-slate-900 dark:text-slate-100 sm:text-3xl dark:text-white">
             <Sparkles className="h-7 w-7 text-indigo-500" />
             {t('ranking.page_title', 'My Ranking')}
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {t('ranking.page_subtitle', 'Track your learning progress, level, and achievements.')}
           </p>
         </div>
@@ -127,7 +127,7 @@ function NavCard({
   return (
     <Link
       href={href}
-      className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+      className="group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
     >
       <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${color}`} />
       <div className="flex items-center justify-between">
@@ -136,7 +136,7 @@ function NavCard({
         >
           <Icon className="h-5 w-5" />
         </div>
-        <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700" />
+        <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700 dark:text-slate-300" />
       </div>
       <p className="mt-3 text-sm font-bold text-slate-900 dark:text-white">
         {label}

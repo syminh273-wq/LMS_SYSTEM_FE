@@ -31,7 +31,7 @@ const GRADES = [
 
 export default function GradesPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -40,12 +40,12 @@ export default function GradesPage() {
               <Sparkles size={11} />
               Theo dõi tiến độ
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Điểm số & Thành tích</h1>
-            <p className="text-slate-600 text-[14px] mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Điểm số & Thành tích</h1>
+            <p className="text-slate-600 dark:text-slate-400 text-[14px] mt-1">
               Theo dõi kết quả học tập và thành tích học thuật của bạn
             </p>
           </div>
-          <button className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors self-start sm:self-auto">
+          <button className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[13px] font-semibold hover:bg-slate-50 dark:bg-slate-900/50 transition-colors self-start sm:self-auto">
             <Download size={14} className="text-indigo-600" />
             Xuất bảng điểm
           </button>
@@ -58,7 +58,7 @@ export default function GradesPage() {
               <div
                 key={s.label}
                 style={{ animationDelay: `${i * 50}ms` }}
-                className="bg-white border border-slate-200 rounded-xl p-5 card-elevated animate-fade-up"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 card-elevated animate-fade-up"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className={cn("w-11 h-11 rounded-lg flex items-center justify-center text-white shadow-sm", s.color)}>
@@ -66,10 +66,10 @@ export default function GradesPage() {
                   </div>
                 </div>
                 <div className="flex items-baseline gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight tabular-nums">{s.value}</p>
-                  {s.suffix && <span className="text-[13px] text-slate-500 font-medium">{s.suffix}</span>}
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight tabular-nums">{s.value}</p>
+                  {s.suffix && <span className="text-[13px] text-slate-500 dark:text-slate-400 font-medium">{s.suffix}</span>}
                 </div>
-                <p className="text-[12.5px] text-slate-500 mt-0.5 font-medium">{s.label}</p>
+                <p className="text-[12.5px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{s.label}</p>
               </div>
             );
           })}
@@ -78,11 +78,11 @@ export default function GradesPage() {
         <div className="space-y-4">
           <div className="flex items-end justify-between">
             <div>
-              <h3 className="text-[15px] font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-[15px] font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                 <TrendingUp size={14} className="text-indigo-600" />
                 Kết quả chi tiết
               </h3>
-              <p className="text-[12px] text-slate-500 mt-0.5">5 bài đánh giá mới nhất</p>
+              <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">5 bài đánh giá mới nhất</p>
             </div>
           </div>
 
@@ -94,7 +94,7 @@ export default function GradesPage() {
               return (
                 <div
                   key={i}
-                  className="group bg-white border border-slate-200 rounded-xl card-elevated hover:border-indigo-300 transition-colors cursor-pointer overflow-hidden"
+                  className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl card-elevated hover:border-indigo-300 transition-colors cursor-pointer overflow-hidden"
                 >
                   <div className="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4">
                     <div className={cn(
@@ -108,17 +108,17 @@ export default function GradesPage() {
                       {item.grade}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13.5px] sm:text-[14px] font-semibold text-slate-900 group-hover:text-indigo-700 transition-colors truncate">
+                      <p className="text-[13.5px] sm:text-[14px] font-semibold text-slate-900 dark:text-slate-100 group-hover:text-indigo-700 transition-colors truncate">
                         {item.course}
                       </p>
-                      <p className="text-[11.5px] text-slate-500 mt-0.5 truncate">{item.assignment}</p>
+                      <p className="text-[11.5px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{item.assignment}</p>
                     </div>
                     <div className="hidden sm:flex flex-col items-end shrink-0 min-w-[100px]">
                       <div className="flex items-baseline gap-0.5">
-                        <span className="text-[15px] font-bold text-slate-900 tabular-nums">{item.score}</span>
-                        <span className="text-[11px] text-slate-500">/{item.total}</span>
+                        <span className="text-[15px] font-bold text-slate-900 dark:text-slate-100 tabular-nums">{item.score}</span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400">/{item.total}</span>
                       </div>
-                      <p className="text-[10.5px] text-slate-500 mt-0.5">{item.date}</p>
+                      <p className="text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">{item.date}</p>
                     </div>
                     <div className="w-16 sm:w-20 shrink-0">
                       <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
@@ -130,7 +130,7 @@ export default function GradesPage() {
                           style={{ width: `${pct}%` }}
                         />
                       </div>
-                      <p className="text-[10px] text-slate-500 text-right mt-1 font-semibold tabular-nums">{Math.round(pct)}%</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 text-right mt-1 font-semibold tabular-nums">{Math.round(pct)}%</p>
                     </div>
                     <ArrowUpRight size={15} className="text-slate-300 group-hover:text-indigo-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0 hidden sm:block" />
                   </div>

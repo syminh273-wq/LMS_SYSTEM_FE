@@ -125,11 +125,11 @@ export function ClassroomDocsTab({ classroomUid, accessToken, apiBase, showFilte
   }, [docs, search, activeSection]);
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 space-y-4">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <BookOpen size={18} className="text-indigo-600" />
-          <h3 className="font-black text-slate-900 text-sm uppercase tracking-tighter">
+          <h3 className="font-black text-slate-900 dark:text-slate-100 text-sm uppercase tracking-tighter">
             {t('classroom.labels.docs_title', undefined, { defaultValue: 'Tài liệu học tập' })}
           </h3>
           <span className="text-xs font-bold text-slate-400">
@@ -153,7 +153,7 @@ export function ClassroomDocsTab({ classroomUid, accessToken, apiBase, showFilte
                 <select
                   value={activeSection}
                   onChange={(e) => setActiveSection(e.target.value)}
-                  className="pl-8 pr-3 h-9 text-xs font-medium rounded-md border border-slate-200 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="pl-8 pr-3 h-9 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:bg-slate-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 >
                   <option value="__all__">{t('classroom.labels.docs_filter_all', undefined, { defaultValue: 'Tất cả mục' })}</option>
                   {sections.map((s) => (
@@ -167,7 +167,7 @@ export function ClassroomDocsTab({ classroomUid, accessToken, apiBase, showFilte
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12 text-slate-500">
+        <div className="flex items-center justify-center py-12 text-slate-500 dark:text-slate-400">
           <Loader2 className="w-6 h-6 animate-spin mr-2" />
           <span className="text-sm font-medium">{t('classroom.labels.docs_loading', undefined, { defaultValue: 'Đang tải...' })}</span>
         </div>
@@ -191,18 +191,18 @@ export function ClassroomDocsTab({ classroomUid, accessToken, apiBase, showFilte
                 href={d.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-3 p-3 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
+                className="group flex items-start gap-3 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all min-w-0 overflow-hidden"
               >
                 <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-100">
                   <Icon size={20} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 min-w-0">
-                    <p className="text-sm font-bold text-slate-800 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
+                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
                     <Download size={12} className="text-slate-400 opacity-0 group-hover:opacity-100 transition shrink-0" />
                   </div>
                   <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex-wrap">
-                    {d.file_type && <span className="px-1.5 py-0.5 bg-slate-100 rounded">{d.file_type}</span>}
+                    {d.file_type && <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">{d.file_type}</span>}
                     {d.size ? <span>{formatSize(d.size)}</span> : null}
                     {d.created_at ? <span>{formatDate(d.created_at)}</span> : null}
                     {section && (

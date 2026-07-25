@@ -71,7 +71,7 @@ export default function ConsumerHistoryPage() {
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="text-slate-600 hover:text-slate-900 -ml-2"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 -ml-2"
               aria-label="Quay lại"
             >
               <ArrowLeft size={18} />
@@ -79,9 +79,9 @@ export default function ConsumerHistoryPage() {
             <div>
               <div className="flex items-center gap-2">
                 <HistoryIcon size={20} className="text-indigo-600" strokeWidth={2.4} />
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Lịch sử</h1>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100">Lịch sử</h1>
               </div>
-              <p className="text-[12px] text-slate-500 mt-0.5">
+              <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">
                 Giao dịch thanh toán và các lớp bạn đã tham gia.
               </p>
             </div>
@@ -117,7 +117,7 @@ export default function ConsumerHistoryPage() {
                     className={`px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors ring-1 ${
                       active
                         ? 'bg-indigo-600 text-white ring-indigo-600'
-                        : 'bg-white text-slate-600 ring-slate-200 hover:ring-indigo-300 hover:text-indigo-700'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 ring-slate-200 hover:ring-indigo-300 hover:text-indigo-700'
                     }`}
                   >
                     {s.label}

@@ -36,7 +36,7 @@ function getIcon(name: string) {
 export function AchievementGrid({ achievements, t }: AchievementGridProps) {
   if (!achievements.length) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-200 p-12 text-center text-sm text-slate-500 dark:border-slate-700">
+      <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-12 text-center text-sm text-slate-500 dark:border-slate-700">
         {t('ranking.no_history', 'No data yet.')}
       </div>
     );
@@ -50,7 +50,7 @@ export function AchievementGrid({ achievements, t }: AchievementGridProps) {
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">
             {t('ranking.achievements_title', 'Achievements')}
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {t('ranking.achievements_unlocked', '{{count}} of {{total}} unlocked', {
               count: unlocked,
               total,
@@ -89,7 +89,7 @@ function AchievementCard({
         'group relative overflow-hidden transition-all',
         unlocked
           ? 'border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 shadow-sm hover:shadow-md dark:border-amber-500/30 dark:from-amber-500/5 dark:to-orange-500/5'
-          : 'border-slate-200 bg-white opacity-90 hover:opacity-100 dark:border-slate-700 dark:bg-slate-900/40',
+          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 opacity-90 hover:opacity-100 dark:border-slate-700 dark:bg-slate-900/40',
       )}
     >
       <CardContent className="p-4">
@@ -99,7 +99,7 @@ function AchievementCard({
               'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
               unlocked
                 ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md'
-                : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-600',
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600',
             )}
           >
             {unlocked ? (
@@ -132,12 +132,12 @@ function AchievementCard({
 
         <div className="mt-3 space-y-1">
           <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wide">
-            <span className="text-slate-500">
+            <span className="text-slate-500 dark:text-slate-400">
               {achievement.current_value} / {achievement.target_value}
             </span>
             <span
               className={cn(
-                unlocked ? 'text-emerald-600' : 'text-slate-500',
+                unlocked ? 'text-emerald-600' : 'text-slate-500 dark:text-slate-400',
               )}
             >
               {pct}%

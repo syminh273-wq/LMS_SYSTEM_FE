@@ -264,7 +264,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             variant="ghost"
             size="sm"
             onClick={() => router.back()}
-            className="rounded-lg text-slate-600 -ml-2"
+            className="rounded-lg text-slate-600 dark:text-slate-400 -ml-2"
           >
             <ArrowLeft size={14} className="mr-1" /> Quay lại
           </Button>
@@ -278,7 +278,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="border-slate-200 overflow-hidden">
+            <Card className="border-slate-200 dark:border-slate-700 overflow-hidden">
               <CardContent className="p-6 sm:p-8 space-y-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-md">
@@ -293,7 +293,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                       Miễn phí
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-md">
                     <Hash size={11} /> {classroom.pid}
                   </span>
                 </div>
@@ -329,8 +329,8 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
               </div>
 
               {preview.items.length === 0 ? (
-                <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-10 text-center">
-                  <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3">
+                <div className="bg-white dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-700 rounded-2xl p-10 text-center">
+                  <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center mx-auto mb-3">
                     <BookOpen size={20} className="text-slate-400" />
                   </div>
                   <div className="text-sm font-bold text-foreground">Chưa có bài giảng miễn phí</div>
@@ -341,7 +341,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                   </div>
                 </div>
               ) : (
-                <Card className="border-slate-200 overflow-hidden">
+                <Card className="border-slate-200 dark:border-slate-700 overflow-hidden">
                   <div className="divide-y divide-slate-100">
                     {preview.items.map((item) => {
                       if (item.type === 'folder') {
@@ -358,7 +358,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                               "w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors",
                               isRootPreview
                                 ? 'bg-emerald-50/40 hover:bg-emerald-50/70 text-emerald-900'
-                                : 'hover:bg-slate-50 text-slate-700'
+                                : 'hover:bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-300'
                             )}
                             style={{ paddingLeft: 16 + item.depth * 20 }}
                           >
@@ -380,7 +380,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                             )}
                             <span className="truncate text-sm font-bold flex-1">{item.name}</span>
                             {isRootPreview && (
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-white border border-emerald-200 rounded px-1.5 py-0.5">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-white dark:bg-slate-900 border border-emerald-200 rounded px-1.5 py-0.5">
                                 Preview
                               </span>
                             )}
@@ -401,10 +401,10 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                               kind: fileKind(item.name, item.file_type),
                             })
                           }
-                          className="w-full group flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left"
+                          className="w-full group flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:bg-slate-900/50 transition-colors text-left"
                           style={{ paddingLeft: 36 + item.depth * 20 }}
                         >
-                          <div className="h-9 w-9 rounded-lg bg-slate-50 group-hover:bg-white flex items-center justify-center shrink-0 border border-slate-100 transition-colors">
+                          <div className="h-9 w-9 rounded-lg bg-slate-50 dark:bg-slate-900/50 group-hover:bg-white dark:bg-slate-900 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800 transition-colors">
                             {fileIcon(item.name, item.file_type)}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -438,7 +438,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
           </div>
 
           <div className="space-y-4">
-            <Card className="border-slate-200">
+            <Card className="border-slate-200 dark:border-slate-700">
               <CardContent className="p-5">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
                   {isPaid ? 'Thanh toán 1 lần' : 'Giá lớp học'}
@@ -469,7 +469,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 className="block group"
                 aria-label={`Xem trang cá nhân của giáo viên ${teacherName}`}
               >
-                <Card className="border-slate-200 transition group-hover:border-slate-300">
+                <Card className="border-slate-200 dark:border-slate-700 transition group-hover:border-slate-300">
                   <CardContent className="p-5 flex items-center gap-3.5">
                     <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-base font-bold overflow-hidden shrink-0">
                       {teacherAvatar ? (
@@ -494,7 +494,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 </Card>
               </Link>
             ) : (
-              <Card className="border-slate-200">
+              <Card className="border-slate-200 dark:border-slate-700">
                 <CardContent className="p-5 flex items-center gap-3.5">
                   <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
                     <GraduationCap size={22} />
@@ -528,7 +528,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
 
       <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-4 pt-3 bg-gradient-to-t from-white via-white/95 to-transparent dark:from-slate-950 dark:via-slate-950/95">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-200/50 p-2.5 flex items-center gap-3">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-lg shadow-slate-200/50 p-2.5 flex items-center gap-3">
             <div className="flex-1 min-w-0 pl-2">
               <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 {isPaid ? 'Tổng thanh toán' : 'Quyền truy cập'}
@@ -540,7 +540,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             {actions.membership_status === 'pending' ? (
               <Button
                 disabled
-                className="h-11 rounded-xl bg-slate-100 text-slate-500 font-bold px-5 gap-1.5 cursor-not-allowed"
+                className="h-11 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-bold px-5 gap-1.5 cursor-not-allowed"
               >
                 <Hourglass size={15} /> Đợi phê duyệt
               </Button>
@@ -631,10 +631,10 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 <iframe
                   src={previewDoc.url}
                   title={previewDoc.name}
-                  className="w-full h-full rounded-lg shadow bg-white"
+                  className="w-full h-full rounded-lg shadow bg-white dark:bg-slate-900"
                 />
               ) : (
-                <div className="text-center text-slate-500">
+                <div className="text-center text-slate-500 dark:text-slate-400">
                   <p className="text-sm font-medium mb-3">
                     Không hỗ trợ xem trước cho định dạng này.
                   </p>

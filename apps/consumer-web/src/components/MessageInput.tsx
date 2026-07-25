@@ -127,12 +127,12 @@ export function MessageInput({ onSend, disabled }: Props) {
           {showEmoji && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowEmoji(false)} />
-              <div className="absolute bottom-12 right-0 z-20 w-72 max-h-64 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl p-2 grid grid-cols-10 gap-1">
+              <div className="absolute bottom-12 right-0 z-20 w-72 max-h-64 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2 grid grid-cols-10 gap-1">
                 {EMOJIS.map((e, i) => (
                   <button
                     key={i}
                     onClick={() => { handleEmoji(e); setShowEmoji(false); }}
-                    className="text-xl hover:bg-slate-100 rounded p-1"
+                    className="text-xl hover:bg-slate-100 dark:bg-slate-800 rounded p-1"
                   >
                     {e}
                   </button>

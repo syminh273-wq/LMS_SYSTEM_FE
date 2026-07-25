@@ -21,7 +21,7 @@ const ICON_BY_EVENT: Record<string, { icon: React.ComponentType<{ className?: st
   quiz_submitted:       { icon: PlayCircle,       color: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300' },
   quiz_passed:          { icon: CheckCircle2,     color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' },
   quiz_perfect:         { icon: StarIcon,         color: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300' },
-  doc_completed:        { icon: BookOpen,         color: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200' },
+  doc_completed:        { icon: BookOpen,         color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:bg-slate-700 dark:text-slate-200' },
   collection_completed: { icon: Layers,           color: 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300' },
   certificate_issued:   { icon: Trophy,           color: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300' },
 };
@@ -47,7 +47,7 @@ function relativeTime(iso: string): string {
 export function XpHistoryList({ transactions, t }: XpHistoryListProps) {
   if (!transactions.length) {
     return (
-      <div className="rounded-xl border border-dashed border-slate-200 p-12 text-center text-sm text-slate-500 dark:border-slate-700">
+      <div className="rounded-xl border border-dashed border-slate-200 dark:border-slate-700 p-12 text-center text-sm text-slate-500 dark:border-slate-700">
         {t('ranking.no_history', 'No XP events yet.')}
       </div>
     );
@@ -62,7 +62,7 @@ export function XpHistoryList({ transactions, t }: XpHistoryListProps) {
             return (
               <li
                 key={tx.uid}
-                className="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50 sm:px-5 dark:hover:bg-slate-800/40"
+                className="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50 dark:bg-slate-900/50 sm:px-5 dark:hover:bg-slate-800/40"
               >
                 <div
                   className={cn(
@@ -76,7 +76,7 @@ export function XpHistoryList({ transactions, t }: XpHistoryListProps) {
                   <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                     {tx.description || tx.event_type}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {relativeTime(tx.created_at)} · {tx.event_type}
                   </p>
                 </div>

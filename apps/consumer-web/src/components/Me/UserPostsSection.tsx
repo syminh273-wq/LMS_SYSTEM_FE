@@ -62,7 +62,7 @@ export function UserPostsSection({ profile, currentUserId, onCountChange }: Prop
       <section className="space-y-3">
         <div className="flex flex-col items-center justify-center py-16 gap-3">
           <Loader2 size={24} className="animate-spin text-indigo-600" />
-          <p className="text-[12.5px] text-slate-500">Đang tải bài đăng...</p>
+          <p className="text-[12.5px] text-slate-500 dark:text-slate-400">Đang tải bài đăng...</p>
         </div>
       </section>
     );
@@ -71,12 +71,12 @@ export function UserPostsSection({ profile, currentUserId, onCountChange }: Prop
   if (posts.length === 0) {
     return (
       <section className="space-y-3">
-        <div className="text-center py-12 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white flex items-center justify-center">
+        <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/50 border border-dashed border-slate-200 dark:border-slate-700 rounded-xl">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center">
             <Sparkles size={24} className="text-slate-400" />
           </div>
-          <p className="font-semibold text-slate-900 text-[14px]">Chưa có bài đăng nào</p>
-          <p className="text-[12.5px] text-slate-500 mt-1">Người dùng này chưa đăng bài viết nào.</p>
+          <p className="font-semibold text-slate-900 dark:text-slate-100 text-[14px]">Chưa có bài đăng nào</p>
+          <p className="text-[12.5px] text-slate-500 dark:text-slate-400 mt-1">Người dùng này chưa đăng bài viết nào.</p>
         </div>
       </section>
     );

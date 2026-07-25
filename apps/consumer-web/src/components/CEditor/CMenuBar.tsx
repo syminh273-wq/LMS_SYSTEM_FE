@@ -36,7 +36,7 @@ function ToolbarButton({
         'relative p-1.5 rounded transition border',
         isActive
           ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-          : 'text-slate-500 border-transparent hover:bg-slate-100 hover:text-slate-900',
+          : 'text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:text-slate-100',
         disabled ? 'opacity-40 cursor-not-allowed' : 'active:scale-95',
       ].join(' ')}
     >
@@ -70,7 +70,7 @@ export function CMenuBar({ editor }: Props) {
   };
 
   return (
-    <div className="px-2 py-1.5 rounded-t-lg flex items-center gap-0.5 w-full border border-b-0 border-slate-200 bg-slate-50 flex-wrap">
+    <div className="px-2 py-1.5 rounded-t-lg flex items-center gap-0.5 w-full border border-b-0 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex-wrap">
       <input
         ref={fileInputRef}
         type="file"

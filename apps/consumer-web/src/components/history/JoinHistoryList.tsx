@@ -22,13 +22,13 @@ const STATUS_BADGE: Record<string, { label: string; icon: React.ElementType; cls
   approved: { label: 'Đã tham gia', icon: CheckCircle2, cls: 'text-emerald-700 bg-emerald-50 ring-emerald-200' },
   pending: { label: 'Chờ duyệt', icon: Clock, cls: 'text-amber-700 bg-amber-50 ring-amber-200' },
   rejected: { label: 'Bị từ chối', icon: XCircle, cls: 'text-rose-700 bg-rose-50 ring-rose-200' },
-  left: { label: 'Đã rời', icon: AlertTriangle, cls: 'text-slate-600 bg-slate-50 ring-slate-200' },
+  left: { label: 'Đã rời', icon: AlertTriangle, cls: 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 ring-slate-200' },
 };
 
 export function JoinHistoryList({ items, loading }: Props) {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16 text-slate-500">
+      <div className="flex items-center justify-center py-16 text-slate-500 dark:text-slate-400">
         <Loader2 size={28} className="animate-spin" />
       </div>
     );
@@ -42,7 +42,7 @@ export function JoinHistoryList({ items, loading }: Props) {
         const badge = STATUS_BADGE[it.status] ?? {
           label: it.status,
           icon: Clock,
-          cls: 'text-slate-600 bg-slate-50 ring-slate-200',
+          cls: 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 ring-slate-200',
         };
         const Icon = badge.icon;
         const isActive = it.status === 'approved' && !it.is_deleted;
@@ -52,14 +52,14 @@ export function JoinHistoryList({ items, loading }: Props) {
             href={isActive ? `/consumer/classroom/${it.classroom_uid}` : `/consumer/classroom/preview/${it.classroom_uid}`}
             className="block group"
           >
-            <Card className="border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all">
+            <Card className="border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:shadow-md transition-all">
               <CardContent className="p-4 sm:p-5 flex items-center gap-4">
                 <div className="shrink-0 w-11 h-11 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center">
                   <BookOpen size={20} strokeWidth={2.2} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-bold text-slate-900 truncate">
+                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
                       {it.classroom_name || 'Lớp học'}
                     </p>
                     <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ring-1', badge.cls)}>
@@ -72,7 +72,7 @@ export function JoinHistoryList({ items, loading }: Props) {
                       </span>
                     )}
                   </div>
-                  <p className="text-[12px] text-slate-500 mt-0.5">
+                  <p className="text-[12px] text-slate-500 dark:text-slate-400 mt-0.5">
                     {it.teacher_name ? `GV: ${it.teacher_name} · ` : ''}
                     {it.is_deleted ? 'Đã xóa' : `Tham gia: ${formatDate(it.joined_at)}`}
                   </p>
@@ -91,12 +91,12 @@ export function JoinHistoryList({ items, loading }: Props) {
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-12 text-center">
-      <div className="w-14 h-14 rounded-2xl bg-slate-100 mx-auto flex items-center justify-center text-slate-400">
+    <div className="rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50/50 p-12 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 mx-auto flex items-center justify-center text-slate-400">
         <HistoryIcon size={26} />
       </div>
-      <h3 className="mt-4 text-sm font-bold text-slate-700">Chưa có lịch sử tham gia lớp</h3>
-      <p className="mt-1 text-[12px] text-slate-500">Các lớp bạn đã tham gia sẽ hiển thị tại đây.</p>
+      <h3 className="mt-4 text-sm font-bold text-slate-700 dark:text-slate-300">Chưa có lịch sử tham gia lớp</h3>
+      <p className="mt-1 text-[12px] text-slate-500 dark:text-slate-400">Các lớp bạn đã tham gia sẽ hiển thị tại đây.</p>
     </div>
   );
 }

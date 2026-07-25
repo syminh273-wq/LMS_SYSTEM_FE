@@ -59,8 +59,8 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-8 text-center space-y-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-8 text-center space-y-6">
         {status === 'loading' && (
           <div className="space-y-4">
             <div className="flex justify-center">
@@ -69,8 +69,8 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
                 <Loader2 className="absolute top-0 left-0 w-20 h-20 text-indigo-600 animate-spin p-4" />
               </div>
             </div>
-            <h2 className="text-xl font-bold text-slate-900">Đang xử lý mã tham gia...</h2>
-            <p className="text-slate-500 text-sm">Vui lòng đợi trong giây lát khi chúng tôi xác nhận quyền truy cập của bạn.</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Đang xử lý mã tham gia...</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">Vui lòng đợi trong giây lát khi chúng tôi xác nhận quyền truy cập của bạn.</p>
           </div>
         )}
 
@@ -82,8 +82,8 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
               </div>
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-slate-900">Yêu cầu đã được gửi!</h2>
-              <p className="text-slate-500 text-sm">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Yêu cầu đã được gửi!</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
                 Yêu cầu tham gia {linkData.resource_type === 'classroom' ? 'lớp học' : 'tài nguyên'} đang chờ giáo viên phê duyệt:
               </p>
               <p className="font-bold text-indigo-600 text-lg">{linkData.metadata.name || 'Phòng học mới'}</p>
@@ -111,8 +111,8 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
               </div>
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-bold text-slate-900">Rất tiếc, đã có lỗi xảy ra</h2>
-              <p className="text-slate-500 text-sm">{errorMsg}</p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Rất tiếc, đã có lỗi xảy ra</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">{errorMsg}</p>
             </div>
             <div className="pt-4 space-y-3">
               <Button
@@ -125,7 +125,7 @@ export default function JoinPage({ params }: { params: Promise<{ code: string }>
               <Button
                 onClick={() => router.push('/consumer/dashboard')}
                 variant="ghost"
-                className="w-full h-12 rounded-xl text-slate-500 font-medium"
+                className="w-full h-12 rounded-xl text-slate-500 dark:text-slate-400 font-medium"
               >
                 Về trang chủ
               </Button>

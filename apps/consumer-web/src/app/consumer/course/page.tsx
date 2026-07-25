@@ -39,7 +39,7 @@ export default function MyCoursesPage() {
           <CardContent className="p-12 text-center space-y-4">
             <GraduationCap size={64} className="mx-auto text-slate-300" />
             <h2 className="text-xl font-bold">{t('course.mine.empty', 'No courses yet.')}</h2>
-            <p className="text-slate-500">{t('course.mine.empty_desc', 'Use a preview link from your teacher to enroll.')}</p>
+            <p className="text-slate-500 dark:text-slate-400">{t('course.mine.empty_desc', 'Use a preview link from your teacher to enroll.')}</p>
           </CardContent>
         </Card>
       </div>

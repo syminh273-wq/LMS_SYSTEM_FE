@@ -189,7 +189,7 @@ export default function DiscoverPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Tìm theo tên hoặc mô tả lớp học..."
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:border-primary-brand transition-all text-sm font-medium"
+            className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:border-primary-brand transition-all text-sm font-medium"
           />
         </div>
 
@@ -200,7 +200,7 @@ export default function DiscoverPage() {
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
               !category
                 ? 'bg-primary-brand text-white shadow-sm shadow-primary-brand/20'
-                : 'bg-white border border-slate-200 text-slate-600 hover:border-primary-brand'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary-brand'
             }`}
           >
             <Filter size={12} className="inline mr-1" /> Tất cả
@@ -213,7 +213,7 @@ export default function DiscoverPage() {
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
                 category === c.value
                   ? 'bg-primary-brand text-white shadow-sm shadow-primary-brand/20'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:border-primary-brand'
+                  : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary-brand'
               }`}
             >
               <span className="mr-1">{c.emoji}</span>
@@ -235,7 +235,7 @@ export default function DiscoverPage() {
               className={`text-xs font-bold px-3 py-1.5 rounded-lg transition ${
                 pricing === p.value
                   ? 'bg-slate-900 text-white'
-                  : 'text-slate-500 hover:bg-slate-100'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-800'
               }`}
             >
               {p.label}
@@ -250,7 +250,7 @@ export default function DiscoverPage() {
           <span className="text-sm font-medium">Đang tải danh sách lớp học...</span>
         </div>
       ) : results.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-dashed border-slate-200 rounded-3xl">
+        <div className="text-center py-20 bg-white dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-700 rounded-3xl">
           <Compass size={36} className="mx-auto text-slate-300 mb-3" />
           <div className="text-sm font-bold text-foreground">Chưa có lớp học nào</div>
           <div className="text-xs text-muted-foreground mt-1">
@@ -286,12 +286,12 @@ export default function DiscoverPage() {
                 onClick={handleClick}
                 aria-disabled={isOwnClass}
                 className={cn(
-                  "group bg-white border border-slate-200 rounded-2xl flex flex-col transition-colors",
+                  "group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col transition-colors",
                   isOwnClass
                     ? "cursor-not-allowed opacity-60"
                     : "cursor-pointer hover:border-slate-300"
                 )}
-                className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300"
+                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300"
               >
                 <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2">
                   <div className="flex items-center gap-1.5 min-w-0">
@@ -316,7 +316,7 @@ export default function DiscoverPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 dark:border-slate-800">
                   <span className="text-sm font-bold text-foreground">
                     {c.price_vnd ? formatPrice(c.price_vnd) : (isPaid ? '—' : 'Miễn phí')}
                   </span>
@@ -333,7 +333,7 @@ export default function DiscoverPage() {
                       Chờ duyệt
                     </span>
                   ) : (
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded group-hover:text-indigo-700 group-hover:bg-indigo-50 group-hover:border-indigo-200 transition-colors">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded group-hover:text-indigo-700 group-hover:bg-indigo-50 group-hover:border-indigo-200 transition-colors">
                       Xem trước →
                     </span>
                   )}
@@ -350,7 +350,7 @@ export default function DiscoverPage() {
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-xs font-bold disabled:opacity-50 hover:border-primary-brand"
+            className="h-9 px-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold disabled:opacity-50 hover:border-primary-brand"
           >
             Trang trước
           </button>
@@ -361,7 +361,7 @@ export default function DiscoverPage() {
             type="button"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-xs font-bold disabled:opacity-50 hover:border-primary-brand"
+            className="h-9 px-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-bold disabled:opacity-50 hover:border-primary-brand"
           >
             Trang sau
           </button>
