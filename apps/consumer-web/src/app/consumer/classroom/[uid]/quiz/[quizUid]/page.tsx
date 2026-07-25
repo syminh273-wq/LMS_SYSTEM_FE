@@ -151,6 +151,10 @@ export default function QuizGamePage({ params }: Props) {
   }, [phase]);
 
   const handleStartPlaying = () => {
+    if (quiz?.closes_at && new Date(quiz.closes_at).getTime() <= Date.now()) {
+      toast.error('Bài quiz đã quá thời gian cho phép.');
+      return;
+    }
     startedAtRef.current = new Date();
     autoSubmitFiredRef.current = false;
     setForceSubmitted(false);
@@ -186,7 +190,8 @@ export default function QuizGamePage({ params }: Props) {
   const maxAttempts = quiz?.max_attempts ?? 0;
   const isBlocked = maxAttempts > 0 && attemptCount >= maxAttempts;
   const attemptsRemaining = maxAttempts > 0 ? maxAttempts - attemptCount : null;
-  const isClosed = quiz?.is_closed === true || quiz?.is_expired === true;
+  const isClosedBySchedule = !!(quiz?.closes_at && new Date(quiz.closes_at).getTime() <= Date.now());
+  const isClosed = quiz?.is_closed === true || quiz?.is_expired === true || isClosedBySchedule;
   const isNotYetOpen = quiz?.is_not_yet_open === true;
   const isOpen = quiz?.is_open !== false;
   const canStart = isOpen && !isClosed && !isBlocked && !isNotYetOpen;
