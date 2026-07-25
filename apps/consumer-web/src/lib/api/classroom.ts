@@ -15,6 +15,18 @@ import type {
   UploadedResource,
 } from './types';
 
+export type JoinHistoryItem = {
+  classroom_uid: string;
+  classroom_name: string;
+  teacher_name: string;
+  role: string;
+  status: 'pending' | 'approved' | string;
+  is_deleted: boolean;
+  has_paid: boolean;
+  joined_at?: string | null;
+  paid_at?: string | null;
+};
+
 export class ClassroomApiClient extends BaseRestApiClient {
   constructor() {
     super();
@@ -95,6 +107,12 @@ export class ClassroomApiClient extends BaseRestApiClient {
     return this.post(`/api/v1/consumer/course/classrooms/${uid}/checkout/`);
   }
 
+  public async getJoinHistory(limit: number = 50): Promise<JoinHistoryItem[]> {
+    const sp = new URLSearchParams();
+    sp.set('limit', String(limit));
+    return this.get<JoinHistoryItem[]>(`/api/v1/consumer/course/classrooms/me/history/?${sp.toString()}`);
+  }
+
   public async access(uid: string): Promise<{
     classroom_uid: string;
     pricing_type: 'free' | 'paid';
@@ -108,7 +126,7 @@ export class ClassroomApiClient extends BaseRestApiClient {
   }
 
   public async leaderboard(uid: string, limit: number = 10): Promise<LeaderboardResponse> {
-    return this.get<LeaderboardResponse>(`/api/v1/consumer/course/classrooms/${uid}/leaderboard/?limit=${limit}`);
+    return this.get<LeaderboardResponse>(`/api/v1/consumer/ranking/classrooms/${uid}/leaderboard/?limit=${limit}`);
   }
 
   public async preview(uid: string): Promise<ClassroomPreviewResponse> {

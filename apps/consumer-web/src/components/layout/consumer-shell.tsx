@@ -27,6 +27,7 @@ import {
   Heart,
   Trophy,
   Calculator,
+  History as HistoryIcon,
 } from 'lucide-react';
 import {
   Avatar,
@@ -106,6 +107,7 @@ const primaryNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
   { name: 'Khám phá', href: '/consumer/discover', icon: Compass },
   { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
+  { name: 'Lịch sử', href: '/consumer/history', icon: HistoryIcon },
 ];
 
 const utilityNavItems: NavItem[] = [

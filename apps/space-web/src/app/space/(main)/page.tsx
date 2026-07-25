@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@shared/components/ui/card';
 import {
   BookOpen,
@@ -9,13 +8,11 @@ import {
   Award,
   Loader2,
   TrendingUp,
-  UserPlus,
   FileCheck,
   GraduationCap,
   CheckCircle2,
   Clock,
   BarChart3,
-  CalendarDays,
   File,
   ClipboardList,
   Video,
@@ -23,16 +20,9 @@ import {
   Gamepad2,
   Timer,
 } from 'lucide-react';
-import { accountService } from '@/lib/api/account';
-import { spaceApi } from '@/lib/api';
-import type { ActivityLog, ActivityLogEventType } from '@/lib/api/types';
+import { useDashboard } from '@/lib/hooks/use-dashboard';
+import type { ActivityLogEventType } from '@/lib/api/types';
 import { useTranslation } from '@shared/components/LocaleProvider';
-
-type DashboardStats = {
-  totalClassrooms: number;
-  totalStudents: number;
-  activeClassrooms: number;
-};
 
 const ACTIVITY_KEY_MAP: Record<ActivityLogEventType, string> = {
   classroom_created: 'dashboard.activity.classroom_created',
@@ -67,7 +57,7 @@ function getActivityMeta(eventType: ActivityLogEventType, t: (key: string) => st
     quiz_assigned:     { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-50', label: t(ACTIVITY_KEY_MAP.quiz_assigned) },
     meeting_started:   { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-50',    label: t(ACTIVITY_KEY_MAP.meeting_started) },
     meeting_ended:     { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.meeting_ended) },
-    member_joined:     { icon: UserPlus,      color: 'text-blue-500',   bg: 'bg-blue-50',   label: t(ACTIVITY_KEY_MAP.member_joined) },
+    member_joined:     { icon: Users,         color: 'text-blue-500',   bg: 'bg-blue-50',   label: t(ACTIVITY_KEY_MAP.member_joined) },
     member_approved:   { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: t(ACTIVITY_KEY_MAP.member_approved) },
     member_rejected:   { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.member_rejected) },
     member_kicked:     { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.member_kicked) },
@@ -78,6 +68,7 @@ function getActivityMeta(eventType: ActivityLogEventType, t: (key: string) => st
 }
 
 function timeAgo(isoString: string, t: (key: string, fb?: string, values?: Record<string, string | number>) => string): string {
+  if (!isoString) return '';
   const diff = Date.now() - new Date(isoString).getTime();
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return t('dashboard.time_ago.just_now');
@@ -86,27 +77,6 @@ function timeAgo(isoString: string, t: (key: string, fb?: string, values?: Recor
   if (hours < 24) return t('dashboard.time_ago.hours_ago', undefined, { count: hours });
   return t('dashboard.time_ago.days_ago', undefined, { count: Math.floor(hours / 24) });
 }
-
-const MOCK_WEEKLY = [
-  { day: 'T2', enrolled: 12, submitted: 8 },
-  { day: 'T3', enrolled: 7,  submitted: 14 },
-  { day: 'T4', enrolled: 18, submitted: 11 },
-  { day: 'T5', enrolled: 5,  submitted: 20 },
-  { day: 'T6', enrolled: 22, submitted: 9 },
-  { day: 'T7', enrolled: 14, submitted: 6 },
-  { day: 'CN', enrolled: 3,  submitted: 2 },
-];
-
-const MAX_WEEKLY = 25;
-
-const MOCK_TOP_CLASSES = [
-  { name: 'Toán Nâng Cao K12',   students: 28, max: 30, progress: 82 },
-  { name: 'Tiếng Anh IELTS',     students: 25, max: 30, progress: 71 },
-  { name: 'Vật Lý 11A',          students: 30, max: 30, progress: 95 },
-  { name: 'Hóa Học Hữu Cơ',      students: 19, max: 25, progress: 60 },
-];
-
-// ── Greeting helpers ─────────────────────────────────────────────────────────
 
 const QUOTES = [
   { text: 'Giáo dục là vũ khí mạnh nhất bạn có thể dùng để thay đổi thế giới.', author: 'Nelson Mandela' },
@@ -130,79 +100,19 @@ function getGreeting(hour: number, t: (key: string) => string): { text: string; 
   return          { text: t('dashboard.greeting.evening'),   emoji: '🌆', gradient: 'from-indigo-600 via-purple-600 to-slate-700' };
 }
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────
+// ── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function SpaceDashboardPage() {
-  const router = useRouter();
   const { t, formatDate: localeFormatDate, formatTime: localeFormatTime } = useTranslation();
-  const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
-  const [teacherName, setTeacherName] = useState('');
-  const [now, setNow] = useState(new Date());
+  const { status, data } = useDashboard();
+  const [now, setNow] = useState(() => new Date());
 
-  useEffect(() => {
-    const init = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        router.push('/space/login');
-        return;
-      }
-
-      try {
-        const profile = await accountService.getProfile();
-        setTeacherName(profile.full_name || profile.email || '');
-
-        const firstPage = await spaceApi.classrooms.list(1);
-        const totalClassrooms = firstPage.count;
-
-        const allPages = await Promise.all(
-          Array.from({ length: firstPage.total_pages }, (_, i) =>
-            spaceApi.classrooms.list(i + 1)
-          )
-        );
-        const allClassrooms = allPages.flatMap(p => p.results);
-
-        const sample = allClassrooms.slice(0, 10);
-        const memberLists = await Promise.all(
-          sample.map(c => spaceApi.classrooms.members(c.uid).catch(() => []))
-        );
-        const totalStudents = memberLists.reduce(
-          (sum, members) => sum + members.filter(m => m.role === 'student').length,
-          0
-        );
-
-        setStats({ totalClassrooms, totalStudents, activeClassrooms: allClassrooms.length });
-
-        // Fetch activity logs from the 3 most recently updated classrooms
-        const recentClassrooms = allClassrooms.slice(0, 3);
-        const activityResults = await Promise.all(
-          recentClassrooms.map(c => spaceApi.classrooms.getActivity(c.uid, 'major', 10).catch(() => []))
-        );
-        const merged = activityResults
-          .flat()
-          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-          .slice(0, 8);
-        setRecentActivity(merged);
-
-        setLoading(false);
-      } catch {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        router.push('/space/login');
-      }
-    };
-
-    init();
-  }, [router]);
-
-  // Live clock
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  if (loading) {
+  if (status === 'loading' || !data) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/50">
         <div className="flex flex-col items-center gap-4">
@@ -213,11 +123,21 @@ export default function SpaceDashboardPage() {
     );
   }
 
+  const { teacherName, summary } = data;
+  const kpis = summary.kpis;
+  const recentActivity = summary.recent_activity;
+  const weeklyTrend = summary.weekly_trend;
+  const topClasses = summary.top_classes;
+
+  const completionPct = kpis.completion_rate_pct ?? 0;
+
+  const weeklyMax = Math.max(1, ...weeklyTrend.flatMap((d) => [d.enrolled, d.submitted]));
+
   const statCards = [
     {
       name: t('dashboard.stats.total_classrooms'),
-      value: stats?.totalClassrooms ?? 0,
-      sub: t('dashboard.stats.total_classrooms_sub'),
+      value: kpis.total_classrooms,
+      sub: t('dashboard.stats.total_classrooms_sub', undefined, { count: kpis.active_classrooms }),
       icon: BookOpen,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
@@ -225,8 +145,8 @@ export default function SpaceDashboardPage() {
     },
     {
       name: t('dashboard.stats.active_students'),
-      value: stats?.totalStudents ?? 0,
-      sub: t('dashboard.stats.active_students_sub'),
+      value: kpis.total_students,
+      sub: t('dashboard.stats.active_students_sub', undefined, { count: kpis.total_classrooms }),
       icon: Users,
       color: 'text-green-600',
       bg: 'bg-green-50',
@@ -234,8 +154,11 @@ export default function SpaceDashboardPage() {
     },
     {
       name: t('dashboard.stats.completion_rate'),
-      value: '74%',
-      sub: t('dashboard.stats.completion_rate_sub'),
+      value: `${completionPct.toFixed(completionPct % 1 === 0 ? 0 : 1)}%`,
+      sub: t('dashboard.stats.completion_rate_sub', undefined, {
+        graded: kpis.graded,
+        total: kpis.submissions,
+      }),
       icon: TrendingUp,
       color: 'text-orange-600',
       bg: 'bg-orange-50',
@@ -243,8 +166,8 @@ export default function SpaceDashboardPage() {
     },
     {
       name: t('dashboard.stats.certificates_issued'),
-      value: 47,
-      sub: t('dashboard.stats.certificates_issued_sub'),
+      value: kpis.certificates_issued,
+      sub: t('dashboard.stats.certificates_issued_sub', undefined, { count: kpis.exams_published }),
       icon: Award,
       color: 'text-purple-600',
       bg: 'bg-purple-50',
@@ -263,13 +186,11 @@ export default function SpaceDashboardPage() {
 
       {/* ── Greeting Card ── */}
       <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br ${greeting.gradient} p-8 text-white shadow-xl`}>
-        {/* Decorative blobs */}
         <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5 blur-2xl" />
         <div className="absolute -bottom-8 -left-8 w-40 h-40 rounded-full bg-white/5 blur-2xl" />
         <div className="absolute top-4 right-4 w-24 h-24 rounded-full bg-white/5 blur-xl" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
-          {/* Left: greeting text */}
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <span className="text-4xl animate-bounce" style={{ animationDuration: '2s' }}>
@@ -285,7 +206,6 @@ export default function SpaceDashboardPage() {
               </div>
             </div>
 
-            {/* Quote */}
             <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-2xl px-5 py-3 border border-white/10 max-w-lg">
               <p className="text-sm font-medium text-white/90 leading-relaxed italic">
                 &ldquo;{quote.text}&rdquo;
@@ -294,7 +214,6 @@ export default function SpaceDashboardPage() {
             </div>
           </div>
 
-          {/* Right: live clock */}
           <div className="shrink-0 text-right">
             <div className="text-4xl md:text-5xl font-black tracking-tighter tabular-nums">
               {timeStr}
@@ -302,15 +221,14 @@ export default function SpaceDashboardPage() {
             <p className="text-white/60 text-xs font-bold uppercase tracking-widest mt-1">
               {t('dashboard.current_time')}
             </p>
-            {/* Mini stats row */}
             <div className="flex items-center gap-4 mt-4 justify-end">
               <div className="text-center">
-                <div className="text-xl font-black">{stats?.totalClassrooms ?? '—'}</div>
+                <div className="text-xl font-black">{kpis.total_classrooms}</div>
                 <div className="text-[10px] text-white/60 uppercase font-bold">{t('dashboard.mini_stats.classrooms')}</div>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div className="text-center">
-                <div className="text-xl font-black">{stats?.totalStudents ?? '—'}</div>
+                <div className="text-xl font-black">{kpis.total_students}</div>
                 <div className="text-[10px] text-white/60 uppercase font-bold">{t('dashboard.mini_stats.students')}</div>
               </div>
             </div>
@@ -354,25 +272,35 @@ export default function SpaceDashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-end justify-between gap-3 h-36 px-2">
-              {MOCK_WEEKLY.map((d) => (
-                <div key={d.day} className="flex-1 flex flex-col items-center gap-1.5">
-                  <div className="w-full flex items-end justify-center gap-1 h-28">
-                    <div
-                      className="flex-1 bg-primary-brand rounded-t-md transition-all duration-700 hover:bg-primary-brand"
-                      style={{ height: `${(d.enrolled / MAX_WEEKLY) * 100}%` }}
-                      title={t('dashboard.chart.enrolled_tooltip', undefined, { count: d.enrolled })}
-                    />
-                    <div
-                      className="flex-1 bg-emerald-400 rounded-t-md transition-all duration-700 hover:bg-emerald-500"
-                      style={{ height: `${(d.submitted / MAX_WEEKLY) * 100}%` }}
-                      title={t('dashboard.chart.submitted_tooltip', undefined, { count: d.submitted })}
-                    />
-                  </div>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">{d.day}</span>
-                </div>
-              ))}
-            </div>
+            {weeklyTrend.length === 0 ? (
+              <p className="text-sm text-muted-foreground italic text-center py-8">{t('dashboard.recent_activity.empty')}</p>
+            ) : (
+              <div className="flex items-end justify-between gap-3 h-36 px-2">
+                {weeklyTrend.map((d) => {
+                  const enrolledH = (d.enrolled / weeklyMax) * 100;
+                  const submittedH = (d.submitted / weeklyMax) * 100;
+                  return (
+                    <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5">
+                      <div className="w-full flex items-end justify-center gap-1 h-28">
+                        <div
+                          className="flex-1 bg-primary-brand rounded-t-md transition-all duration-700"
+                          style={{ height: `${enrolledH}%` }}
+                          title={t('dashboard.chart.enrolled_tooltip', undefined, { count: d.enrolled })}
+                        />
+                        <div
+                          className="flex-1 bg-emerald-400 rounded-t-md transition-all duration-700"
+                          style={{ height: `${submittedH}%` }}
+                          title={t('dashboard.chart.submitted_tooltip', undefined, { count: d.submitted })}
+                        />
+                      </div>
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                        {t(`dashboard.chart.${d.weekday}`)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -415,7 +343,7 @@ export default function SpaceDashboardPage() {
       </div>
 
       {/* Bottom Row */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-1">
         {/* Top Classes */}
         <Card className="border-border shadow-sm">
           <CardHeader>
@@ -425,59 +353,27 @@ export default function SpaceDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {MOCK_TOP_CLASSES.map((cls) => (
-                <div key={cls.name} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-foreground truncate">{cls.name}</span>
-                    <span className="text-xs text-muted-foreground shrink-0 ml-2">{t('dashboard.top_classes.students_count', undefined, { current: cls.students, max: cls.max })}</span>
+            {topClasses.length === 0 ? (
+              <p className="text-sm text-muted-foreground italic text-center py-4">{t('dashboard.recent_activity.empty')}</p>
+            ) : (
+              <div className="space-y-4">
+                {topClasses.map((cls) => (
+                  <div key={cls.uid} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-foreground truncate">{cls.name}</span>
+                      <span className="text-xs text-muted-foreground shrink-0 ml-2">{t('dashboard.top_classes.students_count', undefined, { current: cls.students, max: cls.max })}</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-1.5">
+                      <div
+                        className="h-1.5 rounded-full bg-primary-brand transition-all duration-700"
+                        style={{ width: `${cls.progress}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">{t('dashboard.top_classes.progress', undefined, { percent: cls.progress })}</p>
                   </div>
-                  <div className="w-full bg-muted rounded-full h-1.5">
-                    <div
-                      className="h-1.5 rounded-full bg-primary-brand transition-all duration-700"
-                      style={{ width: `${cls.progress}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground">{t('dashboard.top_classes.progress', undefined, { percent: cls.progress })}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Organization Status */}
-        <Card className="border-border shadow-sm">
-          <CardHeader>
-            <CardTitle>{t('dashboard.organization_status.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-5">
-              {[
-                { label: t('dashboard.organization_status.open_classrooms'), value: stats?.activeClassrooms ?? 0, max: stats?.totalClassrooms ?? 1, color: 'bg-primary-brand' },
-                { label: t('dashboard.organization_status.storage_capacity'), value: 45, max: 100, color: 'bg-amber-500', suffix: '%' },
-                { label: t('dashboard.organization_status.api_calls_month'), value: 68, max: 100, color: 'bg-emerald-500', suffix: '%' },
-              ].map((item) => (
-                <div key={item.label} className="space-y-1.5">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{item.label}</span>
-                    <span className="font-medium text-foreground">
-                      {item.suffix ? `${item.value}${item.suffix}` : `${item.value} / ${item.max}`}
-                    </span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div
-                      className={`${item.color} h-2 rounded-full transition-all duration-700`}
-                      style={{ width: `${Math.min(100, (item.value / item.max) * 100)}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-
-              <div className="pt-3 border-t border-border flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">{t('dashboard.organization_status.current_plan')} <span className="font-bold text-primary-brand">{t('dashboard.organization_status.plan_name')}</span></p>
-                <span className="text-[10px] font-bold bg-primary-brand-light text-primary-brand px-2 py-1 rounded-full border border-primary-brand-muted">{t('dashboard.organization_status.active_badge')}</span>
+                ))}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -6,7 +6,7 @@ import { Award, Crown, Medal, Sparkles, Trophy, TrendingUp, Users } from 'lucide
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { cn } from '@shared/lib/utils';
-import { spaceRankingApi, type ClassroomXpRankingResponse } from '@/lib/api/ranking';
+import { spaceRankingApi, type ClassroomLeaderboardResponse } from '@/lib/api/ranking';
 
 export interface SpaceClassroomRankingViewProps {
   classroomUid: string;
@@ -54,7 +54,7 @@ export default function SpaceClassroomRankingView({
   t,
 }: SpaceClassroomRankingViewProps) {
   const router = useRouter();
-  const [data, setData] = useState<ClassroomXpRankingResponse | null>(null);
+  const [data, setData] = useState<ClassroomLeaderboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -65,7 +65,7 @@ export default function SpaceClassroomRankingView({
       setLoading(true);
       setError(null);
       try {
-        const res = await spaceRankingApi.getClassroomXpRanking(classroomUid, 50);
+        const res = await spaceRankingApi.getClassroomLeaderboard(classroomUid, 50);
         if (cancelled) return;
         setData(res);
       } catch (err: unknown) {
@@ -218,12 +218,24 @@ export default function SpaceClassroomRankingView({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-slate-900">
-                    {entry.student_name}
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm font-bold text-slate-900">
+                      {entry.student_name}
+                    </p>
+                    {entry.level_title && (
+                      <span className="shrink-0 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">
+                        {entry.level_title}
+                      </span>
+                    )}
+                  </div>
+                  <p className="truncate text-xs text-slate-500">
+                    {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
                   </p>
-                  <p className="text-xs text-slate-500">
-                    {entry.total_xp.toLocaleString()} XP
-                  </p>
+                  {entry.explanation && (
+                    <p className="truncate text-[10px] text-slate-400">
+                      {entry.explanation}
+                    </p>
+                  )}
                 </div>
                 <div className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-700">
                   Lv {entry.level}
@@ -297,7 +309,7 @@ function PodiumCell({
   colorClass,
   onClick,
 }: {
-  entry: ClassroomXpRankingResponse['entries'][number];
+  entry: ClassroomLeaderboardResponse['entries'][number];
   heightClass: string;
   colorClass: string;
   onClick: () => void;
@@ -320,8 +332,13 @@ function PodiumCell({
         <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-slate-800 group-hover:text-indigo-600">
           {entry.student_name}
         </p>
+        {entry.level_title && (
+          <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-bold text-indigo-700">
+            {entry.level_title}
+          </span>
+        )}
         <p className="text-[10px] text-slate-500">
-          {entry.total_xp.toLocaleString()} XP · Lv {entry.level}
+          {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
         </p>
       </div>
       <div

@@ -30,18 +30,10 @@ function PaymentResultContent() {
           setErrorMsg('Không tìm thấy đơn hàng.');
           return;
         }
-        if (payment.resource_type === 'classroom' && payment.resource_id) {
-          setStatus('redirecting');
-          const url = new URL(window.location.href);
-          const params = new URLSearchParams();
-          if (resultCode !== null) params.set('resultCode', resultCode);
-          if (message) params.set('message', message);
-          const qs = params.toString();
-          router.replace(`/consumer/classroom/checkout/${payment.resource_id}${qs ? `?${qs}` : ''}`);
-          return;
-        }
-        setStatus(resultCode === '0' ? 'success' : 'failed');
-        if (resultCode !== '0') setErrorMsg(message || 'Thanh toán thất bại');
+        setStatus('redirecting');
+        const invoiceUrl = `/consumer/invoices/${orderId}`;
+        router.replace(invoiceUrl);
+        return;
       } catch (err) {
         setStatus('failed');
         setErrorMsg(err instanceof Error ? err.message : 'Không thể tra cứu đơn hàng');

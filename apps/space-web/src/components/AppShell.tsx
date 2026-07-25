@@ -27,6 +27,8 @@ import {
   Sparkles,
   User,
   Calculator,
+  History as HistoryIcon,
+  Wallet,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
@@ -109,6 +111,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       },
       { key: 'students',        label: t('layout.nav.students'),        href: '/space/student',          icon: Users },
       { key: 'grading',         label: t('layout.nav.grading'),         href: '/space/grading',          icon: Calculator },
+      { key: 'history',         label: 'Lịch sử',                       href: '/space/history',          icon: Wallet },
       { key: 'settings',        label: t('layout.nav.settings'),        href: '/space/settings',         icon: Settings },
     ],
     [t]

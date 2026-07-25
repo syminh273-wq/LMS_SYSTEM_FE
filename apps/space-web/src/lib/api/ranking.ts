@@ -1,18 +1,29 @@
 import BaseRestApiClient from './client';
 
-export type ClassroomXpRankingEntry = {
+export type ClassroomLeaderboardEntry = {
   rank: number;
   student_id: string;
   student_name: string;
   student_avatar: string;
   total_xp: number;
   level: number;
+  level_title: string;
+  total_score: number;
+  quiz_avg: number;
+  exam_avg: number;
+  quiz_count: number;
+  exam_count: number;
+  attendance_pct: number;
+  explanation: string;
 };
 
-export type ClassroomXpRankingResponse = {
+export type ClassroomLeaderboardResponse = {
   classroom_uid: string;
   total_students: number;
-  entries: ClassroomXpRankingEntry[];
+  my_rank: number | null;
+  my_score: number | null;
+  my_xp: number;
+  entries: ClassroomLeaderboardEntry[];
 };
 
 export type StudentRankingProfile = {
@@ -51,13 +62,13 @@ export class SpaceRankingApiClient extends BaseRestApiClient {
     super();
   }
 
-  public async getClassroomXpRanking(
+  public async getClassroomLeaderboard(
     classroomUid: string,
     limit: number = 20,
-  ): Promise<ClassroomXpRankingResponse> {
+  ): Promise<ClassroomLeaderboardResponse> {
     const safeLimit = Math.max(1, Math.min(limit, 100));
-    return this.get<ClassroomXpRankingResponse>(
-      `/api/v1/space/ranking/classrooms/${classroomUid}/xp/?limit=${safeLimit}`,
+    return this.get<ClassroomLeaderboardResponse>(
+      `/api/v1/space/ranking/classrooms/${classroomUid}/leaderboard/?limit=${safeLimit}`,
     );
   }
 

@@ -10,14 +10,14 @@
   },
   "current_time": "Giờ hiện tại",
   "stats": {
-    "total_classrooms": "Tổng lớp học",
-    "total_classrooms_sub": "+3 tháng này",
-    "active_students": "Học sinh đang học",
-    "active_students_sub": "Từ các lớp đang mở",
+    "total_classrooms": "Tổng số lớp",
+    "total_classrooms_sub": "{{count}} đang hoạt động",
+    "active_students": "Học sinh hoạt động",
+    "active_students_sub": "Trên {{count}} lớp học",
     "completion_rate": "Tỉ lệ hoàn thành",
-    "completion_rate_sub": "+6% so với kỳ trước",
+    "completion_rate_sub": "{{graded}}/{{total}} đã chấm",
     "certificates_issued": "Chứng chỉ đã cấp",
-    "certificates_issued_sub": "12 tuần qua"
+    "certificates_issued_sub": "{{count}} bài kiểm tra đã xuất bản"
   },
   "chart": {
     "title": "Hoạt động tuần này",

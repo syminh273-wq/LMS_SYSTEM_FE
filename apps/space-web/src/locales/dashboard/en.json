@@ -11,13 +11,13 @@
   "current_time": "Current time",
   "stats": {
     "total_classrooms": "Total classrooms",
-    "total_classrooms_sub": "+3 this month",
+    "total_classrooms_sub": "{{count}} active",
     "active_students": "Active students",
-    "active_students_sub": "From open classrooms",
+    "active_students_sub": "Across {{count}} classrooms",
     "completion_rate": "Completion rate",
-    "completion_rate_sub": "+6% vs last term",
+    "completion_rate_sub": "{{graded}}/{{total}} graded",
     "certificates_issued": "Certificates issued",
-    "certificates_issued_sub": "Last 12 weeks"
+    "certificates_issued_sub": "{{count}} published exams"
   },
   "chart": {
     "title": "Weekly activity",
