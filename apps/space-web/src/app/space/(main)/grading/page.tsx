@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Calculator } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import GradingScaleView from '@/components/grading/GradingScaleView';
 
@@ -13,7 +13,7 @@ export default function GradingScalePage() {
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <span className="w-12 h-12 rounded-2xl bg-primary-brand/10 text-primary-brand flex items-center justify-center">
-          <Calculator size={22} />
+          <GraduationCap size={22} />
         </span>
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-black text-foreground tracking-tight">

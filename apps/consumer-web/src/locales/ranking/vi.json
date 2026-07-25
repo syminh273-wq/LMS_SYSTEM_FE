@@ -13,6 +13,7 @@
   "view_leaderboard": "Bảng xếp hạng",
   "view_levels": "Bảng cấp",
   "history_title": "Lịch sử XP",
+  "history_in_classroom": "Lịch sử cộng điểm trong lớp: ",
   "no_history": "Chưa có giao dịch XP nào.",
   "achievements_title": "Thành tích",
   "achievements_unlocked": "Đã mở khoá {{count}}/{{total}}",

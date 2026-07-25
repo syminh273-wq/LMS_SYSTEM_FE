@@ -2,18 +2,21 @@
 
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Crown, Medal, Award, Loader2, Trophy, User } from 'lucide-react';
+import Link from 'next/link';
+import { Crown, Medal, Award, Loader2, Trophy, User, History as HistoryIcon, Info, Calculator } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import { Button } from '@shared/components/ui/button';
 import { classroomApi, LeaderboardEntry, LeaderboardResponse } from '@/lib/api';
 import type { RootState } from '@/lib/redux/store';
+import { MyXpHistoryModal } from '@/components/classroom/MyXpHistoryModal';
 
 type Props = {
   classroomUid: string;
 };
 
-const RANK_LIMIT = 10;
+const RANK_LIMIT = 50;
 
 function rankBadge(rank: number) {
   if (rank === 1) {
@@ -54,6 +57,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LeaderboardResponse | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const currentUserId = useSelector((s: RootState) => s.user.profile?.uid);
 
   useEffect(() => {
@@ -122,7 +126,24 @@ export function LeaderboardTab({ classroomUid }: Props) {
                 ? `${totalStudents} thành viên đang cạnh tranh`
                 : 'Chưa có dữ liệu xếp hạng'}
             </div>
+            <Link
+              href="/consumer/grading"
+              className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:underline"
+            >
+              <Calculator size={11} />
+              Bảng quy đổi điểm
+            </Link>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setHistoryOpen(true)}
+            className="shrink-0 gap-1.5 rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+          >
+            <HistoryIcon size={14} />
+            <span className="hidden sm:inline">Xem lịch sử của tôi</span>
+            <span className="sm:hidden">Lịch sử</span>
+          </Button>
           {myRank != null && (
             <div className="text-right shrink-0">
               <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
@@ -160,49 +181,63 @@ export function LeaderboardTab({ classroomUid }: Props) {
             return (
               <div
                 key={e.student_id}
-                className={`flex items-center gap-3 px-4 py-3 ${
-                  isMe ? 'bg-indigo-50/60' : ''
-                }`}
+                className={`px-4 py-3 ${isMe ? 'bg-indigo-50/60' : ''}`}
               >
-                {rankBadge(e.rank)}
-                <Avatar className="h-9 w-9 shrink-0">
-                  {e.student_avatar ? (
-                    <AvatarImage src={e.student_avatar} alt={e.student_name} />
-                  ) : null}
-                  <AvatarFallback className="bg-slate-100 text-slate-600 text-xs font-black">
-                    {initials(e.student_name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold text-slate-900 truncate flex items-center gap-1.5">
-                    {e.student_name}
-                    {isMe && (
-                      <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">
-                        Bạn
-                      </span>
-                    )}
+                <div className="flex items-center gap-3">
+                  {rankBadge(e.rank)}
+                  <Avatar className="h-9 w-9 shrink-0">
+                    {e.student_avatar ? (
+                      <AvatarImage src={e.student_avatar} alt={e.student_name} />
+                    ) : null}
+                    <AvatarFallback className="bg-slate-100 text-slate-600 text-xs font-black">
+                      {initials(e.student_name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold text-slate-900 truncate flex items-center gap-1.5">
+                      {e.student_name}
+                      {isMe && (
+                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">
+                          Bạn
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                      <span>Quiz: {e.quiz_count}</span>
+                      <span>·</span>
+                      <span>Thi: {e.exam_count}</span>
+                      <span>·</span>
+                      <span>Đi học: {e.attendance_pct.toFixed(0)}%</span>
+                    </div>
                   </div>
-                  <div className="text-[11px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
-                    <span>Quiz: {e.quiz_count}</span>
-                    <span>·</span>
-                    <span>Thi: {e.exam_count}</span>
-                    <span>·</span>
-                    <span>Đi học: {e.attendance_pct.toFixed(0)}%</span>
+                  <div className="text-right shrink-0">
+                    <div className="text-base font-black text-slate-900 leading-none">
+                      {e.total_score.toFixed(1)}
+                    </div>
+                    <div className="text-[10px] font-bold text-slate-400 mt-1">
+                      Quiz {e.quiz_avg.toFixed(0)} · Thi {e.exam_avg.toFixed(0)}
+                    </div>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="text-base font-black text-slate-900 leading-none">
-                    {e.total_score.toFixed(1)}
+                {e.explanation && (
+                  <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-600">
+                    <Info size={12} className="mt-0.5 shrink-0 text-slate-400" />
+                    <span className="flex-1">{e.explanation}</span>
                   </div>
-                  <div className="text-[10px] font-bold text-slate-400 mt-1">
-                    Quiz {e.quiz_avg.toFixed(0)} · Thi {e.exam_avg.toFixed(0)}
-                  </div>
-                </div>
+                )}
               </div>
             );
           })}
         </div>
       )}
+
+      <Link
+        href="/consumer/grading"
+        className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/40 px-4 py-2.5 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50"
+      >
+        <Calculator size={14} />
+        Xem bảng quy đổi điểm chi tiết
+      </Link>
 
       {showMyStickyRow && myRank != null && myScore != null && currentUserId && (
         <Card className="border-indigo-200 bg-indigo-50/40 sticky bottom-4 shadow-lg">
@@ -223,6 +258,12 @@ export function LeaderboardTab({ classroomUid }: Props) {
           </CardContent>
         </Card>
       )}
+
+      <MyXpHistoryModal
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        classroomUid={classroomUid}
+      />
     </div>
   );
 }

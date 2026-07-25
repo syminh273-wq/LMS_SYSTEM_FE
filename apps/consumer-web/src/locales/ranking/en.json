@@ -13,6 +13,7 @@
   "view_leaderboard": "Leaderboard",
   "view_levels": "Level chart",
   "history_title": "XP history",
+  "history_in_classroom": "XP history in this classroom: ",
   "no_history": "No XP events yet.",
   "achievements_title": "Achievements",
   "achievements_unlocked": "{{count}} of {{total}} unlocked",

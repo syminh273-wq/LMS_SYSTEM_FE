@@ -122,20 +122,34 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
     );
   };
 
+  const roleLabel = msg.sender_type === 'space' ? 'Giáo viên' : 'Sinh viên';
+  const isTeacher = msg.sender_type === 'space';
+
   return (
     <div className={`flex gap-2 ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
-      {isMe && (
+      {!isMe && (
         <div className="w-8 h-8 shrink-0 rounded-full bg-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center mt-1">
           {initials}
         </div>
       )}
       <div className={`flex flex-col gap-1 max-w-[75%] ${isMe ? 'items-start' : 'items-end'}`}>
-        {isMe && (
-          <div className="flex items-baseline gap-2 px-1">
-            <span className="text-[11px] font-bold text-slate-700">{msg.sender_name || "Ẩn danh"}</span>
-            <span className="text-[10px] text-slate-400">{time}</span>
-          </div>
-        )}
+        <div className="flex items-baseline gap-2 px-1">
+          <span className="text-[11px] font-bold text-slate-700">
+            {isMe ? 'Bạn' : msg.sender_name || 'Ẩn danh'}
+          </span>
+          {!isMe && (
+            <span
+              className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${
+                isTeacher
+                  ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                  : 'bg-sky-100 text-sky-700 border border-sky-200'
+              }`}
+            >
+              {roleLabel}
+            </span>
+          )}
+          <span className="text-[10px] text-slate-400">{time}</span>
+        </div>
         <div
           className={`rounded-2xl text-sm font-medium shadow-sm ${
             isMe
@@ -148,9 +162,6 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
           )}
           {renderAttachment()}
         </div>
-        {!isMe && (
-          <span className="text-[10px] text-slate-400 px-1">{time}</span>
-        )}
       </div>
     </div>
   );
