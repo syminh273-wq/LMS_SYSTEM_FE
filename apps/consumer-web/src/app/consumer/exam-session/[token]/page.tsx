@@ -708,9 +708,9 @@ export default function ExamSessionPage({ params }: Props) {
                                     {' · '}
                                     Đáp án đúng: <span className="font-black text-emerald-700">{String(r.correct_answer ?? '').toUpperCase()}</span>
                                   </p>
-                                  {r.explanation && (
+                                  {r.explanation ? (
                                     <p className="mt-1 text-xs italic text-slate-500">{String(r.explanation)}</p>
-                                  )}
+                                  ) : null}
                                 </div>
                               </div>
                             </li>

@@ -1,31 +1,22 @@
-import * as React from 'react'
+import * as React from "react"
 
-import { cn } from '../../lib/utils'
+import { cn } from "../../lib/utils"
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
+const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
       <input
-        ref={ref}
         type={type}
-        data-slot='input'
         className={cn(
-          'h-10 w-full min-w-0 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors outline-none [color-scheme:light]',
-          'placeholder:text-gray-400',
-          'focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20',
-          'disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50',
-          'aria-invalid:border-red-500 aria-invalid:ring-2 aria-invalid:ring-red-500/20',
-          'file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground',
-          'dark:bg-zinc-900 dark:text-gray-100 dark:border-zinc-700 dark:placeholder:text-zinc-500 dark:[color-scheme:dark]',
-          'dark:focus-visible:border-indigo-400 dark:focus-visible:ring-indigo-400/20',
-          'dark:disabled:bg-zinc-800',
+          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
+        ref={ref}
         {...props}
       />
     )
   }
 )
-Input.displayName = 'Input'
+Input.displayName = "Input"
 
 export { Input }

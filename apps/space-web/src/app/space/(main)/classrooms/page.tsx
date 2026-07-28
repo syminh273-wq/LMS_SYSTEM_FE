@@ -369,8 +369,7 @@ export default function ClassroomsPage() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="my-2 bg-muted/50" />
                             <DropdownMenuItem
-                              variant="destructive"
-                              className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase cursor-pointer"
+                              className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase cursor-pointer text-destructive"
                               onClick={() => handleDelete(classroom.uid)}
                             >
                               <Trash2 size={16} className="mr-3" />

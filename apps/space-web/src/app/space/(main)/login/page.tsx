@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
@@ -39,6 +39,14 @@ function GoogleIcon() {
 }
 
 export default function SpaceLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <SpaceLoginContent />
+    </Suspense>
+  );
+}
+
+function SpaceLoginContent() {
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const [globalError, setGlobalError] = useState(() => {

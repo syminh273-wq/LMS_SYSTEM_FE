@@ -1,6 +1,6 @@
 import BaseRestApiClient from './client';
 import type {
-  Classroom,
+  Classroom as ClassroomType,
   ClassroomPreviewResponse,
   Conversation,
   Exam,
@@ -33,11 +33,11 @@ class ClassroomApiClient extends BaseRestApiClient {
   }
 
   // ── Space (teacher) endpoints ──────────────────────────────────────────────
-  public async list(page: number = 1): Promise<PaginatedResponse<Classroom>> {
+  public async list(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/space/course/classrooms/?page=${page}`);
   }
 
-  public async create(data: CreateClassroomRequest): Promise<Classroom> {
+  public async create(data: CreateClassroomRequest): Promise<ClassroomType> {
     return this.post<Classroom>('/api/v1/space/course/classrooms/', data);
   }
 
@@ -46,11 +46,11 @@ class ClassroomApiClient extends BaseRestApiClient {
   }
 
   // ── Consumer (student) endpoints ───────────────────────────────────────────
-  public async retrieve(uid: string): Promise<Classroom> {
+  public async retrieve(uid: string): Promise<ClassroomType> {
     return this.get<Classroom>(`/api/v1/consumer/course/classrooms/${uid}/`);
   }
 
-  public async mine(page: number = 1): Promise<PaginatedResponse<Classroom>> {
+  public async mine(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
     return this.get<PaginatedResponse<Classroom>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
   }
 
@@ -59,7 +59,7 @@ class ClassroomApiClient extends BaseRestApiClient {
     pricing_type?: 'free' | 'paid';
     search?: string;
     page?: number;
-  } = {}): Promise<PaginatedResponse<Classroom & { is_joined?: boolean; has_paid?: boolean }>> {
+  } = {}): Promise<PaginatedResponse<ClassroomType & { is_joined?: boolean; has_paid?: boolean }>> {
     const search = new URLSearchParams();
     if (params.category) search.set('category', params.category);
     if (params.pricing_type) search.set('pricing_type', params.pricing_type);
@@ -141,7 +141,7 @@ class ClassroomApiClient extends BaseRestApiClient {
     return this.get(`/api/v1/consumer/social/classrooms/${uid}/favorite/status/`);
   }
 
-  public async favorites(page: number = 1): Promise<PaginatedResponse<{ classroom: Classroom; created_at: string }>> {
+  public async favorites(page: number = 1): Promise<PaginatedResponse<{ classroom: ClassroomType; created_at: string }>> {
     return this.get(`/api/v1/consumer/social/classrooms/favorites/?page=${page}`);
   }
 
@@ -187,7 +187,7 @@ class ClassroomApiClient extends BaseRestApiClient {
     return this.patch<UploadedResource>(`/api/v1/resource/${resourceUid}/reupload/`, data);
   }
 
-  public async getByTeacher(teacherId: string): Promise<Classroom[]> {
+  public async getByTeacher(teacherId: string): Promise<ClassroomType[]> {
     return this.get<Classroom[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
   }
 
@@ -207,3 +207,4 @@ class ClassroomApiClient extends BaseRestApiClient {
 }
 
 export const classroomApi = new ClassroomApiClient();
+export type Classroom = ClassroomType;

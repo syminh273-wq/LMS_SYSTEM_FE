@@ -58,7 +58,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
       courseApi.stats(uid).then(setStats).catch(() => setStats(null));
     }
     if (tab === 'sharing' && !sharingLink) {
-      courseApi.sharingLink(uid).then((res: { qr_code_url?: string }) => {
+      courseApi.sharingLink(uid).then((res: { qr_code_url?: string } | any) => {
         if (res?.qr_code_url) setSharingLink(res.qr_code_url);
       }).catch(() => setSharingLink(''));
     }
@@ -334,7 +334,7 @@ function LessonsTab({
       if (editing.uid) {
         await courseApi.updateLesson(courseUid, editing.uid, editing);
       } else {
-        await courseApi.createLesson(courseUid, editing);
+        await courseApi.createLesson(courseUid, editing as any);
       }
       setEditing(null);
       onChange();
@@ -659,7 +659,7 @@ function SharingTab({ course, sharingLink, setSharingLink }: { course: Course; s
           {!sharingLink && (
             <Button size="sm" variant="ghost" onClick={async () => {
               try {
-                const res: { qr_code_url?: string } = await courseApi.sharingLink(course.uid);
+                const res: { qr_code_url?: string } = (await courseApi.sharingLink(course.uid)) as { qr_code_url?: string };
                 if (res?.qr_code_url) setSharingLink(res.qr_code_url);
               } catch {}
             }}>

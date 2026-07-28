@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Wallet, RefreshCw, AlertTriangle } from 'lucide-react';
@@ -30,6 +30,14 @@ function toIsoEnd(date: string | null): string | undefined {
 }
 
 export default function SpaceHistoryPage() {
+  return (
+    <Suspense fallback={null}>
+      <SpaceHistoryPageContent />
+    </Suspense>
+  );
+}
+
+function SpaceHistoryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const classroomFromUrl = searchParams.get('classroom') || 'all';

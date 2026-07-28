@@ -125,8 +125,8 @@ function NodeRow({
         </button>
         {open ? <FolderOpen size={15} className="shrink-0" /> : <FolderIcon size={15} className="shrink-0" />}
         <span className="truncate flex-1 ml-1">{node.name}</span>
-        {isPreview && <Eye size={12} className="text-emerald-600" title="Preview" />}
-        {locked && <Lock size={12} className="text-slate-400" title="Cần nâng cấp" />}
+        {isPreview && <Eye size={12} className="text-emerald-600" aria-label="Preview" />}
+        {locked && <Lock size={12} className="text-slate-400" aria-label="Cần nâng cấp" />}
       </div>
       {open && hasChildren && (
         <div>

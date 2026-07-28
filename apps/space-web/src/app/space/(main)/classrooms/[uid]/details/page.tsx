@@ -2428,19 +2428,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                     {t('classroom.ui.students_action_view_analysis')}
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem variant="destructive" onClick={() => setMemberToKick(member)}>
+                                  <DropdownMenuItem className="text-destructive" onClick={() => setMemberToKick(member)}>
                                     <UserX size={14} className="mr-2" />
                                     {t('classroom.ui.students_action_kick')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    variant="destructive"
+                                    className="text-destructive"
                                     onClick={() => setMemberToBlock({ member, scope: 'classroom' })}
                                   >
                                     <ShieldBan size={14} className="mr-2" />
                                     {t('classroom.ui.students_action_block_classroom')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
-                                    variant="destructive"
+                                    className="text-destructive"
                                     onClick={() => setMemberToBlock({ member, scope: 'global' })}
                                   >
                                     <ShieldBan size={14} className="mr-2" />

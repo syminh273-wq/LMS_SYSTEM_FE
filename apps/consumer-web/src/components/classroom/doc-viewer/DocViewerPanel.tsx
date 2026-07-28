@@ -25,7 +25,8 @@ import {
   listNotes,
 } from './api';
 import type { ApiCtx } from './api';
-import type { ClassroomDoc, DocNote, DocProgress } from '../docs-viewer/types';
+import type { ClassroomDoc } from '../docs-viewer/types';
+import type { DocNote, DocProgress } from './types';
 import { isImageFile, isMediaFile, isPdfFile, NOTE_COLORS } from './utils';
 import { NoteEditor } from './NoteEditor';
 
@@ -83,7 +84,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [p, ns] = await Promise.all([fetchMyProgress(ctxRef.current, docUidRef.current, true), listNotes(ctxRef.current, docUidRef.current, true)]);
+      const [p, ns] = await Promise.all([fetchMyProgress(ctxRef.current, docUidRef.current), listNotes(ctxRef.current, docUidRef.current, true)]);
       setProgress(p);
       setNotes(ns);
       onProgressChangeRef.current?.(p);

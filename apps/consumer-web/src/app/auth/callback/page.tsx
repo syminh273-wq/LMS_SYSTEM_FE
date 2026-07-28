@@ -1,11 +1,17 @@
 import { redirect } from 'next/navigation';
 
 // Giữ nguyên query params khi redirect (access, refresh, error tokens)
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: Record<string, string>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const query = new URLSearchParams(searchParams).toString();
+  const sp = await searchParams;
+  const flat: Record<string, string> = {};
+  for (const [k, v] of Object.entries(sp ?? {})) {
+    if (v == null) continue;
+    flat[k] = Array.isArray(v) ? v.join(',') : String(v);
+  }
+  const query = new URLSearchParams(flat).toString();
   redirect(`/consumer/auth/callback${query ? `?${query}` : ''}`);
 }

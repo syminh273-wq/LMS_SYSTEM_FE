@@ -165,7 +165,7 @@ export function CreatePost({ profile, onCreated }: {
         visibility,
         image_url: imageUrls[0] || '',
         image_urls: imageUrls,
-        classroom_tags: selectedClassroomUids,
+        classroom_tag: selectedClassroomUids,
       });
       onCreated(post);
       reset();

@@ -29,7 +29,7 @@ class CourseApiClient extends BaseRestApiClient {
     return this.patch<Course>(`/api/v1/space/course/courses/${uid}/`, data);
   }
 
-  public async delete(uid: string): Promise<void> {
+  public async remove(uid: string): Promise<unknown> {
     return super.delete(`/api/v1/space/course/courses/${uid}/`);
   }
 

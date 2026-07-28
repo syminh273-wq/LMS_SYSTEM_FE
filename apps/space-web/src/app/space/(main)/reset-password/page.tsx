@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -11,6 +11,14 @@ import { authApi } from '@/lib/api/auth';
 type FormValues = { new_password: string; confirm_password: string };
 
 export default function SpaceResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <SpaceResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function SpaceResetPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [showNew, setShowNew] = useState(false);

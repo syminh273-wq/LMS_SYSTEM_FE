@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -11,6 +11,14 @@ import { authApi } from '@/lib/api/auth';
 type FormValues = { otp_code: string };
 
 export default function SpaceVerifyOTPPage() {
+  return (
+    <Suspense fallback={null}>
+      <SpaceVerifyOTPPageContent />
+    </Suspense>
+  );
+}
+
+function SpaceVerifyOTPPageContent() {
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [countdown, setCountdown] = useState(0);

@@ -93,17 +93,17 @@ export type Classroom = {
   category?: 'math' | 'physics' | 'chemistry' | 'biology' | 'language' | 'programming' | 'business' | 'design' | 'music' | 'other';
   visibility_type?: 'public' | 'private';
   preview_folder_uid?: string | null;
-  membership_status?: 'pending' | 'approved' | null;
   has_paid?: boolean;
   is_joined?: boolean;
   join_required?: boolean;
   has_access?: boolean;
-  has_paid?: boolean;
   requires_payment?: boolean;
   is_paid_classroom?: boolean;
   resolve_link?: SharingLink;
   is_favorited?: boolean;
   favorite_count?: number;
+  member_count?: number;
+  title?: string;
   created_at: string;
   updated_at: string;
 };
@@ -211,6 +211,15 @@ export type Conversation = {
   created_at: string;
 };
 
+export type ChatMessage = {
+  uid: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  read_at?: string | null;
+};
+
 export type Message = {
   uid: string;
   conversation_uid: string;
@@ -261,6 +270,7 @@ export type Exam = {
   due_date: string;
   exam_type?: 'assignment' | 'quiz';
   max_grade?: number;
+  resource_name?: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -606,7 +616,7 @@ export type Post = {
   image_url: string;
   image_urls?: string[];
   visibility: PostVisibility;
-  classroom_tag: string | null;
+  classroom_tag: string[] | string | null;
   likes_count: number;
   comments_count: number;
   liked_by_me: boolean;
@@ -629,7 +639,7 @@ export type CreatePostRequest = {
   image_url?: string;
   image_urls?: string[];
   visibility: PostVisibility;
-  classroom_tag?: string;
+  classroom_tag?: string[] | string | null;
 };
 
 export type SuggestedUser = {

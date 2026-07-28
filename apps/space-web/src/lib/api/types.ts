@@ -97,6 +97,8 @@ export type Classroom = {
   resolve_link?: SharingLink;
   is_favorited?: boolean;
   favorite_count?: number;
+  member_count?: number;
+  title?: string;
   created_at: string;
   updated_at: string;
 };
@@ -198,6 +200,8 @@ export type Exam = {
   max_grade?: number;
   max_visibility_breaks?: number;
   max_face_warnings?: number;
+  max_tab_leaves?: number;
+  resource_name?: string;
   created_at?: string;
   updated_at?: string;
 };

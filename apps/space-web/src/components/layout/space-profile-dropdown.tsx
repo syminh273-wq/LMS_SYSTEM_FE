@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearProfile, type RootState } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/lib/redux/userSlice';
+import type { RootState } from '@/lib/redux/store';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { accountService, type UserProfile } from '@/lib/api/account';
 import {

@@ -548,28 +548,26 @@ function ProvinceCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        render={
-          <button
-            type="button"
-            disabled={disabled}
-            className={cn(
-              'flex h-10 w-full items-center justify-between rounded-lg border bg-white px-3 text-sm transition-colors',
-              'border-slate-300 hover:border-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus:outline-none',
-              'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-50',
-              error && 'border-red-500 ring-2 ring-red-500/20',
-            )}
-            aria-invalid={!!error}
-          >
-            <span className={cn(!selected && 'text-slate-400')}>
-              {selected?.name ?? (loading
-                ? t('common.loading', 'Đang tải...')
-                : t('address.placeholder.province', 'Chọn tỉnh/thành'))}
-            </span>
-            <Search className="size-4 text-slate-400" />
-          </button>
-        }
-      />
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          className={cn(
+            'flex h-10 w-full items-center justify-between rounded-lg border bg-white px-3 text-sm transition-colors',
+            'border-slate-300 hover:border-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus:outline-none',
+            'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-50',
+            error && 'border-red-500 ring-2 ring-red-500/20',
+          )}
+          aria-invalid={!!error}
+        >
+          <span className={cn(!selected && 'text-slate-400')}>
+            {selected?.name ?? (loading
+              ? t('common.loading', 'Đang tải...')
+              : t('address.placeholder.province', 'Chọn tỉnh/thành'))}
+          </span>
+          <Search className="size-4 text-slate-400" />
+        </button>
+      </PopoverTrigger>
       <PopoverContent
         align="start"
         className="w-[var(--anchor-width)] p-0"
@@ -670,30 +668,28 @@ function WardCombobox({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        render={
-          <button
-            type="button"
-            disabled={disabled}
-            className={cn(
-              'flex h-10 w-full items-center justify-between rounded-lg border bg-white px-3 text-sm transition-colors',
-              'border-slate-300 hover:border-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus:outline-none',
-              'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-50',
-              error && 'border-red-500 ring-2 ring-red-500/20',
-            )}
-            aria-invalid={!!error}
-          >
-            <span className={cn(!selected && 'text-slate-400')}>
-              {!provinceCode
-                ? t('address.placeholder.ward_first', 'Chọn tỉnh/thành trước')
-                : selected?.name ?? (loading
-                    ? t('common.loading', 'Đang tải...')
-                    : t('address.placeholder.ward', 'Chọn xã/phường'))}
-            </span>
-            <Search className="size-4 text-slate-400" />
-          </button>
-        }
-      />
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          className={cn(
+            'flex h-10 w-full items-center justify-between rounded-lg border bg-white px-3 text-sm transition-colors',
+            'border-slate-300 hover:border-slate-400 focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 focus:outline-none',
+            'disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-50',
+            error && 'border-red-500 ring-2 ring-red-500/20',
+          )}
+          aria-invalid={!!error}
+        >
+          <span className={cn(!selected && 'text-slate-400')}>
+            {!provinceCode
+              ? t('address.placeholder.ward_first', 'Chọn tỉnh/thành trước')
+              : selected?.name ?? (loading
+                  ? t('common.loading', 'Đang tải...')
+                  : t('address.placeholder.ward', 'Chọn xã/phường'))}
+          </span>
+          <Search className="size-4 text-slate-400" />
+        </button>
+      </PopoverTrigger>
       <PopoverContent align="start" className="w-[var(--anchor-width)] p-0">
         <div className="border-b border-slate-100 p-2">
           <div className="relative">

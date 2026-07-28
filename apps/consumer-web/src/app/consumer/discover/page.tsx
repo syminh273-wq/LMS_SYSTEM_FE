@@ -291,7 +291,6 @@ export default function DiscoverPage() {
                     ? "cursor-not-allowed opacity-60"
                     : "cursor-pointer hover:border-slate-300"
                 )}
-                className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300"
               >
                 <div className="flex items-center justify-between gap-2 px-4 pt-3.5 pb-2">
                   <div className="flex items-center gap-1.5 min-w-0">

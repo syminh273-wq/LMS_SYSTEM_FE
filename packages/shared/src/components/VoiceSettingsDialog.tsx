@@ -27,8 +27,8 @@ export interface AvailableVoice {
 }
 
 interface VoiceSettingsDialogProps {
-  getSettings: () => Promise<VoiceSetting>;
-  updateSettings: (data: Record<string, any>) => Promise<VoiceSetting>;
+  getSettings: () => Promise<VoiceSetting | Record<string, string>>;
+  updateSettings: (data: Record<string, any>) => Promise<VoiceSetting | Record<string, string>>;
   getAvailableVoices: () => Promise<AvailableVoice[]>;
   previewVoice?: (voiceId: string, text?: string) => Promise<{ url: string }>;
   trigger?: React.ReactNode;
@@ -43,7 +43,7 @@ export function VoiceSettingsDialog({
 }: VoiceSettingsDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [settings, setSettings] = React.useState<VoiceSetting | null>(null);
+  const [settings, setSettings] = React.useState<VoiceSetting | Record<string, string> | null>(null);
   const [voices, setVoices] = React.useState<AvailableVoice[]>([]);
   const [saving, setSaving] = React.useState(false);
   const [previewingId, setPreviewingId] = React.useState<string | null>(null);

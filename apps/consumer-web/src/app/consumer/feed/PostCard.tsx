@@ -79,7 +79,7 @@ export function PostCard({
   const isMe = currentUserId === post.consumer_uid;
 
   useEffect(() => {
-    const uids = post.classroom_tags || [];
+    const uids = Array.isArray(post.classroom_tag) ? post.classroom_tag : post.classroom_tag ? [post.classroom_tag] : [];
     const missing = uids.filter((u) => !classroomNames[u]);
     if (missing.length === 0) return;
     let cancelled = false;
@@ -95,7 +95,7 @@ export function PostCard({
       setClassroomNames((prev) => ({ ...prev, ...Object.fromEntries(entries) }));
     });
     return () => { cancelled = true; };
-  }, [post.classroom_tags, classroomNames]);
+  }, [post.classroom_tag, classroomNames]);
   const emotion = post.emotion ? EMOTION_MAP[post.emotion as keyof typeof EMOTION_MAP] : null;
   const VisIcon = VISIBILITY_OPTIONS.find(v => v.key === post.visibility)?.icon ?? Globe;
 
@@ -230,12 +230,12 @@ export function PostCard({
         </div>
       )}
 
-      {(post.classroom_tags || []).length > 0 && (
+      {(post.classroom_tag || []).length > 0 && (
         <div className="px-4 sm:px-5 pb-3 flex flex-wrap items-center gap-1.5">
           <span className="text-[11.5px] text-slate-500 font-medium inline-flex items-center gap-1">
             <BookOpen size={11} /> Chia sẻ với
           </span>
-          {(post.classroom_tags || []).map((uid) => {
+          {(Array.isArray(post.classroom_tag) ? post.classroom_tag : post.classroom_tag ? [post.classroom_tag] : []).map((uid) => {
             const name = classroomNames[uid] || 'Đang tải…';
             return (
               <a
