@@ -1,5 +1,4 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfigured =
   !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
@@ -21,10 +20,5 @@ const app: FirebaseApp | null = firebaseConfigured
     ? initializeApp(firebaseConfig)
     : getApps()[0]
   : null;
-
-export const analytics = async () => {
-  if (!app) return null;
-  return (await isSupported()) ? getAnalytics(app) : null;
-};
 
 export default app;

@@ -6,12 +6,12 @@ import type {
   ApiMessageResponse
 } from './types';
 
-export interface ForgotPasswordRequest { email: string }
-export interface VerifyOTPRequest { email: string; otp_code: string }
-export interface VerifyOTPResponse { reset_token: string }
-export interface ResetPasswordRequest { reset_token: string; new_password: string; confirm_password: string }
+interface ForgotPasswordRequest { email: string }
+interface VerifyOTPRequest { email: string; otp_code: string }
+interface VerifyOTPResponse { reset_token: string }
+interface ResetPasswordRequest { reset_token: string; new_password: string; confirm_password: string }
 
-export class AuthApiClient extends BaseRestApiClient {
+class AuthApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

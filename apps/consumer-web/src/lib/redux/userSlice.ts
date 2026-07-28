@@ -53,9 +53,6 @@ const userSlice = createSlice({
         localStorage.removeItem('faceEnrolled');
       }
     },
-    setAuthenticated: (state, action: PayloadAction<boolean>) => {
-      state.isAuthenticated = action.payload;
-    },
     setFaceEnrolled: (state, action: PayloadAction<boolean>) => {
       state.faceEnrolled = action.payload;
       if (typeof window !== 'undefined') {
@@ -65,5 +62,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setProfile, clearProfile, setAuthenticated, setFaceEnrolled } = userSlice.actions;
+export const { setProfile, clearProfile, setFaceEnrolled } = userSlice.actions;
 export default userSlice.reducer;

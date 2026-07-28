@@ -1,7 +1,7 @@
 import BaseRestApiClient from './client';
 
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-export type PaymentResourceType = 'classroom' | 'course';
+type PaymentResourceType = 'classroom' | 'course';
 
 export type PaymentListItem = {
   uid: string;
@@ -20,7 +20,7 @@ export type PaymentListItem = {
   resource_id?: string | null;
 };
 
-export type PaymentHistoryParams = {
+type PaymentHistoryParams = {
   status?: PaymentStatus;
   resource_type?: PaymentResourceType;
   limit?: number;
@@ -38,7 +38,7 @@ function normalizePayment(item: PaymentListItem): PaymentListItem {
   return { ...item, status: normalizeStatus(item.status) };
 }
 
-export class PaymentApiClient extends BaseRestApiClient {
+class PaymentApiClient extends BaseRestApiClient {
   public async list(params?: PaymentHistoryParams): Promise<PaymentListItem[]> {
     const qs = buildQueryString(params);
     const response = await this.get<PaymentListItem[] | { results: PaymentListItem[] }>(

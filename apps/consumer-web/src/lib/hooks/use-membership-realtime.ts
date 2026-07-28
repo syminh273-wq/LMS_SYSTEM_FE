@@ -3,7 +3,7 @@ import { getDatabase, ref, onValue, off } from 'firebase/database';
 import { toast } from 'sonner';
 import firebaseApp from '@/lib/firebase';
 
-export type MembershipEvent = {
+type MembershipEvent = {
   status: 'approved' | 'rejected';
   classroom_uid: string;
   classroom_name: string;

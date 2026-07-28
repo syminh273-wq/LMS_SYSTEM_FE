@@ -7,7 +7,7 @@ import {
   ProcessLeaveRequestInput,
 } from '@shared/lib/api/leaveRequest';
 
-export class ConsumerLeaveRequestApiClient extends BaseRestApiClient {
+class ConsumerLeaveRequestApiClient extends BaseRestApiClient {
   public async list(params: ListLeaveRequestsParams = {}): Promise<LeaveRequest[]> {
     return leaveRequestApiService.list('consumer', params);
   }

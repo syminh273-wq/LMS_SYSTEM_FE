@@ -1,7 +1,7 @@
 import BaseRestApiClient from './client';
 import type { ApiMessageResponse, Consumer, StudentProfileSettings, PublicStudentProfile } from './index';
 
-export interface UpdateProfileData {
+interface UpdateProfileData {
   full_name?: string;
   phone?: string;
   avatar_url?: string;
@@ -9,11 +9,11 @@ export interface UpdateProfileData {
 
 export type UserProfile = Consumer;
 
-export type UpdateProfileResponse = ApiMessageResponse & {
+type UpdateProfileResponse = ApiMessageResponse & {
   data: UserProfile;
 };
 
-export interface ChangePasswordData {
+interface ChangePasswordData {
   current_password: string;
   new_password: string;
   confirm_password: string;

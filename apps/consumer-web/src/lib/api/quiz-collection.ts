@@ -6,7 +6,7 @@ import type {
   IssuedCertificate,
 } from './types';
 
-export class ConsumerQuizCollectionApiClient extends BaseRestApiClient {
+class ConsumerQuizCollectionApiClient extends BaseRestApiClient {
   public async listByClassroom(classroomId: string): Promise<QuizCollection[]> {
     const response = await this.get<QuizCollection[] | { results: QuizCollection[] }>(
       `/api/v1/consumer/quiz-collection/?classroom_id=${encodeURIComponent(classroomId)}`

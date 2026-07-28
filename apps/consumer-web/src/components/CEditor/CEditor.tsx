@@ -81,5 +81,3 @@ export function CEditor({
     </div>
   );
 }
-
-export default CEditor;

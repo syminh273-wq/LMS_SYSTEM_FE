@@ -3,8 +3,7 @@
 import * as React from 'react';
 
 export type Locale = 'en' | 'vi';
-export const SUPPORTED_LOCALES: Locale[] = ['en', 'vi'];
-export const DEFAULT_LOCALE: Locale = 'vi';
+const DEFAULT_LOCALE: Locale = 'vi';
 
 export type LocaleMessages = Record<string, unknown>;
 export type LocaleBundles = Record<Locale, Record<string, LocaleMessages>>;
@@ -179,7 +178,7 @@ export function LocaleProvider({ bundles, children }: LocaleProviderProps) {
   );
 }
 
-export function useLocale() {
+function useLocale() {
   const ctx = React.useContext(LocaleContext);
   if (!ctx) throw new Error('useLocale must be used within LocaleProvider');
   return ctx;

@@ -3,7 +3,7 @@
 import { cn } from '@shared/lib/utils';
 import type { PaymentStatus } from '@/lib/api/payment';
 
-export const STATUS_FILTERS: { value: PaymentStatus | 'all'; label: string }[] = [
+const STATUS_FILTERS: { value: PaymentStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'Tất cả' },
   { value: 'COMPLETED', label: 'Thành công' },
   { value: 'PENDING', label: 'Đang chờ' },

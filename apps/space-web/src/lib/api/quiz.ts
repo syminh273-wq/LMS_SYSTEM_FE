@@ -6,7 +6,7 @@ import type {
   QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
 } from './types';
 
-export class QuizApiClient extends BaseRestApiClient {
+class QuizApiClient extends BaseRestApiClient {
   public async list(classroomId?: string): Promise<Quiz[]> {
     const url = classroomId
       ? `/api/v1/space/quiz/?classroom_id=${encodeURIComponent(classroomId)}`

@@ -17,7 +17,7 @@ import {
 import { X, Loader2 } from 'lucide-react';
 import { ShiftPicker } from './ShiftPicker';
 
-export interface ClassroomOption {
+interface ClassroomOption {
   uid: string;
   name: string;
 }

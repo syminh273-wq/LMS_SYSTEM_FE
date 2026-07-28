@@ -103,10 +103,6 @@ export function usePaymentList(options: UsePaymentOptions = {}) {
   return { items, loading, refreshing, error, reload: () => load(true), setItems, stats };
 }
 
-export function usePaymentStats(options: UsePaymentOptions = {}) {
-  return usePaymentList(options);
-}
-
 export function usePaymentSummary(filters: PaymentSummaryParams = {}, autoLoad = true) {
   const [summary, setSummary] = useState<PaymentAnalyticsSummary | null>(null);
   const [loading, setLoading] = useState<boolean>(autoLoad);

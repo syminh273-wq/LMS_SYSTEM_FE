@@ -18,7 +18,7 @@ export type SearchResultItem = {
   [key: string]: unknown;
 };
 
-export type SearchCollectionResult = {
+type SearchCollectionResult = {
   total_hits: number;
   results: SearchResultItem[];
   facets?: Record<string, unknown> | null;
@@ -33,9 +33,9 @@ export type SearchResponse = {
   resource?: SearchCollectionResult;
 };
 
-export type SearchType = 'classroom' | 'exam' | 'quiz' | 'consumer' | 'resource';
+type SearchType = 'classroom' | 'exam' | 'quiz' | 'consumer' | 'resource';
 
-export class SearchApiClient extends BaseRestApiClient {
+class SearchApiClient extends BaseRestApiClient {
   async search(
     q: string,
     types: SearchType[] = ['classroom', 'exam', 'quiz', 'consumer'],

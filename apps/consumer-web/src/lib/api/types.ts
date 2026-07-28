@@ -108,7 +108,7 @@ export type Classroom = {
   updated_at: string;
 };
 
-export type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
+type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
 
 export type ClassroomPreviewResponse = {
   classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
@@ -230,10 +230,10 @@ export type Message = {
 };
 
 export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image' | 'quiz';
-export type ExamStatus = 'draft' | 'published' | 'closed' | 'ongoing';
-export type ExamSessionStatus = 'pending' | 'active' | 'expired' | 'completed';
+type ExamStatus = 'draft' | 'published' | 'closed' | 'ongoing';
+type ExamSessionStatus = 'pending' | 'active' | 'expired' | 'completed';
 
-export type ExamMeta = {
+type ExamMeta = {
   url?: string;
   name?: string;
   size?: number;
@@ -359,7 +359,7 @@ export type QuizSummary = {
   updated_at?: string;
 };
 
-export type QuizPlayRecord = {
+type QuizPlayRecord = {
   uid: string;
   quiz_id: string;
   student_id: string;
@@ -408,7 +408,7 @@ export type QuizLeaderboardEntry = {
   attempts_count: number;
 };
 
-export type QuizLeaderboardMe = {
+type QuizLeaderboardMe = {
   rank: number;
   best_score_pct: number;
   best_time_taken_seconds: number;
@@ -427,7 +427,7 @@ export type QuizLeaderboardResponse = {
   closes_at?: string | null;
 };
 
-export type QuizLeaderboardAttempt = {
+type QuizLeaderboardAttempt = {
   attempt_uid: string | null;
   attempt_number: number;
   score: number;
@@ -529,13 +529,13 @@ export type SharingLink = {
 
 // ── Student Profile Settings ──────────────────────────────────────────────────
 
-export type SocialLink = {
+type SocialLink = {
   platform: 'facebook' | 'linkedin' | 'github' | 'twitter' | 'instagram' | 'website' | string;
   url: string;
   label: string;
 };
 
-export type Certificate = {
+type Certificate = {
   title: string;
   issuer: string;
   issued_date: string;
@@ -543,21 +543,21 @@ export type Certificate = {
   badge_url?: string;
 };
 
-export type CustomField = {
+type CustomField = {
   key: string;
   value: string;
 };
 
-export type ProfileMetadata = {
+type ProfileMetadata = {
   hobbies?: string[];
   social_links?: SocialLink[];
   certificates?: Certificate[];
   custom_fields?: CustomField[];
 };
 
-export type ThemeColor = 'indigo' | 'rose' | 'emerald' | 'amber' | 'violet';
-export type CoverStyle = 'gradient' | 'solid' | 'mesh';
-export type ProfileVisibility = 'public' | 'class_only' | 'private';
+type ThemeColor = 'indigo' | 'rose' | 'emerald' | 'amber' | 'violet';
+type CoverStyle = 'gradient' | 'solid' | 'mesh';
+type ProfileVisibility = 'public' | 'class_only' | 'private';
 
 export type StudentProfileSettings = {
   consumer_uid: string;
@@ -650,13 +650,13 @@ export type SuggestionsResponse = {
   results: SuggestedUser[];
 };
 
-export type QuizCollectionItem = {
+type QuizCollectionItem = {
   quiz_id: string;
   order: number;
   added_at: string;
 };
 
-export type QuizCollectionAssignment = {
+type QuizCollectionAssignment = {
   collection_id: string;
   classroom_id: string;
   assigned_by: string;
@@ -739,10 +739,10 @@ export type NotificationItem = {
 
 // ── Course Management ────────────────────────────────────────────────────────
 
-export type PricingType = 'free' | 'paid';
-export type CourseStatus = 'draft' | 'published' | 'archived';
+type PricingType = 'free' | 'paid';
+type CourseStatus = 'draft' | 'published' | 'archived';
 
-export type CourseMaterial = {
+type CourseMaterial = {
   uid: string;
   name: string;
   url: string;
@@ -788,7 +788,7 @@ export type CourseEnrolled = Course & {
   enrollment_amount_vnd: number;
 };
 
-export type CoursePreviewLesson = {
+type CoursePreviewLesson = {
   uid: string;
   title: string;
   description: string;
@@ -798,7 +798,7 @@ export type CoursePreviewLesson = {
   material_urls: CourseMaterial[];
 };
 
-export type CoursePreviewCourse = {
+type CoursePreviewCourse = {
   uid: string;
   pid: string;
   name: string;
@@ -902,7 +902,7 @@ export type MyRankResponse = {
   student_id: string;
 };
 
-export type LevelDefinition = {
+type LevelDefinition = {
   level: number;
   required_xp: number;
   title: string;

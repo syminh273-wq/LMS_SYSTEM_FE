@@ -6,7 +6,7 @@ import {
   ProcessLeaveRequestInput,
 } from '@shared/lib/api/leaveRequest';
 
-export class SpaceLeaveRequestApiClient extends BaseRestApiClient {
+class SpaceLeaveRequestApiClient extends BaseRestApiClient {
   public async list(params: ListLeaveRequestsParams = {}): Promise<LeaveRequest[]> {
     return leaveRequestApiService.list('space', params);
   }

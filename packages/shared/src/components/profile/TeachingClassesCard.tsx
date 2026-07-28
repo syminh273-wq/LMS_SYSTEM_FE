@@ -4,7 +4,7 @@ import * as React from 'react';
 import { BookOpen, Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
-export type TeachingClassItem = {
+type TeachingClassItem = {
   uid: string;
   name: string;
   description?: string;

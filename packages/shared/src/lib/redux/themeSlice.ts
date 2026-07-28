@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface BrandColors {
+interface BrandColors {
   primaryColor: string;
   accentColor: string;
   goldColor: string;
@@ -10,7 +10,7 @@ interface ThemeState {
   brand: BrandColors;
 }
 
-export const DEFAULT_BRAND: BrandColors = {
+const DEFAULT_BRAND: BrandColors = {
   primaryColor: '#1a3a7a',
   accentColor: '#00b4d8',
   goldColor: '#d4a843',
@@ -40,14 +40,8 @@ const themeSlice = createSlice({
         localStorage.setItem('lmsBrandTheme', JSON.stringify(state.brand));
       }
     },
-    resetBrandColors: (state) => {
-      state.brand = { ...DEFAULT_BRAND };
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('lmsBrandTheme');
-      }
-    },
   },
 });
 
-export const { setBrandColors, resetBrandColors } = themeSlice.actions;
+export const { setBrandColors } = themeSlice.actions;
 export default themeSlice.reducer;

@@ -6,7 +6,7 @@ import type {
   CreateQuizTaskResponse,
 } from './types';
 
-export type CreateGenerateTaskInput = {
+type CreateGenerateTaskInput = {
   title?: string;
   content?: string;
   resource_id?: string;
@@ -16,7 +16,7 @@ export type CreateGenerateTaskInput = {
   file?: File;
 };
 
-export class QuizTasksApiClient extends BaseRestApiClient {
+class QuizTasksApiClient extends BaseRestApiClient {
   public async createGenerateTask(input: CreateGenerateTaskInput): Promise<CreateQuizTaskResponse> {
     const path = '/api/v1/space/quiz/generate-task/';
 

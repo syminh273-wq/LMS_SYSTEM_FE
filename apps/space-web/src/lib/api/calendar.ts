@@ -7,7 +7,7 @@ import {
 } from '@shared/lib/api/calendar';
 import type { RecurringSchedulePayload } from '@shared/components/calendar/RecurringScheduleDialog';
 
-export interface RecurringScheduleResult {
+interface RecurringScheduleResult {
   created: number;
   failed: number;
   event_uids: string[];
@@ -23,7 +23,7 @@ function buildQuery(params: ListCalendarEventsParams = {}): string {
   return qs ? `?${qs}` : '';
 }
 
-export class CalendarApiClient extends BaseRestApiClient {
+class CalendarApiClient extends BaseRestApiClient {
   public async list(params: ListCalendarEventsParams = {}): Promise<CalendarEvent[]> {
     return this.get<CalendarEvent[]>(`/api/v1/space/calendar/events/${buildQuery(params)}`);
   }

@@ -11,7 +11,7 @@
 //   - features/course/classroom/services/leaderboard_service.py
 // When the backend changes, update this file to match.
 
-export type XpEventCode =
+type XpEventCode =
   | 'classroom_joined'
   | 'attendance_present'
   | 'exam_submitted'

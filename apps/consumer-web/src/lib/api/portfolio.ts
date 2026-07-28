@@ -1,6 +1,6 @@
 import BaseRestApiClient from './client';
 
-export type PortfolioKey =
+type PortfolioKey =
   | 'intro'
   | 'certificate'
   | 'experience'
@@ -27,7 +27,7 @@ export type Portfolio = {
   education: PortfolioEntry[];
 };
 
-export type PublicTeacher = {
+type PublicTeacher = {
   uid: string;
   full_name: string;
   name: string;
@@ -39,12 +39,12 @@ export type PublicTeacher = {
   portfolio: Portfolio;
 };
 
-export type PortfolioUploadResult = {
+type PortfolioUploadResult = {
   file_key: string;
   url: string;
 };
 
-export class PortfolioApiClient extends BaseRestApiClient {
+class PortfolioApiClient extends BaseRestApiClient {
   async getMine(): Promise<Portfolio> {
     return this.get<Portfolio>('/api/v1/portfolio/me/');
   }

@@ -15,7 +15,7 @@ import type {
 
 export type { Classroom };
 
-export class ClassroomApiClient extends BaseRestApiClient {
+class ClassroomApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

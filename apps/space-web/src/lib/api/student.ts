@@ -13,13 +13,13 @@ export type StudentSearchResult = {
   first_joined_at: number;
 };
 
-export type StudentSearchResponse = {
+type StudentSearchResponse = {
   total_hits: number;
   results: StudentSearchResult[];
   error?: string;
 };
 
-export class StudentApiClient extends BaseRestApiClient {
+class StudentApiClient extends BaseRestApiClient {
   /** All unique students who ever studied with the authenticated teacher. */
   async listMyStudents(): Promise<TeacherContact[]> {
     return this.get<TeacherContact[]>('/api/v1/space/course/students/');

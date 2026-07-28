@@ -45,23 +45,6 @@ export function getYearOptions(
   return years;
 }
 
-export function emptyEducationValue(): EducationValue {
-  return {
-    school: '',
-    degree: '',
-    field_of_study: '',
-    start_month: '',
-    start_year: '',
-    end_month: '',
-    end_year: '',
-    is_current: false,
-    grade: '',
-    activities_and_societies: '',
-    description: '',
-    skills: [],
-  };
-}
-
 export function getEducationValue(raw: Record<string, unknown> | undefined): EducationValue {
   const v = (raw ?? {}) as Partial<EducationValue>;
   const skills = Array.isArray(v.skills) ? v.skills.filter((s): s is string => typeof s === 'string') : [];

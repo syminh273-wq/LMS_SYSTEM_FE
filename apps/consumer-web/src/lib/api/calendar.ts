@@ -14,7 +14,7 @@ function buildQuery(params: ListCalendarEventsParams = {}): string {
   return qs ? `?${qs}` : '';
 }
 
-export class ConsumerCalendarApiClient extends BaseRestApiClient {
+class ConsumerCalendarApiClient extends BaseRestApiClient {
   public async list(params: ListCalendarEventsParams = {}): Promise<CalendarEvent[]> {
     return this.get<CalendarEvent[]>(`/api/v1/consumer/calendar/events/${buildQuery(params)}`);
   }

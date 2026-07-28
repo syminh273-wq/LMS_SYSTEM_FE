@@ -1,5 +1,5 @@
 export type PaymentStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-export type PaymentResourceType = 'classroom' | 'course';
+type PaymentResourceType = 'classroom' | 'course';
 
 export type PaymentListItem = {
   uid: string;
@@ -25,7 +25,7 @@ export type PaymentHistoryParams = {
   limit?: number;
 };
 
-export type PaymentSummaryByClassroom = {
+type PaymentSummaryByClassroom = {
   classroom_uid: string;
   classroom_name: string;
   total_count: number;
@@ -34,19 +34,9 @@ export type PaymentSummaryByClassroom = {
   pending_count: number;
 };
 
-export type PaymentSummary = {
-  total_count: number;
-  total_revenue: number;
-  completed_count: number;
-  pending_count: number;
-  failed_count: number;
-  cancelled_count: number;
-  by_classroom: PaymentSummaryByClassroom[];
-};
-
 // ── Analytics (dashboard) ──────────────────────────────────────────────
 
-export type PaymentBucket = 'day' | 'week' | 'month';
+type PaymentBucket = 'day' | 'week' | 'month';
 
 export type PaymentSummaryParams = {
   from?: string;
@@ -56,7 +46,7 @@ export type PaymentSummaryParams = {
   bucket?: PaymentBucket;
 };
 
-export type PaymentKpis = {
+type PaymentKpis = {
   total_revenue: number;
   total_transactions: number;
   total_paid_amount: number;

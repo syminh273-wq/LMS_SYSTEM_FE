@@ -45,11 +45,8 @@ const userSlice = createSlice({
         localStorage.removeItem('refreshToken');
       }
     },
-    setAuthenticated: (state, action: PayloadAction<boolean>) => {
-      state.isAuthenticated = action.payload;
-    },
   },
 });
 
-export const { setProfile, clearProfile, setAuthenticated } = userSlice.actions;
+export const { setProfile, clearProfile } = userSlice.actions;
 export default userSlice.reducer;

@@ -1,6 +1,6 @@
 import BaseRestApiClient from './client';
 
-export type ClassroomLeaderboardEntry = {
+type ClassroomLeaderboardEntry = {
   rank: number;
   student_id: string;
   student_name: string;
@@ -57,7 +57,7 @@ export type StudentAchievement = {
   unlocked_at?: string | null;
 };
 
-export class SpaceRankingApiClient extends BaseRestApiClient {
+class SpaceRankingApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

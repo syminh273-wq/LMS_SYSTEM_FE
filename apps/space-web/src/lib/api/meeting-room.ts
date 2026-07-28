@@ -16,14 +16,14 @@ export interface MeetingRoom {
   created_at: string;
 }
 
-export type CreateMeetingRoomRequest = {
+type CreateMeetingRoomRequest = {
   classroom_uid: string;
   title: string;
   description?: string;
   max_participants?: number;
 };
 
-export class MeetingRoomApiClient extends BaseRestApiClient {
+class MeetingRoomApiClient extends BaseRestApiClient {
   public async getByClassroom(classroomUid: string): Promise<MeetingRoom[]> {
     return this.get<MeetingRoom[]>(
       `/api/v1/space/course/meeting-rooms/?classroom_uid=${encodeURIComponent(classroomUid)}`

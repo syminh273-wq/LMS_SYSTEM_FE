@@ -1,7 +1,7 @@
 // Read-only mirror of backend hardcoded grading rules.
 // Source of truth (backend): see apps/space-web/src/lib/data/grading-rules.ts header.
 
-export type XpEventCode =
+type XpEventCode =
   | 'classroom_joined'
   | 'attendance_present'
   | 'exam_submitted'

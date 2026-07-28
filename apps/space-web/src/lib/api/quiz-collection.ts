@@ -13,7 +13,7 @@ import type {
   UpdateCertificateRequest,
 } from './types';
 
-export class QuizCollectionApiClient extends BaseRestApiClient {
+class QuizCollectionApiClient extends BaseRestApiClient {
   public async list(): Promise<QuizCollection[]> {
     const response = await this.get<QuizCollection[] | { results: QuizCollection[] }>(
       '/api/v1/space/quiz-collection/'
@@ -64,18 +64,18 @@ export class QuizCollectionApiClient extends BaseRestApiClient {
 
 export const quizCollectionApi = new QuizCollectionApiClient();
 
-export type CreateCertificatePayload = Omit<CreateCertificateRequest, 'template_url'> & {
+type CreateCertificatePayload = Omit<CreateCertificateRequest, 'template_url'> & {
   templateImage?: File | null;
   template_url?: string | null;
 };
 
-export type UpdateCertificatePayload = Omit<UpdateCertificateRequest, 'template_url'> & {
+type UpdateCertificatePayload = Omit<UpdateCertificateRequest, 'template_url'> & {
   templateImage?: File | null;
   template_url?: string | null;
   clearTemplateImage?: boolean;
 };
 
-export class CertificateApiClient extends BaseRestApiClient {
+class CertificateApiClient extends BaseRestApiClient {
   public async list(): Promise<Certificate[]> {
     const response = await this.get<Certificate[] | { results: Certificate[] }>(
       '/api/v1/space/certificate/'

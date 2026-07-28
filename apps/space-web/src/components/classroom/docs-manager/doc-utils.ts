@@ -14,10 +14,6 @@ export function isAudioFile(fileType?: string): boolean {
   return ['mp3', 'wav', 'ogg', 'm4a'].includes(fileType.toLowerCase());
 }
 
-export function isMediaFile(fileType?: string): boolean {
-  return isImageFile(fileType) || isVideoFile(fileType) || isAudioFile(fileType);
-}
-
 export function isPdfFile(fileType?: string): boolean {
   if (!fileType) return false;
   return fileType.toLowerCase() === 'pdf';

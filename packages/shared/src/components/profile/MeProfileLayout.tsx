@@ -5,7 +5,7 @@ import { Camera, FileText, User } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { cn } from '@shared/lib/utils';
 
-export type MeProfileLite = {
+type MeProfileLite = {
   uid: string;
   full_name?: string | null;
   username?: string | null;

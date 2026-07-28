@@ -1,10 +1,8 @@
 "use client"
 
-import * as React from "react"
 import { ReactNode } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Button } from "@shared/components/ui/button"
 
 type ProtectedPageShellProps = {
   title: string
@@ -61,9 +59,3 @@ function StatusBanner({
   return <div className={`rounded-md border p-3 text-sm ${className}`}>{children}</div>
 }
 
-export function PageActionButton({
-  children,
-  ...props
-}: React.ComponentProps<typeof Button>) {
-  return <Button {...props}>{children}</Button>
-}

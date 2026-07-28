@@ -10,7 +10,7 @@ import type {
   LeaderboardPeriod,
 } from './types';
 
-export class RankingApiClient extends BaseRestApiClient {
+class RankingApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

@@ -47,10 +47,3 @@ export const CALENDAR_TYPE_COLORS: Record<CalendarEventType, CalendarEventColor>
   deadline: 'amber',
   study_session: 'emerald',
 };
-
-export function getCalendarEventColor(type: CalendarEventType | string | null | undefined): CalendarEventColor {
-  if (type && type in CALENDAR_TYPE_COLORS) {
-    return CALENDAR_TYPE_COLORS[type as CalendarEventType];
-  }
-  return 'slate';
-}

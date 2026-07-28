@@ -11,12 +11,12 @@ import { countRecurrenceSlots, DayShiftMap, expandRecurrence, toISODate } from '
 import { X, Loader2 } from 'lucide-react';
 import { ShiftMatrixPicker } from './ShiftMatrixPicker';
 
-export interface ClassroomOption {
+interface ClassroomOption {
   uid: string;
   name: string;
 }
 
-export interface RecurringSlotPayload {
+interface RecurringSlotPayload {
   start_time: string;
   end_time: string;
 }
@@ -29,12 +29,6 @@ export interface RecurringSchedulePayload {
   start_date: string;
   end_date: string;
   slots: RecurringSlotPayload[];
-}
-
-export interface RecurringScheduleSubmitResult {
-  created: number;
-  failed: number;
-  errors: string[];
 }
 
 interface RecurringScheduleDialogProps {

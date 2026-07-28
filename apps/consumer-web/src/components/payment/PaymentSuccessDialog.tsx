@@ -15,7 +15,7 @@ import {
 } from '@shared/components/ui/dialog';
 import { cn } from '@shared/lib/utils';
 
-export type PaymentSuccessVariant = 'classroom' | 'course';
+type PaymentSuccessVariant = 'classroom' | 'course';
 
 export interface PaymentSuccessDialogProps {
   open: boolean;

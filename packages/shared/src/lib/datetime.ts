@@ -28,23 +28,3 @@ export function parseVnDate(value: string | number | Date | null | undefined): D
   return isNaN(d.getTime()) ? null : d;
 }
 
-/**
- * Milliseconds until `value`. Returns null when unparseable.
- */
-export function msUntil(value: string | number | Date | null | undefined): number | null {
-  const d = parseVnDate(value);
-  if (!d) return null;
-  return d.getTime() - Date.now();
-}
-
-/**
- * Format a backend datetime for display (already in VN).
- */
-export function formatLocal(
-  value: string | number | Date | null | undefined,
-  options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' },
-): string {
-  const d = parseVnDate(value);
-  if (!d) return '';
-  return d.toLocaleString('vi-VN', options);
-}

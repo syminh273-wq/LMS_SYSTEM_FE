@@ -12,6 +12,7 @@
     "lint": "turbo lint"
   },
   "devDependencies": {
+    "knip": "^6.29.0",
     "turbo": "^2.4.0"
   },
   "dependencies": {

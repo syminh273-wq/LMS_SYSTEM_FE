@@ -3,7 +3,7 @@ import type { QuizTask, QuizTaskStatus } from '@/lib/api/types';
 
 export type TaskCenterTab = 'all' | 'active' | 'completed' | 'failed';
 
-export interface QuizTasksState {
+interface QuizTasksState {
   byId: Record<string, QuizTask>;
   ids: string[];
   panelOpen: boolean;
@@ -50,9 +50,6 @@ const quizTasksSlice = createSlice({
   reducers: {
     setPanelOpen: (state, action: PayloadAction<boolean>) => {
       state.panelOpen = action.payload;
-    },
-    togglePanel: (state) => {
-      state.panelOpen = !state.panelOpen;
     },
     setActiveTab: (state, action: PayloadAction<TaskCenterTab>) => {
       state.activeTab = action.payload;
@@ -105,7 +102,6 @@ const quizTasksSlice = createSlice({
 
 export const {
   setPanelOpen,
-  togglePanel,
   setActiveTab,
   setLoading,
   setError,
@@ -137,7 +133,7 @@ export const selectAllTasks = createSelector(
   },
 );
 
-export const selectActiveTasks = createSelector(
+const selectActiveTasks = createSelector(
   [selectAllTasks],
   (tasks): QuizTask[] =>
     tasks.filter(t => t.status === 'queued' || t.status === 'running'),
@@ -147,10 +143,6 @@ export const selectActiveTaskCount = createSelector(
   [selectActiveTasks],
   (tasks) => tasks.length,
 );
-
-export const selectTaskById = (state: RootState, id: string): QuizTask | undefined => {
-  return state.quizTasks.byId[id];
-};
 
 export const selectIsPanelOpen = (state: RootState): boolean => state.quizTasks.panelOpen;
 export const selectActiveTab = (state: RootState): TaskCenterTab => state.quizTasks.activeTab;

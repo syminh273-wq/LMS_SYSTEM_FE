@@ -3,51 +3,23 @@ import { classroomApi } from './classroom';
 import { examApi } from './exam';
 import { meetingRoomApi } from './meeting-room';
 import { quizApi } from './quiz';
-import { quizTasksApi } from './quiz-tasks';
 import { quizCollectionApi, certificateApi } from './quiz-collection';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
-import { accountService } from './account';
 import { userSettingsApi } from './user-settings';
-import { notificationApi } from './notification';
-import { studentApi } from './student';
 import { calendarApi } from './calendar';
 import { spaceLeaveRequestApi } from './leaveRequest';
 import { courseApi } from './course';
-import { portfolioApi } from './portfolio';
-import { spaceRankingApi } from './ranking';
 import { dashboardApi } from './dashboard';
 
 export * from './types';
 export * from './exceptions';
 export * from './calendar';
 export * from './leaveRequest';
-export { quizApi, quizTasksApi, quizCollectionApi, certificateApi, studentApi, calendarApi, spaceLeaveRequestApi, courseApi, portfolioApi, spaceRankingApi, dashboardApi };
-
-// For backward compatibility and centralized access
-export const api = {
-  auth: authApi,
-  classrooms: classroomApi,
-  exams: examApi,
-  meetingRooms: meetingRoomApi,
-  quizzes: quizApi,
-  quizTasks: quizTasksApi,
-  quizCollections: quizCollectionApi,
-  certificates: certificateApi,
-  spaces: spaceApiInstance,
-  consumers: consumerApiInstance,
-  account: accountService,
-  notifications: notificationApi,
-  calendar: calendarApi,
-  leaveRequests: spaceLeaveRequestApi,
-  courses: courseApi,
-  portfolio: portfolioApi,
-  ranking: spaceRankingApi,
-  dashboard: dashboardApi,
-};
+export { quizApi, calendarApi, spaceLeaveRequestApi, courseApi, classroomApi, examApi };
 
 // Re-export specific instances
-export { authApi, classroomApi, examApi, meetingRoomApi, spaceApiInstance as spaceApiClient, consumerApiInstance as consumerApiClient, accountService, notificationApi, userSettingsApi };
+export { userSettingsApi };
 
 // Backward compatibility exports for the previous structure
 export const consumerApi = {

@@ -4,12 +4,12 @@ export function isImageFile(fileType?: string): boolean {
   return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'].includes(t);
 }
 
-export function isVideoFile(fileType?: string): boolean {
+function isVideoFile(fileType?: string): boolean {
   if (!fileType) return false;
   return ['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(fileType.toLowerCase());
 }
 
-export function isAudioFile(fileType?: string): boolean {
+function isAudioFile(fileType?: string): boolean {
   if (!fileType) return false;
   return ['mp3', 'wav', 'ogg', 'm4a'].includes(fileType.toLowerCase());
 }

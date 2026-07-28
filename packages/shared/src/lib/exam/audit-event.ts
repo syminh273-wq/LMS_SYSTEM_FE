@@ -1,4 +1,4 @@
-export const AUDIT_VIOLATION_EVENTS = [
+const AUDIT_VIOLATION_EVENTS = [
   'tab_leave',
   'window_out',
   'window_blur',
@@ -11,23 +11,12 @@ export const AUDIT_VIOLATION_EVENTS = [
   'no_face',
 ] as const;
 
-export const AUDIT_LIMIT_EVENTS = [
+const AUDIT_LIMIT_EVENTS = [
   'visibility_breaks_exceeded',
   'face_warnings_exceeded',
 ] as const;
 
-export const AUDIT_FORCE_EVENTS = ['force_submitted'] as const;
-
-export const AUDIT_INFORMATIONAL_EVENTS = [
-  'joined',
-  'submitted',
-  'timeout_submit',
-  'face_recognized',
-  'tab_return',
-  'window_back',
-  'app_focus',
-  'visibility_restored',
-] as const;
+const AUDIT_FORCE_EVENTS = ['force_submitted'] as const;
 
 const HUMAN_LABELS: Record<string, string> = {
   joined: 'Bắt đầu làm bài',

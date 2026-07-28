@@ -23,12 +23,12 @@ export type ProctoringEventType =
   | 'visibility_breaks_exceeded'
   | 'face_warnings_exceeded';
 
-export interface RecordEventPayload {
+interface RecordEventPayload {
   event_type: ProctoringEventType;
   event_data?: Record<string, unknown>;
 }
 
-export interface RecordEventResponse {
+interface RecordEventResponse {
   logged: boolean;
   warning: boolean;
   severity: 'info' | 'warning' | 'danger';
@@ -42,7 +42,7 @@ export interface RecordEventResponse {
   submission: Record<string, unknown> | null;
 }
 
-export class ExamSessionApiClient extends BaseRestApiClient {
+class ExamSessionApiClient extends BaseRestApiClient {
   public async join(token: string, options?: RequestInit): Promise<JoinSessionResponse> {
     return this.get<JoinSessionResponse>(`/api/v1/consumer/course/exam-sessions/${token}/`, options);
   }

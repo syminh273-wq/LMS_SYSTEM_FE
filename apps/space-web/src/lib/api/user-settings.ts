@@ -1,8 +1,8 @@
 import BaseRestApiClient from './client';
 
-export type UserSettings = Record<string, string>;
+type UserSettings = Record<string, string>;
 
-export interface AvailableVoice {
+interface AvailableVoice {
     id: string;
     name: string;
 }

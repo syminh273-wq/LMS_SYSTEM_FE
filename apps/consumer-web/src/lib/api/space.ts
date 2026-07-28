@@ -5,7 +5,7 @@ import type {
   UpdateSpaceRequest 
 } from './types';
 
-export class SpaceApiClient extends BaseRestApiClient {
+class SpaceApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

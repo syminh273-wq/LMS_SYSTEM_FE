@@ -107,5 +107,3 @@ class CommunityApiClient extends BaseRestApiClient {
 }
 
 export const communityApi = new CommunityApiClient();
-
-export type { ChatMessage };

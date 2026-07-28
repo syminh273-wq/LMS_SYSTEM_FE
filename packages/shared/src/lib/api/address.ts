@@ -3,8 +3,8 @@
  * Backend: GET/PUT/PATCH/DELETE /api/v1/account/addresses/me/
  */
 
-export type AddressType = 'home' | 'work' | 'billing' | 'other';
-export type OwnerType = 'consumer' | 'space';
+type AddressType = 'home' | 'work' | 'billing' | 'other';
+type OwnerType = 'consumer' | 'space';
 
 export type Address = {
   uid: string;

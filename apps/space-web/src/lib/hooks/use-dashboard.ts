@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { accountService } from '@/lib/api/account';
 import { dashboardApi, type DashboardSummary } from '@/lib/api/dashboard';
 
-export type DashboardData = {
+type DashboardData = {
   teacherName: string;
   summary: DashboardSummary;
 };
 
-export type DashboardStatus = 'loading' | 'authenticated' | 'unauthenticated';
+type DashboardStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 export type UseDashboardResult = {
   status: DashboardStatus;

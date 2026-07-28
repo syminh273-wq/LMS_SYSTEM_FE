@@ -1,6 +1,6 @@
 import BaseRestApiClient from './client';
 
-export type DashboardKpis = {
+type DashboardKpis = {
   total_classrooms: number;
   active_classrooms: number;
   total_students: number;
@@ -11,14 +11,14 @@ export type DashboardKpis = {
   graded: number;
 };
 
-export type DashboardWeeklyPoint = {
+type DashboardWeeklyPoint = {
   date: string;
   weekday: string;
   enrolled: number;
   submitted: number;
 };
 
-export type DashboardTopClass = {
+type DashboardTopClass = {
   uid: string;
   name: string;
   students: number;
@@ -34,7 +34,7 @@ export type DashboardSummary = {
   recent_activity: import('./types').ActivityLog[];
 };
 
-export type DashboardUsage = {
+type DashboardUsage = {
   storage_used_mb: number;
   storage_limit_mb: number;
   api_calls_this_month: number;

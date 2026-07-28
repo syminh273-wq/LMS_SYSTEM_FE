@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { accountService, type UserProfile } from '@/lib/api/account';
 
-export type MeStatus = 'loading' | 'authenticated' | 'unauthenticated';
+type MeStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 export type UseMeResult = {
   status: MeStatus;

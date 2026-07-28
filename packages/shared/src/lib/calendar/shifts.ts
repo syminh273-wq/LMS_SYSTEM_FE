@@ -32,10 +32,6 @@ export function getShiftForDate(date: Date): Shift | null {
   return null;
 }
 
-export function getShiftForIso(iso: string): Shift | null {
-  return getShiftForDate(new Date(iso));
-}
-
 export function applyShiftToDate(date: Date, shift: Shift, kind: 'start' | 'end'): Date {
   const out = new Date(date);
   if (kind === 'start') {

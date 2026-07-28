@@ -22,14 +22,6 @@ const COLOR_MAP: Record<string, string> = {
   cancelled: '#475569', // slate-600
 };
 
-function formatVND(amount: number): string {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 type Props = {
   data: PaymentStatusDistributionPoint[];
   loading?: boolean;
@@ -104,4 +96,3 @@ export function PaymentStatusDonut({ data, loading }: Props) {
   );
 }
 
-export { formatVND as formatDonutVND };

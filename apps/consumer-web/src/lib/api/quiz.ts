@@ -4,7 +4,7 @@ import type {
   QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
 } from './types';
 
-export class ConsumerQuizApiClient extends BaseRestApiClient {
+class ConsumerQuizApiClient extends BaseRestApiClient {
   public async listByClassroom(classroomId: string): Promise<QuizSummary[]> {
     const response = await this.get<QuizSummary[] | { results: QuizSummary[] }>(
       `/api/v1/consumer/quiz/?classroom_id=${encodeURIComponent(classroomId)}`

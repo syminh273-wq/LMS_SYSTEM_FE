@@ -6,7 +6,7 @@ import type {
   PaymentSummaryParams,
 } from './payment';
 
-export class SpacePaymentApiClient extends BaseRestApiClient {
+class SpacePaymentApiClient extends BaseRestApiClient {
   public async getHistory(params?: PaymentHistoryParams): Promise<PaymentListItem[]> {
     const sp = new URLSearchParams();
     if (params?.status) sp.set('status', params.status.toLowerCase());

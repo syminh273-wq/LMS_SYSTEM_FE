@@ -49,7 +49,7 @@ function Divider() {
   return <div className="w-px h-5 bg-slate-200 mx-0.5" />;
 }
 
-export function CMenuBar({ editor }: Props) {
+function CMenuBar({ editor }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!editor) return null;

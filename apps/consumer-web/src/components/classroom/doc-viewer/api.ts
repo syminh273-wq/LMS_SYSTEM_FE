@@ -21,23 +21,6 @@ export async function fetchMyProgress(ctx: ApiCtx, resourceUid: string): Promise
   return (await res.json()) as DocProgress;
 }
 
-export async function updateMyProgress(
-  ctx: ApiCtx,
-  resourceUid: string,
-  payload: { read_progress?: number; is_completed?: boolean },
-): Promise<DocProgress> {
-  const res = await fetch(
-    `${ctx.apiBase}/api/v1/consumer/course/classrooms/${ctx.classroomUid}/docs/${resourceUid}/progress/`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders(ctx.accessToken) },
-      body: JSON.stringify(payload || {}),
-    },
-  );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return (await res.json()) as DocProgress;
-}
-
 export async function markCompleted(ctx: ApiCtx, resourceUid: string, is_completed = true): Promise<DocProgress> {
   const res = await fetch(
     `${ctx.apiBase}/api/v1/consumer/course/classrooms/${ctx.classroomUid}/docs/${resourceUid}/complete/`,

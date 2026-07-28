@@ -101,7 +101,7 @@ export type Classroom = {
   updated_at: string;
 };
 
-export type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
+type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
 
 export type ClassroomPreviewResponse = {
   classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
@@ -164,10 +164,10 @@ export type UpdateClassroomRequest = Partial<CreateClassroomRequest>;
 
 export type ExamContentType = 'markdown' | 'file' | 'pdf' | 'image' | 'quiz';
 export type ExamStatus = 'draft' | 'published' | 'closed' | 'ongoing';
-export type ExamMode = 'online' | 'offline';
-export type ExamSessionStatus = 'pending' | 'active' | 'expired' | 'completed';
+type ExamMode = 'online' | 'offline';
+type ExamSessionStatus = 'pending' | 'active' | 'expired' | 'completed';
 
-export type ExamMeta = {
+type ExamMeta = {
   url?: string;
   name?: string;
   size?: number;
@@ -219,7 +219,7 @@ export type OpenOnlineResponse = {
   expires_in_minutes: number;
 };
 
-export type ExamSubmissionType = 'multiple_choice' | 'online_quiz' | 'file' | 'essay';
+type ExamSubmissionType = 'multiple_choice' | 'online_quiz' | 'file' | 'essay';
 
 export type ExamSubmission = {
   uid: string;
@@ -324,7 +324,7 @@ export type SharingLink = {
   updated_at: string;
 };
 
-export type QuizStatus = 'draft' | 'published' | 'archived';
+type QuizStatus = 'draft' | 'published' | 'archived';
 
 export type QuizQuestion = {
   uid: string;
@@ -393,7 +393,7 @@ export type QuizDetail = Quiz & {
   questions: QuizQuestion[];
 };
 
-export type QuizType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'scenario';
+type QuizType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'scenario';
 
 export type QuizTypeOption = {
   value: QuizType;
@@ -440,7 +440,7 @@ export type QuizLeaderboardEntry = {
   attempts_count: number;
 };
 
-export type QuizLeaderboardMe = {
+type QuizLeaderboardMe = {
   rank: number;
   best_score_pct: number;
   best_time_taken_seconds: number;
@@ -459,7 +459,7 @@ export type QuizLeaderboardResponse = {
   closes_at?: string | null;
 };
 
-export type QuizLeaderboardAttempt = {
+type QuizLeaderboardAttempt = {
   attempt_uid: string | null;
   attempt_number: number;
   score: number;
@@ -481,14 +481,14 @@ export type QuizLeaderboardStudentDetail = {
   attempts: QuizLeaderboardAttempt[];
 };
 
-export type QuizStreamMetaEvent = {
+type QuizStreamMetaEvent = {
   type: 'meta';
   quiz_uid: string;
   title: string;
   description: string;
 };
 
-export type QuizStreamQuestionEvent = {
+type QuizStreamQuestionEvent = {
   type: 'question';
   index: number;
   question_uid: string;
@@ -498,13 +498,13 @@ export type QuizStreamQuestionEvent = {
   explanation: string;
 };
 
-export type QuizStreamDoneEvent = {
+type QuizStreamDoneEvent = {
   type: 'done';
   total: number;
   quiz_uid: string | null;
 };
 
-export type QuizStreamErrorEvent = {
+type QuizStreamErrorEvent = {
   type: 'error';
   detail: string;
 };
@@ -756,7 +756,7 @@ export type AssignCollectionRequest = {
 
 export type QuizTaskStatus = 'queued' | 'running' | 'completed' | 'failed' | 'archived';
 
-export type QuizTaskKind = 'generate';
+type QuizTaskKind = 'generate';
 
 export type QuizTask = {
   id: string;
@@ -788,7 +788,7 @@ export type CreateQuizTaskResponse = {
 
 // ── Audit log (teacher) ───────────────────────────────────────────────────
 
-export type AuditEventType =
+type AuditEventType =
   | 'tab_leave'
   | 'tab_return'
   | 'window_out'
@@ -818,7 +818,7 @@ export type AuditLogEntry = {
   created_at: string;
 };
 
-export type AuditOverviewCounters = {
+type AuditOverviewCounters = {
   visibility_breaks: { count: number; max: number; rule: 'visibility_breaks' };
   face_warnings: { count: number; max: number; rule: 'face_warnings' };
 };
@@ -845,7 +845,7 @@ export type AuditDetailsResponse = {
   events: AuditLogEntry[];
 };
 
-export type AuditQuizAnswer = {
+type AuditQuizAnswer = {
   question_uid: string;
   question_text: string;
   chosen: string | null;
@@ -890,9 +890,9 @@ export type FaceLogEntry = {
 // ── Course Management ────────────────────────────────────────────────────────
 
 export type PricingType = 'free' | 'paid';
-export type CourseStatus = 'draft' | 'published' | 'archived';
+type CourseStatus = 'draft' | 'published' | 'archived';
 
-export type CourseMaterial = {
+type CourseMaterial = {
   uid: string;
   name: string;
   url: string;

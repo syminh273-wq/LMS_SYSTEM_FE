@@ -25,18 +25,18 @@ export interface LiveRoomMarker {
   started_at: string;
 }
 
-export interface LiveRoomResponse {
+interface LiveRoomResponse {
   live_room: LiveRoomMarker | null;
   room: MeetingRoom | null;
 }
 
-export interface JoinRoomResponse {
+interface JoinRoomResponse {
   room: MeetingRoom;
   participant_id: string;
   camera_required: boolean;
 }
 
-export class MeetingRoomApiClient extends BaseRestApiClient {
+class MeetingRoomApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

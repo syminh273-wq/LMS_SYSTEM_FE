@@ -64,4 +64,3 @@ class LeaveRequestApiService extends BaseRestApiClient {
 }
 
 export const leaveRequestApiService = new LeaveRequestApiService();
-export { LeaveRequestApiService };

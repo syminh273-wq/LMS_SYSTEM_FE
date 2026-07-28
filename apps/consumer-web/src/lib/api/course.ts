@@ -10,7 +10,7 @@ import type {
   PaginatedResponse,
 } from './types';
 
-export class ConsumerCourseApiClient extends BaseRestApiClient {
+class ConsumerCourseApiClient extends BaseRestApiClient {
   public async mine(page: number = 1): Promise<PaginatedResponse<CourseEnrolled>> {
     return this.get<PaginatedResponse<CourseEnrolled>>(
       `/api/v1/consumer/course/courses/mine/?page=${page}`,

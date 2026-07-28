@@ -5,7 +5,7 @@ import type {
   UpdateConsumerRequest 
 } from './types';
 
-export class ConsumerApiClient extends BaseRestApiClient {
+class ConsumerApiClient extends BaseRestApiClient {
   constructor() {
     super();
   }

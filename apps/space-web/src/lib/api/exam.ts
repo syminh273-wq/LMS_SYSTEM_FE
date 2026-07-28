@@ -1,7 +1,7 @@
 import BaseRestApiClient from './client';
 import type { AIGradeBatchResponse, AIGradeRequest, CreateExamRequest, Exam, ExamSession, ExamSubmission, OpenOnlineResponse, UpdateExamRequest } from './types';
 
-export class ExamApiClient extends BaseRestApiClient {
+class ExamApiClient extends BaseRestApiClient {
   public async listByClassroom(
     classroomUid: string,
     params?: { status?: string | string[]; exam_mode?: string }

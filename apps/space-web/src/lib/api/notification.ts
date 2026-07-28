@@ -1,7 +1,7 @@
 import BaseRestApiClient from './client';
 import type { PaginatedResponse } from './types';
 
-export type Notification = {
+type Notification = {
   uid: string;
   target_uid: string;
   notify_type: string;
