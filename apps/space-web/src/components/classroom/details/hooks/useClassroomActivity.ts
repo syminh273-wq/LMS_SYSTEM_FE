@@ -5,7 +5,6 @@ import type { ActivityLog } from '@/lib/api/types';
 
 export interface UseClassroomActivityArgs {
   uid: string;
-  activeTab: string;
 }
 
 export interface UseClassroomActivityResult {
@@ -18,7 +17,6 @@ export interface UseClassroomActivityResult {
 
 export function useClassroomActivity({
   uid,
-  activeTab,
 }: UseClassroomActivityArgs): UseClassroomActivityResult {
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [activityLevel, setActivityLevel] = useState<'major' | 'detail'>('major');
@@ -37,11 +35,9 @@ export function useClassroomActivity({
   }, [uid]);
 
   useEffect(() => {
-    if (activeTab === 'info') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Entering the tab initiates its request.
-      void fetchActivity(activityLevel);
-    }
-  }, [activeTab, activityLevel, fetchActivity]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Mounting the tab initiates its request.
+    void fetchActivity(activityLevel);
+  }, [activityLevel, fetchActivity]);
 
   return {
     activityLogs,

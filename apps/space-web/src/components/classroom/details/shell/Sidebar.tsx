@@ -20,8 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card } from '@shared/components/ui/card';
-import type { Classroom, SharingLink } from '@/lib/api';
-import type { ClassroomMember, BlacklistEntry } from '@/lib/api/types';
+import type { Classroom, ClassroomJoinLink } from '@/lib/api';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import type { ActiveTab, ActiveTabKey } from '../utils/tabs';
 
@@ -32,11 +31,11 @@ interface SidebarProps {
   toggleGroup: (key: 'classroom' | 'learning' | 'students') => void;
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  members: ClassroomMember[];
-  blacklist: BlacklistEntry[];
+  studentCount: number;
+  blacklistCount: number;
   activeMeeting: MeetingRoom | null;
   classroom: Classroom;
-  linkData: SharingLink | null;
+  linkData: ClassroomJoinLink | null;
   onDownloadQr: () => void;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
 }
@@ -48,8 +47,8 @@ export default function Sidebar({
   toggleGroup,
   sidebarCollapsed,
   setSidebarCollapsed,
-  members,
-  blacklist,
+  studentCount,
+  blacklistCount,
   activeMeeting,
   classroom,
   linkData,
@@ -230,9 +229,9 @@ export default function Sidebar({
                     {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
                     <Users size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                     {t('classroom.ui.tab_students')}
-                    {members.filter(m => m.role === 'student').length > 0 && (
+                    {studentCount > 0 && (
                       <span className="ml-auto text-[10px] font-black bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                        {members.filter(m => m.role === 'student').length}
+                        {studentCount}
                       </span>
                     )}
                   </Button>
@@ -271,9 +270,9 @@ export default function Sidebar({
                     {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
                     <ShieldBan size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                     {t('classroom.ui.tab_blacklist')}
-                    {blacklist.length > 0 && (
+                    {blacklistCount > 0 && (
                       <span className="ml-auto text-[10px] font-black bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">
-                        {blacklist.length}
+                        {blacklistCount}
                       </span>
                     )}
                   </Button>
@@ -289,14 +288,14 @@ export default function Sidebar({
           <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">{t('classroom.ui.class_size_title')}</h3>
           <div className="flex items-baseline gap-2 mb-6">
             <span className="text-5xl font-bold text-foreground tracking-tighter">
-              {members.filter(m => m.role === 'student').length}
+              {studentCount}
             </span>
             <span className="text-muted-foreground font-bold text-lg">{t('classroom.ui.students_count_suffix', undefined, { count: classroom.max_students })}</span>
           </div>
           <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden p-0.5">
             <div
               className="h-full bg-primary-brand rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000"
-              style={{ width: `${classroom.max_students > 0 ? Math.min(100, (members.filter(m => m.role === 'student').length / classroom.max_students) * 100) : 0}%` }}
+              style={{ width: `${classroom.max_students > 0 ? Math.min(100, (studentCount / classroom.max_students) * 100) : 0}%` }}
             />
           </div>
         </Card>

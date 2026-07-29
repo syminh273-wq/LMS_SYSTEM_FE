@@ -1,30 +1,36 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Wand2, Plus, Gamepad2, Clock, RefreshCw, Trophy, X, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
-import type { Quiz } from '@/lib/api/types';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
+import { useAssignedQuizzes } from '@/components/classroom/details/hooks/useAssignedQuizzes';
+import { useUnassignQuiz } from '@/components/classroom/details/hooks/useUnassignQuiz';
+import type { Quiz } from '@/lib/api/types';
+import AssignQuizModal from '../modals/AssignQuizModal';
+import QuizLeaderboardModal from '@/components/quiz/QuizLeaderboardModal';
+
 interface QuizTabProps {
-  assignedQuizzes: Quiz[];
-  loadingQuizzes: boolean;
-  setShowAssignModal: (show: boolean) => void;
-  unassigningUid: string | null;
-  handleUnassignQuiz: (quiz: Quiz) => Promise<void> | void;
-  setLeaderboardQuiz: (quiz: Quiz | null) => void;
+  uid: string;
   router: AppRouterInstance;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
 }
 
-export default function QuizTab({
-  assignedQuizzes,
-  loadingQuizzes,
-  setShowAssignModal,
-  unassigningUid,
-  handleUnassignQuiz,
-  setLeaderboardQuiz,
-  router,
-  t,
-}: QuizTabProps) {
+export default function QuizTab({ uid, router, t }: QuizTabProps) {
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [leaderboardQuiz, setLeaderboardQuiz] = useState<Quiz | null>(null);
+
+  const { assignedQuizzes, setAssignedQuizzes, loadingQuizzes, fetchAssignedQuizzes } = useAssignedQuizzes({ uid, t });
+  const { unassignQuiz, unassigningUid } = useUnassignQuiz({ uid, t });
+
+  const handleUnassignQuiz = async (quiz: Quiz) => {
+    const success = await unassignQuiz(quiz);
+    if (success) {
+      setAssignedQuizzes(prev => prev.filter(q => q.uid !== quiz.uid));
+    }
+  };
+
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
       <div className="p-10 bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
@@ -108,6 +114,27 @@ export default function QuizTab({
           </div>
         )}
       </div>
+
+      {showAssignModal && (
+        <AssignQuizModal
+          classroomUid={uid}
+          onClose={() => setShowAssignModal(false)}
+          onAssigned={() => {
+            fetchAssignedQuizzes();
+            setShowAssignModal(false);
+            toast.success(t('classroom.labels.quiz_assigned_toast'));
+          }}
+          localAssigned={new Set(assignedQuizzes.map((q) => q.uid))}
+        />
+      )}
+
+      {leaderboardQuiz && (
+        <QuizLeaderboardModal
+          quizUid={leaderboardQuiz.uid}
+          classroomId={uid}
+          onClose={() => setLeaderboardQuiz(null)}
+        />
+      )}
     </div>
   );
 }

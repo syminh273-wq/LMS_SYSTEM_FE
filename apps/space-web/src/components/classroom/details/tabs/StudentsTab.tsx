@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { MoreVertical, UserX, Users, ShieldBan, ClipboardCheck, BarChart2, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import {
@@ -8,36 +9,60 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import type { ClassroomMember } from '@/lib/api/types';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import type { ClassroomMember } from '@/lib/api/types';
+import { useClassroomMembers } from '../hooks/useClassroomMembers';
+import { useKickMember } from '../hooks/useKickMember';
+import { useBlockMember } from '../hooks/useBlockMember';
+import KickDialog from '../modals/KickDialog';
+import BlockDialog from '../modals/BlockDialog';
 
 interface StudentsTabProps {
-  members: ClassroomMember[];
-  loadingMembers: boolean;
-  kickingId: string | null;
-  setMemberToKick: (member: ClassroomMember | null) => void;
-  setMemberToBlock: (value: { member: ClassroomMember; scope: 'classroom' | 'global' } | null) => void;
-  setDetailsMember: (member: ClassroomMember | null) => void;
-  setAnalyzeMember: (member: ClassroomMember | null) => void;
   formatDateTime: (v: string) => string;
   router: AppRouterInstance;
   classroomUid: string;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
+  onMembersChanged?: () => void;
 }
 
 export default function StudentsTab({
-  members,
-  loadingMembers,
-  kickingId,
-  setMemberToKick,
-  setMemberToBlock,
-  setDetailsMember: _setDetailsMember,
-  setAnalyzeMember: _setAnalyzeMember,
   formatDateTime,
   router,
   classroomUid,
   t,
+  onMembersChanged,
 }: StudentsTabProps) {
+  const { members, setMembers, loadingMembers } = useClassroomMembers({ uid: classroomUid, t });
+  const { kickMember, kickingId } = useKickMember({ uid: classroomUid, t });
+  const { blockMember, blockingMemberId } = useBlockMember({ uid: classroomUid, t });
+
+  const [memberToKick, setMemberToKick] = useState<ClassroomMember | null>(null);
+  const [memberToBlock, setMemberToBlock] = useState<{ member: ClassroomMember; scope: 'classroom' | 'global' } | null>(null);
+
+  const onKickConfirm = async () => {
+    if (!memberToKick) return;
+    const ok = await kickMember(memberToKick);
+    if (ok) {
+      setMembers(prev => prev.filter(m => m.member_id !== memberToKick.member_id));
+      setMemberToKick(null);
+      onMembersChanged?.();
+    }
+  };
+
+  const onBlockConfirm = async () => {
+    if (!memberToBlock) return;
+    const { member, scope } = memberToBlock;
+    const ok = await blockMember(member, scope);
+    if (ok) {
+      // Best-effort: block already removes the member from the class in practice,
+      // so a failure here (e.g. "already kicked") must not block this flow.
+      await kickMember(member);
+      setMembers(prev => prev.filter(m => m.member_id !== member.member_id));
+      setMemberToBlock(null);
+      onMembersChanged?.();
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       <div className="bg-card rounded-[32px] overflow-hidden shadow-sm">
@@ -143,6 +168,22 @@ export default function StudentsTab({
           )}
         </div>
       </div>
+
+      <KickDialog
+        memberToKick={memberToKick}
+        onClose={() => setMemberToKick(null)}
+        onConfirm={onKickConfirm}
+        kickingId={kickingId}
+        t={t}
+      />
+
+      <BlockDialog
+        memberToBlock={memberToBlock}
+        onClose={() => setMemberToBlock(null)}
+        onConfirm={onBlockConfirm}
+        blockingMemberId={blockingMemberId}
+        t={t}
+      />
     </div>
   );
 }

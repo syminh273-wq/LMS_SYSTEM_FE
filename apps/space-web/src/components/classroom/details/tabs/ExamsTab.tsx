@@ -9,17 +9,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import type { Exam } from '@/lib/api';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { ExamKind, isExamInKind } from '../utils/exam';
+import { useClassroomExams } from '../hooks/useClassroomExams';
+import { useDeleteExam } from '../hooks/useDeleteExam';
 
 interface ExamsTabProps {
-  exams: Exam[];
-  loadingExams: boolean;
   canManageExams: boolean;
   selectedExamKind: ExamKind;
   goToExamKind: (kind: ExamKind) => void;
-  handleDeleteExam: (exam: Exam) => Promise<void> | void;
   formatDateTime: (v: string) => string;
   formatDate: (v: string | null | undefined) => string;
   router: AppRouterInstance;
@@ -28,20 +26,26 @@ interface ExamsTabProps {
 }
 
 export default function ExamsTab({
-  exams,
-  loadingExams,
   canManageExams,
   selectedExamKind,
   goToExamKind,
-  handleDeleteExam,
   formatDateTime,
   formatDate,
   router,
   classroomUid,
   t,
 }: ExamsTabProps) {
+  const { exams, setExams, loadingExams } = useClassroomExams({ uid: classroomUid, canManageExams, t });
+  const { deleteExam } = useDeleteExam({ t });
   const selectedKind: ExamKind = (['midterm', 'final', 'regular'] as ExamKind[]).includes(selectedExamKind) ? selectedExamKind : 'midterm';
   const filteredExams = useMemo(() => exams.filter(e => isExamInKind(e, selectedKind)), [exams, selectedKind]);
+
+  const handleDeleteExam = async (exam: typeof exams[number]) => {
+    const success = await deleteExam(exam);
+    if (success) {
+      setExams(prev => prev.filter(item => item.uid !== exam.uid));
+    }
+  };
 
   return (
     <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">

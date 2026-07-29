@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { spaceApi, UpdateClassroomRequest, ValidationException, Classroom } from '@/lib/api';
+import { spaceApi, UpdateClassroomRequest, ValidationException, Classroom, ClassroomJoinLink } from '@/lib/api';
 import {
   ArrowLeft,
   Loader2,
@@ -95,7 +95,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   const [fetching, setFetching] = useState(true);
   const [globalError, setGlobalError] = useState('');
   const [classroom, setClassroom] = useState<Classroom | null>(null);
-  const [linkData, setLinkData] = useState<any>(null);
+  const [linkData, setLinkData] = useState<ClassroomJoinLink | null>(null);
 
   const form = useForm<EditFormValues>({
     resolver: zodResolver(editSchema),
@@ -119,16 +119,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         setFetching(true);
         const data = await spaceApi.classrooms.retrieve(uid);
         setClassroom(data);
-        if (data.resolve_link) {
-          setLinkData(data.resolve_link);
-        } else {
-          try {
-            const link = await spaceApi.classrooms.getSharingLink(uid);
-            setLinkData(link);
-          } catch (e) {
-            console.error('Failed to fetch sharing link', e);
-          }
-        }
+        setLinkData(data.pid ? { code: data.pid } : null);
         form.reset({
           name: data.name,
           description: data.description,

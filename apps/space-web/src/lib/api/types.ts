@@ -328,6 +328,9 @@ export type SharingLink = {
   updated_at: string;
 };
 
+// Built locally from Classroom.pid — no separate sharing_link request needed.
+export type ClassroomJoinLink = Pick<SharingLink, 'code'>;
+
 type QuizStatus = 'draft' | 'published' | 'archived';
 
 export type QuizQuestion = {

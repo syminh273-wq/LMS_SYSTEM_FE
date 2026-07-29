@@ -1,16 +1,15 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Wifi, WifiOff, FileText, BarChart2, Timer, Clock, Camera, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
 import type { Exam } from '@/lib/api';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { useClassroomExams } from '../hooks/useClassroomExams';
+import { useCloseExamOnline } from '../hooks/useCloseExamOnline';
+import OpenOnlineExamModal from '../modals/OpenOnlineExamModal';
 
 interface FinalExamsTabProps {
-  exams: Exam[];
-  examSubTab: 'ongoing' | 'closed';
-  setExamSubTab: (tab: 'ongoing' | 'closed') => void;
-  loadingExams: boolean;
-  setShowOpenExamModal: (show: boolean) => void;
-  handleCloseOnline: (exam: Exam) => Promise<void> | void;
   formatDateTime: (v: string) => string;
   router: AppRouterInstance;
   classroomUid: string;
@@ -18,23 +17,36 @@ interface FinalExamsTabProps {
 }
 
 export default function FinalExamsTab({
-  exams,
-  examSubTab,
-  setExamSubTab,
-  loadingExams,
-  setShowOpenExamModal,
-  handleCloseOnline,
   formatDateTime,
   router,
   classroomUid,
   t,
 }: FinalExamsTabProps) {
+  const {
+    exams,
+    setExams,
+    loadingExams,
+    fetchExams,
+  } = useClassroomExams({ uid: classroomUid, canManageExams: true, t });
+  const { closeExamOnline } = useCloseExamOnline({ t });
+  const [examSubTab, setExamSubTab] = useState<'ongoing' | 'closed'>('ongoing');
+  const [showOpenExamModal, setShowOpenExamModal] = useState(false);
   const activeExams = exams.filter(e => e.status === 'ongoing');
   const completedExams = exams.filter(e => e.status === 'closed');
   const hasAnySession = activeExams.length > 0 || completedExams.length > 0;
   const tabExams = examSubTab === 'ongoing' ? activeExams : completedExams;
 
+  const handleCloseOnline = async (exam: Exam) => {
+    const success = await closeExamOnline(exam);
+    if (success) {
+      setExams(prev => prev.map(e =>
+        e.uid === exam.uid ? { ...e, is_online_active: false, status: 'closed' } : e
+      ));
+    }
+  };
+
   return (
+    <>
     <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
       <div className="px-10 pt-10 pb-0 bg-muted/50">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between mb-6">
@@ -193,5 +205,18 @@ export default function FinalExamsTab({
         )}
       </div>
     </div>
+
+    {showOpenExamModal && (
+      <OpenOnlineExamModal
+        classroomUid={classroomUid}
+        onClose={() => setShowOpenExamModal(false)}
+        onOpened={(exam: Exam, studentCount: number) => {
+          fetchExams();
+          setShowOpenExamModal(false);
+          toast.success(t('classroom.ui.exams_open_success', undefined, { count: studentCount }));
+        }}
+      />
+    )}
+    </>
   );
 }

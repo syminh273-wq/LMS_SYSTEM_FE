@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Bot, Sparkles, Send, Mic, Square, Plus, BookOpen, Users, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
@@ -11,62 +12,157 @@ import {
   TypingIndicator,
 } from '@shared/components/ui/message';
 import { userSettingsApi } from '@/lib/api';
+import { useAISessions } from '../hooks/useAISessions';
+import { useAISessionHistory } from '../hooks/useAISessionHistory';
+import type { AiMessage, AiToolCall } from '../hooks/useAISessionHistory';
+import { useCreateAISession } from '../hooks/useCreateAISession';
+import { useClearAISession } from '../hooks/useClearAISession';
+import { useAIAskStream } from '../hooks/useAIAskStream';
+import { useAudioRecorder } from '../hooks/useAudioRecorder';
 
 export type AiMode = 'doc' | 'manage' | 'free';
-export type AiToolCall = { tool: string; args: Record<string, unknown>; result: string };
-export type AiMessage = {
-  role: 'user' | 'assistant';
-  text: string;
-  loading?: boolean;
-  sources?: Array<{ document: string; metadata: Record<string, string>; score: number }>;
-  tool_calls?: AiToolCall[];
-};
+export type { AiMessage, AiToolCall };
 
 export interface AITabProps {
-  aiSessions: Array<{ session_id: string; title?: string; msg_count?: number; updated_at?: string }>;
-  aiSessionId: string | null;
-  setAiSessionId: (id: string | null) => void;
-  aiMessages: AiMessage[];
-  aiMode: AiMode;
-  setAiMode: (mode: AiMode) => void;
-  aiQuestion: string;
-  setAiQuestion: (q: string) => void;
-  aiLoading: boolean;
-  isRecording: boolean;
-  aiScrollRef: React.RefObject<HTMLDivElement>;
-  createNewAiSession: () => Promise<void> | void;
-  clearAiSession: () => Promise<void> | void;
-  startRecording: () => Promise<void> | void;
-  stopRecording: () => void;
-  handleAiAsk: (audioBlob?: Blob) => Promise<void> | void;
-  userSettingsApi: typeof userSettingsApi;
-  AI_MODES: { key: AiMode; label: string; icon: React.ElementType; placeholder: string; description: string }[];
+  uid: string;
   formatDate: (v: string | null | undefined) => string;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
 }
 
 export default function AITab({
-  aiSessions,
-  aiSessionId,
-  setAiSessionId,
-  aiMessages,
-  aiMode,
-  setAiMode,
-  aiQuestion,
-  setAiQuestion,
-  aiLoading,
-  isRecording,
-  aiScrollRef,
-  createNewAiSession,
-  clearAiSession,
-  startRecording,
-  stopRecording,
-  handleAiAsk,
-  userSettingsApi,
-  AI_MODES,
+  uid,
   formatDate,
   t,
 }: AITabProps) {
+  const tSimple = useCallback((key: string) => t(key), [t]);
+
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiMode, setAiMode] = useState<AiMode>('doc');
+  const [aiSessionId, setAiSessionId] = useState<string | null>(null);
+  const aiScrollRef = useRef<HTMLDivElement>(null);
+
+  const { aiSessions, fetchAiSessions } = useAISessions({ uid });
+  const { fetchHistory } = useAISessionHistory({ uid });
+  const { createSession } = useCreateAISession({ uid, t: tSimple });
+  const { clearSession } = useClearAISession({ uid, t: tSimple });
+  const { askStream, streaming: aiLoading } = useAIAskStream({ uid, t: tSimple });
+  const { isRecording, startRecording, stopRecording } = useAudioRecorder({
+    onStop: (blob) => void handleAiAsk(blob),
+    t: tSimple,
+  });
+
+  const AI_MODES: { key: AiMode; label: string; icon: React.ElementType; placeholder: string; description: string }[] = [
+    { key: 'doc',    label: t('classroom.ui.ai_mode_doc_label'),    icon: BookOpen,    placeholder: t('classroom.ui.ai_mode_doc_placeholder'),    description: t('classroom.ui.ai_mode_doc_desc') },
+    { key: 'manage', label: t('classroom.ui.ai_mode_manage_label'), icon: Users,       placeholder: t('classroom.ui.ai_mode_manage_placeholder'), description: t('classroom.ui.ai_mode_manage_desc') },
+    { key: 'free',   label: t('classroom.ui.ai_mode_free_label'),   icon: Sparkles,    placeholder: t('classroom.ui.ai_mode_free_placeholder'),   description: t('classroom.ui.ai_mode_free_desc') },
+  ];
+
+  // Auto-select first session once the list loads, mirrors old combined-hook behavior
+  useEffect(() => {
+    if (!aiSessionId && aiSessions.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Syncs selection once the session list loads.
+      setAiSessionId(aiSessions[0].session_id);
+    }
+  }, [aiSessions, aiSessionId]);
+
+  // Load history whenever the selected session changes
+  useEffect(() => {
+    if (aiSessionId) {
+      void fetchHistory(aiSessionId).then(setAiMessages);
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clears messages when session is deselected.
+      setAiMessages([]);
+    }
+  }, [aiSessionId, fetchHistory]);
+
+  // Auto-scroll AI chat to bottom on new messages
+  useEffect(() => {
+    if (aiScrollRef.current) {
+      aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
+    }
+  }, [aiMessages]);
+
+  const createNewAiSession = async () => {
+    const sessionId = await createSession();
+    if (sessionId) {
+      setAiSessionId(sessionId);
+      void fetchAiSessions();
+    }
+  };
+
+  const clearAiSession = async () => {
+    if (!aiSessionId) return;
+    const newSessionId = await clearSession(aiSessionId);
+    if (newSessionId) {
+      setAiSessionId(newSessionId);
+      void fetchAiSessions();
+    }
+  };
+
+  const handleAiAsk = async (audioBlob?: Blob) => {
+    if ((!aiQuestion.trim() && !audioBlob) || aiLoading) return;
+    const question = aiQuestion.trim();
+    setAiQuestion('');
+
+    if (question) {
+      setAiMessages(prev => [...prev, { role: 'user', text: question }, { role: 'assistant', text: '', loading: true }]);
+    } else {
+      setAiMessages(prev => [...prev, { role: 'user', text: '🎤 [Tin nhắn thoại]' }, { role: 'assistant', text: '', loading: true }]);
+    }
+
+    await askStream({
+      question,
+      audioBlob,
+      sessionId: aiSessionId,
+      mode: aiMode,
+      onEvent: (event) => {
+        if (event.type === 'session_id') {
+          if (event.transcript) {
+            setAiMessages(prev => {
+              const lastUser = prev[prev.length - 2];
+              if (lastUser && lastUser.text === '🎤 [Tin nhắn thoại]') {
+                return [...prev.slice(0, -2), { ...lastUser, text: `🎤 ${event.transcript}` }, prev[prev.length - 1]];
+              }
+              return prev;
+            });
+          }
+          if (!aiSessionId || aiSessionId !== event.session_id) {
+            setAiSessionId(event.session_id);
+            void fetchAiSessions();
+          }
+        } else if (event.type === 'chunk') {
+          setAiMessages(prev => {
+            const last = prev[prev.length - 1];
+            const next = (last.text + event.text).replace(/\n{3,}/g, '\n\n');
+            return [...prev.slice(0, -1), { ...last, loading: false, text: next }];
+          });
+        } else if (event.type === 'tool_calls') {
+          setAiMessages(prev => {
+            const last = prev[prev.length - 1];
+            return [...prev.slice(0, -1), { ...last, tool_calls: event.data }];
+          });
+        } else if (event.type === 'sources') {
+          setAiMessages(prev => {
+            const last = prev[prev.length - 1];
+            return [...prev.slice(0, -1), { ...last, loading: false, sources: event.data }];
+          });
+        } else if (event.type === 'error') {
+          setAiMessages(prev => {
+            const last = prev[prev.length - 1];
+            return [...prev.slice(0, -1), { ...last, loading: false, text: event.message ?? t('classroom.ui.ai_error_generic') }];
+          });
+        }
+      },
+    });
+
+    // Ensure loading cleared
+    setAiMessages(prev => {
+      const last = prev[prev.length - 1];
+      return last?.loading ? [...prev.slice(0, -1), { ...last, loading: false }] : prev;
+    });
+  };
+
   return (
     <div className="flex h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
       <div className="w-72 bg-muted/20 flex flex-col hidden md:flex">

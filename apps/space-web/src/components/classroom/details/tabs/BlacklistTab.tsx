@@ -1,31 +1,47 @@
 import * as React from 'react';
 import { ShieldBan, ShieldOff, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { spaceApi } from '@/lib/api';
+import { toast } from 'sonner';
 import type { BlacklistEntry } from '@/lib/api/types';
+import { useMergedBlacklist } from '@/components/classroom/details/hooks/useMergedBlacklist';
 
 interface BlacklistTabProps {
-  blacklist: BlacklistEntry[];
-  loadingBlacklist: boolean;
-  unblockingId: string | null;
-  setUnblockingId: (id: string | null) => void;
-  setBlacklist: React.Dispatch<React.SetStateAction<BlacklistEntry[]>>;
   formatDate: (v: string | null | undefined) => string;
   classroomUid: string;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
-  onUnblock: (entry: BlacklistEntry) => Promise<void> | void;
+  onBlacklistChanged?: () => void;
 }
 
 export default function BlacklistTab({
-  blacklist,
-  loadingBlacklist,
-  unblockingId,
-  setUnblockingId: _setUnblockingId,
-  setBlacklist: _setBlacklist,
   formatDate,
-  classroomUid: _classroomUid,
+  classroomUid,
   t,
-  onUnblock,
+  onBlacklistChanged,
 }: BlacklistTabProps) {
+  const { blacklist, loadingBlacklist, unblockingId, setUnblockingId, refetch } = useMergedBlacklist({
+    uid: classroomUid,
+    t,
+  });
+
+  const handleUnblock = React.useCallback(async (entry: BlacklistEntry) => {
+    setUnblockingId(entry.consumer_uid);
+    try {
+      if (entry.scope === 'global') {
+        await spaceApi.classrooms.removeGlobalBlacklist(entry.consumer_uid);
+      } else {
+        await spaceApi.classrooms.removeClassroomBlacklist(classroomUid, entry.consumer_uid);
+      }
+      // Refetch blacklist để đồng bộ với merge logic của hook
+      refetch();
+      toast.success(t('classroom.ui.blacklist_unblock_success'));
+      onBlacklistChanged?.();
+    } catch {
+      toast.error(t('classroom.ui.blacklist_unblock_error'));
+    } finally {
+      setUnblockingId(null);
+    }
+  }, [classroomUid, refetch, setUnblockingId, t, onBlacklistChanged]);
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       <div className="bg-card rounded-[32px] overflow-hidden shadow-sm">
@@ -100,7 +116,7 @@ export default function BlacklistTab({
                           disabled={unblockingId === entry.consumer_uid}
                           className="rounded-xl gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-700"
                           onClick={async () => {
-                            await onUnblock(entry);
+                            await handleUnblock(entry);
                           }}
                         >
                           {unblockingId === entry.consumer_uid

@@ -92,18 +92,13 @@ export default function ClassroomsPage() {
 
   const handleDownloadQr = async (classroom: Classroom) => {
     try {
-      let linkData = classroom.resolve_link;
+      const code = classroom.resolve_link?.code || classroom.pid;
 
-      if (!linkData) {
-        toast.info(t('classroom.ui.list_message_qr_initializing'));
-        linkData = await spaceApi.classrooms.getSharingLink(classroom.uid);
-      }
-
-      if (linkData) {
+      if (code) {
         toast.info(t('classroom.ui.list_message_qr_creating'));
 
         // 1. Tạo joining URL
-        const joinUrl = `${window.location.origin.replace('3003', '3000')}/join/${linkData.code}`;
+        const joinUrl = `${window.location.origin.replace('3003', '3000')}/join/${code}`;
 
         // 2. Tạo chuỗi SVG từ QRCodeSVG component
         let svgString = renderToStaticMarkup(

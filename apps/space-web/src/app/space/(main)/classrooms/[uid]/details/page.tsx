@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -10,27 +10,19 @@ import { toast } from 'sonner';
 
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { spaceApi, userSettingsApi } from '@/lib/api';
-import type { Exam } from '@/lib/api';
-import { chatApi } from '@/lib/api/chat';
-import QuizLeaderboardModal from '@/components/quiz/QuizLeaderboardModal';
-import type { BlacklistEntry } from '@/lib/api/types';
-
-// Hooks
+import { spaceApi } from '@/lib/api';
+import type { ClassroomMember } from '@/lib/api/types';
 import { useClassroomCore } from '@/components/classroom/details/hooks/useClassroomCore';
-import { useClassroomActivity } from '@/components/classroom/details/hooks/useClassroomActivity';
-import { useClassroomMembers } from '@/components/classroom/details/hooks/useClassroomMembers';
-import { useClassroomBlacklist } from '@/components/classroom/details/hooks/useClassroomBlacklist';
-import { useClassroomMeetings } from '@/components/classroom/details/hooks/useClassroomMeetings';
-import { useClassroomExams } from '@/components/classroom/details/hooks/useClassroomExams';
-import { useClassroomQuizzes } from '@/components/classroom/details/hooks/useClassroomQuizzes';
-import { useClassroomAI } from '@/components/classroom/details/hooks/useClassroomAI';
+import { usePendingMembers } from '@/components/classroom/details/hooks/usePendingMembers';
+import { useApprovePendingMember } from '@/components/classroom/details/hooks/useApprovePendingMember';
+import { useRejectPendingMember } from '@/components/classroom/details/hooks/useRejectPendingMember';
+import { useMeetingRooms } from '@/components/classroom/details/hooks/useMeetingRooms';
+import { useStartMeeting } from '@/components/classroom/details/hooks/useStartMeeting';
+import { useEndMeeting } from '@/components/classroom/details/hooks/useEndMeeting';
 
-// Shell
 import Header from '@/components/classroom/details/shell/Header';
 import Sidebar from '@/components/classroom/details/shell/Sidebar';
 
-// Tabs
 import InfoTab from '@/components/classroom/details/tabs/InfoTab';
 import DocsTab from '@/components/classroom/details/tabs/DocsTab';
 import AITab from '@/components/classroom/details/tabs/AITab';
@@ -45,14 +37,6 @@ import BlacklistTab from '@/components/classroom/details/tabs/BlacklistTab';
 import RankingTab from '@/components/classroom/details/tabs/RankingTab';
 import StudentsTab from '@/components/classroom/details/tabs/StudentsTab';
 
-// Modals
-import AssignQuizModal from '@/components/classroom/details/modals/AssignQuizModal';
-import OpenOnlineExamModal from '@/components/classroom/details/modals/OpenOnlineExamModal';
-import EditSettingsModal from '@/components/classroom/details/modals/EditSettingsModal';
-import StudentDetailsModal from '@/components/classroom/details/modals/StudentDetailsModal';
-import StudentAnalyzeModal from '@/components/classroom/details/modals/StudentAnalyzeModal';
-import KickDialog from '@/components/classroom/details/modals/KickDialog';
-import BlockDialog from '@/components/classroom/details/modals/BlockDialog';
 import PendingSheet from '@/components/classroom/details/modals/PendingSheet';
 
 interface ClassroomDetailsPageProps {
@@ -84,85 +68,110 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }));
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Chat conversation state
-  const [conversationUid, setConversationUid] = useState<string | null>(null);
-
   // Core (classroom, linkData, activeTab, canManageExams, goToTab, selectedExamKind, ...)
   const core = useClassroomCore({ uid, searchParams, pathname, router, t });
 
-  // Activity (chỉ fetch khi vào info tab)
-  const activity = useClassroomActivity({ uid, activeTab: core.activeTab });
+  // Sidebar badge: lightweight independent student-count fetch (full member list + kick/block
+  // now lives only inside StudentsTab's own useClassroomMembers() call).
+  const [studentCount, setStudentCount] = useState(0);
+  const fetchStudentCount = useCallback(() => {
+    spaceApi.classrooms.members(uid)
+      .then((list) => setStudentCount(list.filter((m) => m.role === 'student').length))
+      .catch(() => {/* silently fail for sidebar count */});
+  }, [uid]);
+  useEffect(() => { fetchStudentCount(); }, [fetchStudentCount]);
 
-  // Members + pending + kick/block/details/analyze state
-  const members = useClassroomMembers({ uid, activeTab: core.activeTab, t });
+  // Sidebar badge: lightweight independent blacklist-count fetch (full list + unblock now lives
+  // only inside BlacklistTab's own useClassroomBlacklist() call).
+  const [blacklistCount, setBlacklistCount] = useState(0);
+  const fetchBlacklistCount = useCallback(() => {
+    Promise.all([
+      spaceApi.classrooms.listClassroomBlacklist(uid),
+      spaceApi.classrooms.listGlobalBlacklist(),
+    ])
+      .then(([classroomEntries, globalEntries]) => {
+        const map = new Map<string, typeof classroomEntries[0]>();
+        for (const e of classroomEntries) map.set(e.consumer_uid, e);
+        for (const e of globalEntries) map.set(e.consumer_uid, e);
+        setBlacklistCount(map.size);
+      })
+      .catch(() => {/* silently fail for sidebar count */});
+  }, [uid]);
+  useEffect(() => { fetchBlacklistCount(); }, [fetchBlacklistCount]);
 
-  // Blacklist
-  const blacklist = useClassroomBlacklist({ uid, activeTab: core.activeTab, t });
+  // Pending members (join requests) — Header's badge/button and PendingSheet can be opened from
+  // any tab, so this stays at page level rather than living inside StudentsTab.
+  const pendingQuery = usePendingMembers({ uid, t });
+  const { approveMember, approvingId } = useApprovePendingMember({ uid, t });
+  const { rejectMember, rejectingId } = useRejectPendingMember({ uid, t });
+  const [showPendingSheet, setShowPendingSheet] = useState(false);
+
+  const handleApproveMember = useCallback(async (member: ClassroomMember) => {
+    const ok = await approveMember(member);
+    if (ok) {
+      pendingQuery.setPendingMembers((prev) => prev.filter((m) => m.member_id !== member.member_id));
+      fetchStudentCount();
+    }
+  }, [approveMember, pendingQuery, fetchStudentCount]);
+
+  const handleRejectMember = useCallback(async (member: ClassroomMember) => {
+    const ok = await rejectMember(member);
+    if (ok) {
+      pendingQuery.setPendingMembers((prev) => prev.filter((m) => m.member_id !== member.member_id));
+    }
+  }, [rejectMember, pendingQuery]);
+
+  const handleApproveAll = useCallback(async () => {
+    for (const member of pendingQuery.pendingMembers) {
+      await handleApproveMember(member);
+    }
+  }, [pendingQuery.pendingMembers, handleApproveMember]);
 
   // RTC instance 1: chỉ lấy function (start/stop) cho meetings hook
   // null roomUid → ws không kết nối nhưng các function vẫn sẵn sàng
   const rtcFunctions = useRTC(null);
   const { startMediaShare, stopScreenShare, stopMediaShare } = rtcFunctions;
 
-  // Meetings: cần startMediaShare/stopScreenShare từ RTC, tính activeMeeting từ meetingRooms
-  const meetings = useClassroomMeetings({
-    uid,
-    activeTab: core.activeTab,
-    classroom: core.classroom,
-    t,
-    startMediaShare,
-    stopScreenShare,
-  });
+  // Meetings: query tách riêng khỏi start/end mutation; orchestration (RTC media share) ở page level
+  const meetingsQuery = useMeetingRooms({ uid, activeTab: core.activeTab, t });
+  const { startMeeting, starting } = useStartMeeting({ uid, t });
+  const { endMeeting, ending } = useEndMeeting({ t });
+  const meetingAction: 'start' | 'end' | null = starting ? 'start' : ending ? 'end' : null;
+
+  const handleStartMeeting = useCallback(async (source: 'screen' | 'camera') => {
+    if (!core.classroom || meetingAction) return;
+    try {
+      const room = await startMeeting(core.classroom, meetingsQuery.activeMeeting);
+      if (!room) return;
+      meetingsQuery.setMeetingRooms((prev) => [room, ...prev.filter((item) => item.uid !== room.uid)]);
+      await startMediaShare(source);
+      toast.success(source === 'screen' ? t('classroom.ui.meeting_start_success_screen') : t('classroom.ui.meeting_start_success_camera'));
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('classroom.ui.meeting_start_error'));
+    }
+  }, [core.classroom, meetingAction, startMeeting, meetingsQuery, startMediaShare, t]);
+
+  const handleEndMeeting = useCallback(async () => {
+    if (!meetingsQuery.activeMeeting || meetingAction) return;
+    stopScreenShare();
+    const ended = await endMeeting(meetingsQuery.activeMeeting.uid);
+    if (!ended) return;
+    meetingsQuery.setMeetingRooms((prev) => prev.map((room) => (room.uid === ended.uid ? ended : room)));
+    toast.success(t('classroom.ui.meeting_ended_toast'));
+  }, [meetingsQuery, meetingAction, stopScreenShare, endMeeting, t]);
 
   // RTC instance 2: dùng activeMeeting?.uid để lấy streams cho MeetingTab UI
-  // Tính activeMeeting local để truyền xuống useRTC (hook tự tính bên trong nhưng
-  // ta cần giá trị này NGAY để set roomUid cho ws connect).
-  const localActiveMeeting = useMemo(
-    () => meetings.meetingRooms.find((room) => room.status === 'active') || null,
-    [meetings.meetingRooms],
-  );
-  const rtcStreams = useRTC(localActiveMeeting?.uid ?? null);
+  const rtcStreams = useRTC(meetingsQuery.activeMeeting?.uid ?? null);
   const localStream = rtcStreams.localStream;
   const remoteStream = rtcStreams.remoteStream;
   const localSource = rtcStreams.localSource;
   const rtcConnected = rtcStreams.isConnected;
 
-  // Exams
-  const exams = useClassroomExams({ uid, activeTab: core.activeTab, canManageExams: core.canManageExams, t });
-
-  // Quizzes
-  const quizzes = useClassroomQuizzes({ uid, activeTab: core.activeTab, t });
-
-  // AI
-  const ai = useClassroomAI({ uid, activeTab: core.activeTab, t });
-
-  // Load or create conversation when chat tab is opened
-  useEffect(() => {
-    if (core.activeTab !== 'chat' || conversationUid) return;
-    chatApi
-      .getConversations(uid)
-      .then((convs) => {
-        if (convs && convs.length > 0) {
-          setConversationUid(convs[0].uid);
-        } else {
-          // No channel yet — create one (list endpoint auto-creates)
-          return chatApi.getConversations(uid).then((created) => {
-            if (created && created.length > 0) {
-              setConversationUid(created[0].uid);
-            }
-          });
-        }
-      })
-      .catch(() => {
-        toast.error(t('classroom.messages.chat_load_error'));
-      });
-  }, [core.activeTab, uid, conversationUid, t]);
-
   // RTC peer-joined: auto-start camera when a new consumer peer joins active meeting
   useEffect(() => {
     const onPeerJoined = (event: Event) => {
       const peer = (event as CustomEvent<{ user_type?: string }>).detail;
-      if (!peer || !localActiveMeeting) return;
+      if (!peer || !meetingsQuery.activeMeeting) return;
       if (peer.user_type !== 'consumer') return;
       if (!localStream) {
         void startMediaShare('camera').catch((err) => {
@@ -172,26 +181,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     };
     window.addEventListener('rtc:peer-joined', onPeerJoined);
     return () => window.removeEventListener('rtc:peer-joined', onPeerJoined);
-  }, [localActiveMeeting, localStream, startMediaShare]);
-
-  // Handler: unblock blacklist entry
-  const handleUnblock = useCallback(async (entry: BlacklistEntry) => {
-    blacklist.setUnblockingId(entry.consumer_uid);
-    try {
-      if (entry.scope === 'global') {
-        await spaceApi.classrooms.removeGlobalBlacklist(entry.consumer_uid);
-      } else {
-        await spaceApi.classrooms.removeClassroomBlacklist(uid, entry.consumer_uid);
-      }
-      // Refetch blacklist để đồng bộ với merge logic của hook
-      blacklist.refetch();
-      toast.success(t('classroom.ui.blacklist_unblock_success'));
-    } catch {
-      toast.error(t('classroom.ui.blacklist_unblock_error'));
-    } finally {
-      blacklist.setUnblockingId(null);
-    }
-  }, [blacklist, uid, t]);
+  }, [meetingsQuery.activeMeeting, localStream, startMediaShare]);
 
   // Handler: download QR code as PNG (copy nguyên từ file gốc)
   const handleDownloadQr = useCallback(() => {
@@ -269,11 +259,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       {/* Header / Navigation */}
       <Header
         classroom={core.classroom}
-        pendingMembersCount={members.pendingMembers.length}
-        onOpenPendingSheet={() => {
-          members.setShowPendingSheet(true);
-        }}
-        onLoadPendingMembers={members.loadPendingMembers}
+        pendingMembersCount={pendingQuery.pendingMembers.length}
+        onOpenPendingSheet={() => setShowPendingSheet(true)}
+        onLoadPendingMembers={pendingQuery.loadPendingMembers}
         router={router}
         t={t}
       />
@@ -288,9 +276,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           toggleGroup={toggleGroup}
           sidebarCollapsed={sidebarCollapsed}
           setSidebarCollapsed={setSidebarCollapsed}
-          members={members.members}
-          blacklist={blacklist.blacklist}
-          activeMeeting={meetings.activeMeeting}
+          studentCount={studentCount}
+          blacklistCount={blacklistCount}
+          activeMeeting={meetingsQuery.activeMeeting}
           classroom={core.classroom}
           linkData={core.linkData}
           onDownloadQr={handleDownloadQr}
@@ -303,10 +291,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <InfoTab
               classroom={core.classroom}
               linkData={core.linkData}
-              activityLogs={activity.activityLogs}
-              activityLevel={activity.activityLevel}
-              setActivityLevel={activity.setActivityLevel}
-              loadingActivity={activity.loadingActivity}
               formatDateTime={formatDateTime}
               onDownloadQr={handleDownloadQr}
               router={router}
@@ -326,24 +310,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {core.activeTab === 'ai' && (
             <AITab
-              aiSessions={ai.aiSessions}
-              aiSessionId={ai.aiSessionId}
-              setAiSessionId={ai.setAiSessionId}
-              aiMessages={ai.aiMessages}
-              aiMode={ai.aiMode}
-              setAiMode={ai.setAiMode}
-              aiQuestion={ai.aiQuestion}
-              setAiQuestion={ai.setAiQuestion}
-              aiLoading={ai.aiLoading}
-              isRecording={ai.isRecording}
-              aiScrollRef={ai.aiScrollRef as React.RefObject<HTMLDivElement>}
-              createNewAiSession={ai.createNewAiSession}
-              clearAiSession={ai.clearAiSession}
-              startRecording={ai.startRecording}
-              stopRecording={ai.stopRecording}
-              handleAiAsk={ai.handleAiAsk}
-              userSettingsApi={userSettingsApi}
-              AI_MODES={ai.AI_MODES}
+              uid={uid}
               formatDate={formatDate}
               t={t}
             />
@@ -351,26 +318,24 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {core.activeTab === 'chat' && (
             <ChatTab
-              conversationUid={conversationUid}
               classroomUid={uid}
-              activeTab={core.activeTab}
               t={t}
             />
           )}
 
           {core.activeTab === 'meeting' && (
             <MeetingTab
-              activeMeeting={meetings.activeMeeting}
-              latestMeeting={meetings.meetingRooms[0] ?? null}
-              meetingRooms={meetings.meetingRooms}
-              loadingMeetings={meetings.loadingMeetings}
-              meetingAction={meetings.meetingAction}
+              activeMeeting={meetingsQuery.activeMeeting}
+              latestMeeting={meetingsQuery.meetingRooms[0] ?? null}
+              meetingRooms={meetingsQuery.meetingRooms}
+              loadingMeetings={meetingsQuery.loadingMeetings}
+              meetingAction={meetingAction}
               localStream={localStream}
               remoteStream={remoteStream}
               localSource={localSource}
               rtcConnected={rtcConnected}
-              handleStartMeeting={meetings.handleStartMeeting}
-              handleEndMeeting={meetings.handleEndMeeting}
+              handleStartMeeting={handleStartMeeting}
+              handleEndMeeting={handleEndMeeting}
               stopMediaShare={stopMediaShare}
               formatDateTime={formatDateTime}
               t={t}
@@ -386,12 +351,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {core.activeTab === 'exams' && (
             <ExamsTab
-              exams={exams.exams}
-              loadingExams={exams.loadingExams}
               canManageExams={core.canManageExams}
               selectedExamKind={core.selectedExamKind}
               goToExamKind={core.goToExamKind}
-              handleDeleteExam={exams.handleDeleteExam}
               formatDateTime={formatDateTime}
               formatDate={formatDate}
               router={router}
@@ -402,12 +364,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {core.activeTab === 'final_exams' && (
             <FinalExamsTab
-              exams={exams.exams}
-              examSubTab={exams.examSubTab}
-              setExamSubTab={exams.setExamSubTab}
-              loadingExams={exams.loadingExams}
-              setShowOpenExamModal={quizzes.setShowOpenExamModal}
-              handleCloseOnline={exams.handleCloseOnline}
               formatDateTime={formatDateTime}
               router={router}
               classroomUid={uid}
@@ -417,12 +373,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {core.activeTab === 'quiz' && (
             <QuizTab
-              assignedQuizzes={quizzes.assignedQuizzes}
-              loadingQuizzes={quizzes.loadingQuizzes}
-              setShowAssignModal={quizzes.setShowAssignModal}
-              unassigningUid={quizzes.unassigningUid}
-              handleUnassignQuiz={quizzes.handleUnassignQuiz}
-              setLeaderboardQuiz={quizzes.setLeaderboardQuiz}
+              uid={uid}
               router={router}
               t={t}
             />
@@ -430,31 +381,20 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {core.activeTab === 'students' && (
             <StudentsTab
-              members={members.members}
-              loadingMembers={members.loadingMembers}
-              kickingId={members.kickingId}
-              setMemberToKick={members.setMemberToKick}
-              setMemberToBlock={members.setMemberToBlock}
-              setDetailsMember={members.setDetailsMember}
-              setAnalyzeMember={members.setAnalyzeMember}
               formatDateTime={formatDateTime}
               router={router}
               classroomUid={uid}
               t={t}
+              onMembersChanged={fetchStudentCount}
             />
           )}
 
           {core.activeTab === 'blacklist' && (
             <BlacklistTab
-              blacklist={blacklist.blacklist}
-              loadingBlacklist={blacklist.loadingBlacklist}
-              unblockingId={blacklist.unblockingId}
-              setUnblockingId={blacklist.setUnblockingId}
-              setBlacklist={blacklist.setBlacklist}
               formatDate={formatDate}
               classroomUid={uid}
               t={t}
-              onUnblock={handleUnblock}
+              onBlacklistChanged={fetchBlacklistCount}
             />
           )}
 
@@ -475,99 +415,20 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
       </div>
 
       {/* Modals */}
-      {quizzes.showAssignModal && (
-        <AssignQuizModal
-          classroomUid={uid}
-          onClose={() => quizzes.setShowAssignModal(false)}
-          onAssigned={() => {
-            quizzes.fetchAssignedQuizzes();
-            quizzes.setShowAssignModal(false);
-            toast.success(t('classroom.labels.quiz_assigned_toast'));
-          }}
-          localAssigned={new Set(quizzes.assignedQuizzes.map((q) => q.uid))}
-        />
-      )}
-
-      {quizzes.showOpenExamModal && (
-        <OpenOnlineExamModal
-          classroomUid={uid}
-          onClose={() => quizzes.setShowOpenExamModal(false)}
-          onOpened={(exam: Exam, studentCount: number) => {
-            exams.fetchExams();
-            quizzes.setShowOpenExamModal(false);
-            core.goToTab('final_exams');
-            toast.success(t('classroom.ui.exams_open_success', undefined, { count: studentCount }));
-          }}
-        />
-      )}
-
-      {quizzes.editingQuiz && (
-        <EditSettingsModal
-          quiz={quizzes.editingQuiz}
-          classroomId={uid}
-          onClose={() => quizzes.setEditingQuiz(null)}
-          onSaved={() => {
-            quizzes.fetchAssignedQuizzes();
-            quizzes.setEditingQuiz(null);
-            toast.success(t('classroom.labels.settings_updated_toast'));
-          }}
-        />
-      )}
-
-      {members.detailsMember && (
-        <StudentDetailsModal
-          member={members.detailsMember}
-          classroomUid={uid}
-          onClose={() => members.setDetailsMember(null)}
-        />
-      )}
-
-      {members.analyzeMember && (
-        <StudentAnalyzeModal
-          member={members.analyzeMember}
-          classroomUid={uid}
-          onClose={() => members.setAnalyzeMember(null)}
-        />
-      )}
-
-      <KickDialog
-        memberToKick={members.memberToKick}
-        onClose={() => members.setMemberToKick(null)}
-        onConfirm={members.handleKickConfirm}
-        kickingId={members.kickingId}
-        t={t}
-      />
-
-      <BlockDialog
-        memberToBlock={members.memberToBlock}
-        onClose={() => members.setMemberToBlock(null)}
-        onConfirm={members.handleBlockConfirm}
-        blockingMemberId={members.blockingMemberId}
-        t={t}
-      />
-
       <PendingSheet
-        open={members.showPendingSheet}
-        onClose={() => members.setShowPendingSheet(false)}
-        pendingMembers={members.pendingMembers}
-        loadingPending={members.loadingPending}
-        approvingId={members.approvingId}
-        rejectingId={members.rejectingId}
-        onApproveMember={members.handleApproveMember}
-        onRejectMember={members.handleRejectMember}
-        onApproveAll={members.handleApproveAll}
-        onRefresh={members.loadPendingMembers}
+        open={showPendingSheet}
+        onClose={() => setShowPendingSheet(false)}
+        pendingMembers={pendingQuery.pendingMembers}
+        loadingPending={pendingQuery.loadingPending}
+        approvingId={approvingId}
+        rejectingId={rejectingId}
+        onApproveMember={handleApproveMember}
+        onRejectMember={handleRejectMember}
+        onApproveAll={handleApproveAll}
+        onRefresh={pendingQuery.loadPendingMembers}
         formatDateTime={formatDateTime}
         t={t}
       />
-
-      {quizzes.leaderboardQuiz && (
-        <QuizLeaderboardModal
-          quizUid={quizzes.leaderboardQuiz.uid}
-          classroomId={uid}
-          onClose={() => quizzes.setLeaderboardQuiz(null)}
-        />
-      )}
     </div>
   );
 }

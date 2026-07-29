@@ -1,27 +1,49 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import ClassroomChatPanel from '@/components/chat/ClassroomChatPanel';
+import { chatApi } from '@/lib/api/chat';
 
 interface ChatTabProps {
-  conversationUid: string | null;
   classroomUid: string;
-  activeTab: string;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
 }
 
 export default function ChatTab({
-  conversationUid,
   classroomUid,
-  activeTab,
   t,
 }: ChatTabProps) {
+  const [conversationUid, setConversationUid] = useState<string | null>(null);
+
+  // Load or create conversation on mount (tab only mounts while chat is active)
+  useEffect(() => {
+    if (conversationUid) return;
+    chatApi
+      .getConversations(classroomUid)
+      .then((convs) => {
+        if (convs && convs.length > 0) {
+          setConversationUid(convs[0].uid);
+        } else {
+          return chatApi.getConversations(classroomUid).then((created) => {
+            if (created && created.length > 0) {
+              setConversationUid(created[0].uid);
+            }
+          });
+        }
+      })
+      .catch(() => {
+        toast.error(t('classroom.messages.chat_load_error'));
+      });
+  }, [classroomUid, conversationUid, t]);
+
   return (
     <div className="bg-card rounded-[32px] overflow-hidden shadow-sm h-[calc(100vh-260px)] flex flex-col">
       {conversationUid ? (
         <ClassroomChatPanel
           conversationUid={conversationUid}
           classroomUid={classroomUid}
-          active={activeTab === 'chat'}
+          active={true}
         />
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">

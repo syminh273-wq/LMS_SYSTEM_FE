@@ -2,18 +2,14 @@ import * as React from 'react';
 import { Info, QrCode, Download, RotateCcw, ChevronRight, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { QRCodeSVG } from 'qrcode.react';
-import type { Classroom, SharingLink } from '@/lib/api';
-import type { ActivityLog } from '@/lib/api/types';
+import type { Classroom, ClassroomJoinLink } from '@/lib/api';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { getActivityMeta } from '../utils/activity';
+import { useClassroomActivity } from '../hooks/useClassroomActivity';
 
 interface InfoTabProps {
   classroom: Classroom;
-  linkData: SharingLink | null;
-  activityLogs: ActivityLog[];
-  activityLevel: 'major' | 'detail';
-  setActivityLevel: (level: 'major' | 'detail') => void;
-  loadingActivity: boolean;
+  linkData: ClassroomJoinLink | null;
   formatDateTime: (value: string) => string;
   onDownloadQr: () => void;
   router: AppRouterInstance;
@@ -24,16 +20,14 @@ interface InfoTabProps {
 export default function InfoTab({
   classroom,
   linkData,
-  activityLogs,
-  activityLevel,
-  setActivityLevel,
-  loadingActivity,
   formatDateTime,
   onDownloadQr,
   router,
   uid,
   t,
 }: InfoTabProps) {
+  const { activityLogs, activityLevel, setActivityLevel, loadingActivity } = useClassroomActivity({ uid });
+
   return (
     <div className="grid grid-cols-1 gap-8 animate-in fade-in duration-300">
       <div className="bg-card rounded-[32px] p-10 shadow-sm group">

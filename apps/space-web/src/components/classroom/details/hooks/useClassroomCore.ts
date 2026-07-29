@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { spaceApi, Classroom, SharingLink } from '@/lib/api';
+import { spaceApi, Classroom, ClassroomJoinLink } from '@/lib/api';
 import { toast } from 'sonner';
 
 type ActiveTab = 'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking';
@@ -38,7 +38,7 @@ export interface UseClassroomCoreArgs {
 export interface UseClassroomCoreResult {
   fetching: boolean;
   classroom: Classroom | null;
-  linkData: SharingLink | null;
+  linkData: ClassroomJoinLink | null;
   activeTab: ActiveTab;
   setActiveTab: React.Dispatch<React.SetStateAction<ActiveTab>>;
   canManageExams: boolean;
@@ -57,7 +57,7 @@ export function useClassroomCore({
 }: UseClassroomCoreArgs): UseClassroomCoreResult {
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
-  const [linkData, setLinkData] = useState<SharingLink | null>(null);
+  const [linkData, setLinkData] = useState<ClassroomJoinLink | null>(null);
   const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking'>('info');
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');
   const [canManageExams, setCanManageExams] = useState(false);
@@ -68,12 +68,7 @@ export function useClassroomCore({
         setFetching(true);
         const details = await spaceApi.classrooms.retrieve(uid);
         setClassroom(details);
-        if (details.resolve_link) {
-          setLinkData(details.resolve_link);
-        } else {
-          const link = await spaceApi.classrooms.getSharingLink(uid);
-          setLinkData(link);
-        }
+        setLinkData(details.pid ? { code: details.pid } : null);
       } catch (error) {
         console.error("Failed to fetch classroom details:", error);
         toast.error(t('classroom.ui.classroom_load_error'));
