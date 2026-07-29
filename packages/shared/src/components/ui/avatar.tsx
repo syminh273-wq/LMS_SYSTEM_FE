@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
-import { cn } from "@/lib/utils"
+import { cn } from "../../lib/utils"
 
 type AvatarSize = "default" | "sm" | "lg"
 
@@ -19,6 +19,7 @@ const Avatar = React.forwardRef<
 >(({ className, size = "default", ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
+    data-slot="avatar"
     data-size={size}
     className={cn(
       "relative flex shrink-0 overflow-hidden rounded-full",
@@ -36,6 +37,7 @@ const AvatarImage = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
+    data-slot="avatar-image"
     className={cn("aspect-square h-full w-full", className)}
     {...props}
   />
@@ -48,8 +50,9 @@ const AvatarFallback = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
+    data-slot="avatar-fallback"
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      "bg-muted flex h-full w-full items-center justify-center rounded-full",
       className
     )}
     {...props}
@@ -63,6 +66,7 @@ const AvatarBadge = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <span
     ref={ref}
+    data-slot="avatar-badge"
     className={cn(
       "absolute bottom-0 right-0 z-10 inline-flex h-2.5 w-2.5 items-center justify-center rounded-full bg-primary ring-2 ring-background",
       className
