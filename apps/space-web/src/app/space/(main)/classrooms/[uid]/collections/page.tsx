@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation';
 import { Layers, Loader2, ArrowLeft, Users, Award, ChevronRight } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
-import { quizCollectionApi, certificateApi } from '@/lib/api/quiz-collection';
+import { quizCollectionApi } from '@/lib/api/quiz-collection';
 import { classroomApi } from '@/lib/api/classroom';
-import type { QuizCollection, Certificate, Classroom, QuizCollectionAssignment } from '@/lib/api/types';
+import type { QuizCollection, Classroom, QuizCollectionAssignment } from '@/lib/api/types';
 
 interface Props {
   params: Promise<{ uid: string }>;
@@ -21,20 +21,17 @@ export default function ClassroomCollectionsPage({ params }: Props) {
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [collections, setCollections] = useState<QuizCollection[]>([]);
   const [assignments, setAssignments] = useState<Record<string, QuizCollectionAssignment[]>>({});
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
-        const [cls, myCollections, certs] = await Promise.all([
+        const [cls, myCollections] = await Promise.all([
           classroomApi.retrieve(classroomUid),
           quizCollectionApi.list(),
-          certificateApi.list(),
         ]);
         setClassroom(cls);
-        setCertificates(certs);
         const assigned: QuizCollection[] = [];
         const assignmentMap: Record<string, QuizCollectionAssignment[]> = {};
         for (const c of myCollections) {
@@ -55,8 +52,6 @@ export default function ClassroomCollectionsPage({ params }: Props) {
     };
     void load();
   }, [classroomUid, t]);
-
-  const certName = (id: string | null) => certificates.find(c => c.uid === id)?.name ?? t('quizCollection.library.card_no_certificate');
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
@@ -108,7 +103,7 @@ export default function ClassroomCollectionsPage({ params }: Props) {
               <div className="flex items-center gap-3 text-xs text-muted-foreground pt-2 border-t border-border">
                 <span className="flex items-center gap-1">
                   <Award size={12} className="text-amber-500" />
-                  <span className="line-clamp-1">{certName(c.certificate_id)}</span>
+                  <span className="line-clamp-1">{c.certificate_name ?? t('quizCollection.library.card_no_certificate')}</span>
                 </span>
               </div>
             </div>

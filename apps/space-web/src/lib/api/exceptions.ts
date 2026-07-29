@@ -19,7 +19,8 @@ export class ValidationException extends ApiException {
 
   constructor(errors: unknown, status = 422) {
     const normalizedErrors = normalizeValidationErrors(errors);
-    super('Validation Failed', status, normalizedErrors);
+    const message = Object.values(normalizedErrors).join('\n') || 'Validation Failed';
+    super(message, status, normalizedErrors);
     this.name = 'ValidationException';
     this.errors = normalizedErrors;
     Object.setPrototypeOf(this, ValidationException.prototype);

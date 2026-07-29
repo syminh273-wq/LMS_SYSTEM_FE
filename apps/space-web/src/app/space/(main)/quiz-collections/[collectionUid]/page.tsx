@@ -24,13 +24,12 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
-import { quizCollectionApi, certificateApi } from '@/lib/api/quiz-collection';
+import { quizCollectionApi } from '@/lib/api/quiz-collection';
 import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/lib/api/classroom';
 import type {
   QuizCollectionDetail,
   QuizCollectionItem,
-  Certificate,
   Classroom,
   Quiz,
 } from '@/lib/api/types';
@@ -65,7 +64,9 @@ function SortableRow({ item, quiz, onRemove }: SortableRowProps) {
       <Button
         {...attributes}
         {...listeners}
-        className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
+        variant="ghost"
+        size="icon"
+        className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing shrink-0"
         title={t('quizCollection.detail.reorder_hint')}
       >
         <GripVertical size={18} />
@@ -83,7 +84,9 @@ function SortableRow({ item, quiz, onRemove }: SortableRowProps) {
       </div>
       <Button
         onClick={() => onRemove(item.quiz_id)}
-        className="text-muted-foreground hover:text-red-500 p-1.5 transition-colors"
+        variant="ghost"
+        size="icon"
+        className="text-muted-foreground hover:text-red-500 shrink-0"
         title="Remove"
       >
         <Trash2 size={14} />
@@ -98,7 +101,6 @@ export default function CollectionDetailPage({ params }: Props) {
   const [uid, setUid] = useState<string | null>(null);
   const [detail, setDetail] = useState<QuizCollectionDetail | null>(null);
   const [quizzes, setQuizzes] = useState<Record<string, Quiz>>({});
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTitle, setEditingTitle] = useState(false);
@@ -121,14 +123,12 @@ export default function CollectionDetailPage({ params }: Props) {
     if (!uid) return;
     try {
       setLoading(true);
-      const [d, certs, cls] = await Promise.all([
+      const [d, cls] = await Promise.all([
         quizCollectionApi.retrieve(uid),
-        certificateApi.list(),
         classroomApi.list().then(r => Array.isArray(r) ? r : r.results),
       ]);
       setDetail(d);
       setItems(d.items);
-      setCertificates(certs);
       setClassrooms(cls);
       const allQuizzes = await quizApi.list();
       const map: Record<string, Quiz> = {};
@@ -147,6 +147,7 @@ export default function CollectionDetailPage({ params }: Props) {
     if (!uid) return;
     try {
       await quizCollectionApi.reorder(uid, { ordered_quiz_ids: newItems.map(i => i.quiz_id) });
+      toast.success(t('quizCollection.detail.save_success'));
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : t('quizCollection.detail.save_error'));
     }
@@ -181,7 +182,6 @@ export default function CollectionDetailPage({ params }: Props) {
       const newItems: QuizCollectionItem[] = res.added.map((qid, idx) => ({
         quiz_id: qid,
         order: items.length + idx,
-        added_at: new Date().toISOString(),
       }));
       setItems(prev => [...prev, ...newItems]);
       if (detail) setDetail({ ...detail, quiz_count: detail.quiz_count + res.added.length });
@@ -208,7 +208,7 @@ export default function CollectionDetailPage({ params }: Props) {
     if (!detail) return;
     try {
       const updated = await quizCollectionApi.update(detail.uid, { certificate_id: certId });
-      setDetail({ ...detail, certificate_id: updated.certificate_id });
+      setDetail({ ...detail, certificate_id: updated.certificate_id, certificate_name: updated.certificate_name });
       toast.success(t('quizCollection.certificate_modal.save_success'));
       setShowAssignCert(false);
     } catch (err: unknown) {
@@ -248,8 +248,6 @@ export default function CollectionDetailPage({ params }: Props) {
       </div>
     );
   }
-
-  const cert = detail.certificate_id ? certificates.find(c => c.uid === detail.certificate_id) : null;
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
@@ -334,11 +332,10 @@ export default function CollectionDetailPage({ params }: Props) {
           <Award size={14} />
           {t('quizCollection.detail.certificate_section')}
         </h2>
-        {cert ? (
+        {detail.certificate_name ? (
           <div className="flex items-center justify-between p-3 rounded-xl border border-border bg-muted/30">
             <div>
-              <p className="font-bold text-foreground">{cert.name}</p>
-              {cert.description && <p className="text-xs text-muted-foreground mt-0.5">{cert.description}</p>}
+              <p className="font-bold text-foreground">{detail.certificate_name}</p>
             </div>
             <div className="flex items-center gap-2">
               <Button size="sm" variant="outline" onClick={() => setShowAssignCert(true)}>
@@ -412,7 +409,6 @@ export default function CollectionDetailPage({ params }: Props) {
       <AssignCertificateDialog
         open={showAssignCert}
         onOpenChange={setShowAssignCert}
-        certificates={certificates}
         currentId={detail.certificate_id}
         onConfirm={handleSetCertificate}
       />

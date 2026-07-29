@@ -400,7 +400,7 @@ export type QuizDetail = Quiz & {
   questions: QuizQuestion[];
 };
 
-type QuizType = 'multiple_choice' | 'true_false' | 'fill_blank' | 'scenario';
+type QuizType = 'multiple_choice';
 
 export type QuizTypeOption = {
   value: QuizType;
@@ -708,7 +708,6 @@ export type UpdateCertificateRequest = {
 export type QuizCollectionItem = {
   quiz_id: string;
   order: number;
-  added_at: string;
 };
 
 export type QuizCollectionAssignment = {
@@ -725,6 +724,7 @@ export type QuizCollection = {
   description: string;
   quiz_count: number;
   certificate_id: string | null;
+  certificate_name: string | null;
   status: 'draft' | 'published' | 'archived';
   created_at: string;
   updated_at: string;
@@ -780,12 +780,6 @@ export type QuizTask = {
   created_at: string;
   updated_at: string;
   completed_at: string | null;
-};
-
-export type CreateQuizTaskRequest = {
-  kind: QuizTaskKind;
-  payload: Record<string, unknown>;
-  title?: string;
 };
 
 export type CreateQuizTaskResponse = {

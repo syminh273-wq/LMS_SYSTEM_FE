@@ -11,34 +11,15 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
-import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from 'sonner';
 
-const QUIZ_TYPE_KEYS = [
-  { value: 'multiple_choice', key: 'type_multiple_choice' },
-  { value: 'true_false',      key: 'type_true_false' },
-  { value: 'fill_blank',      key: 'type_fill_blank' },
-  { value: 'scenario',        key: 'type_scenario' },
-] as const;
-
-const QUIZ_TYPE_ICONS: Record<typeof QUIZ_TYPE_KEYS[number]['value'], string> = {
-  multiple_choice: '🔘',
-  true_false: '✅',
-  fill_blank: '✏️',
-  scenario: '🎯',
-};
-
-type QuizTypeValue = typeof QUIZ_TYPE_KEYS[number]['value'];
 type SubmitPhase = 'idle' | 'submitting';
 
 export default function GenerateQuizModal({ onClose }: { onClose: () => void }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const { t } = useTranslation();
-  const [mode, setMode] = useState<'text' | 'file'>('text');
-  const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [quizType, setQuizType] = useState<QuizTypeValue>('multiple_choice');
   const [numQuestions, setNumQuestions] = useState(10);
   const fileRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<SubmitPhase>('idle');
@@ -49,21 +30,23 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPdf) {
+      toast.error(t('quiz.generate_modal.invalid_file_type'));
+      return;
+    }
     setSelectedFile(file);
   };
 
   const handleGenerate = async () => {
-    if (mode === 'text' && !content.trim()) { toast.error(t('quiz.generate_modal.input_text_required')); return; }
-    if (mode === 'file' && !selectedFile) { toast.error(t('quiz.generate_modal.input_file_required')); return; }
+    if (!selectedFile) { toast.error(t('quiz.generate_modal.input_file_required')); return; }
 
     setPhase('submitting');
 
     try {
       const response = await quizTasksApi.createGenerateTask({
-        ...(mode === 'text' ? { content } : {}),
-        quiz_type: quizType,
+        file: selectedFile,
         num_questions: numQuestions,
-        ...(mode === 'file' ? { file: selectedFile! } : {}),
       });
 
       const optimisticTask = {
@@ -115,31 +98,6 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
 
         <div className="p-6 space-y-6">
           <div className="space-y-2">
-            <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.quiz_type_label')}</div>
-            <div className="grid grid-cols-2 gap-2">
-              {QUIZ_TYPE_KEYS.map(opt => (
-                <Button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setQuizType(opt.value)}
-                  disabled={submitting}
-                  className={`text-left rounded-2xl border-2 px-4 py-3 transition-all ${
-                    quizType === opt.value
-                      ? 'border-primary-brand bg-primary-brand/10'
-                      : 'border-border bg-muted/50 hover:border-primary-brand/50'
-                  } disabled:opacity-60`}
-                >
-                  <div className="text-lg mb-1">{QUIZ_TYPE_ICONS[opt.value]}</div>
-                  <div className={`text-xs font-black ${quizType === opt.value ? 'text-primary-brand' : 'text-foreground'}`}>
-                    {t(`quiz.generate_modal.${opt.key}_label`)}
-                  </div>
-                  <div className="text-[10px] font-medium text-muted-foreground mt-0.5 leading-relaxed">{t(`quiz.generate_modal.${opt.key}_desc`)}</div>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.num_questions_label')}</div>
               <span className="text-sm font-black text-primary-brand">{t('quiz.generate_modal.num_questions_value', undefined, { count: numQuestions })}</span>
@@ -158,51 +116,25 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
 
           <div className="space-y-3">
             <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.source_label')}</div>
-            <div className="flex gap-2">
-              {([['text', t('quiz.generate_modal.source_text')], ['file', t('quiz.generate_modal.source_file')]] as const).map(([key, label]) => (
-                <Button
-                  key={key}
-                  type="button"
-                  onClick={() => setMode(key)}
-                  disabled={submitting}
-                  data-selected={mode === key}
-                  className="flex-1 py-2.5 rounded-xl text-xs font-black bg-muted text-muted-foreground data-[selected=true]:border-2 data-[selected=true]:border-primary data-[selected=true]:text-primary disabled:opacity-60"
-                >
-                  {label}
-                </Button>
-              ))}
+            <div
+              onClick={() => !submitting && fileRef.current?.click()}
+              className="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-border hover:border-primary-brand bg-muted/30 hover:bg-primary-brand/5 transition cursor-pointer"
+            >
+              <Input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
+              {selectedFile ? (
+                <>
+                  <FileText size={28} className="text-primary-brand mb-2" />
+                  <p className="text-sm font-bold text-foreground">{selectedFile.name}</p>
+                  <p className="text-xs text-primary-brand font-medium mt-1">{t('quiz.generate_modal.file_change')}</p>
+                </>
+              ) : (
+                <>
+                  <UploadCloud size={28} className="text-muted-foreground mb-2" />
+                  <p className="text-sm font-bold text-foreground">{t('quiz.generate_modal.file_drop_hint')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('quiz.generate_modal.file_drop_format')}</p>
+                </>
+              )}
             </div>
-
-            {mode === 'text' ? (
-              <Textarea
-                value={content}
-                onChange={e => setContent(e.target.value)}
-                placeholder={t('quiz.generate_modal.text_placeholder')}
-                rows={6}
-                disabled={submitting}
-                className="w-full rounded-2xl border border-border bg-muted/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/20 resize-none transition disabled:opacity-60"
-              />
-            ) : (
-              <div
-                onClick={() => !submitting && fileRef.current?.click()}
-                className="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-border hover:border-primary-brand bg-muted/30 hover:bg-primary-brand/5 transition cursor-pointer"
-              >
-                <Input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
-                {selectedFile ? (
-                  <>
-                    <FileText size={28} className="text-primary-brand mb-2" />
-                    <p className="text-sm font-bold text-foreground">{selectedFile.name}</p>
-                    <p className="text-xs text-primary-brand font-medium mt-1">{t('quiz.generate_modal.file_change')}</p>
-                  </>
-                ) : (
-                  <>
-                    <UploadCloud size={28} className="text-muted-foreground mb-2" />
-                    <p className="text-sm font-bold text-foreground">{t('quiz.generate_modal.file_drop_hint')}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{t('quiz.generate_modal.file_drop_format')}</p>
-                  </>
-                )}
-              </div>
-            )}
           </div>
         </div>
 

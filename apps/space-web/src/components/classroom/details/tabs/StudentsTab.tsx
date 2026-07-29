@@ -21,6 +21,7 @@ interface StudentsTabProps {
   formatDateTime: (v: string) => string;
   router: AppRouterInstance;
   classroomUid: string;
+  maxStudents: number;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
   onMembersChanged?: () => void;
 }
@@ -29,6 +30,7 @@ export default function StudentsTab({
   formatDateTime,
   router,
   classroomUid,
+  maxStudents,
   t,
   onMembersChanged,
 }: StudentsTabProps) {
@@ -70,7 +72,11 @@ export default function StudentsTab({
           <div>
             <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.students_title')}</h3>
             <p className="text-sm text-muted-foreground font-medium mt-1">
-              {loadingMembers ? t('classroom.ui.students_loading') : t('classroom.ui.students_count_in_class', undefined, { count: members.filter(m => m.role === 'student').length })}
+              {loadingMembers
+                ? t('classroom.ui.students_loading')
+                : maxStudents > 0
+                  ? t('classroom.ui.students_count_with_max', undefined, { count: members.filter(m => m.role === 'student').length, max: maxStudents })
+                  : t('classroom.ui.students_count_in_class', undefined, { count: members.filter(m => m.role === 'student').length })}
             </p>
           </div>
         </div>

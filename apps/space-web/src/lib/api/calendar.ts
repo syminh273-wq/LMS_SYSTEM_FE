@@ -11,6 +11,7 @@ interface RecurringScheduleResult {
   created: number;
   failed: number;
   event_uids: string[];
+  conflicts: { start_time: string; end_time: string; reason: string }[];
 }
 
 function buildQuery(params: ListCalendarEventsParams = {}): string {

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Award, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import {
   Dialog,
@@ -10,21 +10,39 @@ import {
 } from '@shared/components/ui/dialog';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { certificateApi } from '@/lib/api/quiz-collection';
 import type { Certificate } from '@/lib/api/types';
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  certificates: Certificate[];
   currentId: string | null;
   onConfirm: (certId: string | null) => Promise<void> | void;
 }
 
-export function AssignCertificateDialog({ open, onOpenChange, certificates, currentId, onConfirm }: Props) {
+export function AssignCertificateDialog({ open, onOpenChange, currentId, onConfirm }: Props) {
   const { t } = useTranslation();
   const router = useRouter();
   const [selected, setSelected] = useState<string | null>(currentId);
   const [submitting, setSubmitting] = useState(false);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [loadingCertificates, setLoadingCertificates] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setSelected(currentId);
+    let cancelled = false;
+    setLoadingCertificates(true);
+    certificateApi.list()
+      .then(certs => { if (!cancelled) setCertificates(certs); })
+      .catch((err: unknown) => {
+        toast.error(err instanceof Error ? err.message : t('quizCollection.load_error'));
+      })
+      .finally(() => { if (!cancelled) setLoadingCertificates(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleConfirm = async () => {
     setSubmitting(true);
@@ -41,7 +59,11 @@ export function AssignCertificateDialog({ open, onOpenChange, certificates, curr
         <DialogHeader>
           <DialogTitle>{t('quizCollection.certificate_modal.title')}</DialogTitle>
         </DialogHeader>
-        {certificates.length === 0 ? (
+        {loadingCertificates ? (
+          <div className="flex items-center justify-center py-8 text-muted-foreground">
+            <Loader2 size={20} className="animate-spin" />
+          </div>
+        ) : certificates.length === 0 ? (
           <div className="py-6 text-center space-y-3">
             <Award size={32} className="mx-auto text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">{t('quizCollection.certificate_modal.empty_library')}</p>

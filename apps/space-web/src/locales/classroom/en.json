@@ -550,6 +550,7 @@
     "students_title": "Student list",
     "students_loading": "Loading...",
     "students_count_in_class": "{{count}} students in class",
+    "students_count_with_max": "{{count}}/{{max}} students in class",
     "students_empty": "No students yet",
     "students_empty_hint": "Share the join link so students can enter the class",
     "students_th_member": "Student",

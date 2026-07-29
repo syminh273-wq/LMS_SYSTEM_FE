@@ -68,4 +68,20 @@ export function countRecurrenceSlots(input: RecurrenceInput): number {
   return expandRecurrence(input).length;
 }
 
+export interface ScheduleConflict {
+  start_time: string;
+  end_time: string;
+  reason: string;
+}
+
+export function summarizeConflicts(conflicts: ScheduleConflict[], locale: string, max = 3): string {
+  const fmt = new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-US', {
+    day: '2-digit',
+    month: '2-digit',
+  });
+  const dates = conflicts.slice(0, max).map((c) => fmt.format(new Date(c.start_time)));
+  const extra = conflicts.length - dates.length;
+  return extra > 0 ? `${dates.join(', ')} (+${extra})` : dates.join(', ');
+}
+
 export { toISODate };

@@ -13,24 +13,6 @@ const initialState: UserState = {
   faceEnrolled: null,
 };
 
-// Try to load initial state from localStorage if available
-if (typeof window !== 'undefined') {
-  const savedProfile = localStorage.getItem('userProfile');
-  const token = localStorage.getItem('accessToken');
-  if (savedProfile && token) {
-    try {
-      initialState.profile = JSON.parse(savedProfile);
-      initialState.isAuthenticated = true;
-    } catch (e) {
-      console.error("Failed to parse userProfile from localStorage", e);
-    }
-  }
-  const savedFaceEnrolled = localStorage.getItem('faceEnrolled');
-  if (savedFaceEnrolled !== null) {
-    initialState.faceEnrolled = savedFaceEnrolled === 'true';
-  }
-}
-
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -59,8 +41,16 @@ const userSlice = createSlice({
         localStorage.setItem('faceEnrolled', String(action.payload));
       }
     },
+    // Runs only after mount (see Providers.tsx) so the client's first render
+    // still matches the server-rendered HTML; restoring from localStorage
+    // here (post-hydration) avoids a hydration mismatch.
+    restoreSession: (state, action: PayloadAction<{ profile: Consumer | null; faceEnrolled: boolean | null }>) => {
+      state.profile = action.payload.profile;
+      state.isAuthenticated = Boolean(action.payload.profile);
+      state.faceEnrolled = action.payload.faceEnrolled;
+    },
   },
 });
 
-export const { setProfile, clearProfile, setFaceEnrolled } = userSlice.actions;
+export const { setProfile, clearProfile, setFaceEnrolled, restoreSession } = userSlice.actions;
 export default userSlice.reducer;

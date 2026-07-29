@@ -287,6 +287,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
         {/* Content Area */}
         <div className="flex-1 min-w-0 space-y-8">
+          {/* /details?tab=info */}
           {core.activeTab === 'info' && (
             <InfoTab
               classroom={core.classroom}
@@ -299,6 +300,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=docs */}
           {core.activeTab === 'docs' && (
             <DocsTab
               classroomUid={uid}
@@ -308,6 +310,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=ai */}
           {core.activeTab === 'ai' && (
             <AITab
               uid={uid}
@@ -316,6 +319,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=chat */}
           {core.activeTab === 'chat' && (
             <ChatTab
               classroomUid={uid}
@@ -323,6 +327,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=meeting */}
           {core.activeTab === 'meeting' && (
             <MeetingTab
               activeMeeting={meetingsQuery.activeMeeting}
@@ -342,6 +347,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=calendar */}
           {core.activeTab === 'calendar' && (
             <CalendarTab
               classroomUid={uid}
@@ -349,6 +355,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=exams */}
           {core.activeTab === 'exams' && (
             <ExamsTab
               canManageExams={core.canManageExams}
@@ -362,6 +369,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=final_exams */}
           {core.activeTab === 'final_exams' && (
             <FinalExamsTab
               formatDateTime={formatDateTime}
@@ -371,6 +379,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=quiz */}
           {core.activeTab === 'quiz' && (
             <QuizTab
               uid={uid}
@@ -379,16 +388,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=students */}
           {core.activeTab === 'students' && (
             <StudentsTab
               formatDateTime={formatDateTime}
               router={router}
               classroomUid={uid}
+              maxStudents={core.classroom.max_students}
               t={t}
               onMembersChanged={fetchStudentCount}
             />
           )}
 
+          {/* /details?tab=blacklist */}
           {core.activeTab === 'blacklist' && (
             <BlacklistTab
               formatDate={formatDate}
@@ -398,6 +410,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=ranking */}
           {core.activeTab === 'ranking' && (
             <RankingTab
               classroomUid={uid}
@@ -405,6 +418,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             />
           )}
 
+          {/* /details?tab=leave_request */}
           {core.activeTab === 'leave_request' && (
             <LeaveRequestTabView
               classroomUid={uid}

@@ -554,6 +554,7 @@
     "students_title": "Danh sách sinh viên",
     "students_loading": "Đang tải...",
     "students_count_in_class": "{{count}} sinh viên trong lớp",
+    "students_count_with_max": "{{count}}/{{max}} sinh viên trong lớp",
     "students_empty": "Chưa có sinh viên nào",
     "students_empty_hint": "Chia sẻ link tham gia để sinh viên vào lớp",
     "students_th_member": "Sinh viên",

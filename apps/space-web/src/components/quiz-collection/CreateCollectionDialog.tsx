@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { X, Plus, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Plus, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
@@ -21,23 +21,37 @@ import {
 } from '@shared/components/ui/select';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
-import { quizCollectionApi } from '@/lib/api/quiz-collection';
+import { quizCollectionApi, certificateApi } from '@/lib/api/quiz-collection';
 import type { Certificate, QuizCollection } from '@/lib/api/types';
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  certificates: Certificate[];
   onCreated: (c: QuizCollection) => void;
 }
 
-export function CreateCollectionDialog({ open, onOpenChange, certificates, onCreated }: Props) {
+export function CreateCollectionDialog({ open, onOpenChange, onCreated }: Props) {
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [certificateId, setCertificateId] = useState<string>('');
   const [isCertificateCollection, setIsCertificateCollection] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [loadingCertificates, setLoadingCertificates] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    setLoadingCertificates(true);
+    certificateApi.list()
+      .then(certs => { if (!cancelled) setCertificates(certs); })
+      .catch((err: unknown) => {
+        toast.error(err instanceof Error ? err.message : t('quizCollection.load_error'));
+      })
+      .finally(() => { if (!cancelled) setLoadingCertificates(false); });
+    return () => { cancelled = true; };
+  }, [open, t]);
 
   const reset = () => {
     setTitle('');
@@ -125,7 +139,11 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
                 {t('quizCollection.create_modal.certificate_label')}
                 <span className="text-rose-500 ml-0.5">*</span>
               </Label>
-              {certificates.length === 0 ? (
+              {loadingCertificates ? (
+                <div className="flex items-center justify-center py-4 text-muted-foreground">
+                  <Loader2 size={16} className="animate-spin" />
+                </div>
+              ) : certificates.length === 0 ? (
                 <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-amber-800">
                   <AlertCircle size={14} className="shrink-0 mt-0.5" />
                   <p className="text-[11px] font-bold leading-snug">

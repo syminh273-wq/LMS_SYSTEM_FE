@@ -12,6 +12,7 @@ import {
   CreateCalendarEventRequest,
 } from '@shared/lib/api/calendar';
 import { getShiftById } from '@shared/lib/calendar/shifts';
+import { summarizeConflicts } from '@shared/lib/calendar/recurrence';
 import {
   EventDialog,
   EventDetailsDialog,
@@ -160,14 +161,32 @@ export default function SpaceCalendarPage() {
     [editing, refetch, t]
   );
 
-  const [recurringResult, setRecurringResult] = useState<{ created: number; failed: number } | null>(null);
+  const [recurringResult, setRecurringResult] = useState<Awaited<ReturnType<typeof calendarApi.createRecurring>> | null>(null);
 
   const handleRecurringSubmit = useCallback(
     async (payload: Parameters<typeof calendarApi.createRecurring>[0]) => {
-      const result = await calendarApi.createRecurring(payload);
-      setRecurringResult({ created: result.created, failed: result.failed });
+      let result: Awaited<ReturnType<typeof calendarApi.createRecurring>>;
+      try {
+        result = await calendarApi.createRecurring(payload);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : t('calendar.recurring.error', 'Không thể tạo lịch.'));
+        throw err;
+      }
+
+      if (result.created === 0 && result.conflicts.length > 0) {
+        toast.error(
+          t(
+            'calendar.recurring.all_conflict',
+            `Không tạo được lịch nào vì trùng ngày/giờ: {{dates}}`,
+            { dates: summarizeConflicts(result.conflicts, locale) }
+          )
+        );
+        throw new Error('Toàn bộ lịch bị trùng.');
+      }
+
+      setRecurringResult(result);
     },
-    []
+    [locale, t]
   );
 
   const handleRecurringClose = useCallback(async () => {

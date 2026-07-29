@@ -119,39 +119,6 @@ export default function DiscoverPage() {
     setPage(1);
   }, [category, pricing]);
 
-  const handleJoin = useCallback(async (c: Classroom) => {
-    try {
-      const hasPaid = !!c.has_paid;
-      const isAlreadyPending = c.membership_status === 'pending';
-      if (hasPaid || isAlreadyPending) {
-        toast.info(
-          hasPaid
-            ? 'Bạn đã thanh toán lớp này, vui lòng chờ giáo viên duyệt.'
-            : `Đã gửi yêu cầu tham gia lớp "${c.name}". Vui lòng chờ giáo viên duyệt.`,
-        );
-        router.push(`/consumer/classroom/${c.uid}`);
-        return;
-      }
-      setJoining(c.uid);
-      const res = await classroomApi.quickJoin(c.uid);
-      if (res.requires_payment && res.pay_url) {
-        toast.info('Lớp học trả phí, đang chuyển đến MoMo...');
-        const orderId = res.order_id ? `?order_id=${res.order_id}` : '';
-        window.location.href = `/consumer/classroom/checkout/${c.uid}${orderId}`;
-        return;
-      }
-      if (res.membership_status === 'pending') {
-        toast.success(`Đã gửi yêu cầu tham gia lớp "${c.name}". Vui lòng chờ giáo viên duyệt.`);
-      } else {
-        toast.success(`Đã tham gia lớp "${c.name}"!`);
-      }
-      router.push(`/consumer/classroom/${c.uid}`);
-    } catch (e: any) {
-      toast.error(e?.message || 'Không thể tham gia lớp');
-    } finally {
-      setJoining(null);
-    }
-  }, [router]);
 
   const headerSubtitle = useMemo(() => {
     if (loading) return 'Đang tải...';

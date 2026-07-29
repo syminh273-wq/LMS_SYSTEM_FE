@@ -7,27 +7,21 @@ import { Layers, Plus, Loader2, Trash2, ChevronRight, Award, Users, BookOpen } f
 import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
-import { quizCollectionApi, certificateApi } from '@/lib/api/quiz-collection';
-import type { QuizCollection, Certificate } from '@/lib/api/types';
+import { quizCollectionApi } from '@/lib/api/quiz-collection';
+import type { QuizCollection } from '@/lib/api/types';
 import { CreateCollectionDialog } from '@/components/quiz-collection/CreateCollectionDialog';
 
 export default function QuizCollectionsPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const [collections, setCollections] = useState<QuizCollection[]>([]);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
 
   const load = async () => {
     try {
       setLoading(true);
-      const [c, certs] = await Promise.all([
-        quizCollectionApi.list(),
-        certificateApi.list(),
-      ]);
-      setCollections(c);
-      setCertificates(certs);
+      setCollections(await quizCollectionApi.list());
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : t('quizCollection.load_error'));
     } finally {
@@ -48,7 +42,6 @@ export default function QuizCollectionsPage() {
     }
   };
 
-  const certName = (id: string | null) => certificates.find(x => x.uid === id)?.name ?? t('quizCollection.library.card_no_certificate');
   const statusClass = (s: string) =>
     s === 'published'
       ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
@@ -123,7 +116,7 @@ export default function QuizCollectionsPage() {
               <div className="flex items-center justify-between pt-3 border-t border-border">
                 <span className="flex items-center gap-1 text-xs font-bold text-primary-brand">
                   <Award size={12} />
-                  <span className="line-clamp-1">{certName(c.certificate_id)}</span>
+                  <span className="line-clamp-1">{c.certificate_name ?? t('quizCollection.library.card_no_certificate')}</span>
                 </span>
                 <div className="flex items-center gap-2">
                   <Button
@@ -146,7 +139,6 @@ export default function QuizCollectionsPage() {
       <CreateCollectionDialog
         open={showCreate}
         onOpenChange={setShowCreate}
-        certificates={certificates}
         onCreated={(c) => {
           setCollections(prev => [c, ...prev]);
           setShowCreate(false);

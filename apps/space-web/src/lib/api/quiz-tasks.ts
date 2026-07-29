@@ -2,46 +2,27 @@ import BaseRestApiClient from './client';
 import type {
   QuizTask,
   QuizTaskStatus,
-  CreateQuizTaskRequest,
   CreateQuizTaskResponse,
 } from './types';
 
 type CreateGenerateTaskInput = {
   title?: string;
-  content?: string;
-  resource_id?: string;
-  quiz_type?: string;
+  file: File;
   num_questions?: number;
   max_content_length?: number;
-  file?: File;
 };
 
 class QuizTasksApiClient extends BaseRestApiClient {
   public async createGenerateTask(input: CreateGenerateTaskInput): Promise<CreateQuizTaskResponse> {
     const path = '/api/v1/space/quiz/generate-task/';
 
-    if (input.file) {
-      const formData = new FormData();
-      formData.append('file', input.file);
-      if (input.title) formData.append('title', input.title);
-      if (input.quiz_type) formData.append('quiz_type', input.quiz_type);
-      if (input.num_questions != null) formData.append('num_questions', String(input.num_questions));
-      if (input.max_content_length != null) formData.append('max_content_length', String(input.max_content_length));
-      return this.post<CreateQuizTaskResponse>(path, formData);
-    }
-
-    const body: CreateQuizTaskRequest = {
-      kind: 'generate',
-      payload: {
-        content: input.content,
-        resource_id: input.resource_id,
-        quiz_type: input.quiz_type,
-        num_questions: input.num_questions,
-        max_content_length: input.max_content_length,
-      },
-      title: input.title,
-    };
-    return this.post<CreateQuizTaskResponse>(path, body);
+    const formData = new FormData();
+    formData.append('file', input.file);
+    formData.append('quiz_type', 'multiple_choice');
+    if (input.title) formData.append('title', input.title);
+    if (input.num_questions != null) formData.append('num_questions', String(input.num_questions));
+    if (input.max_content_length != null) formData.append('max_content_length', String(input.max_content_length));
+    return this.post<CreateQuizTaskResponse>(path, formData);
   }
 
   public async list(status?: QuizTaskStatus | QuizTaskStatus[]): Promise<QuizTask[]> {
