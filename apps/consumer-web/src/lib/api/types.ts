@@ -691,15 +691,6 @@ export type QuizCollectionDetail = QuizCollection & {
   assignments: QuizCollectionAssignment[];
 };
 
-export type QuizCollectionProgress = {
-  total: number;
-  passed: number;
-  is_completed: boolean;
-  percent: number;
-  passed_quiz_ids: string[];
-  missing_quiz_ids: string[];
-};
-
 export type IssuedCertificate = {
   uid: string;
   student_id: string;

@@ -37,23 +37,3 @@ export type DocsTreeResponse = {
 
 export type SortField = 'name' | 'created_at' | 'size' | 'file_type';
 export type SortDir = 'asc' | 'desc';
-
-export type DocNote = {
-  uid: string;
-  doc_id: string;
-  user_id: string;
-  body: string;
-  color?: string | null;
-  page_number?: number | null;
-  created_at?: string;
-  updated_at?: string;
-};
-
-export type DocProgress = {
-  uid: string;
-  doc_id: string;
-  user_id: string;
-  last_page?: number | null;
-  progress_percent?: number;
-  updated_at?: string;
-};
