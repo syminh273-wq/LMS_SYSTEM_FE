@@ -14,10 +14,6 @@ class SpaceApiClient extends BaseRestApiClient {
     return this.get<Space[]>('/api/v1/space/account/spaces/');
   }
 
-  public async mine(): Promise<Space[]> {
-    return this.get<Space[]>('/api/v1/space/account/spaces/mine/');
-  }
-
   public async create(data: CreateSpaceRequest): Promise<Space> {
     return this.post<Space>('/api/v1/space/account/spaces/', data);
   }

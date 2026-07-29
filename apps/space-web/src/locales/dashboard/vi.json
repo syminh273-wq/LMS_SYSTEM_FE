@@ -17,67 +17,26 @@
     "completion_rate": "Tỉ lệ hoàn thành",
     "completion_rate_sub": "{{graded}}/{{total}} đã chấm",
     "certificates_issued": "Chứng chỉ đã cấp",
-    "certificates_issued_sub": "{{count}} bài kiểm tra đã xuất bản"
-  },
-  "chart": {
-    "title": "Hoạt động tuần này",
-    "enrolled_label": "Đăng ký",
-    "submitted_label": "Nộp bài",
-    "enrolled_tooltip": "{{count}} đăng ký",
-    "submitted_tooltip": "{{count}} nộp bài",
-    "day_mon": "T2",
-    "day_tue": "T3",
-    "day_wed": "T4",
-    "day_thu": "T5",
-    "day_fri": "T6",
-    "day_sat": "T7",
-    "day_sun": "CN"
+    "certificates_issued_sub": "{{count}} bài kiểm tra đã xuất bản",
+    "exams_published": "Bài kiểm tra đã xuất bản",
+    "exams_published_sub": "Trong {{count}} lớp học",
+    "submissions": "Bài đã nộp",
+    "submissions_sub": "{{count}} đã chấm"
   },
   "recent_activity": {
-    "title": "Hoạt động gần đây",
     "empty": "Chưa có hoạt động nào."
+  },
+  "profile_card": {
+    "title": "Thông tin giáo viên",
+    "member_since": "Tham gia từ {{date}}"
   },
   "top_classes": {
     "title": "Lớp học nổi bật",
     "students_count": "{{current}}/{{max}} hs",
     "progress": "Tiến độ: {{percent}}%"
   },
-  "organization_status": {
-    "title": "Trạng thái tổ chức",
-    "open_classrooms": "Lớp học đang mở",
-    "storage_capacity": "Dung lượng lưu trữ",
-    "api_calls_month": "API Calls tháng này",
-    "current_plan": "Gói hiện tại:",
-    "plan_name": "Professional Plan",
-    "active_badge": "Đang dùng"
-  },
-  "time_ago": {
-    "just_now": "Vừa xong",
-    "minutes_ago": "{{count}} phút trước",
-    "hours_ago": "{{count}} giờ trước",
-    "days_ago": "{{count}} ngày trước"
-  },
   "mini_stats": {
     "classrooms": "Lớp học",
     "students": "Học sinh"
-  },
-  "activity": {
-    "classroom_created": "Lớp học mới được tạo",
-    "document_uploaded": "Tải lên tài liệu",
-    "document_deleted": "Xóa tài liệu",
-    "exam_created": "Tạo bài kiểm tra",
-    "exam_published": "Phát hành bài kiểm tra",
-    "exam_opened": "Mở ca thi trực tuyến",
-    "exam_closed": "Đóng ca thi",
-    "exam_deleted": "Xóa bài kiểm tra",
-    "quiz_assigned": "Giao đề trắc nghiệm",
-    "meeting_started": "Mở buổi học trực tuyến",
-    "meeting_ended": "Kết thúc buổi học",
-    "member_joined": "Học sinh đăng ký",
-    "member_approved": "Duyệt học sinh vào lớp",
-    "member_rejected": "Từ chối yêu cầu",
-    "member_kicked": "Kick học sinh",
-    "member_left": "Học sinh rời lớp",
-    "exam_submitted": "Học sinh nộp bài"
   }
 }

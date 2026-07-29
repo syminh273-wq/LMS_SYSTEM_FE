@@ -1,82 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Card, CardHeader, CardTitle, CardContent } from '@shared/components/ui/card';
+import { Avatar, AvatarImage, AvatarFallback } from '@shared/components/ui/avatar';
 import {
   BookOpen,
   Users,
   Award,
   Loader2,
   TrendingUp,
-  FileCheck,
   GraduationCap,
-  CheckCircle2,
-  Clock,
-  BarChart3,
-  File,
+  Mail,
   ClipboardList,
-  Video,
-  UserX,
-  Gamepad2,
-  Timer,
+  FileCheck,
 } from 'lucide-react';
 import { useDashboard } from '@/lib/hooks/use-dashboard';
-import type { ActivityLogEventType } from '@/lib/api/types';
+import { communityApi } from '@/lib/api/community';
+import type { RootState } from '@/lib/redux/store';
 import { useTranslation } from '@shared/components/LocaleProvider';
-
-const ACTIVITY_KEY_MAP: Record<ActivityLogEventType, string> = {
-  classroom_created: 'dashboard.activity.classroom_created',
-  document_uploaded: 'dashboard.activity.document_uploaded',
-  document_deleted: 'dashboard.activity.document_deleted',
-  exam_created: 'dashboard.activity.exam_created',
-  exam_published: 'dashboard.activity.exam_published',
-  exam_opened: 'dashboard.activity.exam_opened',
-  exam_closed: 'dashboard.activity.exam_closed',
-  exam_deleted: 'dashboard.activity.exam_deleted',
-  quiz_assigned: 'dashboard.activity.quiz_assigned',
-  meeting_started: 'dashboard.activity.meeting_started',
-  meeting_ended: 'dashboard.activity.meeting_ended',
-  member_joined: 'dashboard.activity.member_joined',
-  member_approved: 'dashboard.activity.member_approved',
-  member_rejected: 'dashboard.activity.member_rejected',
-  member_kicked: 'dashboard.activity.member_kicked',
-  member_left: 'dashboard.activity.member_left',
-  exam_submitted: 'dashboard.activity.exam_submitted',
-};
-
-function getActivityMeta(eventType: ActivityLogEventType, t: (key: string) => string) {
-  const map: Record<ActivityLogEventType, { icon: React.ElementType; color: string; bg: string; label: string }> = {
-    classroom_created: { icon: GraduationCap, color: 'text-primary-brand', bg: 'bg-primary-brand-light', label: t(ACTIVITY_KEY_MAP.classroom_created) },
-    document_uploaded: { icon: File,          color: 'text-blue-600',   bg: 'bg-blue-50',   label: t(ACTIVITY_KEY_MAP.document_uploaded) },
-    document_deleted:  { icon: File,          color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.document_deleted) },
-    exam_created:      { icon: ClipboardList, color: 'text-orange-600', bg: 'bg-orange-50', label: t(ACTIVITY_KEY_MAP.exam_created) },
-    exam_published:    { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: t(ACTIVITY_KEY_MAP.exam_published) },
-    exam_opened:       { icon: Timer,         color: 'text-emerald-600',bg: 'bg-emerald-50',label: t(ACTIVITY_KEY_MAP.exam_opened) },
-    exam_closed:       { icon: Clock,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.exam_closed) },
-    exam_deleted:      { icon: ClipboardList, color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.exam_deleted) },
-    quiz_assigned:     { icon: Gamepad2,      color: 'text-purple-600', bg: 'bg-purple-50', label: t(ACTIVITY_KEY_MAP.quiz_assigned) },
-    meeting_started:   { icon: Video,         color: 'text-sky-600',    bg: 'bg-sky-50',    label: t(ACTIVITY_KEY_MAP.meeting_started) },
-    meeting_ended:     { icon: Video,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.meeting_ended) },
-    member_joined:     { icon: Users,         color: 'text-blue-500',   bg: 'bg-blue-50',   label: t(ACTIVITY_KEY_MAP.member_joined) },
-    member_approved:   { icon: CheckCircle2,  color: 'text-green-600',  bg: 'bg-green-50',  label: t(ACTIVITY_KEY_MAP.member_approved) },
-    member_rejected:   { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.member_rejected) },
-    member_kicked:     { icon: UserX,         color: 'text-red-500',    bg: 'bg-red-50',    label: t(ACTIVITY_KEY_MAP.member_kicked) },
-    member_left:       { icon: Users,         color: 'text-muted-foreground',  bg: 'bg-muted/50',  label: t(ACTIVITY_KEY_MAP.member_left) },
-    exam_submitted:    { icon: FileCheck,     color: 'text-teal-600',   bg: 'bg-teal-50',   label: t(ACTIVITY_KEY_MAP.exam_submitted) },
-  };
-  return map[eventType] ?? { icon: ClipboardList, color: 'text-muted-foreground', bg: 'bg-muted/50', label: eventType };
-}
-
-function timeAgo(isoString: string, t: (key: string, fb?: string, values?: Record<string, string | number>) => string): string {
-  if (!isoString) return '';
-  const diff = Date.now() - new Date(isoString).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return t('dashboard.time_ago.just_now');
-  if (minutes < 60) return t('dashboard.time_ago.minutes_ago', undefined, { count: minutes });
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return t('dashboard.time_ago.hours_ago', undefined, { count: hours });
-  return t('dashboard.time_ago.days_ago', undefined, { count: Math.floor(hours / 24) });
-}
 
 const QUOTES = [
   { text: 'Giáo dục là vũ khí mạnh nhất bạn có thể dùng để thay đổi thế giới.', author: 'Nelson Mandela' },
@@ -104,11 +46,19 @@ function getGreeting(hour: number, t: (key: string) => string): { text: string; 
 export default function SpaceDashboardPage() {
   const { t, formatDate: localeFormatDate, formatTime: localeFormatTime } = useTranslation();
   const { status, data } = useDashboard();
+  const profile = useSelector((state: RootState) => state.user.profile);
   const [now, setNow] = useState(() => new Date());
+  const [workspaceAvatarUrl, setWorkspaceAvatarUrl] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    communityApi.getMyProfile()
+      .then((workspace) => setWorkspaceAvatarUrl(workspace?.avatar_url || ''))
+      .catch(() => {});
   }, []);
 
   if (status === 'loading' || !data) {
@@ -122,15 +72,12 @@ export default function SpaceDashboardPage() {
     );
   }
 
-  const { teacherName, summary } = data;
+  const { summary } = data;
   const kpis = summary.kpis;
-  const recentActivity = summary.recent_activity;
-  const weeklyTrend = summary.weekly_trend;
   const topClasses = summary.top_classes;
+  const teacherName = profile?.full_name || profile?.email || '';
 
   const completionPct = kpis.completion_rate_pct ?? 0;
-
-  const weeklyMax = Math.max(1, ...weeklyTrend.flatMap((d) => [d.enrolled, d.submitted]));
 
   const statCards = [
     {
@@ -172,6 +119,24 @@ export default function SpaceDashboardPage() {
       bg: 'bg-purple-50',
       trend: false,
     },
+    {
+      name: t('dashboard.stats.exams_published'),
+      value: kpis.exams_published,
+      sub: t('dashboard.stats.exams_published_sub', undefined, { count: kpis.total_classrooms }),
+      icon: ClipboardList,
+      color: 'text-teal-600',
+      bg: 'bg-teal-50',
+      trend: false,
+    },
+    {
+      name: t('dashboard.stats.submissions'),
+      value: kpis.submissions,
+      sub: t('dashboard.stats.submissions_sub', undefined, { count: kpis.graded }),
+      icon: FileCheck,
+      color: 'text-rose-600',
+      bg: 'bg-rose-50',
+      trend: false,
+    },
   ];
 
   const greeting = getGreeting(now.getHours(), t);
@@ -179,6 +144,15 @@ export default function SpaceDashboardPage() {
   const timeStr = localeFormatTime(now);
   const dateStr = localeFormatDate(now, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   const firstName = teacherName.split(' ').pop() ?? teacherName;
+  const initials = teacherName
+    .split(/\s+/)
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  const memberSince = profile?.created_at ? localeFormatDate(new Date(profile.created_at), { year: 'numeric', month: 'long' }) : '';
+  const avatarUrl: string = workspaceAvatarUrl || profile?.avatar_url || '';
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -236,7 +210,7 @@ export default function SpaceDashboardPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat) => (
           <Card key={stat.name} className="border-border shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -256,95 +230,38 @@ export default function SpaceDashboardPage() {
         ))}
       </div>
 
-      {/* Middle Row */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Weekly Bar Chart */}
-        <Card className="lg:col-span-2 border-border shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-primary-brand" />
-              {t('dashboard.chart.title')}
-            </CardTitle>
-            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-primary-brand inline-block" />{t('dashboard.chart.enrolled_label')}</span>
-              <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-400 inline-block" />{t('dashboard.chart.submitted_label')}</span>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {weeklyTrend.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic text-center py-8">{t('dashboard.recent_activity.empty')}</p>
-            ) : (
-              <div className="flex items-end justify-between gap-3 h-36 px-2">
-                {weeklyTrend.map((d) => {
-                  const enrolledH = (d.enrolled / weeklyMax) * 100;
-                  const submittedH = (d.submitted / weeklyMax) * 100;
-                  return (
-                    <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5">
-                      <div className="w-full flex items-end justify-center gap-1 h-28">
-                        <div
-                          className="flex-1 bg-primary-brand rounded-t-md transition-all duration-700"
-                          style={{ height: `${enrolledH}%` }}
-                          title={t('dashboard.chart.enrolled_tooltip', undefined, { count: d.enrolled })}
-                        />
-                        <div
-                          className="flex-1 bg-emerald-400 rounded-t-md transition-all duration-700"
-                          style={{ height: `${submittedH}%` }}
-                          title={t('dashboard.chart.submitted_tooltip', undefined, { count: d.submitted })}
-                        />
-                      </div>
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                        {t(`dashboard.chart.${d.weekday}`)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card className="border-border shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Clock size={18} className="text-muted-foreground" />
-              {t('dashboard.recent_activity.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentActivity.length === 0 ? (
-              <p className="text-sm text-muted-foreground italic text-center py-4">{t('dashboard.recent_activity.empty')}</p>
-            ) : (
-              <div className="space-y-4">
-                {recentActivity.map((log) => {
-                  const { icon: Icon, color, bg, label } = getActivityMeta(log.event_type, t);
-                  return (
-                    <div key={log.uid} className="flex items-start gap-3">
-                      <div className={`w-7 h-7 rounded-lg ${bg} flex items-center justify-center shrink-0 mt-0.5`}>
-                        <Icon size={14} className={color} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-foreground leading-snug">
-                          {label}{log.target_name ? ` — ${log.target_name}` : ''}
-                        </p>
-                        {log.actor_name && (
-                          <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{log.actor_name}</p>
-                        )}
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{timeAgo(log.created_at, t)}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Bottom Row */}
-      <div className="grid gap-6 lg:grid-cols-1">
-        {/* Top Classes */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Teacher Profile */}
         <Card className="border-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users size={18} className="text-primary-brand" />
+              {t('dashboard.profile_card.title')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Avatar size="lg" className="border border-border">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={teacherName} />}
+                <AvatarFallback className="font-bold">{initials || 'U'}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground truncate">{teacherName}</p>
+                {memberSince && (
+                  <p className="text-xs text-muted-foreground">{t('dashboard.profile_card.member_since', undefined, { date: memberSince })}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Mail size={14} className="shrink-0" />
+              <span className="truncate">{profile?.email}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Classes */}
+        <Card className="lg:col-span-2 border-border shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <GraduationCap size={18} className="text-primary-brand" />

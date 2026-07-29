@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { accountService } from '@/lib/api/account';
 import { dashboardApi, type DashboardSummary } from '@/lib/api/dashboard';
 
 type DashboardData = {
-  teacherName: string;
   summary: DashboardSummary;
 };
 
@@ -30,15 +28,9 @@ export function useDashboard(): UseDashboardResult {
   const load = useCallback(async () => {
     setStatus('loading');
     try {
-      const [profile, summary] = await Promise.all([
-        accountService.getProfile(),
-        dashboardApi.summary(),
-      ]);
+      const summary = await dashboardApi.summary();
 
-      setData({
-        teacherName: profile.full_name || profile.email || '',
-        summary,
-      });
+      setData({ summary });
       setStatus('authenticated');
     } catch {
       setData(null);
