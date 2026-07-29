@@ -2,6 +2,9 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Building2,
   ShieldCheck,
@@ -30,6 +33,14 @@ import {
 } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@shared/components/ui/form';
 import { Label } from '@shared/components/ui/label';
 import { Textarea } from '@shared/components/ui/textarea';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
@@ -43,7 +54,17 @@ import { setSettings as setGlobalSettings, setThemeColor as setGlobalThemeColor 
 type SettingSection = 'profile' | 'security' | 'classrooms' | 'notifications';
 
 type PasswordForm = { current_password: string; new_password: string; confirm_password: string };
-const EMPTY_PASSWORD: PasswordForm = { current_password: '', new_password: '', confirm_password: '' };
+
+const passwordSchema = z
+  .object({
+    current_password: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại'),
+    new_password: z.string().min(8, 'Mật khẩu mới tối thiểu 8 ký tự'),
+    confirm_password: z.string(),
+  })
+  .refine((d) => d.new_password === d.confirm_password, {
+    message: 'Mật khẩu xác nhận không khớp',
+    path: ['confirm_password'],
+  });
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
@@ -53,11 +74,15 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [themeColor, setThemeColor] = useState('#4f46e5');
 
-  const [passwordForm, setPasswordForm] = useState<PasswordForm>(EMPTY_PASSWORD);
   const [pwVisible, setPwVisible] = useState({ current_password: false, new_password: false, confirm_password: false });
   const [pwLoading, setPwLoading] = useState(false);
   const [pwSuccess, setPwSuccess] = useState('');
   const [pwError, setPwError] = useState('');
+
+  const passwordForm = useForm<PasswordForm>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { current_password: '', new_password: '', confirm_password: '' },
+  });
 
   const [settings, setSettings] = useState<Record<string, any>>({
     space_profile: {},
@@ -122,25 +147,20 @@ export default function SettingsPage() {
     }));
   };
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleChangePassword = passwordForm.handleSubmit(async (data) => {
     setPwError('');
     setPwSuccess('');
-    if (passwordForm.new_password !== passwordForm.confirm_password) {
-      setPwError(t('settings.space.password.mismatch_error'));
-      return;
-    }
     setPwLoading(true);
     try {
-      await accountService.changePassword(passwordForm);
+      await accountService.changePassword(data);
       setPwSuccess(t('settings.space.password.success'));
-      setPasswordForm(EMPTY_PASSWORD);
+      passwordForm.reset();
     } catch (err: unknown) {
       setPwError(err instanceof Error ? err.message : t('settings.space.password.error_fallback'));
     } finally {
       setPwLoading(false);
     }
-  };
+  });
 
   const menuItems = [
     { id: 'profile', label: t('settings.space.nav.profile'), icon: Building2 },
@@ -417,67 +437,79 @@ export default function SettingsPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="p-8">
-                  <form onSubmit={handleChangePassword} className="space-y-5">
-                    {(['current_password', 'new_password', 'confirm_password'] as const).map((field) => {
-                      const labels: Record<typeof field, string> = {
-                        current_password: t('settings.space.security.current_password_label'),
-                        new_password: t('settings.space.security.new_password_label'),
-                        confirm_password: t('settings.space.security.confirm_password_label'),
-                      };
-                      return (
-                        <div key={field} className="space-y-2">
-                          <Label>
-                            {labels[field]}
-                          </Label>
-                          <div className="relative">
-                            <Input
-                              type={pwVisible[field] ? 'text' : 'password'}
-                              value={passwordForm[field]}
-                              onChange={(e) => {
-                                setPasswordForm(prev => ({ ...prev, [field]: e.target.value }));
-                                setPwError('');
-                                setPwSuccess('');
-                              }}
-                              required
-                              className="w-full h-12 pr-12"
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setPwVisible(prev => ({ ...prev, [field]: !prev[field] }))}
-                              className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            >
-                              {pwVisible[field] ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                  <Form {...passwordForm}>
+                    <form onSubmit={handleChangePassword} className="space-y-5">
+                      {(['current_password', 'new_password', 'confirm_password'] as const).map((field) => {
+                        const labels: Record<typeof field, string> = {
+                          current_password: t('settings.space.security.current_password_label'),
+                          new_password: t('settings.space.security.new_password_label'),
+                          confirm_password: t('settings.space.security.confirm_password_label'),
+                        };
+                        return (
+                          <FormField
+                            key={field}
+                            control={passwordForm.control}
+                            name={field}
+                            render={({ field: f }) => (
+                              <FormItem>
+                                <FormLabel>{labels[field]}</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input
+                                      type={pwVisible[field] ? 'text' : 'password'}
+                                      className="h-12 pr-12"
+                                      value={f.value ?? ''}
+                                      onChange={(e) => {
+                                        f.onChange(e.target.value);
+                                        setPwError('');
+                                        setPwSuccess('');
+                                      }}
+                                      onBlur={f.onBlur}
+                                      name={f.name}
+                                      ref={f.ref}
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => setPwVisible((prev) => ({ ...prev, [field]: !prev[field] }))}
+                                      className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                    >
+                                      {pwVisible[field] ? <EyeOff size={16} /> : <Eye size={16} />}
+                                    </Button>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        );
+                      })}
 
-                    {pwError && (
-                      <p className="text-sm text-destructive font-medium bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
-                        {pwError}
-                      </p>
-                    )}
-                    {pwSuccess && (
-                      <p className="text-sm text-emerald-600 font-medium bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2">
-                        <Check size={16} />
-                        {pwSuccess}
-                      </p>
-                    )}
+                      {pwError && (
+                        <p className="text-sm text-destructive font-medium bg-destructive/5 border border-destructive/20 rounded-xl px-4 py-3">
+                          {pwError}
+                        </p>
+                      )}
+                      {pwSuccess && (
+                        <p className="text-sm text-emerald-600 font-medium bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                          <Check size={16} />
+                          {pwSuccess}
+                        </p>
+                      )}
 
-                    <div className="flex justify-end pt-2">
-                      <Button
-                        type="submit"
-                        disabled={pwLoading}
-                        className="h-11 gap-2"
-                      >
-                        {pwLoading ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={16} />}
-                        {t('settings.space.security.change_password_submit')}
-                      </Button>
-                    </div>
-                  </form>
+                      <div className="flex justify-end pt-2">
+                        <Button
+                          type="submit"
+                          disabled={pwLoading}
+                          className="h-11 gap-2"
+                        >
+                          {pwLoading ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={16} />}
+                          {t('settings.space.security.change_password_submit')}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
                 </CardContent>
               </Card>
             </div>

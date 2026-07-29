@@ -1,13 +1,32 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '../ui/button';
-import { X, Loader2, Upload } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { Loader2, Upload } from 'lucide-react';
+import { Button } from '../ui/button';
 import { cn } from '@shared/lib/utils';
 import { Input } from '@shared/components/ui/input';
 import { Textarea } from '@shared/components/ui/textarea';
-import { Label } from '@shared/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@shared/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@shared/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -40,6 +59,43 @@ function fromLocalInput(value: string): string {
   return new Date(value).toISOString();
 }
 
+const NO_EVENT_VALUE = '__no_event__';
+
+const leaveRequestSchema = z
+  .object({
+    mode: z.enum(['event', 'range']),
+    eventId: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    reason: z.string().min(1, 'Vui lòng nhập lý do'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.mode === 'event' && !data.eventId) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['eventId'],
+        message: 'Vui lòng chọn sự kiện',
+      });
+    }
+    if (data.mode === 'range') {
+      if (!data.startDate || !data.endDate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['startDate'],
+          message: 'Vui lòng chọn thời gian',
+        });
+      } else if (new Date(data.endDate) <= new Date(data.startDate)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['endDate'],
+          message: 'Thời gian kết thúc phải sau thời gian bắt đầu',
+        });
+      }
+    }
+  });
+
+type LeaveRequestFormValues = z.infer<typeof leaveRequestSchema>;
+
 export function LeaveRequestForm({
   open,
   onOpenChange,
@@ -49,245 +105,241 @@ export function LeaveRequestForm({
   saving = false,
 }: LeaveRequestFormProps) {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<'event' | 'range'>('event');
-  const [eventId, setEventId] = useState<string>('');
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const [reason, setReason] = useState('');
   const [evidence, setEvidence] = useState<File | null>(null);
-  const [error, setError] = useState('');
+
+  const form = useForm<LeaveRequestFormValues>({
+    resolver: zodResolver(leaveRequestSchema),
+    defaultValues: {
+      mode: events.length > 0 ? 'event' : 'range',
+      eventId: '',
+      startDate: '',
+      endDate: '',
+      reason: '',
+    },
+  });
 
   useEffect(() => {
     if (!open) return;
-    setMode(events.length > 0 ? 'event' : 'range');
-    setEventId('');
-    setStartDate('');
-    setEndDate('');
-    setReason('');
+    form.reset({
+      mode: events.length > 0 ? 'event' : 'range',
+      eventId: '',
+      startDate: '',
+      endDate: '',
+      reason: '',
+    });
     setEvidence(null);
-    setError('');
-  }, [open, events.length]);
+  }, [open, events.length, form]);
 
-  if (!open) return null;
+  const mode = form.watch('mode');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!reason.trim()) {
-      setError(t('leave_request.errors.reason_required', 'Vui lòng nhập lý do.'));
-      return;
-    }
-
-    if (mode === 'event') {
-      if (!eventId) {
-        setError(t('leave_request.errors.event_required', 'Vui lòng chọn sự kiện.'));
-        return;
-      }
-      const ev = events.find((e) => e.uid === eventId);
-      if (!ev) {
-        setError(t('leave_request.errors.event_not_found', 'Sự kiện không tồn tại.'));
-        return;
-      }
-      try {
+  const handleSubmit = form.handleSubmit(async (values) => {
+    try {
+      if (values.mode === 'event') {
+        const ev = events.find((e) => e.uid === values.eventId);
+        if (!ev) return;
         await onSubmit({
           event_id: ev.uid,
           classroom_id: classroomId ?? null,
-          reason: reason.trim(),
+          reason: values.reason.trim(),
           evidence,
         });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : t('leave_request.errors.generic', 'Đã có lỗi xảy ra.'));
+        return;
       }
-      return;
-    }
-
-    if (!startDate || !endDate) {
-      setError(t('leave_request.errors.range_required', 'Vui lòng chọn thời gian.'));
-      return;
-    }
-    if (new Date(endDate) <= new Date(startDate)) {
-      setError(t('leave_request.errors.end_before_start', 'Thời gian kết thúc phải sau thời gian bắt đầu.'));
-      return;
-    }
-
-    try {
       await onSubmit({
         event_id: null,
         classroom_id: classroomId ?? null,
-        start_date: fromLocalInput(startDate),
-        end_date: fromLocalInput(endDate),
-        reason: reason.trim(),
+        start_date: fromLocalInput(values.startDate),
+        end_date: fromLocalInput(values.endDate),
+        reason: values.reason.trim(),
         evidence,
       });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('leave_request.errors.generic', 'Đã có lỗi xảy ra.'));
+    } catch {
+      // parent surfaces error via toast
     }
-  };
+  });
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-fade-in"
-      onClick={() => !saving && onOpenChange(false)}
-    >
-      <div
-        className="w-full max-w-lg rounded-xl bg-white shadow-2xl overflow-hidden animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <h2 className="text-base font-bold text-slate-900">
-            {t('leave_request.form.title', 'Tạo đơn nghỉ phép')}
-          </h2>
-          <Button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            disabled={saving}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </Button>
-        </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{t('leave_request.form.title', 'Tạo đơn nghỉ phép')}</DialogTitle>
+          <DialogDescription>
+            {t('leave_request.form.subtitle', 'Chọn sự kiện hoặc khoảng thời gian và nhập lý do.')}
+          </DialogDescription>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-[12.5px] text-rose-700">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 w-fit">
-              <Button
-                type="button"
-                disabled={events.length === 0}
-                onClick={() => setMode('event')}
-                className={cn(
-                  'px-3 py-1.5 text-[12px] font-semibold rounded-md transition-colors disabled:opacity-40',
-                  mode === 'event' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
-                )}
-              >
-                {t('leave_request.form.mode_event', 'Theo sự kiện')}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => setMode('range')}
-                className={cn(
-                  'px-3 py-1.5 text-[12px] font-semibold rounded-md transition-colors',
-                  mode === 'range' ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
-                )}
-              >
-                {t('leave_request.form.mode_range', 'Theo khoảng ngày')}
-              </Button>
-            </div>
-          </div>
-
-          {mode === 'event' ? (
-            <div>
-              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
-                {t('leave_request.form.field_event', 'Sự kiện')}
-              </Label>
-              {events.length === 0 ? (
-                <p className="text-[12.5px] text-slate-500">
-                  {t('leave_request.form.no_events', 'Bạn chưa có sự kiện nào để tạo đơn.')}
-                </p>
-              ) : (
-                <Select
-                  value={eventId || 'placeholder-event'}
-                  onValueChange={(v) => setEventId(v === 'placeholder-event' ? '' : v)}
-                >
-                  <SelectTrigger className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px]">
-                    <SelectValue placeholder={t('leave_request.form.select_event', '-- Chọn sự kiện --')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="placeholder-event">{t('leave_request.form.select_event', '-- Chọn sự kiện --')}</SelectItem>
-                    {events.map((ev) => (
-                      <SelectItem key={ev.uid} value={ev.uid}>
-                        {ev.classroom_name ? `${ev.classroom_name} · ${ev.title}` : ev.title} ({toLocalInput(ev.start_time)})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="mode"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center bg-card border rounded-md p-0.5 w-fit">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={events.length === 0}
+                      onClick={() => field.onChange('event')}
+                      className={cn(
+                        'h-7 px-3 text-xs font-semibold rounded-sm',
+                        field.value === 'event'
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                          : 'text-muted-foreground'
+                      )}
+                    >
+                      {t('leave_request.form.mode_event', 'Theo sự kiện')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => field.onChange('range')}
+                      className={cn(
+                        'h-7 px-3 text-xs font-semibold rounded-sm',
+                        field.value === 'range'
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground'
+                          : 'text-muted-foreground'
+                      )}
+                    >
+                      {t('leave_request.form.mode_range', 'Theo khoảng ngày')}
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
-                  {t('leave_request.form.field_start', 'Bắt đầu')}
-                </Label>
-                <Input
-                  type="datetime-local"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-                />
-              </div>
-              <div>
-                <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
-                  {t('leave_request.form.field_end', 'Kết thúc')}
-                </Label>
-                <Input
-                  type="datetime-local"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-                />
-              </div>
-            </div>
-          )}
-
-          <div>
-            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
-              {t('leave_request.form.field_reason', 'Lý do')}
-              <span className="text-rose-500"> *</span>
-            </Label>
-            <Textarea
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              rows={3}
-              placeholder={t('leave_request.form.reason_placeholder', 'Vui lòng mô tả lý do nghỉ...')}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 resize-none"
             />
-          </div>
 
-          <div>
-            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
-              {t('leave_request.form.field_evidence', 'Minh chứng (tuỳ chọn)')}
-            </Label>
-            <Label className="flex items-center gap-2 h-10 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 text-[12.5px] text-slate-600 cursor-pointer hover:border-indigo-400">
-              <Upload size={14} />
-              <span className="truncate">
-                {evidence ? evidence.name : t('leave_request.form.upload_hint', 'Chọn ảnh hoặc tài liệu...')}
-              </span>
-              <Input
-                type="file"
-                className="hidden"
-                onChange={(e) => setEvidence(e.target.files?.[0] ?? null)}
+            {mode === 'event' ? (
+              <FormField
+                control={form.control}
+                name="eventId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('leave_request.form.field_event', 'Sự kiện')}</FormLabel>
+                    {events.length === 0 ? (
+                      <FormDescription>
+                        {t('leave_request.form.no_events', 'Bạn chưa có sự kiện nào để tạo đơn.')}
+                      </FormDescription>
+                    ) : (
+                      <Select
+                        value={field.value || NO_EVENT_VALUE}
+                        onValueChange={(v) => field.onChange(v === NO_EVENT_VALUE ? '' : v)}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder={t('leave_request.form.select_event', '-- Chọn sự kiện --')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={NO_EVENT_VALUE}>
+                            {t('leave_request.form.select_event', '-- Chọn sự kiện --')}
+                          </SelectItem>
+                          {events.map((ev) => (
+                            <SelectItem key={ev.uid} value={ev.uid}>
+                              {ev.classroom_name ? `${ev.classroom_name} · ${ev.title}` : ev.title} ({toLocalInput(ev.start_time)})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </Label>
-          </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('leave_request.form.field_start', 'Bắt đầu')}</FormLabel>
+                      <FormControl>
+                        <Input type="datetime-local" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('leave_request.form.field_end', 'Kết thúc')}</FormLabel>
+                      <FormControl>
+                        <Input type="datetime-local" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
-          <div className="flex items-center justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              disabled={saving}
-              className="h-10 px-4 rounded-lg text-slate-700 hover:bg-slate-100 text-[13px] font-semibold"
-            >
-              {t('leave_request.form.cancel', 'Huỷ')}
-            </Button>
-            <Button
-              type="submit"
-              disabled={saving}
-              className="h-10 px-4 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 inline-flex items-center gap-1.5 disabled:opacity-50"
-            >
-              {saving && <Loader2 size={14} className="animate-spin" />}
-              {t('leave_request.form.submit', 'Gửi đơn')}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+            <FormField
+              control={form.control}
+              name="reason"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {t('leave_request.form.field_reason', 'Lý do')} <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={3}
+                      placeholder={t('leave_request.form.reason_placeholder', 'Vui lòng mô tả lý do nghỉ...')}
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormItem>
+              <FormLabel>{t('leave_request.form.field_evidence', 'Minh chứng (tuỳ chọn)')}</FormLabel>
+              <Controller
+                control={form.control}
+                name="reason"
+                render={() => (
+                  <FormControl>
+                    <label className="flex items-center gap-2 h-9 rounded-md border border-dashed bg-muted/30 px-3 text-xs text-muted-foreground cursor-pointer hover:border-primary/60">
+                      <Upload size={14} />
+                      <span className="truncate">
+                        {evidence ? evidence.name : t('leave_request.form.upload_hint', 'Chọn ảnh hoặc tài liệu...')}
+                      </span>
+                      <Input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => setEvidence(e.target.files?.[0] ?? null)}
+                      />
+                    </label>
+                  </FormControl>
+                )}
+              />
+            </FormItem>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={saving}
+              >
+                {t('leave_request.form.cancel', 'Huỷ')}
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 size={14} className="mr-1.5 animate-spin" />}
+                {t('leave_request.form.submit', 'Gửi đơn')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

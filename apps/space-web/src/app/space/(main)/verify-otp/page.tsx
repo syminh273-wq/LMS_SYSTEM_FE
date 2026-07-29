@@ -3,14 +3,28 @@
 import { Suspense, useState, useEffect } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
-import { Label } from '@shared/components/ui/label';
+import { Input } from '@shared/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@shared/components/ui/form';
 
-type FormValues = { otp_code: string };
+const otpSchema = z.object({
+  otp_code: z.string().regex(/^\d{6}$/, 'Mã OTP gồm 6 chữ số'),
+});
+
+type FormValues = z.infer<typeof otpSchema>;
 
 export default function SpaceVerifyOTPPage() {
   return (
@@ -27,7 +41,7 @@ function SpaceVerifyOTPPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>();
+  const form = useForm<FormValues>({ resolver: zodResolver(otpSchema) });
 
   useEffect(() => {
     if (!email) router.replace('/space/forgot-password');
@@ -35,7 +49,7 @@ function SpaceVerifyOTPPageContent() {
 
   useEffect(() => {
     if (countdown <= 0) return;
-    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [countdown]);
 
@@ -70,47 +84,52 @@ function SpaceVerifyOTPPageContent() {
     <div className="flex min-h-screen items-center justify-center bg-muted px-4">
       <div className="max-w-md w-full">
         <div className="bg-card rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-slate-900 py-8 px-10 text-center">
-            <h2 className="text-white text-2xl font-bold">Nhập mã OTP</h2>
+          <div className="bg-foreground py-8 px-10 text-center">
+            <h2 className="text-background text-2xl font-bold">Nhập mã OTP</h2>
             <p className="text-muted-foreground text-sm mt-1">
-              Mã 6 chữ số đã gửi đến <span className="text-white font-semibold">{email}</span>
+              Mã 6 chữ số đã gửi đến <span className="text-background font-semibold">{email}</span>
             </p>
           </div>
 
           <div className="p-10">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <Label className="block text-sm font-semibold text-foreground mb-2">Mã OTP (6 chữ số)</Label>
-                <input
-                  {...register('otp_code', {
-                    required: 'Vui lòng nhập mã OTP',
-                    pattern: { value: /^\d{6}$/, message: 'Mã OTP gồm 6 chữ số' },
-                  })}
-                  maxLength={6}
-                  placeholder="000000"
-                  className={`block w-full py-3 border rounded-lg bg-muted/50 text-foreground text-center text-2xl font-black tracking-[0.4em] placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.otp_code ? 'border-red-500' : 'border-border'}`}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="otp_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mã OTP (6 chữ số)</FormLabel>
+                      <FormControl>
+                        <Input
+                          maxLength={6}
+                          placeholder="000000"
+                          className="h-12 text-center text-2xl font-black tracking-[0.4em] placeholder:text-muted-foreground/50"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <p className="text-xs text-muted-foreground mt-2">Mã có hiệu lực trong 5 phút.</p>
+                    </FormItem>
+                  )}
                 />
-                {errors.otp_code && <p className="text-red-500 text-xs mt-1 font-medium">{errors.otp_code.message}</p>}
-                <p className="text-xs text-muted-foreground mt-2">Mã có hiệu lực trong 5 phút.</p>
-              </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98]"
-              >
-                {loading ? 'Đang xác thực...' : 'Xác nhận'}
-              </Button>
-            </form>
+                <Button type="submit" disabled={loading} className="w-full h-11">
+                  {loading ? 'Đang xác thực...' : 'Xác nhận'}
+                </Button>
+              </form>
+            </Form>
 
             <div className="mt-4 text-center">
               <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={handleResend}
                 disabled={resending || countdown > 0}
-                className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-medium transition-colors disabled:opacity-40"
+                className="text-muted-foreground hover:text-foreground"
               >
-                <RefreshCw size={14} className={resending ? 'animate-spin' : ''} />
+                <RefreshCw size={14} className={`mr-1.5 ${resending ? 'animate-spin' : ''}`} />
                 {countdown > 0 ? `Gửi lại sau ${countdown}s` : 'Gửi lại mã OTP'}
               </Button>
             </div>

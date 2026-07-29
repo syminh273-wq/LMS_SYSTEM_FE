@@ -370,7 +370,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     aria-current={active ? 'page' : undefined}
                     data-active={active || undefined}
                     className={cn(
-                      "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground border-l-2 border-transparent",
+                      "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground border-b-2 border-transparent",
                       "data-[active=true]:border-primary data-[active=true]:text-foreground data-[active=true]:font-semibold",
                     )}
                   >

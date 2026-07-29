@@ -55,6 +55,15 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import {
+  Message,
+  MessageAvatarImage,
+  MessageContent,
+  Bubble,
+  BubbleContent,
+  BubbleMeta,
+  TypingIndicator,
+} from '@shared/components/ui/message';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useMe } from '@/lib/hooks/use-me';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
@@ -124,25 +133,24 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
 
   const roleLabel = msg.sender_type === 'space' ? 'Giáo viên' : 'Sinh viên';
   const isTeacher = msg.sender_type === 'space';
+  const senderLabel = isMe ? 'Bạn' : msg.sender_name || 'Ẩn danh';
 
   return (
-    <div className={`flex gap-2 ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
-      {!isMe && (
-        <div className="w-8 h-8 shrink-0 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center mt-1">
-          {initials}
-        </div>
-      )}
-      <div className={`flex flex-col gap-1 max-w-[75%] ${isMe ? 'items-start' : 'items-end'}`}>
-        <div className="flex items-baseline gap-2 px-1">
-          <span className="text-[11px] font-bold text-foreground">
-            {isMe ? 'Bạn' : msg.sender_name || 'Ẩn danh'}
-          </span>
+    <Message from={isMe ? 'user' : 'assistant'} align={isMe ? 'right' : 'left'}>
+      <MessageAvatarImage
+        src={msg.sender_avatar ?? undefined}
+        alt={senderLabel}
+        fallback={senderLabel}
+      />
+      <MessageContent>
+        <div className={`flex items-baseline gap-2 px-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
+          <span className="text-[11px] font-bold text-foreground">{senderLabel}</span>
           {!isMe && (
             <span
-              className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${
+              className={`rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${
                 isTeacher
-                  ? 'bg-warning/10 text-warning border border-warning/20'
-                  : 'bg-info/10 text-info border border-info/20'
+                  ? 'border border-warning/20 bg-warning/10 text-warning'
+                  : 'border border-info/20 bg-info/10 text-info'
               }`}
             >
               {roleLabel}
@@ -150,20 +158,20 @@ function MessageBubble({ msg, currentUserId }: { msg: ChatMessage; currentUserId
           )}
           <span className="text-[10px] text-muted-foreground">{time}</span>
         </div>
-        <div
-          className={`rounded-2xl text-sm font-medium shadow-sm ${
-            isMe
-              ? 'bg-primary text-white rounded-bl-md'
-              : 'bg-muted text-foreground rounded-br-md'
-          }`}
+        <Bubble
+          variant={isMe ? 'primary' : 'muted'}
+          size="md"
+          className={isMe ? 'rounded-bl-md' : 'rounded-br-md'}
         >
-          {msg.content && (
-            <div className="px-4 py-2.5 break-words whitespace-pre-wrap">{msg.content}</div>
-          )}
-          {renderAttachment()}
-        </div>
-      </div>
-    </div>
+          <BubbleContent>
+            {msg.content && (
+              <p className="break-words whitespace-pre-wrap">{msg.content}</p>
+            )}
+            {renderAttachment()}
+          </BubbleContent>
+        </Bubble>
+      </MessageContent>
+    </Message>
   );
 }
 
@@ -1226,68 +1234,76 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     </div>
                   )}
                   {aiMessages.map((msg, i) => (
-                    <div key={i} className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <Message
+                      key={i}
+                      from={msg.role === 'user' ? 'user' : 'assistant'}
+                      align={msg.role === 'user' ? 'left' : 'right'}
+                    >
                       {msg.role === 'assistant' && (
-                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0 self-end">
                           <Bot size={14} className="text-white" />
                         </div>
                       )}
-                      <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 ${msg.role === 'user' ? 'bg-primary text-white rounded-br-sm' : 'bg-muted text-foreground border border-border rounded-bl-sm'}`}>
-                        <div className="text-sm font-medium leading-relaxed space-y-1">
-                          {msg.text
-                            ? msg.text.split('\n\n').map((para, pi) => (
-                                <p key={pi}>
-                                  {para.split('\n').map((line, li, arr) => (
-                                    <React.Fragment key={li}>
-                                      {line}
-                                      {li < arr.length - 1 && <br />}
-                                    </React.Fragment>
-                                  ))}
-                                  {pi === msg.text.split('\n\n').length - 1 && msg.loading && (
-                                    <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse rounded align-middle" />
-                                  )}
-                                </p>
-                              ))
-                            : msg.loading && (
-                                <span className="inline-flex gap-1">{[0,1,2].map(d => (
-                                  <span key={d} className="w-1.5 h-1.5 rounded-full bg-current animate-bounce" style={{ animationDelay: `${d * 0.15}s` }} />
-                                ))}</span>
-                              )
-                          }
-                        </div>
-                        {msg.sources && msg.sources.length > 0 && (
-                          <div className="mt-2 pt-2 border-t border-border space-y-1">
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Nguồn tham khảo</p>
-                            {msg.sources.slice(0, 3).map((src, j) => {
-                              const docName = src.metadata?.doc_name ?? 'Tài liệu';
-                              const docUrl = src.metadata?.doc_url
-                                ?? docUrlMap[src.metadata?.resource_uid]?.url
-                                ?? null;
-                              const score = (src.score * 100).toFixed(0);
-                              return (
-                                <div key={j} className="text-[10px] text-muted-foreground flex items-center justify-between gap-2">
-                                  {docUrl ? (
-                                    <a
-                                      href={docUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      download
-                                      className="truncate text-primary hover:text-primary hover:underline font-medium cursor-pointer"
-                                      title={`Xem / tải: ${docName}`}
-                                    >
-                                      {docName}
-                                    </a>
-                                  ) : (
-                                    <span className="truncate">{docName}</span>
-                                  )}
-                                  <span className="shrink-0 text-primary font-bold">{score}%</span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                      <MessageContent>
+                        <Bubble
+                          variant={msg.role === 'user' ? 'primary' : 'muted'}
+                          size="md"
+                          className={msg.role === 'user' ? 'rounded-bl-sm' : 'rounded-br-sm'}
+                        >
+                          <BubbleContent>
+                            <div className="text-sm font-medium leading-relaxed space-y-1">
+                              {msg.text
+                                ? msg.text.split('\n\n').map((para, pi) => (
+                                    <p key={pi}>
+                                      {para.split('\n').map((line, li, arr) => (
+                                        <React.Fragment key={li}>
+                                          {line}
+                                          {li < arr.length - 1 && <br />}
+                                        </React.Fragment>
+                                      ))}
+                                      {pi === msg.text.split('\n\n').length - 1 && msg.loading && (
+                                        <span className="inline-block w-0.5 h-3.5 bg-current ml-0.5 animate-pulse rounded align-middle" />
+                                      )}
+                                    </p>
+                                  ))
+                                : msg.loading && <TypingIndicator />
+                              }
+                            </div>
+                            {msg.sources && msg.sources.length > 0 && (
+                              <div className="mt-2 pt-2 border-t border-border space-y-1">
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Nguồn tham khảo</p>
+                                {msg.sources.slice(0, 3).map((src, j) => {
+                                  const docName = src.metadata?.doc_name ?? 'Tài liệu';
+                                  const docUrl = src.metadata?.doc_url
+                                    ?? docUrlMap[src.metadata?.resource_uid]?.url
+                                    ?? null;
+                                  const score = (src.score * 100).toFixed(0);
+                                  return (
+                                    <div key={j} className="text-[10px] text-muted-foreground flex items-center justify-between gap-2">
+                                      {docUrl ? (
+                                        <a
+                                          href={docUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          download
+                                          className="truncate text-primary hover:text-primary hover:underline font-medium cursor-pointer"
+                                          title={`Xem / tải: ${docName}`}
+                                        >
+                                          {docName}
+                                        </a>
+                                      ) : (
+                                        <span className="truncate">{docName}</span>
+                                      )}
+                                      <span className="shrink-0 text-primary font-bold">{score}%</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </BubbleContent>
+                        </Bubble>
+                      </MessageContent>
+                    </Message>
                   ))}
                 </div>
                 {/* Input */}

@@ -1,8 +1,16 @@
 'use client';
 
-import { Check, Image as ImageIcon, Loader2, Wifi, WifiOff } from 'lucide-react';
+import { Check, Image as ImageIcon, Loader2, WifiOff } from 'lucide-react';
 import type { WorkspaceMessage } from '@/lib/api/community';
 import { useEffect, useMemo, useRef } from 'react';
+import {
+  Message,
+  MessageAvatarImage,
+  MessageContent,
+  Bubble,
+  BubbleContent,
+  BubbleMeta,
+} from '@shared/components/ui/message';
 
 type WsStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -17,9 +25,10 @@ type Props = {
 function formatTime(iso: string | null): string {
   if (!iso) return '';
   try {
-    const d = new Date(iso);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  } catch { return ''; }
+    return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
 }
 
 function formatDayLabel(iso: string | null): string {
@@ -30,71 +39,37 @@ function formatDayLabel(iso: string | null): string {
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
     const sameDay = (a: Date, b: Date) =>
-      a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
     if (sameDay(d, today)) return 'Hôm nay';
     if (sameDay(d, yesterday)) return 'Hôm qua';
     return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  } catch { return ''; }
+  } catch {
+    return '';
+  }
 }
 
-function StatusIcon({ status }: { status: WsStatus }) {
+function StatusBadge({ status }: { status: WsStatus }) {
   if (status === 'connected') {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-success">
+        <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
         Online
       </span>
     );
   }
   if (status === 'connecting') {
     return (
-      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600">
+      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-warning">
         <Loader2 size={10} className="animate-spin" /> Đang kết nối
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-500">
+    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-destructive">
       <WifiOff size={10} /> Mất kết nối
     </span>
-  );
-}
-
-function MessageStatus() {
-  return (
-    <span className="inline-flex items-center text-indigo-200/80">
-      <Check size={12} strokeWidth={2.5} />
-    </span>
-  );
-}
-
-function Avatar({ name, url }: { name: string; url?: string }) {
-  const initials = (name || '?').trim().slice(0, 1).toUpperCase();
-  const palette = [
-    'from-indigo-500 to-violet-500',
-    'from-emerald-500 to-teal-500',
-    'from-rose-500 to-pink-500',
-    'from-amber-500 to-orange-500',
-    'from-sky-500 to-cyan-500',
-    'from-fuchsia-500 to-purple-500',
-  ];
-  const grad = palette[(name?.charCodeAt(0) ?? 0) % palette.length];
-
-  if (url) {
-    return (
-      <img
-        src={url}
-        alt={name}
-        className="w-7 h-7 rounded-full object-cover ring-2 ring-white shadow-sm shrink-0"
-      />
-    );
-  }
-  return (
-    <div
-      className={`w-7 h-7 rounded-full bg-gradient-to-br ${grad} text-white text-xs font-bold flex items-center justify-center ring-2 ring-white shadow-sm shrink-0`}
-    >
-      {initials}
-    </div>
   );
 }
 
@@ -123,13 +98,10 @@ export function ChatPanel({
     if (m.is_mine === true) return true;
     if (m.is_mine === false) return false;
     if (!m.sender_id) return false;
-
     if (currentUserId && m.sender_id === currentUserId) return true;
     if (currentUserPid && m.sender_id === currentUserPid) return true;
-
     if (currentUserId && m.sender_id.includes(currentUserId)) return true;
     if (currentUserPid && m.sender_id.includes(currentUserPid)) return true;
-
     return false;
   };
 
@@ -149,104 +121,84 @@ export function ChatPanel({
   }, [messages]);
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-white">
-      <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between text-xs text-slate-500 bg-white/80 backdrop-blur">
-        <StatusIcon status={status} />
-        <span className="font-mono text-[10px] text-slate-400">#{conversationUid.slice(0, 8)}</span>
+    <div className="flex flex-1 min-h-0 flex-col bg-background">
+      <div className="flex items-center justify-between border-b border-border bg-background/80 px-4 py-2 text-xs text-muted-foreground backdrop-blur">
+        <StatusBadge status={status} />
+        <span className="font-mono text-[10px] text-muted-foreground">#{conversationUid.slice(0, 8)}</span>
       </div>
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-gradient-to-b from-slate-50/60 to-white"
+        className="flex-1 space-y-6 overflow-y-auto bg-muted/30 px-4 py-6"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-slate-400 text-sm gap-2">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center">
-              <ImageIcon size={22} className="text-indigo-400" />
+          <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <ImageIcon size={22} />
             </div>
-            <p className="font-medium text-slate-500">Chưa có tin nhắn nào</p>
+            <p className="font-medium text-foreground">Chưa có tin nhắn nào</p>
             <p className="text-xs">Hãy gửi tin nhắn đầu tiên để bắt đầu cuộc trò chuyện</p>
           </div>
         ) : (
           grouped.map((group, gi) => (
-            <div key={gi} className="space-y-2">
+            <div key={gi} className="space-y-3">
               <div className="flex items-center justify-center">
-                <span className="px-3 py-0.5 text-[10px] font-semibold text-slate-500 bg-slate-100 rounded-full uppercase tracking-wide">
+                <span className="rounded-full bg-muted px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                   {group.day}
                 </span>
               </div>
-              {group.items.map((m, i) => {
+              {group.items.map((m) => {
                 const me = isMine(m);
-                const prev = group.items[i - 1];
-                const next = group.items[i + 1];
-                const isFirstInGroup = !prev || isMine(prev) !== me;
-                const isLastInGroup = !next || isMine(next) !== me;
-
-                const bubbleRadius = me
-                  ? `rounded-2xl ${isLastInGroup ? 'rounded-bl-md' : 'rounded-bl-2xl'} ${isFirstInGroup ? 'rounded-tl-md' : 'rounded-tl-2xl'}`
-                  : `rounded-2xl ${isLastInGroup ? 'rounded-br-md' : 'rounded-br-2xl'} ${isFirstInGroup ? 'rounded-tr-md' : 'rounded-tr-2xl'}`;
+                const senderLabel = me ? 'Bạn' : m.sender_name || 'Ẩn danh';
 
                 return (
-                  <div
-                    key={m.uid}
-                    className={`flex items-end gap-2 ${me ? 'justify-start' : 'justify-end'}`}
-                  >
-                    {me && (
-                      <div className="w-7 shrink-0">
-                        {isLastInGroup && <Avatar name="Bạn" />}
-                      </div>
-                    )}
-
-                    <div className={`max-w-[75%] sm:max-w-[65%] flex flex-col ${me ? 'items-start' : 'items-end'}`}>
-                      {!me && isFirstInGroup && m.sender_name && (
-                        <span className="text-[11px] font-semibold text-slate-600 mb-0.5 px-1">
+                  <Message key={m.uid} from={me ? 'user' : 'assistant'} align={me ? 'left' : 'right'}>
+                    <MessageAvatarImage
+                      src={m.sender_avatar ?? undefined}
+                      alt={senderLabel}
+                      fallback={senderLabel}
+                    />
+                    <MessageContent>
+                      {!me && m.sender_name && (
+                        <span className="px-1 text-[11px] font-semibold text-muted-foreground">
                           {m.sender_name}
                         </span>
                       )}
-
-                      <div
-                        className={
-                          me
-                            ? `bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20 ${bubbleRadius} px-3.5 py-2`
-                            : `bg-white border border-slate-200 text-slate-900 shadow-sm ${bubbleRadius} px-3.5 py-2`
-                        }
+                      <Bubble
+                        variant={me ? 'primary' : 'card'}
+                        size="md"
+                        className={me ? 'rounded-bl-md' : 'rounded-br-md'}
                       >
-                        {m.attachment?.url && (
-                          <a
-                            href={m.attachment.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="block mb-1.5 -mx-1 -mt-1"
-                          >
-                            <img
-                              src={m.attachment.url}
-                              alt={m.attachment.name}
-                              className="max-w-[260px] max-h-[220px] object-cover rounded-lg"
-                              loading="lazy"
-                            />
-                          </a>
+                        <BubbleContent>
+                          {m.attachment?.url && (
+                            <a
+                              href={m.attachment.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={m.attachment.url}
+                                alt={m.attachment.name}
+                                className="max-h-[220px] max-w-[260px] rounded-lg object-cover"
+                                loading="lazy"
+                              />
+                            </a>
+                          )}
+                          {m.content && <p className="leading-relaxed">{m.content}</p>}
+                        </BubbleContent>
+                      </Bubble>
+                      <BubbleMeta className={me ? 'justify-start' : 'justify-end'}>
+                        <span>{formatTime(m.created_at)}</span>
+                        {me && (
+                          <span className="inline-flex items-center text-primary/80">
+                            <Check size={12} strokeWidth={2.5} />
+                          </span>
                         )}
-                        {m.content && (
-                          <p className="text-[14px] leading-relaxed whitespace-pre-wrap break-words">
-                            {m.content}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className={`flex items-center gap-1 mt-0.5 px-1 ${me ? '' : 'flex-row-reverse'}`}>
-                        <span className="text-[10px] text-slate-400 font-medium">
-                          {formatTime(m.created_at)}
-                        </span>
-                        {me && <MessageStatus />}
-                      </div>
-                    </div>
-
-                    {!me && (
-                      <div className="w-7 shrink-0">
-                        {isLastInGroup && <Avatar name={m.sender_name || '?'} />}
-                      </div>
-                    )}
-                  </div>
+                      </BubbleMeta>
+                    </MessageContent>
+                  </Message>
                 );
               })}
             </div>

@@ -228,6 +228,7 @@ export type Message = {
   sender_id: string | null;
   sender_type: string;
   sender_name: string;
+  sender_avatar?: string | null;
   attachment: {
     uid: string | null;
     url: string;

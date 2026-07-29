@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { socialApi } from '@/lib/api/social';
@@ -343,11 +344,11 @@ export function PostCard({
               {currentUserId ? 'U' : '?'}
             </div>
             <div className="flex-1 relative">
-              <input
+              <Input
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
                 placeholder="Viết bình luận..."
-                className="w-full text-[13px] bg-white border border-slate-200 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 placeholder:text-slate-400"
+                className="w-full text-[13px] bg-card border-slate-200 rounded-full pl-3.5 pr-10 py-2 focus-visible:ring-1 focus-visible:ring-indigo-500"
               />
               <Button
                 type="submit"

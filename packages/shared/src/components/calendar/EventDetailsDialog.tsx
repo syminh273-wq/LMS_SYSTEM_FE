@@ -1,11 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { cn } from '@shared/lib/utils';
-import { Clock, MapPin, X, CalendarOff } from 'lucide-react';
+import { Clock, MapPin, CalendarOff } from 'lucide-react';
+import { Button } from '../ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@shared/components/ui/dialog';
 import { EventTypeBadge } from './EventTypeBadge';
 
 interface EventDetailsDialogProps {
@@ -29,6 +35,14 @@ function formatDateTime(iso: string, locale: 'vi' | 'en') {
   }).format(d);
 }
 
+const COLOR_BAR: Record<string, string> = {
+  indigo: 'bg-indigo-500',
+  rose: 'bg-rose-500',
+  amber: 'bg-amber-500',
+  emerald: 'bg-emerald-500',
+  slate: 'bg-slate-500',
+};
+
 export function EventDetailsDialog({
   open,
   event,
@@ -41,45 +55,26 @@ export function EventDetailsDialog({
   if (!open || !event) return null;
 
   const color = event.color ?? CALENDAR_TYPE_COLORS[event.type] ?? 'slate';
+  const colorBar = COLOR_BAR[color] ?? COLOR_BAR.slate;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-fade-in"
-      onClick={() => onOpenChange(false)}
-    >
-      <div
-        className="w-full max-w-md rounded-xl bg-white shadow-2xl overflow-hidden animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className={cn('h-1.5 w-full', {
-          'bg-indigo-500': color === 'indigo',
-          'bg-rose-500': color === 'rose',
-          'bg-amber-500': color === 'amber',
-          'bg-emerald-500': color === 'emerald',
-          'bg-slate-500': color === 'slate',
-        })} />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+        <div className={cn('h-1.5 w-full', colorBar)} />
 
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-          <h2 className="text-base font-bold text-slate-900">{event.title}</h2>
-          <Button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-            aria-label="Close"
-          >
-            <X size={18} />
-          </Button>
-        </div>
+        <DialogHeader className="px-6 pt-4 pb-4 border-b">
+          <DialogTitle>{event.title}</DialogTitle>
+        </DialogHeader>
 
         <div className="p-6 space-y-4">
           <EventTypeBadge type={event.type} color={color} />
 
-          <div className="space-y-3 text-[13px] text-slate-700">
+          <div className="space-y-3 text-sm text-foreground">
             <div className="flex items-start gap-2.5">
-              <Clock size={15} className="text-slate-400 mt-0.5 shrink-0" />
+              <Clock size={15} className="text-muted-foreground mt-0.5 shrink-0" />
               <div>
                 <div>{formatDateTime(event.start_time, locale)}</div>
-                <div className="text-slate-500 text-[12px]">
+                <div className="text-muted-foreground text-xs">
                   → {new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -89,14 +84,14 @@ export function EventDetailsDialog({
             </div>
             {event.classroom_name && (
               <div className="flex items-start gap-2.5">
-                <MapPin size={15} className="text-slate-400 mt-0.5 shrink-0" />
+                <MapPin size={15} className="text-muted-foreground mt-0.5 shrink-0" />
                 <div>{event.classroom_name}</div>
               </div>
             )}
           </div>
 
           {event.description && (
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-[12.5px] text-slate-600 whitespace-pre-line">
+            <div className="rounded-lg bg-muted/50 border p-3 text-xs text-muted-foreground whitespace-pre-line">
               {event.description}
             </div>
           )}
@@ -105,26 +100,23 @@ export function EventDetailsDialog({
             {showLeaveRequest && onRequestLeave && event.classroom_id && (
               <Button
                 type="button"
+                variant="outline"
                 onClick={() => {
                   onRequestLeave(event);
                   onOpenChange(false);
                 }}
-                className="w-full h-10 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 text-[13px] font-semibold inline-flex items-center justify-center gap-1.5"
+                className="w-full border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800"
               >
-                <CalendarOff size={15} />
+                <CalendarOff size={15} className="mr-1.5" />
                 {t('calendar.event.request_leave', 'Xin nghỉ buổi này')}
               </Button>
             )}
-            <Button
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-semibold"
-            >
+            <Button type="button" onClick={() => onOpenChange(false)} className="w-full">
               {t('calendar.dialog.close', 'Close')}
             </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

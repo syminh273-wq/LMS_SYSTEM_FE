@@ -537,6 +537,7 @@ export type ChatMessage = {
   sender_id: string | null;
   sender_type: 'space' | 'consumer' | string;
   sender_name: string;
+  sender_avatar?: string | null;
   attachment: ChatAttachment | null;
   created_at: string;
 };

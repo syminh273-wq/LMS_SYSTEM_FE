@@ -3,6 +3,8 @@
 import { Suspense, useState } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,17 +18,26 @@ import {
   Lock,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
-import { Label } from '@shared/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@shared/components/ui/form';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MasterLayout, MasterBody } from '@shared/components/layout/MasterLayout';
 import { useTranslation } from '@shared/components/LocaleProvider';
 
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
+const loginSchema = z.object({
+  email: z.string().email('Email không hợp lệ'),
+  password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 function GoogleIcon() {
   return (
@@ -59,22 +70,10 @@ function SpaceLoginContent() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
-  const { register, handleSubmit, formState: { errors }, setError: setFormError } = useForm<LoginFormValues>({
-    defaultValues: { email: '', password: '' }
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
   });
-
-  const handleApiError = (err: unknown) => {
-    if (err instanceof ValidationException) {
-      Object.entries(err.errors).forEach(([field, message]) => {
-        setFormError(field as keyof LoginFormValues, { type: 'server', message });
-      });
-      toast.error('Vui lòng kiểm tra lại thông tin đăng nhập.');
-    } else {
-      const message = err instanceof Error ? err.message : t('auth.login.login_failed');
-      setGlobalError(message);
-      toast.error(message);
-    }
-  };
 
   const onLogin = async (data: LoginFormValues) => {
     setGlobalError('');
@@ -90,7 +89,16 @@ function SpaceLoginContent() {
 
       router.push('/space');
     } catch (err: unknown) {
-      handleApiError(err);
+      if (err instanceof ValidationException) {
+        Object.entries(err.errors).forEach(([field, message]) => {
+          form.setError(field as keyof LoginFormValues, { type: 'server', message });
+        });
+        toast.error('Vui lòng kiểm tra lại thông tin đăng nhập.');
+      } else {
+        const message = err instanceof Error ? err.message : t('auth.login.login_failed');
+        setGlobalError(message);
+        toast.error(message);
+      }
     } finally { setLoading(false); }
   };
 
@@ -98,7 +106,6 @@ function SpaceLoginContent() {
     <MasterLayout footer={null}>
       <MasterBody className="min-h-screen">
         <div className="flex min-h-screen flex-col lg:flex-row bg-muted">
-
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-background relative">
             <div className="w-full max-w-[420px] animate-fade-up">
               <div className="mb-8 flex justify-center">
@@ -121,81 +128,87 @@ function SpaceLoginContent() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium text-foreground">
-                    Email
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
-                    <Input
-                      {...register('email', { required: 'Vui lòng nhập email' })}
-                      type="email"
-                      autoComplete="email"
-                      placeholder="name@company.com"
-                      className="h-11 pl-10 pr-4 text-sm bg-background border-border rounded-lg focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/20 transition-colors"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-destructive text-xs font-medium mt-1">{errors.email.message}</p>
-                  )}
-                </div>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onLogin)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
+                            <Input
+                              type="email"
+                              autoComplete="email"
+                              placeholder="name@company.com"
+                              className="h-11 pl-10 pr-4"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-foreground">
-                      Mật khẩu
-                    </Label>
-                    <Link
-                      href="/space/forgot-password"
-                      className="text-xs font-medium text-primary-brand hover:underline"
-                    >
-                      Quên mật khẩu?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
-                      placeholder="••••••••"
-                      className="h-11 pl-10 pr-11 text-sm bg-background border-border rounded-lg focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/20 transition-colors"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                      aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </Button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-destructive text-xs font-medium mt-1">{errors.password.message}</p>
-                  )}
-                </div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center justify-between">
+                          <FormLabel>Mật khẩu</FormLabel>
+                          <Link
+                            href="/space/forgot-password"
+                            className="text-xs font-medium text-primary-brand hover:underline"
+                          >
+                            Quên mật khẩu?
+                          </Link>
+                        </div>
+                        <FormControl>
+                          <div className="relative">
+                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
+                            <Input
+                              type={showPassword ? 'text' : 'password'}
+                              autoComplete="current-password"
+                              placeholder="••••••••"
+                              className="h-11 pl-10 pr-11"
+                              {...field}
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                            >
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-11 gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Đang xác thực...
-                    </>
-                  ) : (
-                    <>
-                      Đăng nhập
-                      <ArrowRight size={16} strokeWidth={2.5} />
-                    </>
-                  )}
-                </Button>
-              </form>
+                  <Button type="submit" disabled={loading} className="w-full h-11 gap-2">
+                    {loading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Đang xác thực...
+                      </>
+                    ) : (
+                      <>
+                        Đăng nhập
+                        <ArrowRight size={16} strokeWidth={2.5} />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
 
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">

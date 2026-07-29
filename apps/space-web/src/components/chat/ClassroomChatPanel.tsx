@@ -18,6 +18,14 @@ import {
   MoreVertical,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import {
+  Message,
+  MessageAvatarImage,
+  MessageContent,
+  Bubble,
+  BubbleContent,
+  TypingIndicator,
+} from '@shared/components/ui/message';
 import { toast } from 'sonner';
 import { chatApi } from '@/lib/api/chat';
 import { useChatWebSocket } from '@/lib/hooks/use-chat-websocket';
@@ -206,31 +214,26 @@ function MessageBubble({
       })
     : '';
 
-  const initials = msg.sender_name
-    ? msg.sender_name.slice(0, 2).toUpperCase()
-    : '??';
-
+  const senderLabel = isMe ? 'Bạn' : msg.sender_name || 'Ẩn danh';
   const roleLabel = msg.sender_type === 'space' ? 'Giáo viên' : 'Sinh viên';
   const isTeacher = msg.sender_type === 'space';
 
   return (
-    <div className={`flex gap-2 ${isMe ? 'flex-row' : 'flex-row-reverse'}`}>
-      {!isMe && (
-        <div className="w-8 h-8 shrink-0 rounded-full bg-primary-brand-muted text-primary-brand text-[10px] font-black flex items-center justify-center mt-1">
-          {initials}
-        </div>
-      )}
-      <div className={`flex flex-col gap-1 max-w-[75%] ${isMe ? 'items-start' : 'items-end'}`}>
-        <div className="flex items-baseline gap-2 px-1">
-          <span className="text-[11px] font-bold text-foreground">
-            {isMe ? 'Bạn' : msg.sender_name || 'Ẩn danh'}
-          </span>
+    <Message from={isMe ? 'user' : 'assistant'} align={isMe ? 'left' : 'right'}>
+      <MessageAvatarImage
+        src={msg.sender_avatar ?? undefined}
+        alt={senderLabel}
+        fallback={senderLabel}
+      />
+      <MessageContent>
+        <div className={`flex items-baseline gap-2 px-1 ${isMe ? 'justify-start' : 'justify-end'}`}>
+          <span className="text-[11px] font-bold text-foreground">{senderLabel}</span>
           {!isMe && (
             <span
-              className={`text-[9px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded ${
+              className={`rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${
                 isTeacher
-                  ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                  : 'bg-sky-100 text-sky-700 border border-sky-200'
+                  ? 'border border-amber-200 bg-amber-100 text-amber-700'
+                  : 'border border-sky-200 bg-sky-100 text-sky-700'
               }`}
             >
               {roleLabel}
@@ -238,24 +241,20 @@ function MessageBubble({
           )}
           <span className="text-[10px] text-muted-foreground">{timeStr}</span>
         </div>
-        <div
-          className={`rounded-2xl text-sm font-medium shadow-sm overflow-hidden ${
-            isMe
-              ? 'bg-primary-brand text-white rounded-bl-md'
-              : 'bg-card border border-border text-foreground rounded-br-md'
-          }`}
+        <Bubble
+          variant={isMe ? 'primary' : 'card'}
+          size="md"
+          className={`overflow-hidden p-0 ${isMe ? 'rounded-bl-md' : 'rounded-br-md'}`}
         >
-          {msg.attachment && (
-            <AttachmentView attachment={msg.attachment} isMe={isMe} />
-          )}
-          {msg.content ? (
-            <div className="px-4 py-2.5 break-words whitespace-pre-wrap">
-              {msg.content}
-            </div>
-          ) : null}
-        </div>
-      </div>
-    </div>
+          <BubbleContent>
+            {msg.attachment && <AttachmentView attachment={msg.attachment} isMe={isMe} />}
+            {msg.content ? (
+              <div className="px-4 py-2.5 break-words whitespace-pre-wrap">{msg.content}</div>
+            ) : null}
+          </BubbleContent>
+        </Bubble>
+      </MessageContent>
+    </Message>
   );
 }
 
@@ -527,7 +526,7 @@ export default function ClassroomChatPanel({
       <div
         ref={messagesAreaRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-6 space-y-6 bg-muted/30"
+        className="flex-1 space-y-6 overflow-y-auto bg-muted/30 p-6"
       >
         {/* Load more indicator */}
         {loadingMore && (
@@ -539,12 +538,12 @@ export default function ClassroomChatPanel({
         {/* History loading placeholder */}
         {!historyLoaded && (
           <div className="flex justify-center py-8">
-            <Loader2 size={28} className="animate-spin text-slate-300" />
+            <Loader2 size={28} className="animate-spin text-muted-foreground/50" />
           </div>
         )}
 
         {historyLoaded && messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-32 text-muted-foreground text-sm font-medium">
+          <div className="flex h-32 flex-col items-center justify-center text-sm font-medium text-muted-foreground">
             Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!
           </div>
         )}
@@ -559,12 +558,8 @@ export default function ClassroomChatPanel({
 
         {/* Typing indicator */}
         {typingUsers.length > 0 && (
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-medium italic">
-            <div className="flex gap-0.5">
-              <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:0ms]" />
-              <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:150ms]" />
-              <span className="w-1.5 h-1.5 bg-muted-foreground rounded-full animate-bounce [animation-delay:300ms]" />
-            </div>
+          <div className="flex items-center gap-2 text-[11px] font-medium italic text-muted-foreground">
+            <TypingIndicator />
             {typingUsers.join(', ')} đang nhập...
           </div>
         )}
