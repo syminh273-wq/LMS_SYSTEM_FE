@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import {
   fetchDocsTree,
-  fetchDocsInFolder,
   createFolder,
   updateFolder,
   deleteFolder,
@@ -10,7 +9,7 @@ import {
   uploadDoc,
   deleteDoc,
 } from '../api';
-import { findPathToFolder } from '../tree-utils';
+import { findPathToFolder, flattenTree, collectDocsByFolder } from '../tree-utils';
 import type { ClassroomDoc, ClassroomFolder, SortField, SortDir } from '../types';
 
 type UseDocsTreeArgs = {
@@ -30,7 +29,6 @@ export function useDocsTree({
 }: UseDocsTreeArgs) {
   const [allFolders, setAllFolders] = useState<ClassroomFolder[]>([]);
   const [rootDocs, setRootDocs] = useState<ClassroomDoc[]>([]);
-  const [folderDocs, setFolderDocs] = useState<ClassroomDoc[]>([]);
   const [docsByFolder, setDocsByFolder] = useState<Record<string, ClassroomDoc[]>>({});
   const [previewFolderUid, setPreviewFolderUid] = useState<string | null>(null);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
@@ -58,33 +56,16 @@ export function useDocsTree({
     setLoading(true);
     try {
       const data = await fetchDocsTree(ctx);
-      setAllFolders(data.folders);
+      setAllFolders(flattenTree(data.folders));
+      setDocsByFolder(collectDocsByFolder(data.folders));
       setRootDocs(data.docs_root);
       setPreviewFolderUid(data.preview_folder_uid ?? null);
-      const folderDocsMap: Record<string, ClassroomDoc[]> = {};
-      await Promise.all(
-        data.folders.map(async (f) => {
-          try {
-            const docs = await fetchDocsInFolder(ctx, f.uid);
-            folderDocsMap[f.uid] = docs;
-          } catch {
-            folderDocsMap[f.uid] = [];
-          }
-        }),
-      );
-      setDocsByFolder(folderDocsMap);
-      if (selectedFolderId) {
-        const docs = await fetchDocsInFolder(ctx, selectedFolderId);
-        setFolderDocs(docs);
-      } else {
-        setFolderDocs([]);
-      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi tải tài liệu');
     } finally {
       setLoading(false);
     }
-  }, [ctx, selectedFolderId]);
+  }, [ctx]);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps --
@@ -92,24 +73,15 @@ export function useDocsTree({
     void refresh();
   }, [classroomUid]);
 
-  useEffect(() => {
-    if (selectedFolderId === null) {
-      return;
-    }
-    let cancelled = false;
-    fetchDocsInFolder(ctx, selectedFolderId)
-      .then((docs) => {
-        if (!cancelled) setFolderDocs(docs);
-      })
-      .catch(() => {
-        if (!cancelled) setFolderDocs([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [ctx, selectedFolderId]);
-
+  const folderDocs = selectedFolderId ? (docsByFolder[selectedFolderId] ?? []) : [];
   const currentDocs = selectedFolderId === null ? rootDocs : folderDocs;
+
+  const updateFolderDocs = useCallback(
+    (folderId: string, updater: (prev: ClassroomDoc[]) => ClassroomDoc[]) => {
+      setDocsByFolder((prev) => ({ ...prev, [folderId]: updater(prev[folderId] ?? []) }));
+    },
+    [],
+  );
   const currentBreadcrumb = useMemo(() => {
     if (selectedFolderId === null) return [];
     return findPathToFolder(allFolders, selectedFolderId);
@@ -188,7 +160,7 @@ export function useDocsTree({
       if (selectedFolderId === null) {
         setRootDocs((prev) => prev.filter((d) => d.uid !== target.uid));
       } else {
-        setFolderDocs((prev) => prev.filter((d) => d.uid !== target.uid));
+        updateFolderDocs(selectedFolderId, (prev) => prev.filter((d) => d.uid !== target.uid));
       }
       toast.success(t('classroom.docs.doc_deleted', 'Đã xóa tài liệu'));
       setDeleteDocTarget(null);
@@ -211,16 +183,14 @@ export function useDocsTree({
     }));
     try {
       await reorderDocs(ctx, items);
+      const reorder = (prev: ClassroomDoc[]) => {
+        const map = new Map(prev.map((d) => [d.uid, d]));
+        return orderedUids.map((uid, idx) => ({ ...(map.get(uid) as ClassroomDoc), order_index: idx }));
+      };
       if (selectedFolderId === null) {
-        setRootDocs((prev) => {
-          const map = new Map(prev.map((d) => [d.uid, d]));
-          return orderedUids.map((uid, idx) => ({ ...(map.get(uid) as ClassroomDoc), order_index: idx }));
-        });
+        setRootDocs(reorder);
       } else {
-        setFolderDocs((prev) => {
-          const map = new Map(prev.map((d) => [d.uid, d]));
-          return orderedUids.map((uid, idx) => ({ ...(map.get(uid) as ClassroomDoc), order_index: idx }));
-        });
+        updateFolderDocs(selectedFolderId, reorder);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi lưu thứ tự');
@@ -241,7 +211,7 @@ export function useDocsTree({
         if (selectedFolderId === null) {
           setRootDocs((prev) => [newDoc, ...prev]);
         } else {
-          setFolderDocs((prev) => [newDoc, ...prev]);
+          updateFolderDocs(selectedFolderId, (prev) => [newDoc, ...prev]);
         }
       }
       toast.success(t('classroom.docs.uploaded', 'Đã tải lên'));

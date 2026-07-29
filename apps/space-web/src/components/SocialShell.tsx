@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   Bell,
   ChevronDown,
@@ -29,8 +29,8 @@ import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import NotificationBell from '@/components/NotificationBell';
-import { accountService } from '@/lib/api/account';
 import { clearProfile } from '@/lib/redux/userSlice';
+import { RootState, useAppDispatch } from '@/lib/redux/store';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
 
 type ProfileSummary = {
@@ -46,35 +46,29 @@ type ProfileSummary = {
 
 export function SocialShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const [profile, setProfile] = useState<ProfileSummary | null>(null);
+  const account = useSelector((state: RootState) => state.user.profile);
   const [isOwner, setIsOwner] = useState(false);
   const [authed, setAuthed] = useState(false);
+
+  const profile = useMemo<ProfileSummary | null>(() => {
+    if (!account) return null;
+    return {
+      uid: (account as any).uid,
+      full_name: (account as any).full_name,
+      email: (account as any).email,
+      avatar_url: (account as any).avatar_url,
+      username: (account as any).username,
+      name: (account as any).name,
+      slug: (account as any).slug,
+      description: (account as any).description,
+    };
+  }, [account]);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     setAuthed(Boolean(token));
-    if (!token) return;
-
-    let mounted = true;
-    accountService.getProfile()
-      .then((data) => {
-        if (!mounted) return;
-        const summary: ProfileSummary = {
-          uid: (data as any).uid,
-          full_name: (data as any).full_name,
-          email: (data as any).email,
-          avatar_url: (data as any).avatar_url,
-          username: (data as any).username,
-          name: (data as any).name,
-          slug: (data as any).slug,
-          description: (data as any).description,
-        };
-        setProfile(summary);
-      })
-      .catch(() => {});
-    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {

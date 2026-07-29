@@ -3,14 +3,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Camera } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
-import { accountService, type UserProfile } from '@/lib/api/account';
 import { classroomApi, type Classroom } from '@/lib/api/classroom';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
 import { setProfile } from '@/lib/redux/userSlice';
+import { updateSocialAvatar } from '@/lib/redux/socialProfileSlice';
+import { RootState, useAppDispatch } from '@/lib/redux/store';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { TeachingClassesCard } from '@shared/components/profile/TeachingClassesCard';
 
@@ -28,10 +29,13 @@ import { AddressSection, ProfileHeaderInfo } from '@shared/components/address';
 export default function MePage() {
   const { t } = useTranslation();
   const router = useRouter();
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
-  const [profile, setLocalProfile] = useState<UserProfile | null>(null);
-  const [workspace, setWorkspace] = useState<WorkspaceProfile | null>(null);
+  const dispatch = useAppDispatch();
+  const profile = useSelector((s: RootState) => s.user.profile);
+  const socialProfile = useSelector((s: RootState) => s.socialProfile.profile);
+  // Local edit buffer for workspace (bio/analytics cards mutate it in place);
+  // falls back to the shared Redux cache until the first local edit happens.
+  const [workspaceOverride, setWorkspaceOverride] = useState<WorkspaceProfile | null>(null);
+  const workspace = workspaceOverride ?? socialProfile;
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
   const [teachingLoading, setTeachingLoading] = useState(true);
@@ -42,58 +46,43 @@ export default function MePage() {
     const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
     if (!token) {
       router.replace('/space/login');
-      return;
     }
+  }, [router]);
+
+  useEffect(() => {
+    if (!profile?.uid) return;
     (async () => {
       try {
-        const [me, ws, pf] = await Promise.all([
-          accountService.getProfile(),
-          communityApi.getMyProfile(),
+        const [pf, list] = await Promise.all([
           portfolioApi.getMine().catch(() => null),
+          classroomApi.getByTeacher(profile.uid).catch(() => [] as Classroom[]),
         ]);
-        setLocalProfile(me);
-        setWorkspace(ws);
         setPortfolio(pf);
-        dispatch(setProfile(me));
-        if (me?.uid) {
-          try {
-            const list = await classroomApi.getByTeacher(me.uid);
-            setTeachingClasses(list);
-          } catch {
-            setTeachingClasses([]);
-          } finally {
-            setTeachingLoading(false);
-          }
-        } else {
-          setTeachingLoading(false);
-        }
+        setTeachingClasses(list);
       } catch (err) {
         console.error(err);
         toast.error(t('workspace.common.error'));
-        setTeachingLoading(false);
       } finally {
-        setLoading(false);
+        setTeachingLoading(false);
       }
     })();
-  }, [router, t, dispatch]);
+  }, [profile?.uid, t]);
 
   const uploadFile = async (file: File, kind: 'avatar' | 'cover') => {
     try {
       if (kind === 'avatar') {
         const res = await communityApi.uploadAvatar(file);
         const newUrl = res.url || res.avatar_url || '';
-        setWorkspace((w) => w ? { ...w, avatar_url: newUrl } : w);
+        setWorkspaceOverride(workspace ? { ...workspace, avatar_url: newUrl } : workspace);
+        dispatch(updateSocialAvatar(newUrl));
         if (profile) {
           dispatch(setProfile({ ...profile, avatar_url: newUrl }));
-        }
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('space:profile-updated', { detail: { avatar_url: newUrl } }));
         }
         toast.success('Đã cập nhật ảnh đại diện');
       } else {
         const res = await communityApi.uploadCover(file);
         const newUrl = res.url || res.cover_url || '';
-        setWorkspace((w) => w ? { ...w, cover_url: newUrl } : w);
+        setWorkspaceOverride(workspace ? { ...workspace, cover_url: newUrl } : workspace);
         toast.success('Đã cập nhật ảnh bìa');
       }
     } catch {
@@ -101,7 +90,7 @@ export default function MePage() {
     }
   };
 
-  if (loading || !workspace || !profile) {
+  if (!workspace || !profile) {
     return (
       <WorkspaceShell>
         <div className="flex items-center justify-center py-32">
@@ -117,7 +106,7 @@ export default function MePage() {
         profile={profile}
         workspace={workspace}
         portfolio={portfolio}
-        onWorkspaceChange={(next) => setWorkspace(next as WorkspaceProfile)}
+        onWorkspaceChange={(next) => setWorkspaceOverride(next as WorkspaceProfile)}
         onPortfolioChange={(next) => setPortfolio(next as Portfolio)}
         onEditProfile={() => router.push('/space/me/edit')}
         onEditCover={() => coverRef.current?.click()}

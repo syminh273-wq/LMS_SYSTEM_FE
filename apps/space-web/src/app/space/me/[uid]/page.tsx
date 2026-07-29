@@ -9,7 +9,6 @@ import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { portfolioApi, type Portfolio, type PortfolioEntry } from '@/lib/api/portfolio';
-import { accountService } from '@/lib/api/account';
 import { classroomApi, type Classroom } from '@/lib/api/classroom';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import type { RootState } from '@/lib/redux/store';
@@ -46,6 +45,7 @@ export default function PublicProfilePage() {
   const { t } = useTranslation();
   const targetUid = String(params?.uid ?? '');
   const isAuthed = useSelector((s: RootState) => s.user.isAuthenticated);
+  const me = useSelector((s: RootState) => s.user.profile);
 
   const [profile, setProfile] = useState<SpaceProfile | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceProfile | null>(null);
@@ -61,14 +61,13 @@ export default function PublicProfilePage() {
     (async () => {
       setLoading(true);
       try {
-        const [pf, me, ws, classes] = await Promise.all([
+        const [pf, ws, classes] = await Promise.all([
           portfolioApi.getPublic('space', targetUid).catch(() => null),
-          isAuthed ? accountService.getProfile().catch(() => null) : Promise.resolve(null),
           communityApi.getPublicProfile(targetUid).catch(() => null),
           classroomApi.getByTeacher(targetUid).catch(() => [] as Classroom[]),
         ]);
         setPortfolio(pf ?? EMPTY_PORTFOLIO);
-        if (me) {
+        if (isAuthed && me) {
           setIsOwner(me.uid === targetUid);
         }
         if (ws) {
@@ -94,7 +93,7 @@ export default function PublicProfilePage() {
         setTeachingLoading(false);
       }
     })();
-  }, [targetUid, t, isAuthed]);
+  }, [targetUid, t, isAuthed, me]);
 
   if (loading) {
     return (

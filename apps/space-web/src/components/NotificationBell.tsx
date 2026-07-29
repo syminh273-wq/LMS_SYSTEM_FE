@@ -128,8 +128,10 @@ export default function NotificationBell() {
             <span className="text-sm font-semibold text-foreground">{t('layout.notifications.title')}</span>
             {unreadCount > 0 && (
               <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleMarkAllRead}
-                className="flex items-center gap-1 text-xs text-primary-brand hover:text-primary-brand-dark font-medium"
+                className="h-auto gap-1 px-2 py-1 text-xs text-primary-brand hover:text-primary-brand-dark hover:bg-primary-brand-light/60 font-medium"
               >
                 <CheckCheck size={13} />
                 {t('layout.notifications.mark_all_read')}

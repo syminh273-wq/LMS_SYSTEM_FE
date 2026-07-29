@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   ChevronDown,
   Home,
@@ -24,9 +24,9 @@ import { Input } from '@shared/components/ui/input';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { accountService, type UserProfile } from '@/lib/api/account';
-import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
+import type { UserProfile } from '@/lib/api/account';
 import { clearProfile } from '@/lib/redux/userSlice';
+import { RootState, useAppDispatch } from '@/lib/redux/store';
 import NotificationBell from './NotificationBell';
 
 type ShellProfile = UserProfile & { workspace_avatar_url?: string };
@@ -34,9 +34,10 @@ type ShellProfile = UserProfile & { workspace_avatar_url?: string };
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const [profile, setProfile] = useState<ShellProfile | null>(null);
+  const account = useSelector((state: RootState) => state.user.profile);
+  const workspace = useSelector((state: RootState) => state.socialProfile.profile);
   const [authed, setAuthed] = useState(false);
 
   const isHome = pathname === '/space/feed';
@@ -45,53 +46,14 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
     setAuthed(Boolean(localStorage.getItem('accessToken')));
   }, []);
 
-  useEffect(() => {
-    if (!authed) return;
-    let mounted = true;
-    Promise.all([
-      accountService.getProfile().catch(() => null as UserProfile | null),
-      communityApi.getMyProfile().catch(() => null as WorkspaceProfile | null),
-    ])
-      .then(([account, workspace]) => {
-        if (!mounted) return;
-        if (account) {
-          setProfile({
-            ...account,
-            avatar_url: workspace?.avatar_url || account.avatar_url || '',
-            workspace_avatar_url: workspace?.avatar_url || '',
-          });
-        }
-      })
-      .catch(() => {});
-    return () => { mounted = false; };
-  }, [authed]);
-
-  useEffect(() => {
-    const onProfileUpdated = (e: Event) => {
-      const detail = (e as CustomEvent<{ avatar_url?: string }>).detail;
-      if (detail?.avatar_url) {
-        const newUrl = detail.avatar_url;
-        setProfile((p) => (p ? { ...p, avatar_url: newUrl, workspace_avatar_url: newUrl } : p));
-      } else {
-        Promise.all([
-          accountService.getProfile().catch(() => null as UserProfile | null),
-          communityApi.getMyProfile().catch(() => null as WorkspaceProfile | null),
-        ])
-          .then(([account, workspace]) => {
-            if (account) {
-              setProfile({
-                ...account,
-                avatar_url: workspace?.avatar_url || account.avatar_url || '',
-                workspace_avatar_url: workspace?.avatar_url || '',
-              });
-            }
-          })
-          .catch(() => {});
-      }
+  const profile = useMemo<ShellProfile | null>(() => {
+    if (!account) return null;
+    return {
+      ...account,
+      avatar_url: workspace?.avatar_url || account.avatar_url || '',
+      workspace_avatar_url: workspace?.avatar_url || '',
     };
-    window.addEventListener('space:profile-updated', onProfileUpdated);
-    return () => window.removeEventListener('space:profile-updated', onProfileUpdated);
-  }, []);
+  }, [account, workspace]);
 
   const handleLogout = () => {
     dispatch(clearProfile());

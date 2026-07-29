@@ -2,13 +2,12 @@
 
 import * as React from 'react';
 import { Button } from '@shared/components/ui/button';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { socialApi } from '@/lib/api/social';
-import { accountService } from '@/lib/api/account';
-import { communityApi } from '@/lib/api/community';
-import { portfolioApi } from '@/lib/api/portfolio';
 import type { Post } from '@/lib/api/types';
+import type { RootState } from '@/lib/redux/store';
 import { Loader2, ChevronDown, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { CreatePost } from './CreatePost';
@@ -19,14 +18,27 @@ import { FeedLeftSidebar } from './FeedLeftSidebar';
 
 export default function FeedPage() {
   const router = useRouter();
+  const account = useSelector((s: RootState) => s.user.profile);
+  const workspace = useSelector((s: RootState) => s.socialProfile.profile);
   const [mounted, setMounted] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [profile, setProfile] = useState<{ full_name: string; avatar_url: string; uid: string; email?: string; username?: string; created_at?: string } | null>(null);
-  const [followingCount, setFollowingCount] = useState(0);
   const PAGE = 15;
+
+  const profile = useMemo(() => {
+    if (!account) return null;
+    return {
+      full_name: account.full_name,
+      avatar_url: workspace?.avatar_url || account.avatar_url || '',
+      uid: String(account.uid),
+      email: account.email,
+      username: account.username,
+      created_at: account.created_at,
+    };
+  }, [account, workspace]);
+  const followingCount = workspace?.following_count ?? 0;
 
   const fetchFeed = useCallback(async () => {
     setLoading(true);
@@ -42,38 +54,8 @@ export default function FeedPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (!localStorage.getItem('accessToken')) { router.push('/space/login'); return; }
-    const init = async () => {
-      try {
-        const [prof, workspace, portfolio] = await Promise.all([
-          accountService.getProfile(),
-          communityApi.getMyProfile().catch(() => null),
-          portfolioApi.getMine().catch(() => null),
-        ]);
-        setProfile({
-          full_name: prof.full_name,
-          avatar_url: workspace?.avatar_url || prof.avatar_url || '',
-          uid: String(prof.uid),
-          email: prof.email,
-          username: prof.username,
-          created_at: prof.created_at,
-        });
-        setFollowingCount(workspace?.following_count ?? 0);
-        await fetchFeed();
-      } catch { toast.error('Lỗi khởi tạo'); }
-    };
-    init();
+    fetchFeed();
   }, [router, fetchFeed]);
-
-  useEffect(() => {
-    const onProfileUpdated = (e: Event) => {
-      const detail = (e as CustomEvent<{ avatar_url?: string }>).detail;
-      if (detail?.avatar_url) {
-        setProfile((p) => (p ? { ...p, avatar_url: detail.avatar_url! } : p));
-      }
-    };
-    window.addEventListener('space:profile-updated', onProfileUpdated);
-    return () => window.removeEventListener('space:profile-updated', onProfileUpdated);
-  }, []);
 
   const loadMore = async () => {
     if (loadingMore || !hasMore || posts.length === 0) return;

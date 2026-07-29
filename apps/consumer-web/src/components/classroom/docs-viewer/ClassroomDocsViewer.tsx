@@ -27,10 +27,9 @@ import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import {
   fetchDocsTree,
-  fetchDocsInFolder,
   sortDocs,
 } from './api';
-import { buildFolderTree, findPathToFolder } from './tree-utils';
+import { findPathToFolder, flattenTree, collectDocsByFolder } from './tree-utils';
 import type { ClassroomDoc, ClassroomFolder, SortField, SortDir, FolderNode } from './types';
 import { DocViewerPanel } from '../doc-viewer/DocViewerPanel';
 import { isMediaFile } from '../doc-viewer/utils';
@@ -157,7 +156,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
   const [tree, setTree] = useState<FolderNode[]>([]);
   const [allFolders, setAllFolders] = useState<ClassroomFolder[]>([]);
   const [rootDocs, setRootDocs] = useState<ClassroomDoc[]>([]);
-  const [folderDocs, setFolderDocs] = useState<ClassroomDoc[]>([]);
+  const [docsByFolder, setDocsByFolder] = useState<Record<string, ClassroomDoc[]>>({});
   const [previewOnly, setPreviewOnly] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -176,12 +175,13 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
     let cancelled = false;
     setLoading(true);
     fetchDocsTree(ctx)
-      .then((data: any) => {
+      .then((data) => {
         if (cancelled) return;
-        setAllFolders(data.folders);
+        setTree(data.folders);
+        setAllFolders(flattenTree(data.folders));
+        setDocsByFolder(collectDocsByFolder(data.folders));
         setRootDocs(data.docs_root);
         setPreviewOnly(Boolean(data.preview_only));
-        setTree(buildFolderTree(data.folders));
       })
       .catch(() => {
         if (!cancelled) toast.error(t('classroom.labels.docs_load_error', 'Không thể tải danh sách tài liệu.'));
@@ -194,22 +194,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
     };
   }, [ctx, t]);
 
-  useEffect(() => {
-    if (selectedFolderId === null) {
-      return;
-    }
-    let cancelled = false;
-    fetchDocsInFolder(ctx, selectedFolderId)
-      .then((docs) => {
-        if (!cancelled) setFolderDocs(docs);
-      })
-      .catch(() => {
-        if (!cancelled) setFolderDocs([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [ctx, selectedFolderId]);
+  const folderDocs = selectedFolderId ? (docsByFolder[selectedFolderId] ?? []) : [];
 
   // Fetch progress for each doc (lightweight, only fields we need)
   const allVisibleDocs = useMemo(() => {

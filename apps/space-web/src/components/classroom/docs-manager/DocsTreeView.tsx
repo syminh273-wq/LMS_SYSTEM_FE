@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   FileText,
   FileImage,
@@ -183,6 +183,14 @@ export function DocsTreeView({
     },
     features: [syncDataLoaderFeature, hotkeysCoreFeature],
   });
+
+  // headless-tree caches its flattened item list and only rebuilds it when
+  // `expandedItems` changes — it never notices that `dataLoader` now returns
+  // different data. Folders/docs arrive asynchronously (empty on first render),
+  // so without this the tree stays permanently built from the empty initial state.
+  useEffect(() => {
+    headlessTree.rebuildTree();
+  }, [headlessTree, items, childrenMap]);
 
   const isItemSelected = (itemId: string): boolean => {
     if (selectedFolderId === null) return itemId === ALL_DOCS_ID;

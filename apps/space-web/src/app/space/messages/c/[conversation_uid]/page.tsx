@@ -19,7 +19,7 @@ export default function DirectChatByConvPage() {
   const router = useRouter();
   const conversationUid = String(params?.conversation_uid ?? '');
   const currentUser = useSelector((s: RootState) => s.user.profile);
-  const [workspaceOwnerId, setWorkspaceOwnerId] = useState<string | null>(null);
+  const workspaceOwnerId = useSelector((s: RootState) => s.socialProfile.profile?.owner_id ?? null);
 
   const [convMeta, setConvMeta] = useState<{ name: string; avatar: string; uid: string }>({ name: '', avatar: '', uid: '' });
   const [messages, setMessages] = useState<WorkspaceMessage[]>([]);
@@ -28,19 +28,6 @@ export default function DirectChatByConvPage() {
 
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectRef = useRef(0);
-
-  useEffect(() => {
-    let mounted = true;
-    communityApi
-      .getMyProfile()
-      .then((p) => {
-        if (mounted) setWorkspaceOwnerId(p?.owner_id ?? null);
-      })
-      .catch(() => {});
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (!conversationUid) return;

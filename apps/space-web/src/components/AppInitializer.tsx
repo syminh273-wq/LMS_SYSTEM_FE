@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { spaceApi } from '@/lib/api';
 import { setSettings } from '@/lib/redux/spaceSlice';
-import { setProfile } from '@/lib/redux/userSlice';
-import { RootState } from '@/lib/redux/store';
+import { setProfile, fetchAccountProfile } from '@/lib/redux/userSlice';
+import { fetchSocialProfile } from '@/lib/redux/socialProfileSlice';
+import { RootState, useAppDispatch } from '@/lib/redux/store';
 
 export function AppInitializer({ children }: { children: React.ReactNode }) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const themeColor = useSelector((state: RootState) => state.space.themeColor);
   const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
 
@@ -36,6 +37,8 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         }
       };
       fetchSettings();
+      dispatch(fetchAccountProfile());
+      dispatch(fetchSocialProfile());
     }
   }, [dispatch, isAuthenticated]);
 

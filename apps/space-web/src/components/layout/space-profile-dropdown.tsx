@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import {
   DropdownMenu,
@@ -9,73 +9,30 @@ import {
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
-import type { RootState } from '@/lib/redux/store';
-import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
-import { accountService, type UserProfile } from '@/lib/api/account';
+import { RootState, useAppDispatch } from '@/lib/redux/store';
 import {
   LogOut,
   Sparkles,
   UserCircle,
 } from 'lucide-react';
 
-type ProfileData = {
-  full_name: string;
-  email: string;
-  avatar_url: string;
-  username: string;
-};
-
 export function SpaceProfileDropdown() {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const reduxProfile = useSelector((s: RootState) => s.user.profile);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const dispatch = useAppDispatch();
+  const account = useSelector((s: RootState) => s.user.profile);
+  const workspace = useSelector((s: RootState) => s.socialProfile.profile);
 
-  useEffect(() => {
-    let mounted = true;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    if (!token) return;
-
-    const load = async () => {
-      try {
-        const [account, workspace] = await Promise.all([
-          accountService.getProfile().catch(() => null as UserProfile | null),
-          communityApi.getMyProfile().catch(() => null as WorkspaceProfile | null),
-        ]);
-        if (!mounted) return;
-        const mergedAvatar =
-          workspace?.avatar_url ||
-          account?.avatar_url ||
-          reduxProfile?.avatar_url ||
-          '';
-        setProfile({
-          full_name: account?.full_name || account?.username || 'Admin',
-          email: account?.email || '',
-          avatar_url: mergedAvatar,
-          username: account?.username || '',
-        });
-      } catch {}
+  const profile = useMemo(() => {
+    if (!account) return null;
+    return {
+      full_name: account.full_name || account.username || 'Admin',
+      email: account.email || '',
+      avatar_url: workspace?.avatar_url || account.avatar_url || '',
+      username: account.username || '',
     };
-
-    load();
-
-    const onProfileUpdated = (e: Event) => {
-      const detail = (e as CustomEvent<{ avatar_url?: string }>).detail;
-      if (detail?.avatar_url) {
-        setProfile((prev) => (prev ? { ...prev, avatar_url: detail.avatar_url! } : prev));
-      } else {
-        load();
-      }
-    };
-    window.addEventListener('space:profile-updated', onProfileUpdated);
-
-    return () => {
-      mounted = false;
-      window.removeEventListener('space:profile-updated', onProfileUpdated);
-    };
-  }, [reduxProfile?.avatar_url]);
+  }, [account, workspace]);
 
   const handleLogout = () => {
     dispatch(clearProfile());

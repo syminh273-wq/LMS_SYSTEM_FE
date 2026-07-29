@@ -16,7 +16,6 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { useDashboard } from '@/lib/hooks/use-dashboard';
-import { communityApi } from '@/lib/api/community';
 import type { RootState } from '@/lib/redux/store';
 import { useTranslation } from '@shared/components/LocaleProvider';
 
@@ -47,18 +46,12 @@ export default function SpaceDashboardPage() {
   const { t, formatDate: localeFormatDate, formatTime: localeFormatTime } = useTranslation();
   const { status, data } = useDashboard();
   const profile = useSelector((state: RootState) => state.user.profile);
+  const workspaceAvatarUrl = useSelector((state: RootState) => state.socialProfile.profile?.avatar_url ?? '');
   const [now, setNow] = useState(() => new Date());
-  const [workspaceAvatarUrl, setWorkspaceAvatarUrl] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    communityApi.getMyProfile()
-      .then((workspace) => setWorkspaceAvatarUrl(workspace?.avatar_url || ''))
-      .catch(() => {});
   }, []);
 
   if (status === 'loading' || !data) {

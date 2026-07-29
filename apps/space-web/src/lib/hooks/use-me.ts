@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-import { accountService, type UserProfile } from '@/lib/api/account';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { fetchAccountProfile } from '@/lib/redux/userSlice';
+import type { UserProfile } from '@/lib/api/account';
+import { RootState, useAppDispatch } from '@/lib/redux/store';
 
 type MeStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
@@ -10,35 +13,31 @@ export type UseMeResult = {
 };
 
 /**
- * Fetch the current space (teacher) profile from
- * `/api/v1/space/account/spaces/mine/`. A consumer (student) token will be
+ * Reads the current space (teacher) profile from the shared Redux cache
+ * (populated once by `AppInitializer` from
+ * `/api/v1/space/account/spaces/mine/`). A consumer (student) token will be
  * rejected, leaving `me` as null. Callers can use this to detect "wrong
  * role" or compare `me.uid` against a classroom's `teacher_id` to determine
  * whether the visitor is the class owner.
  */
 export function useMe(): UseMeResult {
-  const [status, setStatus] = useState<MeStatus>('loading');
-  const [me, setMe] = useState<UserProfile | null>(null);
+  const dispatch = useAppDispatch();
+  const me = useSelector((s: RootState) => s.user.profile);
+  const fetchStatus = useSelector((s: RootState) => s.user.status);
 
-  const load = useCallback(async () => {
-    setStatus('loading');
-    try {
-      const profile = await accountService.getProfile();
-      setMe(profile);
-      setStatus('authenticated');
-    } catch {
-      setMe(null);
-      setStatus('unauthenticated');
-    }
-  }, []);
+  const reload = useCallback(async () => {
+    await dispatch(fetchAccountProfile({ force: true }));
+  }, [dispatch]);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect --
-       Initial mount triggers the same loader that updates state; this
-       mirrors the consumer-web useMe hook and is safe because load only
-       fires once on mount (load is stable via useCallback([])). */
-    void load();
-  }, [load]);
+    dispatch(fetchAccountProfile());
+  }, [dispatch]);
 
-  return { status, me, reload: load };
+  const status = useMemo<MeStatus>(() => {
+    if (fetchStatus === 'failed') return 'unauthenticated';
+    if (fetchStatus === 'succeeded') return me ? 'authenticated' : 'unauthenticated';
+    return 'loading';
+  }, [fetchStatus, me]);
+
+  return { status, me, reload };
 }

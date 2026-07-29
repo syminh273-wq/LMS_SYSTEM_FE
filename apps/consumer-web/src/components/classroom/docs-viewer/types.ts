@@ -23,17 +23,20 @@ export type ClassroomFolder = {
   updated_at?: string;
 };
 
+export type FolderNode = ClassroomFolder & {
+  children: FolderNode[];
+  docs: ClassroomDoc[];
+};
+
 export type DocsTreeResponse = {
-  folders: ClassroomFolder[];
+  folders: FolderNode[];
   docs_root: ClassroomDoc[];
+  preview_only?: boolean;
+  requires_payment?: boolean;
 };
 
 export type SortField = 'name' | 'created_at' | 'size' | 'file_type';
 export type SortDir = 'asc' | 'desc';
-
-export type FolderNode = ClassroomFolder & {
-  children: FolderNode[];
-};
 
 export type DocNote = {
   uid: string;

@@ -4,13 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@shared/components/ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import { ArrowLeft, Loader2, Mail, Search, UserCheck, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
-import { accountService, type UserProfile } from '@/lib/api/account';
 import { socialApi } from '@/lib/api/social';
+import type { RootState } from '@/lib/redux/store';
 
 type FollowedUser = {
   consumer_uid: string;
@@ -21,7 +22,7 @@ type FollowedUser = {
 
 export default function FollowingPage() {
   const router = useRouter();
-  const [me, setMe] = useState<UserProfile | null>(null);
+  const me = useSelector((s: RootState) => s.user.profile);
   const [users, setUsers] = useState<FollowedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +36,11 @@ export default function FollowingPage() {
       router.replace('/auth/login');
       return;
     }
+    if (!me?.uid) return;
     let mounted = true;
     (async () => {
       try {
-        const prof = await accountService.getProfile();
-        if (!mounted) return;
-        setMe(prof);
-        const list = (await socialApi.getFollowing(String(prof.uid), 100)) as FollowedUser[];
+        const list = (await socialApi.getFollowing(String(me.uid), 100)) as FollowedUser[];
         if (!mounted) return;
         setUsers(Array.isArray(list) ? list : []);
         setCount(Array.isArray(list) ? list.length : 0);
@@ -56,7 +55,7 @@ export default function FollowingPage() {
     return () => {
       mounted = false;
     };
-  }, [router]);
+  }, [router, me?.uid]);
 
   const filtered = useMemo(() => {
     if (!query.trim()) return users;
@@ -70,9 +69,6 @@ export default function FollowingPage() {
       await socialApi.toggleFollow(targetUid);
       setUsers((prev) => prev.filter((u) => u.consumer_uid !== targetUid));
       setCount((c) => Math.max(0, c - 1));
-      window.dispatchEvent(
-        new CustomEvent('space:profile-updated', { detail: { following_count_delta: -1 } }),
-      );
       toast.success('Đã hủy theo dõi');
     } catch {
       toast.error('Thao tác thất bại');

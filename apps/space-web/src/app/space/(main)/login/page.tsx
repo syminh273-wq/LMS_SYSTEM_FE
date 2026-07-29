@@ -6,10 +6,9 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { spaceApi, ValidationException } from '@/lib/api';
-import { accountService } from '@/lib/api/account';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useDispatch } from 'react-redux';
-import { setProfile } from '@/lib/redux/userSlice';
+import { fetchAccountProfile } from '@/lib/redux/userSlice';
+import { useAppDispatch } from '@/lib/redux/store';
 import {
   Eye,
   EyeOff,
@@ -67,7 +66,7 @@ function SpaceLoginContent() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
   const form = useForm<LoginFormValues>({
@@ -84,8 +83,7 @@ function SpaceLoginContent() {
       localStorage.setItem('refreshToken', response.refresh);
       localStorage.setItem('userType', 'space');
 
-      const profile = await accountService.getProfile();
-      dispatch(setProfile(profile));
+      await dispatch(fetchAccountProfile({ force: true }));
 
       router.push('/space');
     } catch (err: unknown) {

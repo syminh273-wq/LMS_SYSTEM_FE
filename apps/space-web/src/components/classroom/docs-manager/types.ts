@@ -24,15 +24,16 @@ export type ClassroomFolder = {
   updated_at?: string;
 };
 
+export type FolderNode = ClassroomFolder & {
+  children: FolderNode[];
+  docs: ClassroomDoc[];
+};
+
 export type DocsTreeResponse = {
-  folders: ClassroomFolder[];
+  folders: FolderNode[];
   docs_root: ClassroomDoc[];
   preview_folder_uid?: string | null;
 };
 
 export type SortField = 'name' | 'created_at' | 'size' | 'file_type';
 export type SortDir = 'asc' | 'desc';
-
-export type FolderNode = ClassroomFolder & {
-  children: FolderNode[];
-};

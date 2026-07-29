@@ -21,19 +21,6 @@ export async function fetchDocsTree(ctx: ApiCtx): Promise<DocsTreeResponse> {
   return (await res.json()) as DocsTreeResponse;
 }
 
-export async function fetchDocsInFolder(
-  ctx: ApiCtx,
-  folderId: string | null,
-): Promise<ClassroomDoc[]> {
-  const q = folderId ? `?folder_id=${encodeURIComponent(folderId)}` : '?folder_id=';
-  const res = await fetch(
-    `${ctx.apiBase}/api/v1/space/course/classrooms/${ctx.classroomUid}/docs/${q}`,
-    { headers: authHeaders(ctx.accessToken) },
-  );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return (await res.json()) as ClassroomDoc[];
-}
-
 export async function createFolder(
   ctx: ApiCtx,
   payload: { name: string; parent_folder_id?: string | null; color?: string | null; is_preview_only?: boolean },
