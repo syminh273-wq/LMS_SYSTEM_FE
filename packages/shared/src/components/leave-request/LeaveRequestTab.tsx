@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Plus, Loader2, CalendarOff } from 'lucide-react';
@@ -165,7 +166,7 @@ export function LeaveRequestTab({
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5">
             {FILTERS.map((f) => (
-              <button
+              <Button
                 type="button"
                 key={f.key}
                 onClick={() => setFilter(f.key)}
@@ -176,18 +177,18 @@ export function LeaveRequestTab({
                 }`}
               >
                 {t(f.labelKey, f.key)}
-              </button>
+              </Button>
             ))}
           </div>
           {canCreate !== false && role === 'student' && api.create && (
-            <button
+            <Button
               type="button"
               onClick={() => setDialogOpen(true)}
               className="h-9 px-3 rounded-lg bg-indigo-600 text-white text-[12.5px] font-semibold hover:bg-indigo-700 inline-flex items-center gap-1.5"
             >
               <Plus size={14} strokeWidth={2.5} />
               {t('leave_request.tab.create', 'Tạo đơn')}
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Smile, Send, Loader2, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+
+import { Input } from '@shared/components/ui/input';
 import { useTranslation } from '@shared/components/LocaleProvider';
 
 const EMOJIS = [
@@ -86,16 +88,16 @@ export function MessageInput({ onSend, disabled }: Props) {
       {previewUrl && (
         <div className="mb-2 relative inline-block">
           <img src={previewUrl} alt="preview" className="h-20 w-20 object-cover rounded-lg border border-border" />
-          <button
+          <Button
             onClick={() => { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); setPendingFile(null); }}
             className="absolute -top-2 -right-2 w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center hover:bg-slate-700"
           >
             <X size={12} />
-          </button>
+          </Button>
         </div>
       )}
       <div className="flex items-center gap-2 bg-muted/40 p-2 rounded-2xl border border-border focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all">
-        <input id="dm-file" type="file" accept="image/*" className="hidden" onChange={handleFile} />
+        <Input id="dm-file" type="file" accept="image/*" className="hidden" onChange={handleFile} />
         <Button
           variant="ghost" size="icon"
           onClick={() => document.getElementById('dm-file')?.click()}
@@ -103,7 +105,7 @@ export function MessageInput({ onSend, disabled }: Props) {
         >
           <ImageIcon size={18} />
         </Button>
-        <input
+        <Input
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -114,7 +116,7 @@ export function MessageInput({ onSend, disabled }: Props) {
           }}
           placeholder={t('workspace.messages.input_placeholder')}
           disabled={disabled || uploading}
-          className="flex-1 bg-transparent border-none outline-none text-sm px-2 h-9 text-foreground"
+          className="flex-1 bg-transparent border-none shadow-none text-sm px-2 h-9 text-foreground"
         />
         <div className="relative">
           <Button
@@ -129,13 +131,13 @@ export function MessageInput({ onSend, disabled }: Props) {
               <div className="fixed inset-0 z-10" onClick={() => setShowEmoji(false)} />
               <div className="absolute bottom-12 right-0 z-20 w-72 max-h-64 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl p-2 grid grid-cols-10 gap-1">
                 {EMOJIS.map((e, i) => (
-                  <button
+                  <Button
                     key={i}
                     onClick={() => { handleEmoji(e); setShowEmoji(false); }}
                     className="text-xl hover:bg-slate-100 rounded p-1"
                   >
                     {e}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </>

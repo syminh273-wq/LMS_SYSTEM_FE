@@ -265,7 +265,7 @@ export function ClassroomDocsManager({
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
-          <button
+          <Button
             type="button"
             onClick={() => setSelectedFolderId(null)}
             className={`px-2 py-1 rounded-md font-bold ${
@@ -275,11 +275,11 @@ export function ClassroomDocsManager({
             }`}
           >
             {t('classroom.docs.root_label', 'Tất cả tài liệu')}
-          </button>
+          </Button>
           {currentBreadcrumb.map((f) => (
             <React.Fragment key={f.uid}>
               <span className="text-slate-300">/</span>
-              <button
+              <Button
                 type="button"
                 onClick={() => setSelectedFolderId(f.uid)}
                 className={`px-2 py-1 rounded-md font-bold ${
@@ -290,7 +290,7 @@ export function ClassroomDocsManager({
               >
                 <FolderIcon size={12} className="inline-block mr-1" />
                 {f.name}
-              </button>
+              </Button>
             </React.Fragment>
           ))}
         </div>

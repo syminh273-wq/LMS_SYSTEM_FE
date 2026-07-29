@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Mail, ShieldCheck } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
 
@@ -54,9 +56,9 @@ export default function ForgotPasswordPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[12px] font-semibold text-slate-700">
+            <Label className="text-[12px] font-semibold text-slate-700">
               Địa chỉ Email
-            </label>
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
               <Input
@@ -71,7 +73,7 @@ export default function ForgotPasswordPage() {
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
             className="mt-2 w-full h-11 rounded-lg font-semibold text-[14px] text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -87,7 +89,7 @@ export default function ForgotPasswordPage() {
                 <ArrowRight size={16} strokeWidth={2.5} />
               </>
             )}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

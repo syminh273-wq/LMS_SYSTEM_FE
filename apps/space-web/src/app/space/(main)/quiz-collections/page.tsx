@@ -126,13 +126,13 @@ export default function QuizCollectionsPage() {
                   <span className="line-clamp-1">{certName(c.certificate_id)}</span>
                 </span>
                 <div className="flex items-center gap-2">
-                  <button
+                  <Button
                     onClick={(e) => { e.stopPropagation(); void handleDelete(c); }}
                     className="text-muted-foreground hover:text-red-500 transition-colors p-1"
                     title="Delete"
                   >
                     <Trash2 size={14} />
-                  </button>
+                  </Button>
                   <ChevronRight size={16} className="text-muted-foreground group-hover:text-primary-brand group-hover:translate-x-1 transition-all" />
                 </div>
               </div>

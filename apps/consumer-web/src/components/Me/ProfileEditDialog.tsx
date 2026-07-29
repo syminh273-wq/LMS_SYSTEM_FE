@@ -85,13 +85,13 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
                   key={`${s}-${i}`}
                   className="inline-flex items-center gap-1.5 pl-2.5 pr-2 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold"
                 >
-                  <button
+                  <Button
                     onClick={() => setSkills(skills.filter((_, j) => j !== i))}
                     aria-label="Remove skill"
                     className="-ml-1 hover:text-rose-600"
                   >
                     <X size={12} />
-                  </button>
+                  </Button>
                   {s}
                 </span>
               ))}

@@ -117,7 +117,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
 
           {authed && (
             <nav className="hidden md:flex items-center gap-1 ml-2">
-              <button
+              <Button
                 onClick={() => router.push('/space/feed')}
                 className={
                   'inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-bold transition-colors ' +
@@ -129,7 +129,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
               >
                 <Home size={14} />
                 Trang chủ
-              </button>
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -160,7 +160,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 <ThemeToggle />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button
+                    <Button
                       type="button"
                       aria-label="Mở menu tài khoản"
                       className="ml-2 pl-1.5 pr-2 py-0.5 flex items-center gap-2 rounded-full outline-none hover:ring-2 hover:ring-indigo-300 transition-all"
@@ -172,7 +172,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                         </AvatarFallback>
                       </Avatar>
                       <ChevronDown size={12} className="text-muted-foreground" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" sideOffset={8} className="rounded-2xl border border-border bg-card p-1.5 shadow-xl w-64">
                     <div className="px-3 py-2.5">
@@ -180,35 +180,35 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <p className="text-xs text-muted-foreground truncate">{profile?.email || ''}</p>
                     </div>
                     <div className="h-px bg-border my-1" />
-                    <button
+                    <Button
                       onClick={() => router.push('/space')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <LayoutDashboard size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">Quay về trang chính</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => router.push('/space/me')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <User size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => router.push('/space/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <UserCheck size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">Đang theo dõi</span>
-                    </button>
+                    </Button>
                     <div className="h-px bg-border my-1" />
-                    <button
+                    <Button
                       onClick={handleLogout}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-destructive/5"
                     >
                       <LogOut size={14} className="text-destructive" />
                       <span className="text-sm font-medium text-destructive">Đăng xuất</span>
-                    </button>
+                    </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>

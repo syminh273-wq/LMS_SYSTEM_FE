@@ -82,13 +82,13 @@ export default function IssuedCertificateViewPage({ params }: Props) {
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 space-y-4 print:p-0 print:max-w-none">
       <div className="flex items-center justify-between print:hidden">
-        <button
+        <Button
           onClick={() => router.back()}
           className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft size={14} />
           {t('certificate.back_btn')}
-        </button>
+        </Button>
         <div className="flex items-center gap-2">
           <Button onClick={handleCopy} variant="outline" className="gap-2 font-bold text-xs">
             {copied ? <Check size={14} /> : <Copy size={14} />}

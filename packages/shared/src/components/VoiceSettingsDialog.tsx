@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Settings, Loader2, Volume2, VolumeX, Check, Play } from 'lucide-react';
 import { Button } from './ui/button';
+import { Settings, Loader2, Volume2, VolumeX, Check, Play } from 'lucide-react';
+
 import {
   Dialog,
   DialogContent,
@@ -181,7 +182,7 @@ export function VoiceSettingsDialog({
               <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1">Danh sách giọng nói</h4>
               <div className="grid gap-2">
                 {voices.map((voice) => (
-                  <button
+                  <Button
                     key={voice.id}
                     onClick={() => void handleSelectVoice(voice.id)}
                     disabled={saving}
@@ -219,7 +220,7 @@ export function VoiceSettingsDialog({
                         <Check size={16} className="text-[#4F46E5]" />
                       )}
                     </div>
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

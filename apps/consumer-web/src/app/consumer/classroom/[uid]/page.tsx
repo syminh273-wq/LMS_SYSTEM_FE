@@ -739,7 +739,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               ].map((item) => {
                 const isActive = activeTab === item.key;
                 return (
-                  <button
+                  <Button
                     key={item.key}
                     type="button"
                     onClick={() => goToTab(item.key)}
@@ -751,7 +751,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   >
                     <item.icon size={18} className="shrink-0" />
                     <span className="truncate">{item.label}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -859,7 +859,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {quizzes.map(quiz => (
-                        <button
+                        <Button
                           key={quiz.uid}
                           type="button"
                           onClick={() => router.push(`/consumer/classroom/${uid}/quiz/${quiz.uid}`)}
@@ -878,7 +878,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                             </div>
                           </div>
                           <ChevronRight size={18} className="text-slate-400 shrink-0" />
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   )}
@@ -922,7 +922,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                             isExpanded ? 'border-indigo-200 shadow-sm' : 'border-slate-100'
                           }`}
                         >
-                          <button
+                          <Button
                             type="button"
                             onClick={() => void handleToggleCollection(c)}
                             className="w-full text-left p-4 flex items-center gap-4 cursor-pointer hover:bg-slate-50/50 transition-colors"
@@ -954,7 +954,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                               )}
                             </div>
                             {isExpanded ? <ChevronUp size={18} className="text-slate-400" /> : <ChevronDown size={18} className="text-slate-400" />}
-                          </button>
+                          </Button>
 
                           {isExpanded && (
                             <div className="border-t border-slate-100 bg-slate-50/40 p-4 space-y-4">
@@ -1211,7 +1211,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     <p className="text-[11px] text-slate-400 font-medium">Hỏi đáp từ tài liệu lớp học</p>
                   </div>
                   {aiMessages.length > 0 && (
-                    <button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 font-medium cursor-pointer">Xoá</button>
+                    <Button onClick={() => setAiMessages([])} className="ml-auto text-xs text-slate-400 hover:text-slate-600 font-medium cursor-pointer">Xoá</Button>
                   )}
                 </div>
                 {/* Messages */}
@@ -1300,13 +1300,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                       disabled={aiLoading}
                       className="flex-1 h-10 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:opacity-60"
                     />
-                    <button
+                    <Button
                       onClick={() => void handleAiAsk()}
                       disabled={!aiQuestion.trim() || aiLoading}
                       className="h-10 w-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center disabled:opacity-50 transition-colors shrink-0"
                     >
                       {aiLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -1352,7 +1352,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                   ) : (
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                       {groupedExams.map(group => (
-                        <button
+                        <Button
                           key={group.key}
                           type="button"
                           onClick={() => setSelectedExamGroup(group.key)}
@@ -1371,7 +1371,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                               <ClipboardList size={17} />
                             </div>
                           </div>
-                        </button>
+                        </Button>
                     ))}
                   </div>
                 )}
@@ -1440,7 +1440,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                   {getContentTypeLabel(exam.content_type)}
                                 </span>
                                 {isOnline && exam.status === 'ongoing' ? (
-                                  <button
+                                  <Button
                                     type="button"
                                     onClick={() => void handleJoinOnlineExam(exam.uid)}
                                     disabled={joiningExamUid === exam.uid}
@@ -1448,19 +1448,19 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                   >
                                     {joiningExamUid === exam.uid ? <Loader2 size={11} className="animate-spin" /> : <Wifi size={11} />}
                                     Vào phòng thi
-                                  </button>
+                                  </Button>
                                 ) : isOnline && exam.status === 'closed' ? (
                                   <span className="text-[10px] font-black uppercase text-slate-400">
                                     Đã kết thúc
                                   </span>
                                 ) : (
-                                  <button
+                                  <Button
                                     type="button"
                                     onClick={() => router.push(`/consumer/classroom/${uid}/exams/${exam.uid}`)}
                                     className="text-[10px] font-black uppercase text-indigo-500 hover:text-indigo-700 cursor-pointer"
                                   >
                                     Xem chi tiết
-                                  </button>
+                                  </Button>
                                 )}
                               </div>
                             </div>
@@ -1770,7 +1770,7 @@ function CollectionExpandedPanel({
       )}
 
       <div className="bg-white border border-slate-100 rounded-xl p-1 flex gap-1">
-        <button
+        <Button
           type="button"
           onClick={() => handleSelectMode('game')}
           className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all ${
@@ -1781,8 +1781,8 @@ function CollectionExpandedPanel({
         >
           <Gamepad2 size={12} />
           {t('quizCollection.mode_game')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => handleSelectMode('certificate')}
           disabled={!certUnlocked}
@@ -1796,7 +1796,7 @@ function CollectionExpandedPanel({
         >
           {certUnlocked ? <Award size={12} /> : <Lock size={10} />}
           {t('quizCollection.mode_certificate')}
-        </button>
+        </Button>
       </div>
 
       {mode === 'game' && (
@@ -1948,7 +1948,7 @@ function MissionAccordion({
   return (
     <div className={`rounded-xl border transition-colors ${isOpen ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 bg-white'}`}>
       <div className="flex items-center gap-2 px-3 py-2.5">
-        <button
+        <Button
           type="button"
           onClick={handleToggle}
           disabled={isLocked}
@@ -1979,7 +1979,7 @@ function MissionAccordion({
               ? <ChevronUp size={13} className="text-slate-400" />
               : <ChevronDown size={13} className="text-slate-400" />
           )}
-        </button>
+        </Button>
         <Button
           size="sm"
           onClick={onStart}

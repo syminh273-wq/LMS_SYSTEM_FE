@@ -75,6 +75,8 @@ import type { Quiz } from '@/lib/api/types';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import { Button } from '@shared/components/ui/button';
 import { Card } from '@shared/components/ui/card';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
 import { VoiceSettingsDialog } from '@shared/components/VoiceSettingsDialog';
 import {
   Dialog,
@@ -1037,13 +1039,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             /* ── Collapsed: icon-only ── */
             <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden py-1">
               {/* Expand button */}
-              <button
+              <Button
                 onClick={() => setSidebarCollapsed(false)}
                 title={t('classroom.ui.expand_sidebar')}
                 className="w-full flex justify-center py-3 hover:bg-muted transition-colors"
               >
                 <ChevronsRight size={16} className="text-muted-foreground" />
-              </button>
+              </Button>
               <div className="mx-3 border-t border-border mb-1" />
               {/* All tabs as icons */}
               {([
@@ -1063,7 +1065,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               ] as const).map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === id;
                 return (
-                  <button
+                  <Button
                     key={id}
                     title={label}
                     onClick={() => goToTab(id as ActiveTab)}
@@ -1076,7 +1078,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     {id === 'meeting' && activeMeeting && (
                       <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     )}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -1086,23 +1088,23 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {/* Collapse button */}
               <div className="flex items-center justify-between px-5 py-2.5 border-b border-border">
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{t('classroom.ui.menu_label')}</span>
-                <button
+                <Button
                   onClick={() => setSidebarCollapsed(true)}
                   title={t('classroom.ui.collapse_sidebar')}
                   className="rounded-lg p-1 hover:bg-muted transition-colors"
                 >
                   <ChevronsLeft size={15} className="text-muted-foreground" />
-                </button>
+                </Button>
               </div>
 
               {/* Nhóm 1: Thông tin lớp */}
-              <button
+              <Button
                 onClick={() => toggleGroup('classroom')}
                 className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
                 {t('classroom.ui.group_class_info')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.classroom ? '' : '-rotate-90'}`} />
-              </button>
+              </Button>
               {openGroups.classroom && (
                 <div className="pb-1 px-1">
                   {[
@@ -1115,7 +1117,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
-                      <button
+                      <Button
                         key={id}
                         onClick={() => goToTab(id as ActiveTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
@@ -1128,7 +1130,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         {id === 'meeting' && activeMeeting && (
                           <span className="ml-auto flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                         )}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -1137,13 +1139,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="mx-4 border-t border-border" />
 
               {/* Nhóm 2: Học tập & Đánh giá */}
-              <button
+              <Button
                 onClick={() => toggleGroup('learning')}
                 className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
                 {t('classroom.ui.group_learning')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.learning ? '' : '-rotate-90'}`} />
-              </button>
+              </Button>
               {openGroups.learning && (
                 <div className="pb-1 px-1">
                   {[
@@ -1153,7 +1155,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ].map(({ id, label, icon: Icon }) => {
                     const isActive = activeTab === id;
                     return (
-                      <button
+                      <Button
                         key={id}
                         onClick={() => goToTab(id as ActiveTab)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
@@ -1163,7 +1165,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
                         <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         {label}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -1172,19 +1174,19 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="mx-4 border-t border-border" />
 
               {/* Nhóm 3: Quản lý sinh viên */}
-              <button
+              <Button
                 onClick={() => toggleGroup('students')}
                 className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
               >
                 {t('classroom.ui.group_students')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.students ? '' : '-rotate-90'}`} />
-              </button>
+              </Button>
               {openGroups.students && (
                 <div className="pb-2 px-1">
                   {(() => {
                     const isActive = activeTab === 'students';
                     return (
-                      <button
+                      <Button
                         onClick={() => goToTab('students')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
@@ -1198,13 +1200,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             {members.filter(m => m.role === 'student').length}
                           </span>
                         )}
-                      </button>
+                      </Button>
                     );
                   })()}
                   {(() => {
                     const isActive = activeTab === 'ranking';
                     return (
-                      <button
+                      <Button
                         onClick={() => goToTab('ranking')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
@@ -1213,13 +1215,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
                         <Trophy size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
                         {t('classroom.ui.tab_ranking')}
-                      </button>
+                      </Button>
                     );
                   })()}
                   {(() => {
                     const isActive = activeTab === 'blacklist';
                     return (
-                      <button
+                      <Button
                         onClick={() => goToTab('blacklist')}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
                           isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
@@ -1233,7 +1235,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             {blacklist.length}
                           </span>
                         )}
-                      </button>
+                      </Button>
                     );
                   })()}
                 </div>
@@ -1339,7 +1341,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className="flex items-center gap-2">
                       <div className="flex bg-muted rounded-xl p-1 gap-1">
                         {(['major', 'detail'] as const).map((lvl) => (
-                          <button
+                          <Button
                             key={lvl}
                             onClick={() => setActivityLevel(lvl)}
                             className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
@@ -1349,16 +1351,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             }`}
                           >
                             {lvl === 'major' ? t('classroom.ui.info_level_major') : t('classroom.ui.info_level_detail')}
-                          </button>
+                          </Button>
                         ))}
                       </div>
-                      <button
+                      <Button
                         onClick={() => router.push(`/space/classrooms/${uid}/activity`)}
                         className="flex items-center gap-1.5 text-[10px] font-black text-primary-brand hover:text-primary-brand uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-primary-brand-light transition-all"
                       >
                         {t('classroom.ui.info_view_all')}
                         <ChevronRight size={13} />
-                      </button>
+                      </Button>
                     </div>
                   </div>
 
@@ -1440,7 +1442,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     </div>
                   ) : (
                     aiSessions.map((s) => (
-                      <button
+                      <Button
                         key={s.session_id}
                         onClick={() => setAiSessionId(s.session_id)}
                         className={`w-full text-left p-3 rounded-xl transition-all duration-200 group ${
@@ -1460,7 +1462,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             {localeFormatDate(s.updated_at)}
                           </span>
                         </div>
-                      </button>
+                      </Button>
                     ))
                   )}
                 </div>
@@ -1589,7 +1591,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {/* Mode selector */}
                 <div className="flex gap-2 mb-3">
                   {AI_MODES.map(({ key, label, icon: Icon }) => (
-                    <button
+                    <Button
                       key={key}
                       onClick={() => setAiMode(key)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
@@ -1600,30 +1602,30 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     >
                       <Icon size={13} />
                       {label}
-                    </button>
+                    </Button>
                   ))}
                 </div>
                 <div className="flex gap-3">
                   <div className="flex-1 flex gap-2">
                     {isRecording ? (
-                      <button
+                      <Button
                         onClick={stopRecording}
                         className="flex-1 h-12 flex items-center justify-center gap-2 bg-rose-500 text-white rounded-2xl text-xs font-black uppercase tracking-wide animate-pulse"
                       >
                         <Square size={14} fill="white" />
                         {t('classroom.ui.ai_speaking')}
-                      </button>
+                      </Button>
                     ) : (
                       <>
-                        <button
+                        <Button
                           disabled={aiLoading}
                           onClick={() => void startRecording()}
                           className="h-12 w-12 flex items-center justify-center bg-muted text-muted-foreground rounded-2xl hover:bg-primary-brand-light hover:text-primary-brand disabled:opacity-50 transition-all shrink-0"
                           title={t('classroom.ui.ai_mic_title')}
                         >
                           <Mic size={18} />
-                        </button>
-                        <input
+                        </Button>
+                        <Input
                           type="text"
                           value={aiQuestion}
                           onChange={e => setAiQuestion(e.target.value)}
@@ -1878,7 +1880,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div className="p-10 flex-1 overflow-y-auto space-y-8">
                 <div className="flex items-center gap-3 bg-muted p-1.5 rounded-2xl border border-border w-fit">
                   {(['midterm', 'final', 'regular'] as ExamKind[]).map(kind => (
-                    <button
+                    <Button
                       key={kind}
                       onClick={() => goToExamKind(kind)}
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
@@ -1888,7 +1890,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       }`}
                     >
                       {t(`classroom.ui.exam_kind_${kind}`)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
 
@@ -1997,7 +1999,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
                   {/* Tab bar */}
                   <div className="flex gap-1">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setExamSubTab('ongoing')}
                       className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
@@ -2014,8 +2016,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'ongoing' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'}`}>
                         {activeExams.length}
                       </span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => setExamSubTab('closed')}
                       className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
@@ -2028,7 +2030,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-black ${examSubTab === 'closed' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'}`}>
                         {completedExams.length}
                       </span>
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -2677,12 +2679,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     {t('classroom.ui.pending_approve_all')}
                   </Button>
                 )}
-                <button
+                <Button
                   onClick={() => setShowPendingSheet(false)}
                   className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                 >
                   <X size={18} />
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -2758,13 +2760,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
             {/* Footer */}
             <div className="border-t border-border px-8 py-4">
-              <button
+              <Button
                 onClick={() => { loadPendingMembers(); }}
                 className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-muted-foreground transition-colors"
               >
                 <RefreshCw size={13} />
                 {t('classroom.ui.pending_refresh')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -2845,13 +2847,13 @@ function AssignQuizModal({
           <div className="p-8 space-y-8">
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.assign_modal.time_label')}</label>
-                <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
+                <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.assign_modal.time_label')}</Label>
+                <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
                   className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
               <div className="space-y-2.5">
-                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.assign_modal.max_attempts_label')}</label>
-                <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
+                <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.assign_modal.max_attempts_label')}</Label>
+                <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
                   className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
             </div>
@@ -2862,13 +2864,13 @@ function AssignQuizModal({
                 { label: t('quiz.assign_modal.shuffle_options'), icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
                 { label: t('quiz.assign_modal.show_explanation'), icon: HelpCircle, val: showExplanation, set: setShowExplanation },
               ].map(item => (
-                <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
+                <Label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
                   <div className="flex items-center gap-3 text-sm font-bold text-foreground">
                     <item.icon size={16} className="text-muted-foreground group-hover:text-primary-brand" /> {item.label}
                   </div>
-                  <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
+                  <Input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
                     className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand border-border transition-all" />
-                </label>
+                </Label>
               ))}
             </div>
           </div>
@@ -2919,7 +2921,7 @@ function AssignQuizModal({
             quizzes.map(quiz => {
               const assigned = localAssigned.has(quiz.uid);
               return (
-                <button
+                <Button
                   key={quiz.uid}
                   type="button"
                   disabled={assigned}
@@ -2944,7 +2946,7 @@ function AssignQuizModal({
                   ) : (
                     <span className="text-[10px] font-black text-primary-brand uppercase bg-primary-brand-light border border-primary-brand-light px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">{t('quiz.assign_modal.select_badge')}</span>
                   )}
-                </button>
+                </Button>
               );
             })
           )}
@@ -3072,7 +3074,7 @@ function OpenOnlineExamModal({
                 {exams.map(exam => {
                   const active = exam.uid === selectedExamUid;
                   return (
-                    <button
+                    <Button
                       key={exam.uid}
                       type="button"
                       onClick={() => handleSelectExam(exam)}
@@ -3092,7 +3094,7 @@ function OpenOnlineExamModal({
                           <div className="mt-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">{exam.duration_seconds ? `${Math.round(exam.duration_seconds / 60)} phút` : t('classroom.ui.quiz_no_limit')}</div>
                         </div>
                       </div>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
@@ -3102,9 +3104,9 @@ function OpenOnlineExamModal({
           {selectedExam && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <label className="space-y-2">
+                <Label className="space-y-2">
                   <span className="px-1 text-sm font-bold text-foreground">{t('classroom.ui.exam_duration_label')} <span className="text-rose-500">*</span></span>
-                  <input
+                  <Input
                     type="number"
                     min={1}
                     value={durationMin}
@@ -3112,11 +3114,11 @@ function OpenOnlineExamModal({
                     disabled={opening}
                     className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
                   />
-                </label>
+                </Label>
 
-                <label className="space-y-2">
+                <Label className="space-y-2">
                   <span className="px-1 text-sm font-bold text-foreground">{t('classroom.ui.late_threshold_label')}</span>
-                  <input
+                  <Input
                     type="number"
                     min={0}
                     value={lateThresholdMin}
@@ -3125,7 +3127,7 @@ function OpenOnlineExamModal({
                     className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
                     placeholder={t('classroom.ui.no_time_limit_hint')}
                   />
-                </label>
+                </Label>
               </div>
 
               {/* Camera toggle */}
@@ -3141,7 +3143,7 @@ function OpenOnlineExamModal({
                     </div>
                   </div>
                 </div>
-                <button
+                <Button
                   type="button"
                   disabled={opening}
                   onClick={() => setCameraRequired(v => !v)}
@@ -3149,7 +3151,7 @@ function OpenOnlineExamModal({
                   style={{ width: 52 }}
                 >
                   <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
-                </button>
+                </Button>
               </div>
 
               {/* Proctoring rules */}
@@ -3159,13 +3161,13 @@ function OpenOnlineExamModal({
                   <span className="text-[10px] font-black uppercase tracking-widest text-rose-700">Giám sát & chống gian lận</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <label className="space-y-2">
+                  <Label className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-bold text-foreground">Số lần rời tab tối đa</span>
                       <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-black uppercase text-rose-700">Quan trọng</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <input
+                      <Input
                         type="number"
                         min={0}
                         max={20}
@@ -3177,15 +3179,15 @@ function OpenOnlineExamModal({
                       <span className="text-xs font-bold text-muted-foreground">lần (0 = không giới hạn)</span>
                     </div>
                     <p className="text-[10px] font-medium text-muted-foreground">Vượt quá sẽ tự động nộp bài với phần SV đã làm</p>
-                  </label>
+                  </Label>
 
-                  <label className="space-y-2">
+                  <Label className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-bold text-foreground">Cảnh báo camera tối đa</span>
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-black uppercase text-amber-700">Nâng cao</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <input
+                      <Input
                         type="number"
                         min={0}
                         max={50}
@@ -3197,7 +3199,7 @@ function OpenOnlineExamModal({
                       <span className="text-xs font-bold text-muted-foreground">lần (0 = chỉ log)</span>
                     </div>
                     <p className="text-[10px] font-medium text-muted-foreground">Số lần mất khuôn mặt trước khi dừng thi</p>
-                  </label>
+                  </Label>
                 </div>
               </div>
             </div>
@@ -3280,22 +3282,22 @@ function EditSettingsModal({
         <div className="p-8 space-y-8">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.settings_modal.time_label')}</label>
-              <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
+              <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.settings_modal.time_label')}</Label>
+              <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
                 className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
             <div className="space-y-2.5">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.settings_modal.max_attempts_label')}</label>
-              <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
+              <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.settings_modal.max_attempts_label')}</Label>
+              <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
                 className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('quiz.settings_modal.passing_score_label', undefined, { score: passingScore })}</label>
+              <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('quiz.settings_modal.passing_score_label', undefined, { score: passingScore })}</Label>
             </div>
-            <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
+            <Input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
               className="w-full accent-primary-brand" />
           </div>
 
@@ -3305,13 +3307,13 @@ function EditSettingsModal({
               { label: t('quiz.settings_modal.shuffle_options'), icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
               { label: t('quiz.settings_modal.show_explanation'), icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
-              <label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
+              <Label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
                 <div className="flex items-center gap-3 text-sm font-bold text-foreground">
                   <item.icon size={16} className="text-muted-foreground group-hover:text-primary-brand" /> {item.label}
                 </div>
-                <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
+                <Input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
                   className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand border-border transition-all" />
-              </label>
+              </Label>
             ))}
           </div>
         </div>

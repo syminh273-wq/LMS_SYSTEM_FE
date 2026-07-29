@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useCallback, useState } from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { consumerCalendarApi } from '@/lib/api';
@@ -91,31 +92,31 @@ export default function ConsumerCalendarPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden h-10">
-            <button
+            <Button
               type="button"
               onClick={goPrev}
               className="h-full px-2.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Previous"
             >
               <ChevronLeft size={15} />
-            </button>
+            </Button>
             <div className="h-5 w-px bg-slate-200" />
-            <button
+            <Button
               type="button"
               onClick={goNext}
               className="h-full px-2.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Next"
             >
               <ChevronRight size={15} />
-            </button>
+            </Button>
           </div>
-          <button
+          <Button
             type="button"
             onClick={goToday}
             className="h-10 px-3 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12.5px] font-semibold hover:bg-slate-50"
           >
             {locale === 'vi' ? 'Hôm nay' : 'Today'}
-          </button>
+          </Button>
           <span className="text-[15px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
         </div>
       </div>

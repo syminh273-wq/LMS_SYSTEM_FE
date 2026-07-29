@@ -1,6 +1,7 @@
 'use client';
 
 import { Calendar, X } from 'lucide-react';
+import { Button } from '@shared/components/ui/button';
 import { cn } from '@shared/lib/utils';
 
 export type DateRangeValue = {
@@ -72,7 +73,7 @@ export function DateRangeFilter({ value, onChange }: Props) {
         {PRESETS.map((p) => {
           const active = isPresetActive(p.days);
           return (
-            <button
+            <Button
               key={p.label}
               onClick={() => applyPreset(p.days)}
               className={cn(
@@ -83,18 +84,18 @@ export function DateRangeFilter({ value, onChange }: Props) {
               )}
             >
               {p.label}
-            </button>
+            </Button>
           );
         })}
         {(value.from || value.to) && (
-          <button
+          <Button
             onClick={() => onChange({ from: null, to: null })}
             className="ml-1 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100"
             aria-label="Xoá bộ lọc ngày"
           >
             <X size={10} />
             Xoá
-          </button>
+          </Button>
         )}
       </div>
     </div>

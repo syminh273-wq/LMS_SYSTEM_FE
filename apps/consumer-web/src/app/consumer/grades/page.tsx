@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@shared/components/ui/button';
 import {
   Award, BookOpen, GraduationCap, TrendingUp, ArrowUpRight,
   Sparkles, Download,
@@ -45,10 +46,10 @@ export default function GradesPage() {
               Theo dõi kết quả học tập và thành tích học thuật của bạn
             </p>
           </div>
-          <button className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors self-start sm:self-auto">
+          <Button className="inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-white border border-slate-200 text-slate-700 text-[13px] font-semibold hover:bg-slate-50 transition-colors self-start sm:self-auto">
             <Download size={14} className="text-indigo-600" />
             Xuất bảng điểm
-          </button>
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -165,10 +166,10 @@ export default function GradesPage() {
                 <p className="text-[11.5px] text-amber-50 mt-0.5">Tiếp tục phấn đấu để nhận thêm huy hiệu nhé!</p>
               </div>
             </div>
-            <button className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-white hover:underline">
+            <Button className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-white hover:underline">
               Xem tất cả huy hiệu
               <ArrowUpRight size={13} />
-            </button>
+            </Button>
           </div>
         </div>
       </div>

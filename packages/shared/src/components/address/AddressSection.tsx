@@ -1,10 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { AlertTriangle, MapPin, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
-import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import {
@@ -203,7 +203,7 @@ export function AddressSection({ isOwner = true, className }: Props) {
             )}
           </div>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={() => isOwner && setEditing(true)}
             disabled={!isOwner}
@@ -226,7 +226,7 @@ export function AddressSection({ isOwner = true, className }: Props) {
                 </p>
               )}
             </div>
-          </button>
+          </Button>
         )}
       </div>
 
@@ -549,7 +549,7 @@ function ProvinceCombobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
           disabled={disabled}
           className={cn(
@@ -566,7 +566,7 @@ function ProvinceCombobox({
               : t('address.placeholder.province', 'Chọn tỉnh/thành'))}
           </span>
           <Search className="size-4 text-slate-400" />
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
@@ -583,14 +583,14 @@ function ProvinceCombobox({
               className="h-9 w-full rounded-md border border-slate-200 bg-white pr-2 pl-8 text-sm outline-none focus:border-indigo-500"
             />
             {query && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setQuery('')}
                 className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 aria-label="clear"
               >
                 <X className="size-3.5" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -601,7 +601,7 @@ function ProvinceCombobox({
             </p>
           ) : (
             filtered.map((p) => (
-              <button
+              <Button
                 key={p.code}
                 type="button"
                 onClick={() => {
@@ -616,7 +616,7 @@ function ProvinceCombobox({
               >
                 <span>{p.name}</span>
                 {p.code === value && <span className="text-indigo-600">✓</span>}
-              </button>
+              </Button>
             ))
           )}
         </div>
@@ -669,7 +669,7 @@ function WardCombobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
           disabled={disabled}
           className={cn(
@@ -688,7 +688,7 @@ function WardCombobox({
                   : t('address.placeholder.ward', 'Chọn xã/phường'))}
           </span>
           <Search className="size-4 text-slate-400" />
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[var(--anchor-width)] p-0">
         <div className="border-b border-slate-100 p-2">
@@ -702,14 +702,14 @@ function WardCombobox({
               className="h-9 w-full rounded-md border border-slate-200 bg-white pr-2 pl-8 text-sm outline-none focus:border-indigo-500"
             />
             {query && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setQuery('')}
                 className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 aria-label="clear"
               >
                 <X className="size-3.5" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -720,7 +720,7 @@ function WardCombobox({
             </p>
           ) : (
             filtered.map((w) => (
-              <button
+              <Button
                 key={w.code}
                 type="button"
                 onClick={() => {
@@ -735,7 +735,7 @@ function WardCombobox({
               >
                 <span>{w.name}</span>
                 {w.code === value && <span className="text-indigo-600">✓</span>}
-              </button>
+              </Button>
             ))
           )}
         </div>

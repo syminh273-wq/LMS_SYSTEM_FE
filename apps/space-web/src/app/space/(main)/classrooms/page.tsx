@@ -219,18 +219,18 @@ export default function ClassroomsPage() {
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
           <div className="flex bg-muted/80 p-1.5 rounded-xl border border-border">
-            <button
+            <Button
               onClick={() => setViewMode('list')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary-brand shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <List size={18} />
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary-brand shadow-sm border border-border' : 'text-muted-foreground hover:text-muted-foreground'}`}
             >
               <LayoutGrid size={18} />
-            </button>
+            </Button>
           </div>
 
           <Button
@@ -345,18 +345,18 @@ export default function ClassroomsPage() {
                     </td>
                     <td className="px-8 py-5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-2">
-                        <button
+                        <Button
                           onClick={() => router.push(`/space/classrooms/${classroom.uid}/details`)}
                           className="text-muted-foreground/60 hover:text-primary-brand p-2 transition-all rounded-xl hover:bg-primary-brand-light border-transparent hover:border-primary-brand-muted"
                           title={t('classroom.ui.list_view_detail')}
                         >
                           <ChevronRight size={20} />
-                        </button>
+                        </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <button className="text-muted-foreground/60 hover:text-foreground p-2 transition-all rounded-xl hover:bg-muted border border-transparent">
+                            <Button className="text-muted-foreground/60 hover:text-foreground p-2 transition-all rounded-xl hover:bg-muted border border-transparent">
                               <MoreVertical size={20} />
-                            </button>
+                            </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
                             <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
@@ -433,9 +433,9 @@ export default function ClassroomsPage() {
                     </span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="text-muted-foreground/60 hover:text-foreground p-1.5 transition-all rounded-lg hover:bg-muted/50 border border-transparent">
+                        <Button className="text-muted-foreground/60 hover:text-foreground p-1.5 transition-all rounded-lg hover:bg-muted/50 border border-transparent">
                           <MoreVertical size={18} />
-                        </button>
+                        </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
                         <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}>
@@ -531,9 +531,9 @@ export default function ClassroomsPage() {
                 <h3 className="text-lg font-bold text-foreground">{t('classroom.ui.list_resource_title')}</h3>
                 <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.list_resource_desc')}</p>
               </div>
-              <button className="text-primary-brand text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
+              <Button className="text-primary-brand text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
                 {t('classroom.ui.list_resource_detail')}
-              </button>
+              </Button>
             </div>
 
             <div className="flex-1 flex items-end justify-between gap-4 px-4 pb-2">

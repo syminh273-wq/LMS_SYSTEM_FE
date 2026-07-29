@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Button } from './button';
 import { cn } from "../../lib/utils"
 
 type GalleryProps = {
@@ -15,7 +16,7 @@ export function PostImageGallery({ images, onImageClick, className, maxHeight = 
 
   if (images.length === 1) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => onImageClick(0)}
         className={cn(
@@ -31,7 +32,7 @@ export function PostImageGallery({ images, onImageClick, className, maxHeight = 
           style={{ maxHeight }}
           loading="lazy"
         />
-      </button>
+      </Button>
     )
   }
 
@@ -52,7 +53,7 @@ export function PostImageGallery({ images, onImageClick, className, maxHeight = 
         const remaining = images.length - 9
         const isLastVisible = i === 8 && images.length > 9
         return (
-          <button
+          <Button
             type="button"
             key={i}
             onClick={() => onImageClick(i)}
@@ -74,7 +75,7 @@ export function PostImageGallery({ images, onImageClick, className, maxHeight = 
                 +{remaining}
               </div>
             )}
-          </button>
+          </Button>
         )
       })}
     </div>

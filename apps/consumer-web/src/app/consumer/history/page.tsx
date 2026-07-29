@@ -111,7 +111,7 @@ export default function ConsumerHistoryPage() {
               {STATUS_FILTERS.map((s) => {
                 const active = statusFilter === s.value;
                 return (
-                  <button
+                  <Button
                     key={s.value}
                     onClick={() => setStatusFilter(s.value)}
                     className={`px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors ring-1 ${
@@ -121,7 +121,7 @@ export default function ConsumerHistoryPage() {
                     }`}
                   >
                     {s.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

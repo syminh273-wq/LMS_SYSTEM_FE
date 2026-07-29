@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import {
   Info,
@@ -40,13 +41,13 @@ export default function StudentsLayout({
         {sidebarCollapsed ? (
           /* ── Collapsed: icon-only ── */
           <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden py-1">
-            <button
+            <Button
               onClick={() => setSidebarCollapsed(false)}
               title="Mở rộng sidebar"
               className="w-full flex justify-center py-3 hover:bg-muted/50 transition-colors"
             >
               <ChevronsRight size={16} className="text-muted-foreground" />
-            </button>
+            </Button>
             <div className="mx-3 border-t border-border mb-1" />
             {([
               { id: 'info',     label: 'Thông tin chung',    icon: Info },
@@ -59,7 +60,7 @@ export default function StudentsLayout({
             ] as const).map(({ id, label, icon: Icon }) => {
               const isActive = id === 'students';
               return (
-                <button
+                <Button
                   key={id}
                   title={label}
                   onClick={() => goToTab(id)}
@@ -73,7 +74,7 @@ export default function StudentsLayout({
                     <div className="absolute left-0 w-1 h-5 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />
                   )}
                   <Icon size={18} />
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -83,17 +84,17 @@ export default function StudentsLayout({
             {/* Collapse button */}
             <div className="flex items-center justify-between px-5 py-2.5 border-b border-border">
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">MENU</span>
-              <button
+              <Button
                 onClick={() => setSidebarCollapsed(true)}
                 title="Thu nhỏ sidebar"
                 className="rounded-lg p-1 hover:bg-muted transition-colors"
               >
                 <ChevronsLeft size={15} className="text-muted-foreground" />
-              </button>
+              </Button>
             </div>
 
             {/* Nhóm 1: Thông tin lớp */}
-            <button
+            <Button
               onClick={() => toggleGroup('classroom')}
               className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
@@ -102,7 +103,7 @@ export default function StudentsLayout({
                 size={14}
                 className={`transition-transform duration-200 ${openGroups.classroom ? '' : '-rotate-90'}`}
               />
-            </button>
+            </Button>
             {openGroups.classroom && (
               <div className="pb-1 px-1">
                 {[
@@ -111,14 +112,14 @@ export default function StudentsLayout({
                   { id: 'chat',    label: 'Thảo luận lớp học', icon: MessageSquare },
                   { id: 'meeting', label: 'Phòng họp',         icon: Video },
                 ].map(({ id, label, icon: Icon }) => (
-                  <button
+                  <Button
                     key={id}
                     onClick={() => goToTab(id)}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-muted-foreground hover:bg-muted/50 group"
                   >
                     <Icon size={18} className="text-muted-foreground group-hover:text-muted-foreground" />
                     {label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -126,7 +127,7 @@ export default function StudentsLayout({
             <div className="mx-4 border-t border-border" />
 
             {/* Nhóm 2: Học tập & Đánh giá */}
-            <button
+            <Button
               onClick={() => toggleGroup('learning')}
               className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
@@ -135,21 +136,21 @@ export default function StudentsLayout({
                 size={14}
                 className={`transition-transform duration-200 ${openGroups.learning ? '' : '-rotate-90'}`}
               />
-            </button>
+            </Button>
             {openGroups.learning && (
               <div className="pb-1 px-1">
                 {[
                   { id: 'exams', label: 'Bài kiểm tra', icon: ClipboardList },
                   { id: 'quiz',  label: 'Quiz Game',    icon: Gamepad2 },
                 ].map(({ id, label, icon: Icon }) => (
-                  <button
+                  <Button
                     key={id}
                     onClick={() => goToTab(id)}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-muted-foreground hover:bg-muted/50 group"
                   >
                     <Icon size={18} className="text-muted-foreground group-hover:text-muted-foreground" />
                     {label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -157,7 +158,7 @@ export default function StudentsLayout({
             <div className="mx-4 border-t border-border" />
 
             {/* Nhóm 3: Quản lý sinh viên — always active */}
-            <button
+            <Button
               onClick={() => toggleGroup('students')}
               className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
@@ -166,17 +167,17 @@ export default function StudentsLayout({
                 size={14}
                 className={`transition-transform duration-200 ${openGroups.students ? '' : '-rotate-90'}`}
               />
-            </button>
+            </Button>
             {openGroups.students && (
               <div className="pb-2 px-1">
-                <button
+                <Button
                   onClick={() => goToTab('students')}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative bg-primary-brand-light text-primary-brand"
                 >
                   <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />
                   <Users size={18} className="text-primary-brand" />
                   Danh sách sinh viên
-                </button>
+                </Button>
               </div>
             )}
           </div>

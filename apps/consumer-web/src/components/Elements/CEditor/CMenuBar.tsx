@@ -1,4 +1,5 @@
 import { type Editor } from '@tiptap/react'
+import { Button } from '@shared/components/ui/button';
 import { 
   Bold, Italic, Underline, Strikethrough, Code, 
   Heading1, Heading2, Heading3, 
@@ -22,7 +23,7 @@ interface ToolbarButtonProps {
 
 const ToolbarButton: React.FC<ToolbarButtonProps> = ({ onClick, isActive = false, disabled = false, tooltip, children }) => {
   return (
-    <button
+    <Button
       onClick={onClick}
       disabled={disabled}
       className={`
@@ -43,7 +44,7 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({ onClick, isActive = false
       >
         {tooltip}
       </span>
-    </button>
+    </Button>
   )
 }
 

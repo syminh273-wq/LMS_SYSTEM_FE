@@ -7,6 +7,9 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { ArrowLeft, Loader2, BookOpen, ImageIcon, DollarSign, GraduationCap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import { ValidationException, courseApi, type CreateCourseRequest, type PricingType } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -122,10 +125,10 @@ export default function CreateCoursePage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
+              <Label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
                 {t('course.create.name_label', 'Course name')} <span className="text-rose-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 {...register('name', { required: t('course.create.name_required', 'Required') })}
                 className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500' : 'border-border'}`}
                 placeholder={t('course.create.name_placeholder', 'Example: Python Basics')}
@@ -134,10 +137,10 @@ export default function CreateCoursePage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground px-1">
+              <Label className="text-sm font-bold text-foreground px-1">
                 {t('course.create.description_label', 'Description')}
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 {...register('description')}
                 rows={4}
                 className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none"
@@ -146,10 +149,10 @@ export default function CreateCoursePage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
+              <Label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
                 <ImageIcon size={14} />
                 {t('course.create.cover_label', 'Cover image')}
-              </label>
+              </Label>
               <div className="border-2 border-dashed border-border rounded-xl p-4 text-center">
                 {coverUrl ? (
                   <div className="space-y-2">
@@ -167,15 +170,15 @@ export default function CreateCoursePage() {
                     </Button>
                   </div>
                 ) : (
-                  <label className="cursor-pointer block">
-                    <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+                  <Label className="cursor-pointer block">
+                    <Input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
                     <div className="py-4 space-y-1">
                       <ImageIcon size={32} className="mx-auto text-slate-300" />
                       <p className="text-xs text-muted-foreground">
                         {uploading ? 'Uploading...' : t('course.create.cover_hint', 'Recommended 16:9, max 2MB')}
                       </p>
                     </div>
-                  </label>
+                  </Label>
                 )}
               </div>
             </div>
@@ -196,7 +199,7 @@ export default function CreateCoursePage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               {(['free', 'paid'] as PricingType[]).map((type) => (
-                <button
+                <Button
                   key={type}
                   type="button"
                   onClick={() => setValue('pricing_type', type)}
@@ -212,16 +215,16 @@ export default function CreateCoursePage() {
                   <div className="text-xs text-muted-foreground mt-1">
                     {type === 'free' ? 'Students join instantly' : 'MoMo payment required'}
                   </div>
-                </button>
+                </Button>
               ))}
             </div>
 
             {pricingType === 'paid' && (
               <div className="space-y-2">
-                <label className="text-sm font-bold text-foreground px-1">
+                <Label className="text-sm font-bold text-foreground px-1">
                   {t('course.create.price_label', 'Price (VND)')} <span className="text-rose-500">*</span>
-                </label>
-                <input
+                </Label>
+                <Input
                   type="number"
                   min={1000}
                   {...register('price_vnd_str', {

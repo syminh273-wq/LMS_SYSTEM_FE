@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { socialApi } from '@/lib/api/social';
@@ -191,23 +192,23 @@ export function PostCard({
 
         {isMe && (
           <div className="relative shrink-0">
-            <button
+            <Button
               onClick={() => setMenuOpen(p => !p)}
               className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
               aria-label="Tùy chọn"
             >
               <MoreHorizontal size={16} />
-            </button>
+            </Button>
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
-                  <button
+                  <Button
                     onClick={() => { setMenuOpen(false); handleDelete(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
                   >
                     <Trash2 size={13} /> Xóa bài
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -265,9 +266,9 @@ export function PostCard({
             </span>
           )}
           {post.comments_count > 0 && (
-            <button onClick={toggleComments} className="hover:text-slate-900 hover:underline ml-auto transition-colors">
+            <Button onClick={toggleComments} className="hover:text-slate-900 hover:underline ml-auto transition-colors">
               {post.comments_count} bình luận
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -278,7 +279,7 @@ export function PostCard({
           { key: 'comment', icon: MessageCircle, label: 'Bình luận', onClick: toggleComments, active: false, activeColor: '' },
           { key: 'share', icon: Share2, label: 'Chia sẻ', onClick: () => {}, active: false, activeColor: '' },
         ].map(({ key, icon: Icon, label, onClick, active, activeColor }) => (
-          <button
+          <Button
             key={key}
             onClick={onClick}
             className={cn(
@@ -290,7 +291,7 @@ export function PostCard({
           >
             <Icon size={16} strokeWidth={2} fill={active ? 'currentColor' : 'none'} />
             <span className="hidden sm:inline">{label}</span>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -344,14 +345,14 @@ export function PostCard({
                 placeholder="Viết bình luận..."
                 className="w-full text-[13px] bg-white border border-slate-200 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 placeholder:text-slate-400"
               />
-              <button
+              <Button
                 type="submit"
                 disabled={!newComment.trim() || submitting}
                 className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center disabled:opacity-30 hover:bg-indigo-700 transition-colors"
                 aria-label="Gửi bình luận"
               >
                 {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

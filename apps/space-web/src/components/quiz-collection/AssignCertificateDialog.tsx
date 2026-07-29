@@ -57,7 +57,7 @@ export function AssignCertificateDialog({ open, onOpenChange, certificates, curr
         ) : (
           <div className="space-y-2 max-h-80 overflow-y-auto">
             {certificates.map(c => (
-              <button
+              <Button
                 key={c.uid}
                 onClick={() => setSelected(c.uid === selected ? null : c.uid)}
                 className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
@@ -69,7 +69,7 @@ export function AssignCertificateDialog({ open, onOpenChange, certificates, curr
                   <p className="text-sm font-bold truncate">{c.name}</p>
                   {c.description && <p className="text-[11px] text-muted-foreground truncate">{c.description}</p>}
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         )}

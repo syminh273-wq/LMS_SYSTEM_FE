@@ -112,7 +112,7 @@ function NodeRow({
         style={{ paddingLeft: 8 + depth * 12 }}
         onClick={() => onSelect(node.uid)}
       >
-        <button
+        <Button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
@@ -122,7 +122,7 @@ function NodeRow({
           aria-label={open ? 'Collapse' : 'Expand'}
         >
           {hasChildren ? open ? <ChevronDown size={14} /> : <ChevronRight size={14} /> : <span className="inline-block w-[14px]" />}
-        </button>
+        </Button>
         {open ? <FolderOpen size={15} className="shrink-0" /> : <FolderIcon size={15} className="shrink-0" />}
         <span className="truncate flex-1 ml-1">{node.name}</span>
         {isPreview && <Eye size={12} className="text-emerald-600" aria-label="Preview" />}
@@ -303,7 +303,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
         </div>
       )}
       <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
-        <button
+        <Button
           type="button"
           onClick={() => setSelectedFolderId(null)}
           className={`px-2 py-1 rounded-md font-bold ${
@@ -311,11 +311,11 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
           }`}
         >
           {t('classroom.docs.root_label', 'Tất cả tài liệu')}
-        </button>
+        </Button>
         {currentBreadcrumb.map((f) => (
           <React.Fragment key={f.uid}>
             <span className="text-slate-300">/</span>
-            <button
+            <Button
               type="button"
               onClick={() => setSelectedFolderId(f.uid)}
               className={`px-2 py-1 rounded-md font-bold ${
@@ -324,7 +324,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
             >
               <FolderIcon size={12} className="inline-block mr-1" />
               {f.name}
-            </button>
+            </Button>
           </React.Fragment>
         ))}
       </div>
@@ -376,7 +376,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
             <div className="flex items-center gap-1 ml-auto">
               <ArrowUpDown size={14} className="text-slate-400" />
               {SORT_FIELDS.map((s) => (
-                <button
+                <Button
                   key={s.field}
                   type="button"
                   onClick={() => handleSortChange(s.field)}
@@ -388,7 +388,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                   {sortField === s.field && (
                     <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>
                   )}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -416,7 +416,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                 const pct = prog?.read_progress ?? 0;
                 const media = isMediaFile(d.file_type);
                 return (
-                  <button
+                  <Button
                     type="button"
                     key={d.uid}
                     onClick={() => setOpenDoc(d)}
@@ -459,7 +459,7 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                     >
                       <Download size={14} />
                     </a>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

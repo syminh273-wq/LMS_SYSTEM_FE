@@ -84,7 +84,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-1">
             {authed ? (
               <>
-                <button
+                <Button
                   onClick={() => router.push('/consumer/feed')}
                   className={
                     'hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors ' +
@@ -96,7 +96,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 >
                   <Home size={14} />
                   Trang chủ
-                </button>
+                </Button>
                 <LanguageSwitcher />
                 <ThemeToggle />
                 <Button
@@ -119,7 +119,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="ml-1 flex items-center gap-1 rounded-full p-0.5 outline-none hover:ring-2 hover:ring-indigo-300 transition-all">
+                    <Button className="ml-1 flex items-center gap-1 rounded-full p-0.5 outline-none hover:ring-2 hover:ring-indigo-300 transition-all">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={profile?.avatar_url || ''}  />
                         <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-black text-white">
@@ -127,7 +127,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                         </AvatarFallback>
                       </Avatar>
                       <ChevronDown size={12} className="text-muted-foreground" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" sideOffset={8} className="rounded-2xl border border-border bg-card p-1.5 shadow-xl w-64">
                     <div className="px-3 py-2.5">
@@ -135,35 +135,35 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <p className="text-xs text-muted-foreground truncate">{profile?.email || ''}</p>
                     </div>
                     <div className="h-px bg-border my-1" />
-                    <button
+                    <Button
                       onClick={() => router.push('/consumer/profile')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <User size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => router.push('/consumer/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <UserCheck size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">Đang theo dõi</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => router.push('/consumer/classroom')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <BookOpen size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">Quay về trang chính</span>
-                    </button>
+                    </Button>
                     <div className="h-px bg-border my-1" />
-                    <button
+                    <Button
                       onClick={handleLogout}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-destructive/5"
                     >
                       <LogOut size={14} className="text-destructive" />
                       <span className="text-sm font-medium text-destructive">Đăng xuất</span>
-                    </button>
+                    </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>

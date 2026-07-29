@@ -13,6 +13,14 @@ import {
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 import type { ClassroomFolder } from './types';
 
 type Props = {
@@ -63,9 +71,9 @@ function DialogBody({
       </DialogHeader>
       <div className="space-y-3 py-2">
         <div>
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             {t('classroom.docs.file_label', 'File')}
-          </label>
+          </Label>
           <input
             ref={inputRef}
             type="file"
@@ -79,9 +87,9 @@ function DialogBody({
           )}
         </div>
         <div>
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             {t('classroom.docs.section_label', 'Mục (tuỳ chọn)')}
-          </label>
+          </Label>
           <Input
             value={section}
             onChange={(e) => setSection(e.target.value)}
@@ -90,21 +98,25 @@ function DialogBody({
           />
         </div>
         <div>
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             {t('classroom.docs.folder_label', 'Thư mục đích')}
-          </label>
-          <select
-            value={folderId ?? ''}
-            onChange={(e) => setFolderId(e.target.value || null)}
-            className="mt-1 w-full h-9 text-xs rounded-md border border-slate-200 bg-white px-2"
+          </Label>
+          <Select
+            value={folderId ?? 'root'}
+            onValueChange={(v) => setFolderId(v === 'root' ? null : v)}
           >
-            <option value="">{t('classroom.docs.root_option', 'Gốc (không thư mục)')}</option>
-            {parentFolders.map((f) => (
-              <option key={f.uid} value={f.uid}>
-                {f.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="mt-1 w-full h-9 text-xs rounded-md border border-slate-200 bg-white px-2">
+              <SelectValue placeholder={t('classroom.docs.root_option', 'Gốc (không thư mục)')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="root">{t('classroom.docs.root_option', 'Gốc (không thư mục)')}</SelectItem>
+              {parentFolders.map((f) => (
+                <SelectItem key={f.uid} value={f.uid}>
+                  {f.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <DialogFooter>

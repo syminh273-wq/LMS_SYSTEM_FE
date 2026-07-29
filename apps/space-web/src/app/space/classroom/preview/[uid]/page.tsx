@@ -357,7 +357,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                         const isOpen = expanded[item.uid] ?? true;
                         const isRootPreview = item.is_preview_only && item.depth === 0;
                         return (
-                          <button
+                          <Button
                             type="button"
                             key={`f-${item.uid}`}
                             onClick={() =>
@@ -393,13 +393,13 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                                 Preview
                               </span>
                             )}
-                          </button>
+                          </Button>
                         );
                       }
                       const parentOpen = expanded[item.folder_id] ?? true;
                       if (!parentOpen) return null;
                       return (
-                        <button
+                        <Button
                           type="button"
                           key={`d-${item.uid}`}
                           onClick={() =>
@@ -431,7 +431,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                             )}
                             <ExternalLink size={13} className="text-slate-400" />
                           </div>
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -605,14 +605,14 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
               >
                 <Download size={14} />
               </a>
-              <button
+              <Button
                 type="button"
                 onClick={() => setPreviewDoc(null)}
                 className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                 title="Đóng (Esc)"
               >
                 <X size={16} />
-              </button>
+              </Button>
             </div>
             <div className="flex-1 min-h-0 flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 overflow-auto">
               {previewDoc.kind === 'image' ? (

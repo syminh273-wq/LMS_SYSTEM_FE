@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { consumerApi, ValidationException } from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -14,6 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -119,7 +121,7 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit(onRegister)} className="space-y-3.5">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Họ</label>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Họ</Label>
                     <Input
                       {...register('last_name', { required: 'Bắt buộc' })}
                       placeholder="Nguyễn"
@@ -128,7 +130,7 @@ export default function RegisterPage() {
                     {errors.last_name && <p className="text-rose-600 text-xs font-medium">{errors.last_name.message}</p>}
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tên</label>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tên</Label>
                     <Input
                       {...register('first_name', { required: 'Bắt buộc' })}
                       placeholder="An"
@@ -139,7 +141,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
                     <Input
@@ -155,7 +157,7 @@ export default function RegisterPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Mật khẩu</label>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Mật khẩu</Label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
                       <Input
@@ -165,19 +167,19 @@ export default function RegisterPage() {
                         placeholder="••••••••"
                         className="h-11 pl-10 pr-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                       />
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
                       >
                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                      </button>
+                      </Button>
                     </div>
                     {errors.password && <p className="text-rose-600 text-xs font-medium">{errors.password.message}</p>}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Xác nhận</label>
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Xác nhận</Label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
                       <Input
@@ -190,13 +192,13 @@ export default function RegisterPage() {
                         placeholder="••••••••"
                         className="h-11 pl-10 pr-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
                       />
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
                       >
                         {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                      </button>
+                      </Button>
                     </div>
                     {errors.confirm_password && <p className="text-rose-600 text-xs font-medium">{errors.confirm_password.message}</p>}
                   </div>
@@ -226,7 +228,7 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                <button
+                <Button
                   type="submit"
                   disabled={loading}
                   className="mt-2 w-full h-11 rounded-lg font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -242,7 +244,7 @@ export default function RegisterPage() {
                       <ArrowRight size={16} strokeWidth={2.5} />
                     </>
                   )}
-                </button>
+                </Button>
               </form>
 
               <div className="relative my-5">
@@ -256,7 +258,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -266,7 +268,7 @@ export default function RegisterPage() {
               >
                 <GoogleIcon />
                 Tiếp tục với Google
-              </button>
+              </Button>
 
               <Link
                 href="/consumer/login"

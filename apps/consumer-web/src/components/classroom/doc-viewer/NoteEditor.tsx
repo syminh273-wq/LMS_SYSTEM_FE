@@ -50,14 +50,14 @@ export function NoteEditor({
           {mode === 'create' ? 'Take Note' : 'Edit Note'}
         </span>
         {existingNote && onDelete && (
-          <button
+          <Button
             type="button"
             onClick={onDelete}
             className="p-1 rounded hover:bg-rose-50 text-rose-500"
             title="Xóa"
           >
             <Trash2 size={13} />
-          </button>
+          </Button>
         )}
       </div>
       <Input
@@ -76,7 +76,7 @@ export function NoteEditor({
       )}
       <div className="flex items-center gap-1">
         {Object.entries(NOTE_COLORS).map(([key, cls]) => (
-          <button
+          <Button
             key={key}
             type="button"
             onClick={() => setColor(key)}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Briefcase, Plus, MoreHorizontal, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -49,13 +50,13 @@ export function ExperienceSection({ items, isOwner = true, onChanged }: Props) {
         <h2 className="text-xl font-bold text-slate-900">{t('portfolio.me.experience')}</h2>
         {isOwner && (
           <div className="flex items-center gap-1">
-            <button
+            <Button
               onClick={() => setAdding(true)}
               className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
               aria-label={t('portfolio.me.add')}
             >
               <Plus className="size-4" />
-            </button>
+            </Button>
           </div>
         )}
       </div>

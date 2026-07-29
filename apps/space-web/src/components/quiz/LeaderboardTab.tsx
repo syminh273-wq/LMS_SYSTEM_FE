@@ -117,7 +117,7 @@ export default function LeaderboardTab({ quizUid, classroomId }: Props) {
           <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Top 3</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {top3.map(e => (
-              <button
+              <Button
                 key={e.student_id}
                 type="button"
                 onClick={() => void openDetail(e)}
@@ -153,7 +153,7 @@ export default function LeaderboardTab({ quizUid, classroomId }: Props) {
                     <Clock size={10} /> {fmtSeconds(e.best_time_taken_seconds)}
                   </div>
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { ArrowLeft } from 'lucide-react';
@@ -124,12 +125,12 @@ export default function DirectChatPage() {
       <div className="max-w-[75vw] mx-auto">
         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-160px)]">
           <div className="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
-            <button
+            <Button
               onClick={() => router.push('/space/messages')}
               className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"
             >
               <ArrowLeft size={18} />
-            </button>
+            </Button>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-[14px] text-slate-900 truncate">
                 {conv?.other_user.name || 'Đang tải...'}

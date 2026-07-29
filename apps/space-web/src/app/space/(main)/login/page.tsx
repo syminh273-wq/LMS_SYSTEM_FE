@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
@@ -15,6 +16,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -122,9 +124,9 @@ function SpaceLoginContent() {
 
               <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Email
-                  </label>
+                  </Label>
                   <div className="relative">
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
                     <Input
@@ -142,9 +144,9 @@ function SpaceLoginContent() {
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                       Mật khẩu
-                    </label>
+                    </Label>
                     <Link
                       href="/space/forgot-password"
                       className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
@@ -161,21 +163,21 @@ function SpaceLoginContent() {
                       placeholder="••••••••"
                       className="h-11 pl-10 pr-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
                     />
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors dark:hover:text-slate-200"
                       aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
+                    </Button>
                   </div>
                   {errors.password && (
                     <p className="text-rose-600 text-xs font-medium mt-1">{errors.password.message}</p>
                   )}
                 </div>
 
-                <button
+                <Button
                   type="submit"
                   disabled={loading}
                   className={cn(
@@ -197,7 +199,7 @@ function SpaceLoginContent() {
                       <ArrowRight size={16} strokeWidth={2.5} />
                     </>
                   )}
-                </button>
+                </Button>
               </form>
 
               <div className="relative my-6">
@@ -211,7 +213,7 @@ function SpaceLoginContent() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -221,7 +223,7 @@ function SpaceLoginContent() {
               >
                 <GoogleIcon />
                 Tiếp tục với Google
-              </button>
+              </Button>
 
               <Link
                 href="/space/register"

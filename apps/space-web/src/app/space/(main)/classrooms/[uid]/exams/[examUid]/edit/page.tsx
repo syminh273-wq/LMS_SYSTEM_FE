@@ -6,6 +6,9 @@ import { ArrowLeft, Calendar, Camera, Check, ChevronDown, CircleDashed, Clipboar
 import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -259,11 +262,11 @@ export default function EditExamPage({ params }: EditExamPageProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="space-y-2">
+              <Label className="space-y-2">
                 <span className="px-1 text-sm font-bold text-foreground">Hình thức bài thi</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild disabled={form.exam_mode === 'online'}>
-                    <button
+                    <Button
                       type="button"
                       disabled={form.exam_mode === 'online'}
                       className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -273,7 +276,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                         <span className="truncate">{selectedExamType.label}</span>
                       </span>
                       {form.exam_mode !== 'online' && <ChevronDown size={16} className="shrink-0 text-muted-foreground" />}
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-border bg-card p-1.5 shadow-lg shadow-slate-200/60">
                     {EXAM_TYPE_OPTIONS.map(option => {
@@ -308,13 +311,13 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     * Chế độ trực tuyến bắt buộc thi trắc nghiệm
                   </p>
                 )}
-              </label>
+              </Label>
 
-              <label className="space-y-2">
+              <Label className="space-y-2">
                 <span className="px-1 text-sm font-bold text-foreground">Phân loại</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button
+                    <Button
                       type="button"
                       className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                     >
@@ -323,7 +326,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                         <span className="truncate">{selectedExamKind.label}</span>
                       </span>
                       <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-border bg-card p-1.5 shadow-lg shadow-slate-200/60">
                     {EXAM_KIND_OPTIONS.map(kind => {
@@ -346,26 +349,26 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </label>
+              </Label>
             </div>
 
-            <label className="block space-y-2">
+            <Label className="block space-y-2">
               <span className="px-1 text-sm font-bold text-foreground">Tiêu đề <span className="text-rose-500">*</span></span>
-              <input
+              <Input
                 value={form.title}
                 onChange={event => updateForm('title', event.target.value)}
                 className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                 placeholder="Ví dụ: Kiểm tra giữa kỳ - Chương 1"
               />
-            </label>
+            </Label>
 
             {form.exam_type === 'quiz' && (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <label className="space-y-2">
+                <Label className="space-y-2">
                   <span className="px-1 text-sm font-bold text-foreground">Bộ đề trắc nghiệm <span className="text-rose-500">*</span></span>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button
+                      <Button
                         type="button"
                         className="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                       >
@@ -374,7 +377,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                           <span className="truncate">{selectedQuiz?.title || 'Chọn bộ đề trắc nghiệm'}</span>
                         </span>
                         <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
-                      </button>
+                      </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" sideOffset={6} className="max-h-[300px] overflow-y-auto rounded-xl border border-border bg-card p-1.5 shadow-lg shadow-slate-200/60">
                       {quizzes.length === 0 ? (
@@ -396,11 +399,11 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </label>
+                </Label>
 
-                <label className="space-y-2">
+                <Label className="space-y-2">
                   <span className="px-1 text-sm font-bold text-foreground">Thang điểm tối đa</span>
-                  <input
+                  <Input
                     type="number"
                     min={0}
                     max={100}
@@ -409,20 +412,20 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     onChange={event => updateForm('max_grade', parseFloat(event.target.value) || 0)}
                     className="w-full h-12 rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                   />
-                </label>
+                </Label>
               </div>
             )}
 
-            <label className="block space-y-2">
+            <Label className="block space-y-2">
               <span className="px-1 text-sm font-bold text-foreground">Mô tả</span>
-              <textarea
+              <Textarea
                 value={form.description}
                 onChange={event => updateForm('description', event.target.value)}
                 rows={4}
                 className="w-full resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                 placeholder="Mô tả ngắn về yêu cầu bài thi"
               />
-            </label>
+            </Label>
           </CardContent>
         </Card>
 
@@ -436,7 +439,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => updateForm('exam_mode', 'offline')}
                 className={`flex items-center gap-3 rounded-2xl border-2 p-4 text-left transition-all ${form.exam_mode === 'offline' ? 'border-primary-brand bg-primary-brand-light' : 'border-border bg-muted/50 hover:border-border'}`}
@@ -449,9 +452,9 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   <div className="text-[11px] font-bold text-muted-foreground">Học sinh nộp bài thông thường</div>
                 </div>
                 {form.exam_mode === 'offline' && <Check size={16} className="ml-auto text-primary-brand" />}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   updateForm('exam_mode', 'online');
@@ -468,24 +471,24 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                   <div className="text-[11px] font-bold text-muted-foreground">Thi trắc nghiệm, có camera & đếm giờ</div>
                 </div>
                 {form.exam_mode === 'online' && <Check size={16} className="ml-auto text-violet-500" />}
-              </button>
+              </Button>
             </div>
 
             {form.exam_mode === 'online' && (
               <div className="space-y-4 rounded-2xl border border-violet-100 bg-primary-brand-light/50 p-4">
-                <label className="block space-y-2">
+                <Label className="block space-y-2">
                   <span className="flex items-center gap-1.5 px-1 text-sm font-bold text-foreground">
                     <Timer size={15} className="text-violet-500" />
                     Thời gian làm bài (giây)
                   </span>
-                  <input
+                  <Input
                     type="number"
                     min={0}
                     value={form.duration_seconds}
                     onChange={event => updateForm('duration_seconds', parseInt(event.target.value) || 0)}
                     className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                   />
-                </label>
+                </Label>
 
                 <div className="flex items-center justify-between px-1">
                   <div className="space-y-0.5">
@@ -495,13 +498,13 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     </div>
                     <div className="text-[11px] font-medium text-muted-foreground">Giám sát học sinh qua camera trong suốt quá trình thi</div>
                   </div>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => updateForm('camera_required', !form.camera_required)}
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${form.camera_required ? 'bg-primary-brand' : 'bg-muted'}`}
                   >
                     <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-card shadow ring-0 transition duration-200 ease-in-out ${form.camera_required ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
@@ -518,21 +521,21 @@ export default function EditExamPage({ params }: EditExamPageProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <label className="space-y-2">
+              <Label className="space-y-2">
                 <span className="px-1 text-sm font-bold text-foreground">Hạn nộp <span className="text-rose-500">*</span></span>
-                <input
+                <Input
                   type="datetime-local"
                   value={form.due_date}
                   onChange={event => updateForm('due_date', event.target.value)}
                   className="w-full rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                 />
-              </label>
+              </Label>
 
-              <label className="space-y-2">
+              <Label className="space-y-2">
                 <span className="px-1 text-sm font-bold text-foreground">Trạng thái</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button
+                    <Button
                       type="button"
                       className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10"
                     >
@@ -541,7 +544,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                         <span className="truncate">{selectedStatus.label}</span>
                       </span>
                       <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-border bg-card p-1.5 shadow-lg shadow-slate-200/60">
                     {STATUS_OPTIONS.map(status => {
@@ -564,13 +567,13 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </label>
+              </Label>
 
-              <label className="space-y-2">
+              <Label className="space-y-2">
                 <span className="px-1 text-sm font-bold text-foreground">Loại nội dung</span>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild disabled={form.exam_type === 'quiz'}>
-                    <button
+                    <Button
                       type="button"
                       disabled={form.exam_type === 'quiz'}
                       className="flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3 text-left text-sm font-medium text-foreground outline-none transition-all hover:bg-card focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10 disabled:opacity-70"
@@ -580,7 +583,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                         <span className="truncate">{selectedContentType.label}</span>
                       </span>
                       <ChevronDown size={16} className="shrink-0 text-muted-foreground" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" sideOffset={6} className="rounded-xl border border-border bg-card p-1.5 shadow-lg shadow-slate-200/60">
                     {CONTENT_TYPE_OPTIONS.map(option => {
@@ -607,12 +610,12 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     })}
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </label>
+              </Label>
             </div>
 
-            <label className="block space-y-2">
+            <Label className="block space-y-2">
               <span className="px-1 text-sm font-bold text-foreground">Hướng dẫn làm bài <span className="text-rose-500">*</span></span>
-              <textarea
+              <Textarea
                 value={form.body}
                 onChange={event => updateForm('body', event.target.value)}
                 rows={needsResource ? 2 : 6}
@@ -620,7 +623,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                 className="w-full resize-none rounded-xl border border-border bg-muted/50 px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary-brand focus:bg-card focus:ring-4 focus:ring-primary-brand/10 disabled:opacity-70"
                 placeholder={form.exam_type === 'quiz' ? 'Nội dung sẽ được lấy từ bộ đề trắc nghiệm' : needsResource ? 'File mới sẽ được upload khi lưu' : 'Nhập hướng dẫn làm bài cho học sinh'}
               />
-            </label>
+            </Label>
 
             {needsResource && (
               <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-border bg-muted/50 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -632,7 +635,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
                     {selectedFile ? 'Sẽ upload khi lưu' : exam?.meta?.url ? 'Đang dùng tài nguyên hiện tại' : 'Yêu cầu tệp đính kèm'}
                   </div>
                 </div>
-                <input
+                <Input
                   ref={fileInputRef}
                   type="file"
                   className="hidden"

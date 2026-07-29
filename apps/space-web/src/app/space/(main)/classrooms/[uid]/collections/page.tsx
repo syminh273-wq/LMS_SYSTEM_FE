@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Layers, Loader2, ArrowLeft, Users, Award, ChevronRight } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
@@ -59,13 +60,13 @@ export default function ClassroomCollectionsPage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
-      <button
+      <Button
         onClick={() => router.push(`/space/classrooms/${classroomUid}/details?tab=quiz`)}
         className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={14} />
         {classroom?.name ?? '...'}
-      </button>
+      </Button>
 
       <div>
         <h1 className="text-2xl font-black text-foreground tracking-tight">{t('quizCollection.title')}</h1>

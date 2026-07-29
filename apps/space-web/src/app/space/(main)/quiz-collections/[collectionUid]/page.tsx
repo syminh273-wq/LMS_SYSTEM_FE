@@ -62,14 +62,14 @@ function SortableRow({ item, quiz, onRemove }: SortableRowProps) {
       style={style}
       className="flex items-center gap-3 px-4 py-3 rounded-xl border border-border bg-card hover:bg-muted/30 transition-colors"
     >
-      <button
+      <Button
         {...attributes}
         {...listeners}
         className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
         title={t('quizCollection.detail.reorder_hint')}
       >
         <GripVertical size={18} />
-      </button>
+      </Button>
       <div className="w-7 h-7 rounded-lg bg-primary-brand/10 text-primary-brand text-xs font-black flex items-center justify-center shrink-0">
         {item.order + 1}
       </div>
@@ -81,13 +81,13 @@ function SortableRow({ item, quiz, onRemove }: SortableRowProps) {
           </p>
         )}
       </div>
-      <button
+      <Button
         onClick={() => onRemove(item.quiz_id)}
         className="text-muted-foreground hover:text-red-500 p-1.5 transition-colors"
         title="Remove"
       >
         <Trash2 size={14} />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -253,13 +253,13 @@ export default function CollectionDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
-      <button
+      <Button
         onClick={() => router.push('/space/quiz-collections')}
         className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={14} />
         {t('quizCollection.detail.back')}
-      </button>
+      </Button>
 
       {/* General info */}
       <section className="bg-card border border-border rounded-2xl p-5 space-y-3">

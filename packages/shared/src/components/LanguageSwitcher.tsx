@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from './ui/button';
 import { Languages } from 'lucide-react';
 import { useTranslation, type Locale } from './LocaleProvider';
 import { cn } from '@shared/lib/utils';
@@ -39,7 +40,7 @@ export function LanguageSwitcher({
         {locales.map((loc) => {
           const isActive = loc === locale;
           return (
-            <button
+            <Button
               key={loc}
               type="button"
               onClick={() => setLocale(loc)}
@@ -57,7 +58,7 @@ export function LanguageSwitcher({
             >
               {variant === 'segmented' && <Languages size={12} className="opacity-60" />}
               {loc}
-            </button>
+            </Button>
           );
         })}
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { SHIFTS, getShiftForDate } from '@shared/lib/calendar/shifts';
@@ -134,7 +135,7 @@ export function ShiftWeekGrid({
               const visible = evs.slice(0, maxEventsPerCell);
               const extra = evs.length - visible.length;
               return (
-                <button
+                <Button
                   type="button"
                   key={`${si}-${di}`}
                   disabled={evs.length === 0 || readOnly}
@@ -174,7 +175,7 @@ export function ShiftWeekGrid({
                       {t('calendar.labels.more', '+{{count}} more', { count: extra })}
                     </div>
                   )}
-                </button>
+                </Button>
               );
             })}
           </React.Fragment>
@@ -191,7 +192,7 @@ export function ShiftWeekGrid({
         {days.map((d, di) => {
           const evs = outsideShift[di];
           return (
-            <button
+            <Button
               type="button"
               key={`outside-${di}`}
               disabled={evs.length === 0 || readOnly}
@@ -225,7 +226,7 @@ export function ShiftWeekGrid({
                   );
                 })
               )}
-            </button>
+            </Button>
           );
         })}
       </div>

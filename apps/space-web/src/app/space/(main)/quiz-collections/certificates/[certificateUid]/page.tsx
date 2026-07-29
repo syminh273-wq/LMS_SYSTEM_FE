@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, Edit3, Check, X, Award } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { certificateApi } from '@/lib/api/quiz-collection';
@@ -86,13 +88,13 @@ export default function CertificateDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
-      <button
+      <Button
         onClick={() => router.push('/space/quiz-collections/certificates')}
         className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft size={14} />
         {t('certificate.detail.back')}
-      </button>
+      </Button>
 
       <section className="bg-card border border-border rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-3">
@@ -104,7 +106,7 @@ export default function CertificateDetailPage({ params }: Props) {
               {t('certificate.detail.name_section')}
             </p>
             {editing ? (
-              <input
+              <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full text-xl font-black bg-background border border-border rounded-lg px-2 py-1 mt-1"
@@ -135,7 +137,7 @@ export default function CertificateDetailPage({ params }: Props) {
             {t('certificate.detail.description_section')}
           </p>
           {editing ? (
-            <textarea
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}

@@ -13,6 +13,14 @@ import {
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 import type { ClassroomFolder } from './types';
 
 type SubmitPayload = { name: string; parentFolderId: string | null; isPreviewOnly: boolean };
@@ -92,24 +100,28 @@ function DialogBody({
       />
       {showParentPicker && (
         <div className="mt-3">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
             {t('classroom.docs.parent_folder_label', 'Thư mục cha')}
-          </label>
-          <select
-            value={parentId ?? ''}
-            onChange={(e) => setParentId(e.target.value || null)}
-            className="mt-1 w-full h-9 text-xs rounded-md border border-slate-200 bg-white px-2"
+          </Label>
+          <Select
+            value={parentId ?? 'root'}
+            onValueChange={(v) => setParentId(v === 'root' ? null : v)}
           >
-            <option value="">{t('classroom.docs.root_option', 'Gốc (không có thư mục cha)')}</option>
-            {parentOptions.map((f) => (
-              <option key={f.uid} value={f.uid}>
-                {f.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="mt-1 w-full h-9 text-xs rounded-md border border-slate-200 bg-white px-2">
+              <SelectValue placeholder={t('classroom.docs.root_option', 'Gốc (không có thư mục cha)')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="root">{t('classroom.docs.root_option', 'Gốc (không có thư mục cha)')}</SelectItem>
+              {parentOptions.map((f) => (
+                <SelectItem key={f.uid} value={f.uid}>
+                  {f.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
-      <label className="mt-4 flex items-start gap-2 cursor-pointer select-none">
+      <Label className="mt-4 flex items-start gap-2 cursor-pointer select-none">
         <input
           type="checkbox"
           checked={isPreviewOnly}
@@ -128,7 +140,7 @@ function DialogBody({
             </div>
           )}
         </div>
-      </label>
+      </Label>
       <DialogFooter>
         <Button variant="ghost" onClick={onCancel} disabled={submitting}>
           {t('classroom.docs.cancel', 'Huỷ')}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useDispatch, useSelector } from 'react-redux';
 import { ListTodo, Loader2 } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
@@ -22,7 +23,7 @@ export default function TaskCenterBell() {
 
   return (
     <div className="relative" ref={wrapperRef}>
-      <button
+      <Button
         onClick={() => dispatch(setPanelOpen(!open))}
         className="relative p-2 rounded-full hover:bg-muted transition-colors"
         aria-label={t('quizTasks.badge.aria_label')}
@@ -37,7 +38,7 @@ export default function TaskCenterBell() {
             {activeCount > 99 ? '99+' : activeCount}
           </span>
         )}
-      </button>
+      </Button>
 
       {open && <TaskCenterPanel onClose={() => dispatch(setPanelOpen(false))} />}
     </div>

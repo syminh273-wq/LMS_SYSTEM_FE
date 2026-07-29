@@ -9,6 +9,16 @@ import {
   DialogTitle,
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { Label } from '@shared/components/ui/label';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { portfolioApi, type PortfolioEntry } from '@/lib/api/portfolio';
 import { MONTHS, getYearOptions } from '@shared/lib/portfolio/education';
@@ -86,7 +96,7 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
         </DialogHeader>
         <div className="px-6 py-5 space-y-3">
           <Field label={t('portfolio.labels.position')}>
-            <input
+            <Input
               value={form.position}
               onChange={(e) => setForm({ ...form, position: e.target.value })}
               className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
@@ -94,7 +104,7 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
             />
           </Field>
           <Field label={t('portfolio.labels.company')}>
-            <input
+            <Input
               value={form.company}
               onChange={(e) => setForm({ ...form, company: e.target.value })}
               className={inputCls}
@@ -105,26 +115,34 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
           <div>
             <p className="text-xs font-bold text-slate-700 mb-1">{t('portfolio.labels.start_year_month')}</p>
             <div className="grid grid-cols-2 gap-2">
-              <select
-                value={form.start_month}
-                onChange={(e) => setForm({ ...form, start_month: e.target.value })}
-                className={inputCls}
+              <Select
+                value={form.start_month || 'placeholder-start-month'}
+                onValueChange={(v) => setForm({ ...form, start_month: v === 'placeholder-start-month' ? '' : v })}
               >
-                <option value="">{t('portfolio.labels.start_month')}</option>
-                {MONTHS.map((m) => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
-                ))}
-              </select>
-              <select
-                value={form.start_year}
-                onChange={(e) => setForm({ ...form, start_year: e.target.value })}
-                className={inputCls}
+                <SelectTrigger className={inputCls}>
+                  <SelectValue placeholder={t('portfolio.labels.start_month')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-start-month">{t('portfolio.labels.start_month')}</SelectItem>
+                  {MONTHS.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={form.start_year || 'placeholder-start-year'}
+                onValueChange={(v) => setForm({ ...form, start_year: v === 'placeholder-start-year' ? '' : v })}
               >
-                <option value="">YYYY</option>
-                {YEAR_OPTIONS.map((y) => (
-                  <option key={y.value} value={y.value}>{y.label}</option>
-                ))}
-              </select>
+                <SelectTrigger className={inputCls}>
+                  <SelectValue placeholder="YYYY" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-start-year">YYYY</SelectItem>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -134,50 +152,58 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
                 {t('portfolio.labels.end_year_month')}{' '}
                 <span className="font-normal text-slate-500">({t('portfolio.labels.end_expected')})</span>
               </p>
-              <label className="flex items-center gap-1.5 text-xs text-slate-600">
-                <input
+              <Label className="flex items-center gap-1.5 text-xs text-slate-600">
+                <Input
                   type="checkbox"
                   checked={form.is_current}
                   onChange={(e) => setForm({ ...form, is_current: e.target.checked })}
                   className="size-3.5 accent-[#0a66c2]"
                 />
                 {t('portfolio.labels.end_year_present')}
-              </label>
+              </Label>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <select
-                value={form.end_month}
-                onChange={(e) => setForm({ ...form, end_month: e.target.value })}
-                className={inputCls}
+              <Select
+                value={form.end_month || 'placeholder-end-month'}
+                onValueChange={(v) => setForm({ ...form, end_month: v === 'placeholder-end-month' ? '' : v })}
                 disabled={form.is_current}
               >
-                <option value="">{t('portfolio.labels.end_month')}</option>
-                {MONTHS.map((m) => (
-                  <option key={m.value} value={m.value}>{m.label}</option>
-                ))}
-              </select>
-              <select
-                value={form.end_year}
-                onChange={(e) => setForm({ ...form, end_year: e.target.value })}
-                className={inputCls}
+                <SelectTrigger className={inputCls} disabled={form.is_current}>
+                  <SelectValue placeholder={t('portfolio.labels.end_month')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-end-month">{t('portfolio.labels.end_month')}</SelectItem>
+                  {MONTHS.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={form.end_year || 'placeholder-end-year'}
+                onValueChange={(v) => setForm({ ...form, end_year: v === 'placeholder-end-year' ? '' : v })}
                 disabled={form.is_current}
               >
-                <option value="">YYYY</option>
-                {YEAR_OPTIONS.map((y) => (
-                  <option key={y.value} value={y.value}>{y.label}</option>
-                ))}
-              </select>
+                <SelectTrigger className={inputCls} disabled={form.is_current}>
+                  <SelectValue placeholder="YYYY" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-end-year">YYYY</SelectItem>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y.value} value={y.value}>{y.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Field label={t('portfolio.me.fields.location')}>
-            <input
+            <Input
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               className={inputCls}
             />
           </Field>
           <Field label={t('portfolio.me.fields.description')}>
-            <textarea
+            <Textarea
               rows={3}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -205,9 +231,9 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block">
+    <Label className="block">
       <span className="block text-xs font-bold text-slate-700 mb-1">{label}</span>
       {children}
-    </label>
+    </Label>
   );
 }

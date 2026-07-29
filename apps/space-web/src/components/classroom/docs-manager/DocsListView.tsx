@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import {
   FileText,
   FileImage,
@@ -90,7 +91,7 @@ function SortableRow({
       className="grid grid-cols-[24px_36px_minmax(0,1fr)_120px_100px_120px_100px] items-center gap-3 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:border-indigo-200 transition group min-w-0"
     >
       {canManage ? (
-        <button
+        <Button
           type="button"
           className="cursor-grab text-slate-300 hover:text-slate-600 touch-none"
           {...attributes}
@@ -98,7 +99,7 @@ function SortableRow({
           aria-label="Drag to reorder"
         >
           <GripVertical size={16} />
-        </button>
+        </Button>
       ) : (
         <span />
       )}
@@ -128,14 +129,14 @@ function SortableRow({
           : ''}
       </span>
       <div className="flex items-center justify-end gap-1">
-        <button
+        <Button
           type="button"
           onClick={() => onShowProgress(doc)}
           className="p-1.5 rounded-md hover:bg-indigo-50 text-slate-500 hover:text-indigo-600"
           title="Xem tiến độ học sinh"
         >
           <Users size={14} />
-        </button>
+        </Button>
         <a
           href={doc.url}
           target="_blank"
@@ -146,14 +147,14 @@ function SortableRow({
           <Download size={14} />
         </a>
         {canManage && (
-          <button
+          <Button
             type="button"
             onClick={() => onDelete(doc)}
             className="p-1.5 rounded-md hover:bg-rose-50 text-slate-500 hover:text-rose-600"
             title="Xóa"
           >
             <Trash2 size={14} />
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -226,7 +227,7 @@ export function DocsListView({
         <div className="flex items-center gap-1 ml-auto">
           <ArrowUpDown size={14} className="text-slate-400" />
           {SORT_FIELDS.map((s) => (
-            <button
+            <Button
               key={s.field}
               type="button"
               onClick={() => onSortChange(s.field)}
@@ -240,7 +241,7 @@ export function DocsListView({
               {sortField === s.field && (
                 <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

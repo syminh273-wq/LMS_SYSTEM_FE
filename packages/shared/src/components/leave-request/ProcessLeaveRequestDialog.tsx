@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '../ui/button';
 import { X, Loader2, Check, X as XIcon } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { cn } from '@shared/lib/utils';
@@ -9,6 +10,8 @@ import {
   ProcessLeaveRequestInput,
 } from '@shared/lib/api/leaveRequest';
 import { LeaveRequestStatusBadge } from './LeaveRequestStatusBadge';
+import { Textarea } from '@shared/components/ui/textarea';
+import { Label } from '@shared/components/ui/label';
 
 interface ProcessLeaveRequestDialogProps {
   open: boolean;
@@ -62,7 +65,7 @@ export function ProcessLeaveRequestDialog({
           <h2 className="text-base font-bold text-slate-900">
             {t('leave_request.process.title', 'Xử lý đơn nghỉ phép')}
           </h2>
-          <button
+          <Button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={processing}
@@ -70,7 +73,7 @@ export function ProcessLeaveRequestDialog({
             aria-label="Close"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -112,7 +115,7 @@ export function ProcessLeaveRequestDialog({
           {request.status === 'pending' ? (
             <>
               <div className="grid grid-cols-2 gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setChoice('approved')}
                   className={cn(
@@ -124,8 +127,8 @@ export function ProcessLeaveRequestDialog({
                 >
                   <Check size={14} />
                   {t('leave_request.process.approve', 'Duyệt')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => setChoice('rejected')}
                   className={cn(
@@ -137,16 +140,16 @@ export function ProcessLeaveRequestDialog({
                 >
                   <XIcon size={14} />
                   {t('leave_request.process.reject', 'Từ chối')}
-                </button>
+                </Button>
               </div>
 
               {choice === 'rejected' && (
                 <div>
-                  <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+                  <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                     {t('leave_request.process.rejection_label', 'Lý do từ chối')}
                     <span className="text-rose-500"> *</span>
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
                     rows={3}
@@ -156,15 +159,15 @@ export function ProcessLeaveRequestDialog({
               )}
 
               <div className="flex items-center justify-end gap-2 pt-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => onOpenChange(false)}
                   disabled={processing}
                   className="h-10 px-4 rounded-lg text-slate-700 hover:bg-slate-100 text-[13px] font-semibold"
                 >
                   {t('leave_request.process.cancel', 'Huỷ')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
                   disabled={processing}
                   className={cn(
@@ -178,18 +181,18 @@ export function ProcessLeaveRequestDialog({
                   {choice === 'approved'
                     ? t('leave_request.process.submit_approve', 'Duyệt đơn')
                     : t('leave_request.process.submit_reject', 'Từ chối đơn')}
-                </button>
+                </Button>
               </div>
             </>
           ) : (
             <div className="flex items-center justify-end">
-              <button
+              <Button
                 type="button"
                 onClick={() => onOpenChange(false)}
                 className="h-10 px-4 rounded-lg text-slate-700 hover:bg-slate-100 text-[13px] font-semibold"
               >
                 {t('leave_request.process.close', 'Đóng')}
-              </button>
+              </Button>
             </div>
           )}
         </form>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Pencil, ChevronDown } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { ProfileEditDialog } from './ProfileEditDialog';
@@ -32,13 +33,13 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-xl font-bold text-slate-900">{t('workspace.profile.section_bio')}</h2>
         {isOwner && (
-          <button
+          <Button
             onClick={() => setOpen(true)}
             className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
             aria-label={t('workspace.common.edit')}
           >
             <Pencil className="size-4" />
-          </button>
+          </Button>
         )}
       </div>
       {bioHtml ? (
@@ -58,7 +59,7 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
             dangerouslySetInnerHTML={{ __html: bioHtml }}
           />
           {isLong && (
-            <button
+            <Button
               type="button"
               onClick={() => setExpanded((v) => !v)}
               className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline mt-2 inline-flex items-center gap-1"
@@ -67,7 +68,7 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
               <ChevronDown
                 className={`size-3 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
               />
-            </button>
+            </Button>
           )}
         </>
       ) : (

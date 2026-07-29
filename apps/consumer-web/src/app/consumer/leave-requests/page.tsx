@@ -149,7 +149,7 @@ export default function ConsumerLeaveRequestsPage() {
       <div className="flex items-center gap-2 flex-wrap">
         <Filter size={14} className="text-slate-400" />
         {FILTERS.map((f) => (
-          <button
+          <Button
             key={f.key}
             type="button"
             onClick={() => setFilter(f.key)}
@@ -161,7 +161,7 @@ export default function ConsumerLeaveRequestsPage() {
             )}
           >
             {t(f.labelKey, f.key)}
-          </button>
+          </Button>
         ))}
       </div>
 

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
+import { Label } from '@shared/components/ui/label';
 
 type FormValues = { email: string };
 
@@ -40,7 +42,7 @@ export default function SpaceForgotPasswordPage() {
           <div className="p-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Email quản trị</label>
+                <Label className="block text-sm font-semibold text-foreground mb-2">Email quản trị</Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
                     <Mail size={18} />
@@ -55,13 +57,13 @@ export default function SpaceForgotPasswordPage() {
                 {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email.message}</p>}
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98]"
               >
                 {loading ? 'Đang gửi...' : 'Gửi mã OTP'}
-              </button>
+              </Button>
             </form>
 
             <div className="mt-6 text-center">

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Button } from '@shared/components/ui/button';
+import { Label } from '@shared/components/ui/label';
 import { X, Calendar, Lock, Unlock, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { quizApi } from '@/lib/api/quiz';
@@ -93,9 +94,9 @@ export default function CloseScheduleDialog({ quizUid, assignment, onClose, onUp
           )}
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+            <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
               <Calendar size={12} /> Thời gian mở (không bắt buộc)
-            </label>
+            </Label>
             <input
               type="datetime-local"
               value={opensAtLocal}
@@ -105,9 +106,9 @@ export default function CloseScheduleDialog({ quizUid, assignment, onClose, onUp
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+            <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
               <Calendar size={12} /> Thời gian đóng (không bắt buộc)
-            </label>
+            </Label>
             <input
               type="datetime-local"
               value={closesAtLocal}

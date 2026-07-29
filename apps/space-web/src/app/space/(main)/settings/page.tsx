@@ -31,6 +31,7 @@ import {
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
@@ -168,7 +169,7 @@ export default function SettingsPage() {
       <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
         <aside className="lg:col-span-3 space-y-2">
           {menuItems.map((item) => (
-            <button
+            <Button
               key={item.id}
               onClick={() => setActiveSection(item.id as SettingSection)}
               className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all font-bold text-sm uppercase tracking-wider ${
@@ -179,7 +180,7 @@ export default function SettingsPage() {
             >
               <item.icon size={20} />
               {item.label}
-            </button>
+            </Button>
           ))}
         </aside>
 
@@ -232,7 +233,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="md:col-span-2 space-y-2.5">
                         <Label htmlFor="desc" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.desc_label')}</Label>
-                        <textarea
+                        <Textarea
                           id="desc"
                           rows={3}
                           className="w-full p-4 rounded-xl bg-muted/30 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary-brand/10 focus:bg-card transition-all font-medium"
@@ -250,26 +251,26 @@ export default function SettingsPage() {
                     </div>
                     <div className="flex flex-wrap gap-4 items-center">
                       {['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'].map((color) => (
-                        <button
+                        <Button
                           key={color}
                           onClick={() => setThemeColor(color)}
                           className={`w-12 h-12 rounded-2xl border-2 shadow-sm transition-all hover:scale-110 active:scale-95 ${themeColor === color ? 'border-primary-brand ring-2 ring-primary-brand/20' : 'border-white ring-1 ring-border'}`}
                           style={{ backgroundColor: color }}
                         >
                           {themeColor === color && <Check size={18} className="text-white mx-auto" />}
-                        </button>
+                        </Button>
                       ))}
 
                       <div className="relative group">
-                        <input
+                        <Input
                           type="color"
                           value={themeColor}
                           onChange={(e) => setThemeColor(e.target.value)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
-                        <button className="w-12 h-12 rounded-2xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground group-hover:bg-muted/50 group-hover:border-primary-brand group-hover:text-primary-brand transition-all">
+                        <Button className="w-12 h-12 rounded-2xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground group-hover:bg-muted/50 group-hover:border-primary-brand group-hover:text-primary-brand transition-all">
                           <Palette size={20} />
-                        </button>
+                        </Button>
                       </div>
 
                       <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight ml-2">{t('settings.space.profile.custom_color_hint')}</p>
@@ -364,7 +365,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <input
+                      <Input
                         type="number"
                         min={0}
                         max={20}
@@ -432,7 +433,7 @@ export default function SettingsPage() {
                             {labels[field]}
                           </Label>
                           <div className="relative">
-                            <input
+                            <Input
                               type={pwVisible[field] ? 'text' : 'password'}
                               value={passwordForm[field]}
                               onChange={(e) => {
@@ -443,13 +444,13 @@ export default function SettingsPage() {
                               required
                               className="w-full h-12 rounded-xl bg-muted/30 border border-border px-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-primary-brand/20 focus:bg-card transition-all"
                             />
-                            <button
+                            <Button
                               type="button"
                               onClick={() => setPwVisible(prev => ({ ...prev, [field]: !prev[field] }))}
                               className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             >
                               {pwVisible[field] ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       );
@@ -518,18 +519,18 @@ export default function SettingsPage() {
                         {t('settings.space.classrooms.view_mode_label')}
                       </Label>
                       <div className="flex h-12 bg-muted/30 rounded-xl border border-border p-1">
-                        <button
+                        <Button
                           onClick={() => updateSetting('classroom_defaults', 'view_mode', 'grid')}
                           className={`flex-1 rounded-lg transition-all text-xs font-bold ${settings.classroom_defaults?.view_mode === 'grid' ? 'bg-card shadow-sm text-primary-brand border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                           {t('settings.space.classrooms.view_grid')}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => updateSetting('classroom_defaults', 'view_mode', 'list')}
                           className={`flex-1 rounded-lg transition-all text-xs font-bold ${settings.classroom_defaults?.view_mode === 'list' ? 'bg-card shadow-sm text-primary-brand border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                           {t('settings.space.classrooms.view_list')}
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>

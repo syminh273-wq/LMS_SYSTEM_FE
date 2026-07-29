@@ -23,6 +23,13 @@ import {
   useCalendarState,
 } from '@shared/components/calendar';
 import { Button } from '@shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 
 const EMPTY_EVENT: Partial<CalendarEvent> = {
   type: 'class',
@@ -243,17 +250,21 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <select
+          <Select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as CalendarEventType | 'all')}
-            className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12.5px] font-semibold text-slate-700 outline-none focus:border-indigo-500"
+            onValueChange={(v) => setTypeFilter(v as CalendarEventType | 'all')}
           >
-            {TYPE_FILTERS.map((f) => (
-              <option key={f.key} value={f.key}>
-                {t(f.labelKey, f.key)}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12.5px] font-semibold text-slate-700">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TYPE_FILTERS.map((f) => (
+                <SelectItem key={f.key} value={f.key}>
+                  {t(f.labelKey, f.key)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <div className="relative">
             <Button
               onClick={() => setCreateMenuOpen((o) => !o)}
@@ -266,7 +277,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setCreateMenuOpen(false)} />
                 <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-40 overflow-hidden">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setCreateMenuOpen(false);
@@ -276,8 +287,8 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
                   >
                     <CalendarPlus size={14} className="text-indigo-600" />
                     {t('calendar.recurring.menu_one_day', 'Sự kiện 1 ngày')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => {
                       setCreateMenuOpen(false);
@@ -287,7 +298,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
                   >
                     <Repeat size={14} className="text-indigo-600" />
                     {t('calendar.recurring.menu_recurring', 'Thời khóa biểu')}
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -298,31 +309,31 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
-            <button
+            <Button
               type="button"
               onClick={goPrev}
               className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Previous"
             >
               <ChevronLeft size={14} />
-            </button>
+            </Button>
             <div className="h-4 w-px bg-slate-200" />
-            <button
+            <Button
               type="button"
               onClick={goNext}
               className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Next"
             >
               <ChevronRight size={14} />
-            </button>
+            </Button>
           </div>
-          <button
+          <Button
             type="button"
             onClick={goToday}
             className="h-9 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12px] font-semibold hover:bg-slate-50"
           >
             {locale === 'vi' ? 'Hôm nay' : 'Today'}
-          </button>
+          </Button>
           <span className="text-[14px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
         </div>
 

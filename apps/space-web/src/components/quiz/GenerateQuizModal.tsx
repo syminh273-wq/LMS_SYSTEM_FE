@@ -12,6 +12,8 @@ import {
   UploadCloud, X, Wand2,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from 'sonner';
 
 const QUIZ_TYPE_KEYS = [
@@ -118,7 +120,7 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
             <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.quiz_type_label')}</div>
             <div className="grid grid-cols-2 gap-2">
               {QUIZ_TYPE_KEYS.map(opt => (
-                <button
+                <Button
                   key={opt.value}
                   type="button"
                   onClick={() => setQuizType(opt.value)}
@@ -134,7 +136,7 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
                     {t(`quiz.generate_modal.${opt.key}_label`)}
                   </div>
                   <div className="text-[10px] font-medium text-muted-foreground mt-0.5 leading-relaxed">{t(`quiz.generate_modal.${opt.key}_desc`)}</div>
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -144,7 +146,7 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
               <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.num_questions_label')}</div>
               <span className="text-sm font-black text-primary-brand">{t('quiz.generate_modal.num_questions_value', undefined, { count: numQuestions })}</span>
             </div>
-            <input
+            <Input
               type="range" min={5} max={30} step={5}
               value={numQuestions}
               onChange={e => setNumQuestions(Number(e.target.value))}
@@ -160,7 +162,7 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
             <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">{t('quiz.generate_modal.source_label')}</div>
             <div className="flex gap-2">
               {([['text', t('quiz.generate_modal.source_text')], ['file', t('quiz.generate_modal.source_file')]] as const).map(([key, label]) => (
-                <button
+                <Button
                   key={key}
                   type="button"
                   onClick={() => setMode(key)}
@@ -172,12 +174,12 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
                   } disabled:opacity-60`}
                 >
                   {label}
-                </button>
+                </Button>
               ))}
             </div>
 
             {mode === 'text' ? (
-              <textarea
+              <Textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
                 placeholder={t('quiz.generate_modal.text_placeholder')}
@@ -190,7 +192,7 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
                 onClick={() => !submitting && fileRef.current?.click()}
                 className="flex flex-col items-center justify-center h-36 rounded-2xl border-2 border-dashed border-border hover:border-primary-brand bg-muted/30 hover:bg-primary-brand/5 transition cursor-pointer"
               >
-                <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
+                <Input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleFileSelect} />
                 {selectedFile ? (
                   <>
                     <FileText size={28} className="text-primary-brand mb-2" />

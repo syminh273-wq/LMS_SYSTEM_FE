@@ -74,13 +74,13 @@ export function ProfileHero({
                 </div>
               )}
               {isOwner && onEditAvatar && (
-                <button
+                <Button
                   onClick={onEditAvatar}
                   className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 shadow-sm hover:bg-slate-50"
                   aria-label={t('portfolio.me.edit_avatar')}
                 >
                   <Camera className="size-4" />
-                </button>
+                </Button>
               )}
             </div>
             <div className="sm:pb-2 min-w-0">

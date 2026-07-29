@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   User as UserIcon,
@@ -72,7 +73,7 @@ export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Prof
             const active = pathname === path || (path === '/consumer/feed' && pathname?.startsWith('/consumer/feed'));
             return (
               <li key={path}>
-                <button
+                <Button
                   onClick={() => router.push(path)}
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-[13.5px] font-medium transition-colors',
@@ -96,20 +97,20 @@ export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Prof
                       {badge > 999 ? '999+' : badge}
                     </span>
                   )}
-                </button>
+                </Button>
               </li>
             );
           })}
         </ul>
       </nav>
 
-      <button
+      <Button
         onClick={() => router.push('/consumer/profile')}
         className="w-full inline-flex items-center justify-center gap-2 h-11 bg-white border border-slate-200 rounded-xl text-[13.5px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors card-elevated"
       >
         <PenLine size={14} />
         Chỉnh sửa hồ sơ
-      </button>
+      </Button>
     </aside>
   );
 }

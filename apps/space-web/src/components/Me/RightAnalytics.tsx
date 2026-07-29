@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Languages, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -77,7 +78,7 @@ export function MeRightAnalytics({ profile, isEditable = true, onUpdated }: Prop
               className="flex-1 min-w-0 px-2.5 py-1.5 text-[12.5px] border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500"
               maxLength={40}
             />
-            <button
+            <Button
               type="button"
               onClick={add}
               disabled={!draft.trim() || saving}
@@ -85,7 +86,7 @@ export function MeRightAnalytics({ profile, isEditable = true, onUpdated }: Prop
               title="Thêm"
             >
               <Plus size={14} />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -100,7 +101,7 @@ export function MeRightAnalytics({ profile, isEditable = true, onUpdated }: Prop
               >
                 {s}
                 {isEditable && (
-                  <button
+                  <Button
                     type="button"
                     onClick={() => remove(s)}
                     disabled={saving}
@@ -108,7 +109,7 @@ export function MeRightAnalytics({ profile, isEditable = true, onUpdated }: Prop
                     title="Xoá"
                   >
                     <X size={10} />
-                  </button>
+                  </Button>
                 )}
               </li>
             ))}

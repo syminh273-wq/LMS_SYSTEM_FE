@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Upload, X, Loader2 } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
@@ -81,17 +82,17 @@ export function ImageUploader({ value, file, onChange, onClear, maxSizeMB = 4, c
               {t('imageUploader.new_file')}
             </span>
           )}
-          <button
+          <Button
             type="button"
             onClick={clear}
             className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500 transition-colors"
             title={t('imageUploader.remove')}
           >
             <X size={14} />
-          </button>
+          </Button>
         </div>
       ) : (
-        <button
+        <Button
           type="button"
           onClick={onPick}
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -118,18 +119,18 @@ export function ImageUploader({ value, file, onChange, onClear, maxSizeMB = 4, c
               <p className="text-[10px] text-muted-foreground">{t('imageUploader.formats', undefined, { size: maxSizeMB })}</p>
             </>
           )}
-        </button>
+        </Button>
       )}
 
       {displayedUrl && (
-        <button
+        <Button
           type="button"
           onClick={onPick}
           disabled={uploading}
           className="mt-2 w-full text-xs font-bold text-primary-brand hover:underline disabled:opacity-50"
         >
           {t('imageUploader.replace')}
-        </button>
+        </Button>
       )}
     </div>
   );

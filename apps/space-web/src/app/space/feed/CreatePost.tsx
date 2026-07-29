@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
@@ -188,19 +189,19 @@ export function CreatePost({ profile, onCreated }: {
           <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-[12px] shrink-0 overflow-hidden">
             {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : initials}
           </div>
-          <button
+          <Button
             onClick={() => setOpen(true)}
             className="flex-1 text-left px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-full text-[13.5px] text-slate-500 transition-colors"
           >
             {profile?.full_name ? `${profile.full_name} ơi, bạn đang nghĩ gì?` : 'Bạn đang nghĩ gì?'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setOpen(true)}
             className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-[12.5px] font-semibold text-slate-700 transition-colors"
           >
             <ImageIcon size={14} />
             Ảnh
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -219,11 +220,11 @@ export function CreatePost({ profile, onCreated }: {
                 <p className="text-[13.5px] font-semibold text-slate-900 truncate">{profile?.full_name || 'Bạn'}</p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full hover:bg-indigo-100 transition-colors">
+                    <Button className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full hover:bg-indigo-100 transition-colors">
                       <selectedVis.icon size={10} strokeWidth={2.5} />
                       {selectedVis.label}
                       <ChevronDown size={9} />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="bg-white border-slate-200">
                     {VISIBILITY_OPTIONS.map((opt) => (
@@ -240,13 +241,13 @@ export function CreatePost({ profile, onCreated }: {
                 </DropdownMenu>
               </div>
             </div>
-            <button
+            <Button
               onClick={() => setOpen(false)}
               className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
               aria-label="Đóng"
             >
               <X size={16} />
-            </button>
+            </Button>
           </div>
 
           {selectedEmotion && (
@@ -256,13 +257,13 @@ export function CreatePost({ profile, onCreated }: {
               <span className="font-semibold text-indigo-700">
                 {selectedEmotion.emoji} {selectedEmotion.label}
               </span>
-              <button
+              <Button
                 onClick={() => setEmotion('')}
                 className="text-slate-400 hover:text-slate-600 ml-1"
                 aria-label="Bỏ cảm xúc"
               >
                 <X size={12} />
-              </button>
+              </Button>
             </div>
           )}
 
@@ -276,13 +277,13 @@ export function CreatePost({ profile, onCreated }: {
                 >
                   <BookOpen size={11} />
                   {c.name || c.title}
-                  <button
+                  <Button
                     onClick={() => toggleClassroom(c.uid)}
                     className="ml-0.5 text-emerald-500 hover:text-emerald-700"
                     aria-label={`Bỏ tag ${c.name || c.title}`}
                   >
                     <X size={11} />
-                  </button>
+                  </Button>
                 </span>
               ))}
             </div>
@@ -300,14 +301,14 @@ export function CreatePost({ profile, onCreated }: {
               {imagePreviews.map((src, i) => (
                 <div key={i} className="relative group aspect-square">
                   <img src={src} alt="" className="w-full h-full object-cover rounded" />
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeImage(i)}
                     className="absolute top-1 right-1 w-6 h-6 bg-slate-900/70 rounded-full flex items-center justify-center text-white hover:bg-slate-900 transition-colors"
                     aria-label={`Xóa ảnh ${i + 1}`}
                   >
                     <X size={12} />
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>
@@ -316,7 +317,7 @@ export function CreatePost({ profile, onCreated }: {
           {showEmotions && (
             <div className="grid grid-cols-5 sm:grid-cols-10 gap-1 p-2.5 bg-slate-50 rounded-lg border border-slate-200 animate-fade-down">
               {EMOTIONS.map(e => (
-                <button
+                <Button
                   key={e.key}
                   onClick={() => { setEmotion(e.key); setShowEmotions(false); }}
                   className={cn(
@@ -328,14 +329,14 @@ export function CreatePost({ profile, onCreated }: {
                 >
                   <span className="text-xl">{e.emoji}</span>
                   <span className="text-[9.5px] text-slate-500 mt-1 truncate w-full text-center">{e.label}</span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
 
           <div className="flex items-center justify-between border-t border-slate-200 pt-3 mt-1">
             <div className="flex items-center gap-1">
-              <button
+              <Button
                 onClick={() => fileRef.current?.click()}
                 disabled={imageFiles.length >= MAX_IMAGES}
                 className="p-2 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors flex items-center gap-1.5 text-[12.5px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
@@ -344,7 +345,7 @@ export function CreatePost({ profile, onCreated }: {
                 <span className="hidden sm:inline">
                   Ảnh{imageFiles.length > 0 ? ` (${imageFiles.length}/${MAX_IMAGES})` : ''}
                 </span>
-              </button>
+              </Button>
               <input
                 type="file"
                 ref={fileRef}
@@ -353,15 +354,15 @@ export function CreatePost({ profile, onCreated }: {
                 multiple
                 onChange={handleImage}
               />
-              <button
+              <Button
                 onClick={() => setShowEmotions(!showEmotions)}
                 className="p-2 rounded-lg text-amber-700 hover:bg-amber-50 transition-colors flex items-center gap-1.5 text-[12.5px] font-semibold"
               >
                 <Smile size={15} />
                 <span className="hidden sm:inline">Cảm xúc</span>
-              </button>
+              </Button>
               <div ref={classroomButtonRef} className="relative">
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowClassroomPicker((v) => !v)}
                   className={cn(
@@ -375,17 +376,17 @@ export function CreatePost({ profile, onCreated }: {
                   <span className="hidden sm:inline">
                     Lớp học{selectedClassroomUids.length > 0 ? ` (${selectedClassroomUids.length})` : ''}
                   </span>
-                </button>
+                </Button>
               </div>
             </div>
-            <button
+            <Button
               onClick={handleFormSubmit(onSubmit)}
               disabled={(!content.trim() && imageFiles.length === 0) || submitting}
               className="px-5 h-9 rounded-lg text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1.5"
             >
               {submitting && <Loader2 size={13} className="animate-spin" />}
               Đăng bài
-            </button>
+            </Button>
           </div>
         </div>
           </Form>
@@ -420,7 +421,7 @@ export function CreatePost({ profile, onCreated }: {
               filteredClassrooms.map((c) => {
                 const isSel = selectedClassroomUids.includes(c.uid);
                 return (
-                  <button
+                  <Button
                     key={c.uid}
                     onClick={() => toggleClassroom(c.uid)}
                     className={cn(
@@ -442,7 +443,7 @@ export function CreatePost({ profile, onCreated }: {
                         <p className="text-[11px] text-slate-500 truncate">{c.description}</p>
                       )}
                     </div>
-                  </button>
+                  </Button>
                 );
               })
             )}
@@ -452,12 +453,12 @@ export function CreatePost({ profile, onCreated }: {
               <span className="text-[11.5px] text-slate-500 font-medium">
                 Đã chọn {selectedClassroomUids.length} lớp
               </span>
-              <button
+              <Button
                 onClick={() => setSelectedClassroomUids([])}
                 className="text-[11.5px] font-semibold text-slate-500 hover:text-rose-600"
               >
                 Bỏ chọn tất cả
-              </button>
+              </Button>
             </div>
           )}
         </div>,

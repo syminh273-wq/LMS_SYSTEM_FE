@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import {
   BookOpen,
@@ -98,7 +99,7 @@ function ResultItem({
   const meta = TYPE_META[item.type];
   const Icon = TYPE_ICONS[item.type];
   return (
-    <button
+    <Button
       type="button"
       onMouseEnter={onMouseEnter}
       onClick={onClick}
@@ -123,7 +124,7 @@ function ResultItem({
       <span className={`flex-shrink-0 text-[10px] font-bold uppercase tracking-wider mt-1 ${meta.color}`}>
         {t(labelKey)}
       </span>
-    </button>
+    </Button>
   );
 }
 
@@ -254,7 +255,7 @@ export default function GlobalSearch() {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={openDialog}
         className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-muted/60 border border-border hover:bg-muted transition-colors text-sm text-muted-foreground group"
@@ -264,7 +265,7 @@ export default function GlobalSearch() {
         <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
           ⌘K
         </kbd>
-      </button>
+      </Button>
     );
   }
 
@@ -300,21 +301,21 @@ export default function GlobalSearch() {
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
           />
           {query && (
-            <button
+            <Button
               type="button"
               onClick={() => { setQuery(''); inputRef.current?.focus(); }}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <X size={16} />
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
             onClick={closeDialog}
             className="text-[10px] font-bold text-muted-foreground border border-border rounded px-1.5 py-0.5 hover:text-foreground transition-colors"
           >
             ESC
-          </button>
+          </Button>
         </div>
 
         {/* Results */}

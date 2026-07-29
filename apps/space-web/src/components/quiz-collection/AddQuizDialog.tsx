@@ -84,7 +84,7 @@ export function AddQuizDialog({ open, onOpenChange, quizzes, existingQuizIds, on
               {filtered.map(q => {
                 const isSelected = selected.has(q.uid);
                 return (
-                  <button
+                  <Button
                     key={q.uid}
                     onClick={() => toggle(q.uid)}
                     className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
@@ -100,7 +100,7 @@ export function AddQuizDialog({ open, onOpenChange, quizzes, existingQuizIds, on
                       <p className="text-sm font-bold truncate">{q.title}</p>
                       <p className="text-[11px] text-muted-foreground">{q.questions_count} q</p>
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

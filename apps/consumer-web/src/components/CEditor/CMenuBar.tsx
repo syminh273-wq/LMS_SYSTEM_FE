@@ -1,6 +1,7 @@
 'use client';
 
 import { type Editor } from '@tiptap/react';
+import { Button } from '@shared/components/ui/button';
 import {
   Bold, Italic, Underline, Strikethrough, Code,
   Heading1, Heading2, Heading3,
@@ -27,7 +28,7 @@ function ToolbarButton({
   children: React.ReactNode;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       disabled={disabled}
@@ -41,7 +42,7 @@ function ToolbarButton({
       ].join(' ')}
     >
       <div className="w-4 h-4 [&_svg]:w-4 [&_svg]:h-4">{children}</div>
-    </button>
+    </Button>
   );
 }
 

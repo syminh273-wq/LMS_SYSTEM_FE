@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import {
@@ -15,6 +16,16 @@ import {
   getShiftById,
 } from '@shared/lib/calendar/shifts';
 import { X, Loader2 } from 'lucide-react';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import { Label } from '@shared/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 import { ShiftPicker } from './ShiftPicker';
 
 interface ClassroomOption {
@@ -162,7 +173,7 @@ export function EventDialog({
           <h2 className="text-base font-bold text-slate-900">
             {t(`calendar.dialog.${titleKey}`, isEdit ? 'Edit event' : 'Create event')}
           </h2>
-          <button
+          <Button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={saving || deleting}
@@ -170,7 +181,7 @@ export function EventDialog({
             aria-label="Close"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -181,10 +192,10 @@ export function EventDialog({
           )}
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('calendar.dialog.field_title', 'Title')} <span className="text-rose-500">*</span>
-            </label>
-            <input
+            </Label>
+            <Input
               autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -195,27 +206,31 @@ export function EventDialog({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.dialog.field_type', 'Type')}
-              </label>
-              <select
+              </Label>
+              <Select
                 value={type}
-                onChange={(e) => setType(e.target.value as CalendarEventType)}
-                className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                onValueChange={(v) => setType(v as CalendarEventType)}
               >
-                {TYPES.map((tp) => (
-                  <option key={tp} value={tp}>
-                    {t(`calendar.types.${tp}`, tp)}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TYPES.map((tp) => (
+                    <SelectItem key={tp} value={tp}>
+                      {t(`calendar.types.${tp}`, tp)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             {lockedClassroom ? (
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+                <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                   {t('calendar.dialog.field_classroom', 'Classroom')}
-                </label>
+                </Label>
                 <div className="h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 inline-flex items-center text-[13px] text-slate-700 font-medium">
                   <span className="truncate">
                     {lockedClassroom.name ?? lockedClassroom.uid}
@@ -224,38 +239,42 @@ export function EventDialog({
               </div>
             ) : showClassroomSelect ? (
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+                <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                   {t('calendar.dialog.field_classroom', 'Classroom')}
-                </label>
-                <select
-                  value={classroomId}
-                  onChange={(e) => setClassroomId(e.target.value)}
-                  className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                </Label>
+                <Select
+                  value={classroomId || 'placeholder-no-classroom'}
+                  onValueChange={(v) => setClassroomId(v === 'placeholder-no-classroom' ? '' : v)}
                 >
-                  <option value="">{t('calendar.dialog.no_classroom', 'No classroom')}</option>
-                  {classroomOptions.map((c) => (
-                    <option key={c.uid} value={c.uid}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px]">
+                    <SelectValue placeholder={t('calendar.dialog.no_classroom', 'No classroom')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="placeholder-no-classroom">{t('calendar.dialog.no_classroom', 'No classroom')}</SelectItem>
+                    {classroomOptions.map((c) => (
+                      <SelectItem key={c.uid} value={c.uid}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             ) : null}
           </div>
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('calendar.dialog.field_shift', 'Ca học')}
-            </label>
+            </Label>
             <ShiftPicker value={shiftId} onChange={handleShiftChange} optional />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.dialog.field_start', 'Start')} <span className="text-rose-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 type="datetime-local"
                 value={startTime}
                 onChange={(e) => handleStartTimeChange(e.target.value)}
@@ -263,10 +282,10 @@ export function EventDialog({
               />
             </div>
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.dialog.field_end', 'End')} <span className="text-rose-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 type="datetime-local"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
@@ -276,10 +295,10 @@ export function EventDialog({
           </div>
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('calendar.dialog.field_description', 'Description')}
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
@@ -290,7 +309,7 @@ export function EventDialog({
           <div className="flex items-center justify-between gap-2 pt-2">
             <div>
               {onDelete && isEdit && (
-                <button
+                <Button
                   type="button"
                   onClick={onDelete}
                   disabled={saving || deleting}
@@ -298,26 +317,26 @@ export function EventDialog({
                 >
                   {deleting && <Loader2 size={14} className="animate-spin" />}
                   {t('calendar.labels.delete_event', 'Delete')}
-                </button>
+                </Button>
               )}
             </div>
             <div className="flex items-center gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => onOpenChange(false)}
                 disabled={saving || deleting}
                 className="h-10 px-4 rounded-lg text-slate-700 hover:bg-slate-100 text-[13px] font-semibold"
               >
                 {t('calendar.dialog.cancel', 'Cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={saving || deleting}
                 className="h-10 px-4 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 inline-flex items-center gap-1.5 disabled:opacity-50"
               >
                 {saving && <Loader2 size={14} className="animate-spin" />}
                 {t('calendar.dialog.save', 'Save')}
-              </button>
+              </Button>
             </div>
           </div>
         </form>

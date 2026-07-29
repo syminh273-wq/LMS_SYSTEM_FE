@@ -896,7 +896,7 @@ function SubmissionGradingDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-foreground/30">
-      <button type="button" aria-label={t('classroom.ui.close_submission_detail')} className="absolute inset-0" onClick={onClose} />
+      <Button type="button" aria-label={t('classroom.ui.close_submission_detail')} className="absolute inset-0" onClick={onClose} />
       <aside className="relative flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl animate-in slide-in-from-right duration-200">
         <div className="flex items-start justify-between gap-4 border-b border-border p-4">
           <div>

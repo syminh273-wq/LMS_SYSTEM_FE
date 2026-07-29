@@ -315,7 +315,7 @@ function PodiumCell({
   onClick: () => void;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       className="group flex flex-col items-center justify-end gap-2 text-center"
@@ -350,6 +350,6 @@ function PodiumCell({
       >
         <span className="pb-2 text-base">#{entry.rank}</span>
       </div>
-    </button>
+    </Button>
   );
 }

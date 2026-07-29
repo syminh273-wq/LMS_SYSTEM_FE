@@ -499,14 +499,14 @@ export default function QuizGamePage({ params }: Props) {
             </p>
           )}
 
-          <button
+          <Button
             type="button"
             onClick={() => router.push(`/consumer/classroom/${classroomUid}`)}
             className="w-full text-center text-indigo-200 text-sm font-bold hover:text-white transition flex items-center justify-center gap-2"
           >
             <ArrowLeft size={16} />
             Quay lại lớp học
-          </button>
+          </Button>
         </div>
 
         {showLeaderboard && (
@@ -541,14 +541,14 @@ export default function QuizGamePage({ params }: Props) {
         {/* Header */}
         <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
-            <button
+            <Button
               type="button"
               onClick={handleRestart}
               className="shrink-0 w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition active:scale-95"
               aria-label="Quay lại"
             >
               <ArrowLeft size={18} />
-            </button>
+            </Button>
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-3 mb-1.5">
@@ -626,7 +626,7 @@ export default function QuizGamePage({ params }: Props) {
               {OPTION_KEYS.map((opt, idx) => {
                 const isSelected = selected === opt;
                 return (
-                  <button
+                  <Button
                     key={opt}
                     type="button"
                     onClick={() => handleAnswer(opt)}
@@ -651,7 +651,7 @@ export default function QuizGamePage({ params }: Props) {
                     </span>
                     <span className="flex-1">{currentQuestion[`option_${opt}` as keyof QuizQuestionPublic] as string}</span>
                     {isSelected && <CheckCircle2 size={18} className="shrink-0" />}
-                  </button>
+                  </Button>
                 );
               })}
             </div>

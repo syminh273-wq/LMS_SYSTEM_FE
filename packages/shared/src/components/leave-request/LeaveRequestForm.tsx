@@ -1,9 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '../ui/button';
 import { X, Loader2, Upload } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { cn } from '@shared/lib/utils';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import { Label } from '@shared/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 import {
   CreateLeaveRequestInput,
   LeaveRequestEventOption,
@@ -127,7 +138,7 @@ export function LeaveRequestForm({
           <h2 className="text-base font-bold text-slate-900">
             {t('leave_request.form.title', 'Tạo đơn nghỉ phép')}
           </h2>
-          <button
+          <Button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={saving}
@@ -135,7 +146,7 @@ export function LeaveRequestForm({
             aria-label="Close"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -147,7 +158,7 @@ export function LeaveRequestForm({
 
           <div>
             <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 w-fit">
-              <button
+              <Button
                 type="button"
                 disabled={events.length === 0}
                 onClick={() => setMode('event')}
@@ -157,8 +168,8 @@ export function LeaveRequestForm({
                 )}
               >
                 {t('leave_request.form.mode_event', 'Theo sự kiện')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setMode('range')}
                 className={cn(
@@ -167,43 +178,45 @@ export function LeaveRequestForm({
                 )}
               >
                 {t('leave_request.form.mode_range', 'Theo khoảng ngày')}
-              </button>
+              </Button>
             </div>
           </div>
 
           {mode === 'event' ? (
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('leave_request.form.field_event', 'Sự kiện')}
-              </label>
+              </Label>
               {events.length === 0 ? (
                 <p className="text-[12.5px] text-slate-500">
                   {t('leave_request.form.no_events', 'Bạn chưa có sự kiện nào để tạo đơn.')}
                 </p>
               ) : (
-                <select
-                  value={eventId}
-                  onChange={(e) => setEventId(e.target.value)}
-                  className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                <Select
+                  value={eventId || 'placeholder-event'}
+                  onValueChange={(v) => setEventId(v === 'placeholder-event' ? '' : v)}
                 >
-                  <option value="">
-                    {t('leave_request.form.select_event', '-- Chọn sự kiện --')}
-                  </option>
-                  {events.map((ev) => (
-                    <option key={ev.uid} value={ev.uid}>
-                      {ev.classroom_name ? `${ev.classroom_name} · ${ev.title}` : ev.title} ({toLocalInput(ev.start_time)})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px]">
+                    <SelectValue placeholder={t('leave_request.form.select_event', '-- Chọn sự kiện --')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="placeholder-event">{t('leave_request.form.select_event', '-- Chọn sự kiện --')}</SelectItem>
+                    {events.map((ev) => (
+                      <SelectItem key={ev.uid} value={ev.uid}>
+                        {ev.classroom_name ? `${ev.classroom_name} · ${ev.title}` : ev.title} ({toLocalInput(ev.start_time)})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+                <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                   {t('leave_request.form.field_start', 'Bắt đầu')}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="datetime-local"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
@@ -211,10 +224,10 @@ export function LeaveRequestForm({
                 />
               </div>
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+                <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                   {t('leave_request.form.field_end', 'Kết thúc')}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="datetime-local"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
@@ -225,11 +238,11 @@ export function LeaveRequestForm({
           )}
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('leave_request.form.field_reason', 'Lý do')}
               <span className="text-rose-500"> *</span>
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
@@ -239,39 +252,39 @@ export function LeaveRequestForm({
           </div>
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('leave_request.form.field_evidence', 'Minh chứng (tuỳ chọn)')}
-            </label>
-            <label className="flex items-center gap-2 h-10 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 text-[12.5px] text-slate-600 cursor-pointer hover:border-indigo-400">
+            </Label>
+            <Label className="flex items-center gap-2 h-10 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 text-[12.5px] text-slate-600 cursor-pointer hover:border-indigo-400">
               <Upload size={14} />
               <span className="truncate">
                 {evidence ? evidence.name : t('leave_request.form.upload_hint', 'Chọn ảnh hoặc tài liệu...')}
               </span>
-              <input
+              <Input
                 type="file"
                 className="hidden"
                 onChange={(e) => setEvidence(e.target.files?.[0] ?? null)}
               />
-            </label>
+            </Label>
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">
-            <button
+            <Button
               type="button"
               onClick={() => onOpenChange(false)}
               disabled={saving}
               className="h-10 px-4 rounded-lg text-slate-700 hover:bg-slate-100 text-[13px] font-semibold"
             >
               {t('leave_request.form.cancel', 'Huỷ')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={saving}
               className="h-10 px-4 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 inline-flex items-center gap-1.5 disabled:opacity-50"
             >
               {saving && <Loader2 size={14} className="animate-spin" />}
               {t('leave_request.form.submit', 'Gửi đơn')}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

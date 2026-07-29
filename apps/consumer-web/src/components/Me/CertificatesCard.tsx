@@ -9,6 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
+import { Label } from '@shared/components/ui/label';
 import { CollapsibleItem } from './CollapsibleItem';
 
 function formatDate(iso: string | null): string {
@@ -116,12 +117,12 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
           </span>
         </div>
         {isOwner && (
-          <button
+          <Button
             onClick={startCreate}
             className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors"
           >
             <Plus size={13} /> Thêm
-          </button>
+          </Button>
         )}
       </div>
 
@@ -175,18 +176,18 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                 )}
                 {isOwner && (
                   <div className="absolute top-2 right-2 flex gap-1">
-                    <button
+                    <Button
                       onClick={() => startEdit(it)}
                       className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50"
                     >
                       <Pencil size={11} />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleDelete(it)}
                       className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-rose-600 hover:bg-rose-50"
                     >
                       <Trash2 size={11} />
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -202,7 +203,7 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
               <DialogTitle>{editing ? 'Sửa chứng chỉ' : 'Thêm chứng chỉ'}</DialogTitle>
             </DialogHeader>
             <div className="px-6 py-5 space-y-3">
-              <label className="block">
+              <Label className="block">
                 <span className="block text-xs font-bold text-slate-700 mb-1">Tên chứng chỉ *</span>
                 <input
                   value={title}
@@ -210,8 +211,8 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                   placeholder="VD: AWS Solutions Architect"
                   className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
                 />
-              </label>
-              <label className="block">
+              </Label>
+              <Label className="block">
                 <span className="block text-xs font-bold text-slate-700 mb-1">Nơi cấp</span>
                 <input
                   value={issuer}
@@ -219,8 +220,8 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                   placeholder="VD: Amazon Web Services"
                   className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
                 />
-              </label>
-              <label className="block">
+              </Label>
+              <Label className="block">
                 <span className="block text-xs font-bold text-slate-700 mb-1">Năm</span>
                 <input
                   value={year}
@@ -228,8 +229,8 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                   placeholder="VD: 2024"
                   className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
                 />
-              </label>
-              <label className="block">
+              </Label>
+              <Label className="block">
                 <span className="block text-xs font-bold text-slate-700 mb-1">URL file đính kèm (tùy chọn)</span>
                 <input
                   value={fileUrl}
@@ -237,7 +238,7 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                   placeholder="https://..."
                   className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
                 />
-              </label>
+              </Label>
             </div>
             <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>

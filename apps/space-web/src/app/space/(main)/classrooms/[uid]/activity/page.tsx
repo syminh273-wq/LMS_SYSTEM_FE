@@ -188,7 +188,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
         {/* Level toggle */}
         <div className="flex bg-muted rounded-xl p-1 gap-1 self-start">
           {(['major', 'detail'] as const).map(lvl => (
-            <button
+            <Button
               key={lvl}
               onClick={() => setLevel(lvl)}
               className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
@@ -198,7 +198,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
               }`}
             >
               {lvl === 'major' ? 'Hoạt động chính' : 'Audit chi tiết'}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -216,7 +216,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
         {/* Event group filter */}
         <div className="flex flex-wrap gap-2">
           {EVENT_GROUPS.map((g, i) => (
-            <button
+            <Button
               key={g.label}
               onClick={() => setActiveGroup(i)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
@@ -226,7 +226,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
               }`}
             >
               {g.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

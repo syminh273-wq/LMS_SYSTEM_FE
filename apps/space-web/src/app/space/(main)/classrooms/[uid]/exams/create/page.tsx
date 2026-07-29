@@ -272,7 +272,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => updateForm('exam_mode', 'offline')}
                 className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition-all ${form.exam_mode === 'offline' ? 'border-primary bg-primary/10' : 'border-border bg-muted/50 hover:bg-muted'}`}
@@ -285,9 +285,9 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
                   <div className="text-xs text-muted-foreground">Học sinh nộp bài thông thường</div>
                 </div>
                 {form.exam_mode === 'offline' && <Check className="ml-auto size-4 text-primary" />}
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   updateForm('exam_mode', 'online');
@@ -304,7 +304,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
                   <div className="text-xs text-muted-foreground">Thi trắc nghiệm, có camera & đếm giờ</div>
                 </div>
                 {form.exam_mode === 'online' && <Check className="ml-auto size-4 text-primary" />}
-              </button>
+              </Button>
             </div>
 
             {form.exam_mode === 'online' && (

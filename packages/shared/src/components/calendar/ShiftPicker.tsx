@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { SHIFTS } from '@shared/lib/calendar/shifts';
 import { cn } from '@shared/lib/utils';
@@ -17,7 +18,7 @@ export function ShiftPicker({ value, onChange, optional = false, className }: Sh
   return (
     <div className={cn('grid gap-2', optional ? 'grid-cols-2 sm:grid-cols-5' : 'grid-cols-2 sm:grid-cols-4', className)}>
       {optional && (
-        <button
+        <Button
           type="button"
           onClick={() => onChange('')}
           className={cn(
@@ -33,12 +34,12 @@ export function ShiftPicker({ value, onChange, optional = false, className }: Sh
           <div className="text-[10.5px] text-slate-500 mt-0.5">
             {t('calendar.shifts.none_hint', 'Giờ tự do')}
           </div>
-        </button>
+        </Button>
       )}
       {SHIFTS.map((s) => {
         const active = value === s.id;
         return (
-          <button
+          <Button
             type="button"
             key={s.id}
             onClick={() => onChange(s.id)}
@@ -55,7 +56,7 @@ export function ShiftPicker({ value, onChange, optional = false, className }: Sh
             <div className="text-[10.5px] text-slate-500 tabular-nums mt-0.5">
               {String(s.startHour).padStart(2, '0')}:{String(s.startMinute).padStart(2, '0')} – {String(s.endHour).padStart(2, '0')}:{String(s.endMinute).padStart(2, '0')}
             </div>
-          </button>
+          </Button>
         );
       })}
     </div>

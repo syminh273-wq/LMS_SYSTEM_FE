@@ -146,7 +146,7 @@ export function StudentProgressModal({
                     .map((p) => {
                       const isSelected = p.student_id === selectedStudent;
                       return (
-                        <button
+                        <Button
                           type="button"
                           key={p.student_id}
                           onClick={() => setSelectedStudent(p.student_id)}
@@ -179,7 +179,7 @@ export function StudentProgressModal({
                             </div>
                           </div>
                           <ChevronRight size={12} className="text-slate-400 shrink-0" />
-                        </button>
+                        </Button>
                       );
                     })
                 )}
@@ -193,13 +193,13 @@ export function StudentProgressModal({
                   {selectedStudent ? `Note của học sinh` : 'Chọn học sinh để xem note'}
                 </span>
                 {selectedStudent && (
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setSelectedStudent(null)}
                     className="p-1 rounded hover:bg-slate-200"
                   >
                     <X size={12} />
-                  </button>
+                  </Button>
                 )}
               </div>
               <div className="flex-1 overflow-y-auto p-2">

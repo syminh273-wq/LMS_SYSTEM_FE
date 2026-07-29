@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, Mail, Search, UserCheck, X } from 'lucide-react';
@@ -89,13 +90,13 @@ export default function FollowingPage() {
     <WorkspaceShell>
       <div className="mx-auto w-full max-w-2xl py-6 sm:py-8">
         <div className="mb-4 flex items-center gap-3">
-          <button
+          <Button
             onClick={() => router.back()}
             className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors"
             aria-label="Quay lại"
           >
             <ArrowLeft size={16} />
-          </button>
+          </Button>
           <div className="flex-1 min-w-0">
             <h1 className="text-[20px] font-bold text-slate-900 flex items-center gap-2">
               <UserCheck size={18} className="text-indigo-600" />
@@ -122,13 +123,13 @@ export default function FollowingPage() {
                 className="w-full h-10 pl-9 pr-9 rounded-lg bg-slate-50 border border-slate-200 text-[13.5px] outline-none focus:bg-white focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 transition-colors"
               />
               {query && (
-                <button
+                <Button
                   onClick={() => setQuery('')}
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center"
                   aria-label="Xóa"
                 >
                   <X size={12} />
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -141,12 +142,12 @@ export default function FollowingPage() {
           ) : error ? (
             <div className="py-16 text-center">
               <p className="text-[13.5px] text-slate-600 mb-3">{error}</p>
-              <button
+              <Button
                 onClick={() => window.location.reload()}
                 className="inline-flex items-center h-9 px-4 rounded-full bg-indigo-600 text-white text-[12.5px] font-semibold hover:bg-indigo-700"
               >
                 Thử lại
-              </button>
+              </Button>
             </div>
           ) : users.length === 0 ? (
             <div className="py-16 text-center px-6">
@@ -198,15 +199,15 @@ export default function FollowingPage() {
                       </div>
                     </Link>
                     <div className="flex items-center gap-2 shrink-0">
-                      <button
+                      <Button
                         onClick={() => handleMessage(u.consumer_uid)}
                         className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-slate-200 text-[12.5px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
                         title="Nhắn tin"
                       >
                         <Mail size={13} />
                         <span className="hidden sm:inline">Nhắn tin</span>
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => handleUnfollow(u.consumer_uid)}
                         disabled={isPending}
                         className={cn(
@@ -223,7 +224,7 @@ export default function FollowingPage() {
                         <span className="hidden sm:inline">
                           {isPending ? 'Đang xử lý' : 'Đang theo dõi'}
                         </span>
-                      </button>
+                      </Button>
                     </div>
                   </li>
                 );

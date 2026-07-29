@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import {
   Activity,
   AlertTriangle,
@@ -20,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@shared/components/ui/dialog';
-import { Button } from '@shared/components/ui/button';
+
 import {
   formatAuditClockTime,
   formatAuditEventData,
@@ -132,7 +133,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
             const { label, icon: Icon } = TAB_LABELS[key];
             const active = activeTab === key;
             return (
-              <button
+              <Button
                 key={key}
                 type="button"
                 onClick={() => setActiveTab(key)}
@@ -144,7 +145,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
               >
                 <Icon size={14} />
                 {label}
-              </button>
+              </Button>
             );
           })}
         </div>

@@ -20,6 +20,8 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
 import {
   formatAuditClockTime,
   formatAuditEventData,
@@ -612,7 +614,7 @@ export default function ExamSessionPage({ params }: Props) {
           {/* Tabs */}
           <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="flex border-b border-slate-200">
-              <button
+              <Button
                 type="button"
                 onClick={() => setResultView('overview')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
@@ -622,8 +624,8 @@ export default function ExamSessionPage({ params }: Props) {
                 }`}
               >
                 Tổng quan
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setResultView('answers')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
@@ -633,8 +635,8 @@ export default function ExamSessionPage({ params }: Props) {
                 }`}
               >
                 Bài làm của tôi
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setResultView('audit')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
@@ -644,7 +646,7 @@ export default function ExamSessionPage({ params }: Props) {
                 }`}
               >
                 Lịch sử ({resultAuditEvents.length})
-              </button>
+              </Button>
             </div>
 
             <div className="p-5">
@@ -674,13 +676,13 @@ export default function ExamSessionPage({ params }: Props) {
                       <p className="mt-1 text-sm font-bold text-slate-800">
                         Tổng cộng <span className="font-black text-slate-900">{resultAuditEvents.length}</span> sự kiện đã được ghi lại trong phiên thi này.
                       </p>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => setResultView('audit')}
                         className="mt-2 text-xs font-black text-indigo-600 hover:text-indigo-700"
                       >
                         Xem chi tiết →
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -875,14 +877,14 @@ export default function ExamSessionPage({ params }: Props) {
               </p>
               <p className="mt-0.5 text-sm font-bold text-slate-800">{warning.message}</p>
             </div>
-            <button
+            <Button
               type="button"
               onClick={() => setWarning(null)}
               className="text-slate-400 hover:text-slate-600 text-lg leading-none"
               aria-label="Đóng"
             >
               ×
-            </button>
+            </Button>
           </div>
           {warning.rule && warning.max > 0 && (
             <div className="flex items-center justify-between gap-3 px-4 py-2.5">
@@ -982,7 +984,7 @@ export default function ExamSessionPage({ params }: Props) {
           )}
 
           {isOnline && session?.uid && (
-            <button
+            <Button
               type="button"
               onClick={() => {
                 setAuditOpen(true);
@@ -993,7 +995,7 @@ export default function ExamSessionPage({ params }: Props) {
             >
               <Activity size={14} className="text-slate-500" />
               <span className="hidden sm:inline">Lịch sử</span>
-            </button>
+            </Button>
           )}
         </div>
       </header>
@@ -1091,7 +1093,7 @@ export default function ExamSessionPage({ params }: Props) {
                       const value = question[`option_${letter}` as keyof typeof question] as string;
                       const selected = quizAnswers[question.uid] === letter;
                       return (
-                        <button
+                        <Button
                           key={letter}
                           type="button"
                           disabled={timeExpired || submitted}
@@ -1104,7 +1106,7 @@ export default function ExamSessionPage({ params }: Props) {
                         >
                           <span className="mr-2 text-xs font-black uppercase">{letter}.</span>
                           {value}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -1152,7 +1154,7 @@ export default function ExamSessionPage({ params }: Props) {
           <div className="mb-4 text-[10px] font-black uppercase tracking-widest text-indigo-500">Bài làm của bạn</div>
 
           {exam.content_type === 'markdown' && (
-            <textarea
+            <Textarea
               value={answerContent}
               onChange={e => setAnswerContent(e.target.value)}
               rows={10}
@@ -1172,7 +1174,7 @@ export default function ExamSessionPage({ params }: Props) {
                   {answerFile ? 'Sẵn sàng nộp' : 'Chọn file để đính kèm bài làm'}
                 </div>
               </div>
-              <input
+              <Input
                 ref={fileInputRef}
                 type="file"
                 className="hidden"
@@ -1253,14 +1255,14 @@ export default function ExamSessionPage({ params }: Props) {
                   )}
                 </h2>
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={() => setAuditOpen(false)}
                 className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Đóng"
               >
                 <X size={18} />
-              </button>
+              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-4">

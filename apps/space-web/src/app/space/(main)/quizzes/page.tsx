@@ -11,6 +11,8 @@ import {
   Shuffle, HelpCircle, Target, X, CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { useSelector } from 'react-redux';
@@ -149,7 +151,7 @@ export default function QuizLibraryPage() {
               >
                 <div className="p-5 flex flex-col gap-4">
                   <div className="flex items-start justify-between gap-3">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => void handleToggleExpand(quiz)}
                       className="flex items-start gap-3 flex-1 min-w-0 text-left cursor-pointer"
@@ -180,7 +182,7 @@ export default function QuizLibraryPage() {
                       <div className="shrink-0 text-muted-foreground">
                         {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                       </div>
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="flex items-center justify-end pt-2 border-t border-border">
@@ -344,14 +346,14 @@ function QuizExpandedPanel({
                     <Clock size={11} />{Math.round(a.time_limit_seconds / 60)}p
                   </span>
                 )}
-                <button type="button" onClick={() => setEditingAssignment(a)}
+                <Button type="button" onClick={() => setEditingAssignment(a)}
                   className="text-muted-foreground/60 hover:text-primary-brand transition-colors">
                   <Settings size={12} />
-                </button>
-                <button type="button" onClick={() => void handleUnassignInline(a.classroom_id, detail.uid, onUnassigned)}
+                </Button>
+                <Button type="button" onClick={() => void handleUnassignInline(a.classroom_id, detail.uid, onUnassigned)}
                   className="text-muted-foreground/60 hover:text-rose-500 transition-colors">
                   <X size={12} />
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -423,14 +425,14 @@ function QuestionRow({ index, question, onEdit }: { index: number; question: Qui
           </span>
         </div>
       </div>
-      <button
+      <Button
         type="button"
         onClick={onEdit}
         title="Sửa đáp án"
         className="shrink-0 w-7 h-7 rounded-lg text-muted-foreground hover:text-primary-brand hover:bg-primary-brand/10 flex items-center justify-center transition-colors"
       >
         <Pencil size={13} />
-      </button>
+      </Button>
     </li>
   );
 }
@@ -508,61 +510,61 @@ function AssignToClassroomModal({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</label>
-                  <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
+                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</Label>
+                  <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
                     className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</label>
-                  <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
+                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</Label>
+                  <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
                     className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt (%)</label>
+                <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt (%)</Label>
                 <div className="flex items-center gap-4">
-                  <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
+                  <Input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
                     className="flex-1 accent-primary-brand" />
                   <span className="text-sm font-black text-primary-brand w-8">{passingScore}%</span>
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
-                <label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-                  <input type="checkbox" checked={shuffleQuestions} onChange={e => setShuffleQuestions(e.target.checked)}
+                <Label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                  <Input type="checkbox" checked={shuffleQuestions} onChange={e => setShuffleQuestions(e.target.checked)}
                     className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
                   <div className="flex-1">
                     <div className="text-xs font-black text-foreground flex items-center gap-1.5"><Shuffle size={12} /> Trộn câu hỏi</div>
                     <p className="text-[10px] text-muted-foreground font-medium">Thay đổi thứ tự câu hỏi cho mỗi lượt làm</p>
                   </div>
-                </label>
+                </Label>
 
-                <label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-                  <input type="checkbox" checked={shuffleOptions} onChange={e => setShuffleOptions(e.target.checked)}
+                <Label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                  <Input type="checkbox" checked={shuffleOptions} onChange={e => setShuffleOptions(e.target.checked)}
                     className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
                   <div className="flex-1">
                     <div className="text-xs font-black text-foreground flex items-center gap-1.5"><Shuffle size={12} /> Trộn đáp án</div>
                     <p className="text-[10px] text-muted-foreground font-medium">Thay đổi thứ tự A/B/C/D</p>
                   </div>
-                </label>
+                </Label>
 
-                <label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
-                  <input type="checkbox" checked={showExplanation} onChange={e => setShowExplanation(e.target.checked)}
+                <Label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                  <Input type="checkbox" checked={showExplanation} onChange={e => setShowExplanation(e.target.checked)}
                     className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
                   <div className="flex-1">
                     <div className="text-xs font-black text-foreground flex items-center gap-1.5"><HelpCircle size={12} /> Hiện giải thích</div>
                     <p className="text-[10px] text-muted-foreground font-medium">Hiển thị giải thích sau khi hoàn thành</p>
                   </div>
-                </label>
+                </Label>
               </div>
 
               <div className="space-y-3 pt-2 border-t border-border">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
                     <Clock size={12} /> Thời gian mở (tùy chọn)
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="datetime-local"
                     value={opensAt}
                     onChange={e => setOpensAt(e.target.value)}
@@ -570,10 +572,10 @@ function AssignToClassroomModal({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
                     <Clock size={12} /> Thời gian đóng (tùy chọn)
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="datetime-local"
                     value={closesAt}
                     onChange={e => setClosesAt(e.target.value)}
@@ -693,20 +695,20 @@ function EditAssignmentModal({
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian</label>
-              <input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
+              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian</Label>
+              <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
                 className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Lần thử</label>
-              <input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
+              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Lần thử</Label>
+              <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
                 className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt: {passingScore}%</label>
-            <input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
+            <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt: {passingScore}%</Label>
+            <Input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
               className="w-full accent-primary-brand" />
           </div>
 
@@ -716,13 +718,13 @@ function EditAssignmentModal({
               { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
               { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
-              <label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-muted/50 cursor-pointer">
+              <Label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-muted/50 cursor-pointer">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground">
                   <item.icon size={14} className="text-muted-foreground" /> {item.label}
                 </div>
-                <input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
+                <Input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
                   className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
-              </label>
+              </Label>
             ))}
           </div>
 
@@ -741,10 +743,10 @@ function EditAssignmentModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
                 <Clock size={12} /> Thời gian mở (tùy chọn)
-              </label>
-              <input
+              </Label>
+              <Input
                 type="datetime-local"
                 value={opensAt}
                 onChange={e => setOpensAt(e.target.value)}
@@ -752,10 +754,10 @@ function EditAssignmentModal({
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
                 <Clock size={12} /> Thời gian đóng (tùy chọn)
-              </label>
-              <input
+              </Label>
+              <Input
                 type="datetime-local"
                 value={closesAt}
                 onChange={e => setClosesAt(e.target.value)}

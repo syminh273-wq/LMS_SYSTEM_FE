@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, consumerApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
+import { Label } from '@shared/components/ui/label';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/lib/redux/store';
@@ -148,13 +149,13 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
             <h2 className="text-base font-bold text-slate-900">Tham gia lớp học</h2>
             <p className="text-[12px] text-slate-500 mt-0.5">Nhập mã hoặc quét QR từ giáo viên</p>
           </div>
-          <button
+          <Button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
             aria-label="Đóng"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <div className="flex border-b border-slate-200 bg-slate-50">
@@ -162,7 +163,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
             { key: 'code' as const, label: 'Nhập mã', icon: KeyRound },
             { key: 'qr' as const, label: 'Quét QR', icon: QrCode },
           ].map(({ key, label, icon: Icon }) => (
-            <button
+            <Button
               key={key}
               onClick={() => setTab(key)}
               className={cn(
@@ -174,7 +175,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
             >
               <Icon size={14} />
               {label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -182,9 +183,9 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
           {tab === 'code' && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[12px] font-semibold text-slate-700 mb-2">
+                <Label className="block text-[12px] font-semibold text-slate-700 mb-2">
                   Mã lớp (PID)
-                </label>
+                </Label>
                 <input
                   autoFocus
                   value={code}
@@ -327,7 +328,7 @@ export default function ClassroomPage() {
                   { key: 'all' as const, label: 'Tất cả' },
                   { key: 'active' as const, label: 'Đang học' },
                 ].map(({ key, label }) => (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => setFilter(key)}
                     className={cn(
@@ -338,7 +339,7 @@ export default function ClassroomPage() {
                     )}
                   >
                     {label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

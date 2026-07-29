@@ -185,14 +185,14 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
           onClick={e => e.stopPropagation()}
           style={{ animation: 'cert-celebrate-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both' }}
         >
-          <button
+          <Button
             type="button"
             onClick={handleClose}
             className="absolute right-3 top-3 rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
             aria-label="Close"
           >
             <X size={16} />
-          </button>
+          </Button>
 
           <div className="relative flex flex-col items-center text-center space-y-4">
             <div className="relative w-24 h-24">
@@ -277,7 +277,7 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
             </div>
 
             {certificates.length > 1 ? (
-              <button
+              <Button
                 type="button"
                 onClick={handleNext}
                 className="text-[11px] font-bold text-slate-500 hover:text-slate-700"
@@ -285,15 +285,15 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
                 {currentIdx < certificates.length - 1
                   ? `→ ${certificates[currentIdx + 1].verification_code.slice(0, 6)}…`
                   : t('quizCollection.celebration_stay_btn')}
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
                 className="text-[11px] font-bold text-slate-500 hover:text-slate-700"
               >
                 {t('quizCollection.celebration_stay_btn')}
-              </button>
+              </Button>
             )}
           </div>
         </div>

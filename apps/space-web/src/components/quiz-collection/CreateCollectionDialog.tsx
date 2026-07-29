@@ -4,6 +4,9 @@ import * as React from 'react';
 import { useState } from 'react';
 import { X, Plus, AlertCircle } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +14,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@shared/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { quizCollectionApi } from '@/lib/api/quiz-collection';
@@ -71,10 +81,10 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">
+            <Label className="text-xs font-bold text-foreground block mb-1.5">
               {t('quizCollection.create_modal.name_label')}
-            </label>
-            <input
+            </Label>
+            <Input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -84,10 +94,10 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">
+            <Label className="text-xs font-bold text-foreground block mb-1.5">
               {t('quizCollection.create_modal.description_label')}
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('quizCollection.create_modal.description_placeholder')}
@@ -95,8 +105,8 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
               className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
             />
           </div>
-          <label className="flex items-start gap-2.5 p-3 rounded-xl border border-border bg-muted/30 cursor-pointer">
-            <input
+          <Label className="flex items-start gap-2.5 p-3 rounded-xl border border-border bg-muted/30 cursor-pointer">
+            <Input
               type="checkbox"
               checked={isCertificateCollection}
               onChange={(e) => setIsCertificateCollection(e.target.checked)}
@@ -110,13 +120,13 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
                 {t('quizCollection.create_modal.cert_collection_hint')}
               </p>
             </div>
-          </label>
+          </Label>
           {isCertificateCollection && (
             <div>
-              <label className="text-xs font-bold text-foreground block mb-1.5">
+              <Label className="text-xs font-bold text-foreground block mb-1.5">
                 {t('quizCollection.create_modal.certificate_label')}
                 <span className="text-rose-500 ml-0.5">*</span>
-              </label>
+              </Label>
               {certificates.length === 0 ? (
                 <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-amber-800">
                   <AlertCircle size={14} className="shrink-0 mt-0.5" />
@@ -125,16 +135,20 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
                   </p>
                 </div>
               ) : (
-                <select
-                  value={certificateId}
-                  onChange={(e) => setCertificateId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
+                <Select
+                  value={certificateId || 'placeholder-cert'}
+                  onValueChange={(v) => setCertificateId(v === 'placeholder-cert' ? '' : v)}
                 >
-                  <option value="">{t('quizCollection.create_modal.certificate_placeholder')}</option>
-                  {certificates.map(c => (
-                    <option key={c.uid} value={c.uid}>{c.name}</option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm h-auto">
+                    <SelectValue placeholder={t('quizCollection.create_modal.certificate_placeholder')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="placeholder-cert">{t('quizCollection.create_modal.certificate_placeholder')}</SelectItem>
+                    {certificates.map(c => (
+                      <SelectItem key={c.uid} value={c.uid}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
             </div>
           )}

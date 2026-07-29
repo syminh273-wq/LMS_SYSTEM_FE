@@ -23,6 +23,13 @@ import {
   useCalendarState,
 } from '@shared/components/calendar';
 import { Button } from '@shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 
 const EMPTY_EVENT: Partial<CalendarEvent> = {
   type: 'class',
@@ -241,29 +248,37 @@ export default function SpaceCalendarPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <select
+          <Select
             value={classroomFilter}
-            onChange={(e) => setClassroomFilter(e.target.value)}
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 min-w-[180px]"
+            onValueChange={(v) => setClassroomFilter(v)}
           >
-            <option value="all">{t('calendar.labels.all_classrooms', 'All classrooms')}</option>
-            {classrooms.map((c) => (
-              <option key={c.uid} value={c.uid}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          <select
+            <SelectTrigger className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 min-w-[180px]">
+              <SelectValue placeholder={t('calendar.labels.all_classrooms', 'All classrooms')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('calendar.labels.all_classrooms', 'All classrooms')}</SelectItem>
+              {classrooms.map((c) => (
+                <SelectItem key={c.uid} value={c.uid}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as CalendarEventType | 'all')}
-            className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 min-w-[140px]"
+            onValueChange={(v) => setTypeFilter(v as CalendarEventType | 'all')}
           >
-            {TYPE_FILTERS.map((f) => (
-              <option key={f.key} value={f.key}>
-                {t(f.labelKey, f.key)}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 min-w-[140px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TYPE_FILTERS.map((f) => (
+                <SelectItem key={f.key} value={f.key}>
+                  {t(f.labelKey, f.key)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <div className="relative">
             <Button
               onClick={() => setCreateMenuOpen((o) => !o)}
@@ -277,7 +292,7 @@ export default function SpaceCalendarPage() {
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setCreateMenuOpen(false)} />
                 <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-40 overflow-hidden">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setCreateMenuOpen(false);
@@ -287,8 +302,8 @@ export default function SpaceCalendarPage() {
                   >
                     <CalendarPlus size={14} className="text-indigo-600" />
                     {t('calendar.recurring.menu_one_day', 'Sự kiện 1 ngày')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => {
                       setCreateMenuOpen(false);
@@ -298,7 +313,7 @@ export default function SpaceCalendarPage() {
                   >
                     <Repeat size={14} className="text-indigo-600" />
                     {t('calendar.recurring.menu_recurring', 'Thời khóa biểu')}
-                  </button>
+                  </Button>
                 </div>
               </>
             )}
@@ -309,31 +324,31 @@ export default function SpaceCalendarPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
-            <button
+            <Button
               type="button"
               onClick={goPrev}
               className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Previous"
             >
               <ChevronLeft size={15} />
-            </button>
+            </Button>
             <div className="h-5 w-px bg-slate-200" />
-            <button
+            <Button
               type="button"
               onClick={goNext}
               className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Next"
             >
               <ChevronRight size={15} />
-            </button>
+            </Button>
           </div>
-          <button
+          <Button
             type="button"
             onClick={goToday}
             className="h-10 px-3 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12.5px] font-semibold hover:bg-slate-50"
           >
             {locale === 'vi' ? 'Hôm nay' : 'Today'}
-          </button>
+          </Button>
           <span className="text-[15px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
         </div>
 

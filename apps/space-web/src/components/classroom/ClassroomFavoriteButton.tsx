@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { classroomApi } from '@/lib/api/classroom';
@@ -67,7 +68,7 @@ export function ClassroomFavoriteButton({
 
   if (variant === 'overlay') {
     return (
-      <button
+      <Button
         type="button"
         onClick={handleClick}
         disabled={busy}
@@ -78,12 +79,12 @@ export function ClassroomFavoriteButton({
           size={16}
           className={cn(isFavorited && 'fill-rose-500 text-rose-500')}
         />
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
+    <Button
       type="button"
       onClick={handleClick}
       disabled={busy}
@@ -95,6 +96,6 @@ export function ClassroomFavoriteButton({
       />
       <span>{isFavorited ? 'Đã thích' : 'Yêu thích'}</span>
       {count > 0 && <span className="text-slate-400 font-medium">· {count}</span>}
-    </button>
+    </Button>
   );
 }

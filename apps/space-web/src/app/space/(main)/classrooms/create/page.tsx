@@ -28,6 +28,14 @@ import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { Textarea } from '@shared/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { Controller } from 'react-hook-form';
 
 const CATEGORIES: Array<{ value: NonNullable<CreateClassroomRequest['category']>; label: string }> = [
   { value: 'math', label: 'Toán học' },
@@ -47,7 +55,7 @@ export default function CreateClassroomPage() {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState('');
 
-  const { register, handleSubmit, watch, formState: { errors }, setError: setFormError } = useForm<CreateClassroomRequest>({
+  const { register, handleSubmit, watch, control, formState: { errors }, setError: setFormError } = useForm<CreateClassroomRequest>({
     defaultValues: {
       name: '',
       description: '',
@@ -189,20 +197,20 @@ export default function CreateClassroomPage() {
             <div className="space-y-3">
               <Label>Hình thức</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${pricingType === 'free' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
+                <Label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${pricingType === 'free' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <Input type="radio" value="free" {...register('pricing_type')} className="mt-1" />
                   <div>
                     <div className="font-medium text-foreground">Miễn phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
                   </div>
-                </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${pricingType === 'paid' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
+                </Label>
+                <Label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${pricingType === 'paid' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <Input type="radio" value="paid" {...register('pricing_type')} className="mt-1" />
                   <div>
                     <div className="font-medium text-foreground">Trả phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
                   </div>
-                </label>
+                </Label>
               </div>
             </div>
 
@@ -249,35 +257,49 @@ export default function CreateClassroomPage() {
                 <Tag className="size-4 text-primary" />
                 Danh mục <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="category"
-                {...register('category', { required: 'Vui lòng chọn danh mục' })}
-                className={`h-10 w-full rounded-lg border bg-background px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 ${errors.category ? 'border-destructive' : 'border-border'}`}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="category"
+                rules={{ required: 'Vui lòng chọn danh mục' }}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="category"
+                      className={`h-10 w-full rounded-lg border bg-background px-3 text-sm text-foreground ${errors.category ? 'border-destructive' : 'border-border'}`}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.category && <p className="text-xs text-destructive">{errors.category.message}</p>}
             </div>
 
             <div className="space-y-3">
               <Label>Chế độ hiển thị</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${visibilityType === 'public' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
+                <Label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${visibilityType === 'public' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <Input type="radio" value="public" {...register('visibility_type')} className="mt-1" />
                   <div>
                     <div className="font-medium text-foreground flex items-center gap-1"><Globe className="size-3.5" /> Công khai</div>
                     <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
                   </div>
-                </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${visibilityType === 'private' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
-                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
+                </Label>
+                <Label className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${visibilityType === 'private' ? 'border-primary bg-primary/5' : 'border-border bg-muted/30 hover:bg-muted/50'}`}>
+                  <Input type="radio" value="private" {...register('visibility_type')} className="mt-1" />
                   <div>
                     <div className="font-medium text-foreground flex items-center gap-1"><Lock className="size-3.5" /> Riêng tư</div>
                     <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
                   </div>
-                </label>
+                </Label>
               </div>
             </div>
           </CardContent>

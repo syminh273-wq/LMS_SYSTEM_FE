@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Bell, CheckCheck } from 'lucide-react';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
 import firebaseApp from '@/lib/firebase';
@@ -108,7 +109,7 @@ export default function NotificationBell() {
 
   return (
     <div className="relative" ref={panelRef}>
-      <button
+      <Button
         onClick={() => setOpen(prev => !prev)}
         className="relative p-2 rounded-full hover:bg-muted transition-colors"
         aria-label={t('layout.notifications.aria_label')}
@@ -119,20 +120,20 @@ export default function NotificationBell() {
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute right-0 top-11 z-50 w-80 rounded-xl border border-border bg-card shadow-xl">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <span className="text-sm font-semibold text-foreground">{t('layout.notifications.title')}</span>
             {unreadCount > 0 && (
-              <button
+              <Button
                 onClick={handleMarkAllRead}
                 className="flex items-center gap-1 text-xs text-primary-brand hover:text-primary-brand-dark font-medium"
               >
                 <CheckCheck size={13} />
                 {t('layout.notifications.mark_all_read')}
-              </button>
+              </Button>
             )}
           </div>
 

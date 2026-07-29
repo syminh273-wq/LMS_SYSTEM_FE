@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Loader2, Plus, Sparkles, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { socialApi } from '@/lib/api/social';
@@ -90,14 +91,14 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
 
       {!composerOpen && (
         <div className="flex items-center justify-end">
-          <button
+          <Button
             type="button"
             onClick={() => setComposerOpen(true)}
             className="inline-flex items-center gap-1.5 px-4 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
           >
             <Plus className="size-4" />
             Tạo bài đăng
-          </button>
+          </Button>
         </div>
       )}
 
@@ -132,7 +133,7 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
           ))}
           {hasMore && (
             <div className="flex justify-center pt-2">
-              <button
+              <Button
                 type="button"
                 onClick={loadMore}
                 disabled={loadingMore}
@@ -140,7 +141,7 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
               >
                 {loadingMore ? <Loader2 size={14} className="animate-spin" /> : null}
                 Xem thêm
-              </button>
+              </Button>
             </div>
           )}
         </div>

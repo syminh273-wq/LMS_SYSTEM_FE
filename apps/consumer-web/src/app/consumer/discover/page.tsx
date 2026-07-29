@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, Classroom } from '@/lib/api';
@@ -194,7 +195,7 @@ export default function DiscoverPage() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             type="button"
             onClick={() => setCategory(null)}
             className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
@@ -204,9 +205,9 @@ export default function DiscoverPage() {
             }`}
           >
             <Filter size={12} className="inline mr-1" /> Tất cả
-          </button>
+          </Button>
           {CATEGORIES.map((c) => (
-            <button
+            <Button
               key={c.value}
               type="button"
               onClick={() => setCategory(category === c.value ? null : c.value)}
@@ -218,7 +219,7 @@ export default function DiscoverPage() {
             >
               <span className="mr-1">{c.emoji}</span>
               {c.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -228,7 +229,7 @@ export default function DiscoverPage() {
             { value: 'free' as PricingFilter, label: 'Miễn phí' },
             { value: 'paid' as PricingFilter, label: 'Trả phí' },
           ].map((p) => (
-            <button
+            <Button
               key={p.value}
               type="button"
               onClick={() => setPricing(p.value)}
@@ -239,7 +240,7 @@ export default function DiscoverPage() {
               }`}
             >
               {p.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -345,25 +346,25 @@ export default function DiscoverPage() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-2">
-          <button
+          <Button
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
             className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-xs font-bold disabled:opacity-50 hover:border-primary-brand"
           >
             Trang trước
-          </button>
+          </Button>
           <div className="text-xs font-bold text-muted-foreground">
             Trang {page} / {totalPages}
           </div>
-          <button
+          <Button
             type="button"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             className="h-9 px-4 rounded-lg bg-white border border-slate-200 text-xs font-bold disabled:opacity-50 hover:border-primary-brand"
           >
             Trang sau
-          </button>
+          </Button>
         </div>
       )}
     </div>

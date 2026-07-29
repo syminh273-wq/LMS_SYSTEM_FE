@@ -9,6 +9,9 @@ import {
   DialogTitle,
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import { portfolioApi, type PortfolioEntry } from '@/lib/api/portfolio';
 import { PdfThumbnail } from './PdfThumbnail';
 import { toast } from 'sonner';
@@ -146,8 +149,8 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
 
         <div className="p-5 space-y-3">
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">Tiêu đề</label>
-            <input
+            <Label className="text-xs font-bold text-slate-700 mb-1 block">Tiêu đề</Label>
+            <Input
               type="text"
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
@@ -158,10 +161,10 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">
+            <Label className="text-xs font-bold text-slate-700 mb-1 block">
               Mô tả <span className="text-slate-400 font-normal">(tuỳ chọn)</span>
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               placeholder="Mô tả ngắn..."
@@ -172,10 +175,10 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">
+            <Label className="text-xs font-bold text-slate-700 mb-1 block">
               Link <span className="text-slate-400 font-normal">(tuỳ chọn)</span>
-            </label>
-            <input
+            </Label>
+            <Input
               type="url"
               value={form.url}
               onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
@@ -185,10 +188,10 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <label className="text-xs font-bold text-slate-700 mb-1 block">
+            <Label className="text-xs font-bold text-slate-700 mb-1 block">
               File <span className="text-slate-400 font-normal">(tuỳ chọn, ảnh/PDF ≤ 10MB, sẽ upload cùng lúc khi lưu)</span>
-            </label>
-            <input
+            </Label>
+            <Input
               ref={fileRef}
               type="file"
               accept={ACCEPT_ATTR}

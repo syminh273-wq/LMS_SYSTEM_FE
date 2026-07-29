@@ -1,12 +1,14 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
+import { Label } from '@shared/components/ui/label';
 
 type FormValues = { otp_code: string };
 
@@ -78,7 +80,7 @@ function SpaceVerifyOTPPageContent() {
           <div className="p-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Mã OTP (6 chữ số)</label>
+                <Label className="block text-sm font-semibold text-foreground mb-2">Mã OTP (6 chữ số)</Label>
                 <input
                   {...register('otp_code', {
                     required: 'Vui lòng nhập mã OTP',
@@ -92,17 +94,17 @@ function SpaceVerifyOTPPageContent() {
                 <p className="text-xs text-muted-foreground mt-2">Mã có hiệu lực trong 5 phút.</p>
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98]"
               >
                 {loading ? 'Đang xác thực...' : 'Xác nhận'}
-              </button>
+              </Button>
             </form>
 
             <div className="mt-4 text-center">
-              <button
+              <Button
                 type="button"
                 onClick={handleResend}
                 disabled={resending || countdown > 0}
@@ -110,7 +112,7 @@ function SpaceVerifyOTPPageContent() {
               >
                 <RefreshCw size={14} className={resending ? 'animate-spin' : ''} />
                 {countdown > 0 ? `Gửi lại sau ${countdown}s` : 'Gửi lại mã OTP'}
-              </button>
+              </Button>
             </div>
 
             <div className="mt-4 text-center">

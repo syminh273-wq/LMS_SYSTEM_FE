@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { cn } from '@shared/lib/utils';
@@ -129,7 +130,7 @@ export function MonthGrid({
                     {dayEvents.slice(0, maxPerCell).map((e) => {
                       const color = e.color ?? CALENDAR_TYPE_COLORS[e.type] ?? 'slate';
                       return (
-                        <button
+                        <Button
                           type="button"
                           key={e.uid}
                           onClick={(ev) => {
@@ -143,7 +144,7 @@ export function MonthGrid({
                           title={e.title}
                         >
                           {e.title}
-                        </button>
+                        </Button>
                       );
                     })}
                     {dayEvents.length > maxPerCell && (

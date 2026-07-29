@@ -23,7 +23,9 @@ import {
   Check,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
 import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
+import { Label } from '@shared/components/ui/label';
 import { classroomApi, Classroom, Exam, ExamContentType, ExamSubmission, ExamSubmissionType } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
 import { FaceMonitorWidget } from '@/components/face/face-monitor-widget';
@@ -409,7 +411,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                                 const isSelected = quizAnswers[q.uid] === letter;
 
                                 return (
-                                  <button
+                                  <Button
                                     key={letter}
                                     type="button"
                                     onClick={() => setQuizAnswers(prev => ({ ...prev, [q.uid]: letter }))}
@@ -420,7 +422,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                                     </span>
                                     <span className={`text-sm font-medium ${isSelected ? 'text-indigo-900' : 'text-slate-700'}`}>{optionText}</span>
                                     {isSelected && <Check size={16} className="ml-auto text-indigo-500" />}
-                                  </button>
+                                  </Button>
                                 );
                               })}
                             </div>
@@ -496,7 +498,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                     </div>
 
                     <div className="space-y-4 p-5">
-                      <label
+                      <Label
                         onDragEnter={event => {
                           event.preventDefault();
                           if (!submissionDisabled) setIsDraggingFile(true);
@@ -517,8 +519,8 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                         </span>
                         <span className="text-sm font-black text-slate-800">{answerFile?.name || (submission?.resource_url ? 'Kéo thả file mới để thay đổi bài làm' : 'Kéo thả file bài làm vào đây')}</span>
                         <span className="mt-1 text-xs font-medium text-slate-500">{submissionDisabled ? 'Đã hết hạn nộp bài' : 'hoặc bấm để chọn file từ máy tính'}</span>
-                        <input ref={fileInputRef} type="file" disabled={submissionDisabled} onChange={event => handleSelectFile(event.target.files?.[0] || null)} className="sr-only" />
-                      </label>
+                        <Input ref={fileInputRef} type="file" disabled={submissionDisabled} onChange={event => handleSelectFile(event.target.files?.[0] || null)} className="sr-only" />
+                      </Label>
 
                       {(selectedPreviewFile || submittedFile) ? (
                         <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
@@ -530,13 +532,13 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                               <p className="truncate text-sm font-bold text-slate-700">{(selectedPreviewFile || submittedFile)?.name}</p>
                               {submission?.submitted_at && !selectedPreviewFile && <p className="text-xs text-slate-500">Đã nộp lúc {formatDateTime(submission.submitted_at)}</p>}
                             </div>
-                            <button type="button" onClick={() => setPreviewFile(selectedPreviewFile || submittedFile)} className="rounded-lg px-2 py-1 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50">
+                            <Button type="button" onClick={() => setPreviewFile(selectedPreviewFile || submittedFile)} className="rounded-lg px-2 py-1 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50">
                               Xem
-                            </button>
+                            </Button>
                             {(answerFile || (submission?.resource_url && !deadline.expired)) && (
-                              <button type="button" onClick={handleRemoveFile} className="rounded-lg p-1 text-rose-500 hover:bg-rose-50">
+                              <Button type="button" onClick={handleRemoveFile} className="rounded-lg p-1 text-rose-500 hover:bg-rose-50">
                                 <Trash2 size={16} />
-                              </button>
+                              </Button>
                             )}
                           </div>
                         </div>

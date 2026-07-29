@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import {
@@ -9,6 +10,16 @@ import {
 } from '@shared/lib/api/calendar';
 import { countRecurrenceSlots, DayShiftMap, expandRecurrence, toISODate } from '@shared/lib/calendar/recurrence';
 import { X, Loader2 } from 'lucide-react';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import { Label } from '@shared/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 import { ShiftMatrixPicker } from './ShiftMatrixPicker';
 
 interface ClassroomOption {
@@ -145,7 +156,7 @@ export function RecurringScheduleDialog({
           <h2 className="text-base font-bold text-slate-900">
             {t('calendar.recurring.title', 'Weekly schedule')}
           </h2>
-          <button
+          <Button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={saving}
@@ -153,7 +164,7 @@ export function RecurringScheduleDialog({
             aria-label="Close"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
@@ -164,10 +175,10 @@ export function RecurringScheduleDialog({
           )}
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('calendar.dialog.field_title', 'Title')} <span className="text-rose-500">*</span>
-            </label>
-            <input
+            </Label>
+            <Input
               autoFocus
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -178,47 +189,55 @@ export function RecurringScheduleDialog({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.dialog.field_type', 'Type')}
-              </label>
-              <select
+              </Label>
+              <Select
                 value={type}
-                onChange={(e) => setType(e.target.value as CalendarEventType)}
-                className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                onValueChange={(v) => setType(v as CalendarEventType)}
               >
-                {TYPES.map((tp) => (
-                  <option key={tp} value={tp}>
-                    {t(`calendar.types.${tp}`, tp)}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {TYPES.map((tp) => (
+                    <SelectItem key={tp} value={tp}>
+                      {t(`calendar.types.${tp}`, tp)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.dialog.field_classroom', 'Classroom')}
-              </label>
-              <select
-                value={classroomId}
-                onChange={(e) => setClassroomId(e.target.value)}
-                className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              </Label>
+              <Select
+                value={classroomId || 'placeholder-no-classroom'}
+                onValueChange={(v) => setClassroomId(v === 'placeholder-no-classroom' ? '' : v)}
               >
-                <option value="">{t('calendar.dialog.no_classroom', 'No classroom')}</option>
-                {classroomOptions.map((c) => (
-                  <option key={c.uid} value={c.uid}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full h-10 rounded-lg border border-slate-300 bg-white px-3 text-[13.5px]">
+                  <SelectValue placeholder={t('calendar.dialog.no_classroom', 'No classroom')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-no-classroom">{t('calendar.dialog.no_classroom', 'No classroom')}</SelectItem>
+                  {classroomOptions.map((c) => (
+                    <SelectItem key={c.uid} value={c.uid}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.recurring.field_start_date', 'Start date')} <span className="text-rose-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
@@ -226,10 +245,10 @@ export function RecurringScheduleDialog({
               />
             </div>
             <div>
-              <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+              <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
                 {t('calendar.recurring.field_end_date', 'End date')} <span className="text-rose-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
@@ -240,9 +259,9 @@ export function RecurringScheduleDialog({
           </div>
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('calendar.recurring.field_matrix', 'Days × Shifts')}
-            </label>
+            </Label>
             <ShiftMatrixPicker value={dayShifts} onChange={setDayShifts} />
             <p className="text-[11.5px] text-slate-500 mt-2">
               {t('calendar.recurring.slot_count', 'Will create {{count}} event(s)', { count: slotCount })}
@@ -250,10 +269,10 @@ export function RecurringScheduleDialog({
           </div>
 
           <div>
-            <label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
+            <Label className="block text-[12px] font-semibold text-slate-700 mb-1.5">
               {t('calendar.dialog.field_description', 'Description')}
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
@@ -263,15 +282,15 @@ export function RecurringScheduleDialog({
         </form>
 
         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-slate-200 bg-slate-50/50 flex-shrink-0">
-          <button
+          <Button
             type="button"
             onClick={() => onOpenChange(false)}
             disabled={saving}
             className="h-10 px-4 rounded-lg text-slate-700 hover:bg-slate-100 text-[13px] font-semibold"
           >
             {t('calendar.dialog.cancel', 'Cancel')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={handleSubmit}
             disabled={saving}
@@ -279,7 +298,7 @@ export function RecurringScheduleDialog({
           >
             {saving && <Loader2 size={14} className="animate-spin" />}
             {t('calendar.recurring.create_button', 'Create schedule')}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

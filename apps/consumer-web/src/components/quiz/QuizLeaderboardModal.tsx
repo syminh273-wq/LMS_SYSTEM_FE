@@ -195,7 +195,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                       const isFirst = e.rank === 1;
                       const isMe = data.me && data.me.rank === e.rank;
                       return (
-                        <button
+                        <Button
                           key={e.student_id}
                           type="button"
                           onClick={() => void openDetail(e)}
@@ -253,7 +253,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                               </div>
                             </div>
                           </div>
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>

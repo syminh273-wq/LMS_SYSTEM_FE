@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Button } from './button';
 import { ChevronLeft, ChevronRight, X } from "lucide-react"
 import {
   Dialog,
@@ -56,33 +57,33 @@ export function ImageLightbox({ open, images, index, onIndexChange, onClose }: I
         <DialogTitle className="sr-only">
           {current?.alt || "Image preview"}
         </DialogTitle>
-        <button
+        <Button
           type="button"
           onClick={onClose}
           className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
           aria-label="Đóng"
         >
           <X className="size-4" />
-        </button>
+        </Button>
 
         {total > 1 && (
           <>
-            <button
+            <Button
               type="button"
               onClick={goPrev}
               className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
               aria-label="Ảnh trước"
             >
               <ChevronLeft className="size-5" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={goNext}
               className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
               aria-label="Ảnh sau"
             >
               <ChevronRight className="size-5" />
-            </button>
+            </Button>
           </>
         )}
 

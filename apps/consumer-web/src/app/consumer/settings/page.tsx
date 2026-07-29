@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Eye, EyeOff, KeyRound, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Label } from '@shared/components/ui/label';
 import { accountService } from '@/lib/api/account';
 import { ValidationException } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
@@ -246,9 +247,9 @@ function PasswordField({
 }) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="text-[12px] font-semibold text-slate-700">
+      <Label htmlFor={id} className="text-[12px] font-semibold text-slate-700">
         {label}
-      </label>
+      </Label>
       <div className="relative">
         <input
           id={id}
@@ -258,14 +259,14 @@ function PasswordField({
           className="h-11 w-full rounded-lg border border-slate-300 bg-white px-4 pr-11 text-[13.5px] font-medium text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           autoComplete="off"
         />
-        <button
+        <Button
           type="button"
           onClick={onToggle}
           className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
           aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
         >
           {visible ? <EyeOff size={15} /> : <Eye size={15} />}
-        </button>
+        </Button>
       </div>
     </div>
   );

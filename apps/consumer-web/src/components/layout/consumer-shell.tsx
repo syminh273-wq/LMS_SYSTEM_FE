@@ -163,7 +163,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           className="relative z-[100] inline-flex items-center justify-center w-9 h-9 text-slate-900 bg-white hover:bg-slate-100 rounded-lg transition-colors dark:text-white dark:bg-slate-800 dark:hover:bg-slate-700 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700"
           aria-label="Notifications"
         >
@@ -173,7 +173,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent
         align="end"
@@ -213,7 +213,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
                 const hasLink = !!meta.classroom_uid;
                 return (
                   <li key={item.uid ?? `notification-${idx}`}>
-                    <button
+                    <Button
                       onClick={() => handleClickItem(item)}
                       className={cn(
                         "w-full text-left px-4 py-3 transition-colors flex items-start gap-3",
@@ -267,7 +267,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
                           )}
                         </p>
                       </div>
-                    </button>
+                    </Button>
                   </li>
                 );
               })}
@@ -384,7 +384,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                 return (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button
+                      <Button
                         className={cn(
                           "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none",
                           "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800",
@@ -402,7 +402,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                             {unseenCertCount > 9 ? '9+' : unseenCertCount}
                           </span>
                         )}
-                      </button>
+                      </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
@@ -447,37 +447,37 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
-            <button
+            <Button
               className="hidden md:flex items-center gap-2 h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400 dark:hover:text-slate-100"
               aria-label="Search"
             >
               <Search size={15} strokeWidth={2.2} />
               <span className="hidden lg:inline">Tìm kiếm</span>
-            </button>
+            </Button>
 
-            <button
+            <Button
               className="md:hidden p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               aria-label="Search"
             >
               <Search size={18} strokeWidth={2} />
-            </button>
+            </Button>
 
             <div className="flex items-center">
               <ThemeToggle />
               <NotificationBell userId={mounted ? userProfile?.uid : null} />
-              <button
+              <Button
                 className="p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
                 aria-label="Help"
               >
                 <HelpCircle size={17} strokeWidth={2} />
-              </button>
+              </Button>
             </div>
 
             <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button
+                <Button
                   className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors outline-none dark:hover:bg-slate-800"
                   aria-label="Open user menu"
                 >
@@ -496,7 +496,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     </span>
                   </div>
                   <ChevronDown size={13} className="text-slate-400 hidden xl:block" />
-                </button>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
@@ -529,7 +529,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     { label: 'Lớp học của tôi', Icon: BookOpen, path: '/consumer/classroom' },
                     { label: 'Cài đặt', Icon: Settings, path: '/consumer/settings' },
                   ].map(({ label, Icon, path }) => (
-                    <button
+                    <Button
                       key={path}
                       onClick={() => router.push(path)}
                       className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left hover:bg-slate-100 transition-colors group dark:hover:bg-slate-800"
@@ -540,13 +540,13 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                       <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-slate-100">
                         {label}
                       </span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
 
                 <div className="h-px bg-slate-200 dark:bg-slate-700 my-1.5 mx-1" />
 
-                <button
+                <Button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left hover:bg-rose-50 transition-colors group dark:hover:bg-rose-500/10"
                 >
@@ -556,7 +556,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                   <span className="text-sm font-medium text-rose-600 group-hover:text-rose-700 dark:text-rose-400">
                     Đăng xuất
                   </span>
-                </button>
+                </Button>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

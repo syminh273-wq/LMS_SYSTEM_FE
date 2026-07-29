@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
@@ -114,7 +115,7 @@ export function SpaceProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           type="button"
           aria-label="Mở menu tài khoản"
           onClick={(e) => e.stopPropagation()}
@@ -138,7 +139,7 @@ export function SpaceProfileDropdown() {
             </p>
           </div>
           <ChevronDown size={14} className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -147,7 +148,7 @@ export function SpaceProfileDropdown() {
         style={{ width: '240px', minWidth: '240px' }}
         className="rounded-2xl border border-border bg-card p-1.5 shadow-xl"
       >
-        <button
+        <Button
           onClick={goToProfile}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted"
         >
@@ -166,13 +167,13 @@ export function SpaceProfileDropdown() {
             <p className="truncate text-sm font-bold leading-tight text-foreground">{displayName}</p>
             <p className="mt-0.5 truncate text-xs text-muted-foreground">{email}</p>
           </div>
-        </button>
+        </Button>
 
         <div className="mx-1 my-1 h-px bg-border" />
 
         <div className="space-y-0.5">
           {menuItems.map(({ label, Icon, path }) => (
-            <button
+            <Button
               key={path}
               onClick={() => router.push(path)}
               className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted group"
@@ -185,13 +186,13 @@ export function SpaceProfileDropdown() {
               <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
                 {label}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
 
         <div className="mx-1 my-1 h-px bg-border" />
 
-        <button
+        <Button
           onClick={() => router.push('/space/feed')}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted group"
         >
@@ -206,11 +207,11 @@ export function SpaceProfileDropdown() {
           <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
             MỚI
           </span>
-        </button>
+        </Button>
 
         <div className="mx-1 my-1 h-px bg-border" />
 
-        <button
+        <Button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-destructive/5 group"
         >
@@ -222,7 +223,7 @@ export function SpaceProfileDropdown() {
           <span className="text-sm font-medium text-foreground/80 group-hover:text-destructive">
             Đăng xuất
           </span>
-        </button>
+        </Button>
       </DropdownMenuContent>
     </DropdownMenu>
   );

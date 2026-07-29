@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -106,9 +107,9 @@ export default function StudentDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <p className="text-base font-semibold text-foreground">Student not found</p>
-        <button onClick={() => router.back()} className="mt-3 text-sm text-primary-brand hover:underline">
+        <Button onClick={() => router.back()} className="mt-3 text-sm text-primary-brand hover:underline">
           Go back
-        </button>
+        </Button>
       </div>
     );
   }
@@ -124,13 +125,13 @@ export default function StudentDetailPage() {
   return (
     <div className="space-y-6">
       {/* Back */}
-      <button
+      <Button
         onClick={() => router.back()}
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft size={16} />
         Back to students
-      </button>
+      </Button>
 
       {/* Profile card */}
       <div className="bg-card border border-border rounded-2xl p-6">

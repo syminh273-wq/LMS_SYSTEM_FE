@@ -9,6 +9,16 @@ import {
   DialogTitle,
 } from '@shared/components/ui/dialog';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Textarea } from '@shared/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { Label } from '@shared/components/ui/label';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { portfolioApi, type PortfolioEntry } from '@/lib/api/portfolio';
 import {
@@ -93,7 +103,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
         </DialogHeader>
         <div className="px-6 py-5 space-y-4">
           <Field label={t('portfolio.labels.school')} required>
-            <input
+            <Input
               value={form.school}
               onChange={(e) => update('school', e.target.value)}
               className={inputCls}
@@ -104,7 +114,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label={t('portfolio.labels.degree')}>
-              <input
+              <Input
                 value={form.degree}
                 onChange={(e) => update('degree', e.target.value)}
                 className={inputCls}
@@ -112,7 +122,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
               />
             </Field>
             <Field label={t('portfolio.labels.field_of_study')}>
-              <input
+              <Input
                 value={form.field_of_study}
                 onChange={(e) => update('field_of_study', e.target.value)}
                 className={inputCls}
@@ -124,30 +134,38 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
           <div>
             <p className="text-xs font-bold text-slate-700 mb-1">{t('portfolio.labels.start_year_month')}</p>
             <div className="grid grid-cols-2 gap-2">
-              <select
-                value={form.start_month}
-                onChange={(e) => update('start_month', e.target.value)}
-                className={inputCls}
+              <Select
+                value={form.start_month || 'placeholder-start-month'}
+                onValueChange={(v) => update('start_month', v === 'placeholder-start-month' ? '' : v)}
               >
-                <option value="">{t('portfolio.labels.start_month')}</option>
-                {MONTHS.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={form.start_year}
-                onChange={(e) => update('start_year', e.target.value)}
-                className={inputCls}
+                <SelectTrigger className={inputCls}>
+                  <SelectValue placeholder={t('portfolio.labels.start_month')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-start-month">{t('portfolio.labels.start_month')}</SelectItem>
+                  {MONTHS.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={form.start_year || 'placeholder-start-year'}
+                onValueChange={(v) => update('start_year', v === 'placeholder-start-year' ? '' : v)}
               >
-                <option value="">YYYY</option>
-                {YEAR_OPTIONS.map((y) => (
-                  <option key={y.value} value={y.value}>
-                    {y.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className={inputCls}>
+                  <SelectValue placeholder="YYYY" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-start-year">YYYY</SelectItem>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y.value} value={y.value}>
+                      {y.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -156,48 +174,56 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
               <p className="text-xs font-bold text-slate-700">
                 {t('portfolio.labels.end_year_month')} <span className="font-normal text-slate-500">({t('portfolio.labels.end_expected')})</span>
               </p>
-              <label className="flex items-center gap-1.5 text-xs text-slate-600">
-                <input
+              <Label className="flex items-center gap-1.5 text-xs text-slate-600">
+                <Input
                   type="checkbox"
                   checked={form.is_current}
                   onChange={(e) => update('is_current', e.target.checked)}
                   className="size-3.5 accent-[#0a66c2]"
                 />
                 {t('portfolio.labels.end_year_present')}
-              </label>
+              </Label>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <select
-                value={form.end_month}
-                onChange={(e) => update('end_month', e.target.value)}
-                className={inputCls}
+              <Select
+                value={form.end_month || 'placeholder-end-month'}
+                onValueChange={(v) => update('end_month', v === 'placeholder-end-month' ? '' : v)}
                 disabled={form.is_current}
               >
-                <option value="">{t('portfolio.labels.end_month')}</option>
-                {MONTHS.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={form.end_year}
-                onChange={(e) => update('end_year', e.target.value)}
-                className={inputCls}
+                <SelectTrigger className={inputCls} disabled={form.is_current}>
+                  <SelectValue placeholder={t('portfolio.labels.end_month')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-end-month">{t('portfolio.labels.end_month')}</SelectItem>
+                  {MONTHS.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={form.end_year || 'placeholder-end-year'}
+                onValueChange={(v) => update('end_year', v === 'placeholder-end-year' ? '' : v)}
                 disabled={form.is_current}
               >
-                <option value="">YYYY</option>
-                {YEAR_OPTIONS.map((y) => (
-                  <option key={y.value} value={y.value}>
-                    {y.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className={inputCls} disabled={form.is_current}>
+                  <SelectValue placeholder="YYYY" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="placeholder-end-year">YYYY</SelectItem>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y.value} value={y.value}>
+                      {y.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <Field label={t('portfolio.labels.grade')}>
-            <input
+            <Input
               value={form.grade}
               onChange={(e) => update('grade', e.target.value.slice(0, 80))}
               className={inputCls}
@@ -207,7 +233,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
           </Field>
 
           <Field label={t('portfolio.labels.activities_and_societies')}>
-            <textarea
+            <Textarea
               rows={2}
               value={form.activities_and_societies}
               onChange={(e) => update('activities_and_societies', e.target.value.slice(0, 5000))}
@@ -221,7 +247,7 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
           </Field>
 
           <Field label={t('portfolio.labels.education_description')}>
-            <textarea
+            <Textarea
               rows={3}
               value={form.description}
               onChange={(e) => update('description', e.target.value.slice(0, 1000))}
@@ -243,20 +269,20 @@ export function EducationEditDialog({ initial, onClose, onSaved }: Props) {
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-100 text-xs text-slate-700"
                 >
                   {skill}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeSkill(skill)}
                     className="text-slate-400 hover:text-red-500"
                     aria-label={`Remove ${skill}`}
                   >
                     <X className="size-3" />
-                  </button>
+                  </Button>
                 </span>
               ))}
             </div>
             {form.skills.length < SKILL_MAX && (
               <div className="flex gap-2">
-                <input
+                <Input
                   value={skillDraft}
                   onChange={(e) => setSkillDraft(e.target.value)}
                   onKeyDown={(e) => {
@@ -307,12 +333,12 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
+    <Label className="block">
       <span className="block text-xs font-bold text-slate-700 mb-1">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </span>
       {children}
-    </label>
+    </Label>
   );
 }

@@ -10,6 +10,9 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
@@ -147,7 +150,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
       <div className="border-b border-border">
         <div className="flex gap-1">
           {(['info', 'lessons', 'students', 'sharing'] as Tab[]).map((k) => (
-            <button
+            <Button
               key={k}
               onClick={() => setTab(k)}
               className={`px-4 py-3 font-bold text-sm border-b-2 transition-colors ${
@@ -155,7 +158,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
               }`}
             >
               {t(`course.detail.tabs.${k}`, k)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -233,15 +236,15 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
       <CardContent className="p-6 space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-bold">{t('course.create.name_label', 'Name')}</label>
-            <input
+            <Label className="text-sm font-bold">{t('course.create.name_label', 'Name')}</Label>
+            <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-bold">{t('course.create.cover_label', 'Cover')}</label>
+            <Label className="text-sm font-bold">{t('course.create.cover_label', 'Cover')}</Label>
             <div className="border-2 border-dashed border-border rounded-xl p-2">
               {coverUrl ? (
                 <div className="relative">
@@ -251,19 +254,19 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
                   </Button>
                 </div>
               ) : (
-                <label className="cursor-pointer block py-4 text-center">
-                  <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
+                <Label className="cursor-pointer block py-4 text-center">
+                  <Input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
                   <Upload size={20} className="mx-auto text-slate-300" />
                   <p className="text-xs text-muted-foreground mt-1">{uploading ? 'Uploading...' : 'Click to upload'}</p>
-                </label>
+                </Label>
               )}
             </div>
           </div>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-bold">{t('course.create.description_label', 'Description')}</label>
-          <textarea
+          <Label className="text-sm font-bold">{t('course.create.description_label', 'Description')}</Label>
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
@@ -273,10 +276,10 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
 
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <label className="text-sm font-bold">{t('course.create.pricing_label', 'Pricing')}</label>
+            <Label className="text-sm font-bold">{t('course.create.pricing_label', 'Pricing')}</Label>
             <div className="grid grid-cols-2 gap-2">
               {(['free', 'paid'] as const).map((p) => (
-                <button
+                <Button
                   key={p}
                   type="button"
                   onClick={() => setPricingType(p)}
@@ -285,14 +288,14 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
                   }`}
                 >
                   {p}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
           {pricingType === 'paid' && (
             <div className="space-y-2">
-              <label className="text-sm font-bold">{t('course.create.price_label', 'Price (VND)')}</label>
-              <input
+              <Label className="text-sm font-bold">{t('course.create.price_label', 'Price (VND)')}</Label>
+              <Input
                 type="number"
                 min={1000}
                 value={priceVnd}
@@ -400,20 +403,20 @@ function LessonsTab({
               className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3"
             >
               <div className="flex flex-col gap-0.5">
-                <button
+                <Button
                   onClick={() => handleMove(idx, -1)}
                   disabled={idx === 0}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs"
                 >
                   ▲
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleMove(idx, 1)}
                   disabled={idx === lessons.length - 1}
                   className="text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs"
                 >
                   ▼
-                </button>
+                </Button>
               </div>
               <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
                 {idx + 1}
@@ -483,16 +486,16 @@ function LessonsTab({
               {editing.uid ? t('course.detail.edit_lesson', 'Edit lesson') : t('course.detail.add_lesson', 'Add lesson')}
             </h3>
             <div className="space-y-2">
-              <label className="text-sm font-bold">{t('course.detail.lesson_title_label', 'Title')}</label>
-              <input
+              <Label className="text-sm font-bold">{t('course.detail.lesson_title_label', 'Title')}</Label>
+              <Input
                 value={editing.title || ''}
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
                 className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold">{t('course.detail.lesson_description_label', 'Description')}</label>
-              <textarea
+              <Label className="text-sm font-bold">{t('course.detail.lesson_description_label', 'Description')}</Label>
+              <Textarea
                 value={editing.description || ''}
                 onChange={(e) => setEditing({ ...editing, description: e.target.value })}
                 rows={3}
@@ -500,8 +503,8 @@ function LessonsTab({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-bold">{t('course.detail.lesson_duration_label', 'Duration (s)')}</label>
-              <input
+              <Label className="text-sm font-bold">{t('course.detail.lesson_duration_label', 'Duration (s)')}</Label>
+              <Input
                 type="number"
                 min={0}
                 value={editing.duration_seconds || 0}
@@ -514,24 +517,24 @@ function LessonsTab({
                 <div className="font-bold text-sm">{t('course.detail.lesson_preview_toggle', 'Allow preview')}</div>
                 <p className="text-xs text-muted-foreground">Non-enrolled students can watch</p>
               </div>
-              <button
+              <Button
                 onClick={() => setEditing({ ...editing, is_preview: !editing.is_preview })}
                 className={`w-11 h-6 rounded-full transition-colors ${editing.is_preview ? 'bg-amber-500' : 'bg-slate-300'}`}
               >
                 <div className={`w-5 h-5 rounded-full bg-white transition-transform ${editing.is_preview ? 'translate-x-5' : 'translate-x-0.5'}`} />
-              </button>
+              </Button>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-border p-3">
               <div>
                 <div className="font-bold text-sm">{t('course.detail.lesson_published_toggle', 'Published')}</div>
                 <p className="text-xs text-muted-foreground">Visible to enrolled students</p>
               </div>
-              <button
+              <Button
                 onClick={() => setEditing({ ...editing, is_published: !editing.is_published })}
                 className={`w-11 h-6 rounded-full transition-colors ${editing.is_published ? 'bg-emerald-500' : 'bg-slate-300'}`}
               >
                 <div className={`w-5 h-5 rounded-full bg-white transition-transform ${editing.is_published ? 'translate-x-5' : 'translate-x-0.5'}`} />
-              </button>
+              </Button>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="ghost" onClick={() => setEditing(null)}>
@@ -672,7 +675,7 @@ function SharingTab({ course, sharingLink, setSharingLink }: { course: Course; s
       <Card className="border-border">
         <CardContent className="p-6 space-y-4">
           <div>
-            <label className="text-sm font-bold">{t('course.sharing.code_label', 'Public code')}</label>
+            <Label className="text-sm font-bold">{t('course.sharing.code_label', 'Public code')}</Label>
             <div className="flex gap-2 mt-1">
               <code className="flex-1 px-4 py-2.5 bg-muted/50 border border-border rounded-xl font-mono text-lg">
                 {course.pid}
@@ -683,9 +686,9 @@ function SharingTab({ course, sharingLink, setSharingLink }: { course: Course; s
             </div>
           </div>
           <div>
-            <label className="text-sm font-bold">{t('course.sharing.url_label', 'Public link')}</label>
+            <Label className="text-sm font-bold">{t('course.sharing.url_label', 'Public link')}</Label>
             <div className="flex gap-2 mt-1">
-              <input
+              <Input
                 readOnly
                 value={previewUrl}
                 className="flex-1 px-4 py-2.5 bg-muted/50 border border-border rounded-xl text-sm"

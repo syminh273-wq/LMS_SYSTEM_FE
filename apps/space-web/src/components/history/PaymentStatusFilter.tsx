@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@shared/lib/utils';
+import { Button } from '@shared/components/ui/button';
 import type { PaymentStatus } from '@/lib/api/payment';
 
 const STATUS_FILTERS: { value: PaymentStatus | 'all'; label: string }[] = [
@@ -22,7 +23,7 @@ export function PaymentStatusFilter({ value, onChange }: Props) {
       {STATUS_FILTERS.map((s) => {
         const active = value === s.value;
         return (
-          <button
+          <Button
             key={s.value}
             onClick={() => onChange(s.value)}
             className={cn(
@@ -33,7 +34,7 @@ export function PaymentStatusFilter({ value, onChange }: Props) {
             )}
           >
             {s.label}
-          </button>
+          </Button>
         );
       })}
     </div>

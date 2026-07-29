@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from '@shared/components/LocaleProvider';
+import { Button } from '../ui/button';
 import { cn } from '@shared/lib/utils';
 import type { CalendarView } from './useCalendarState';
 
@@ -19,7 +20,7 @@ export function ViewSwitcher({ value, onChange, className }: ViewSwitcherProps) 
   return (
     <div className={cn('flex items-center bg-white border border-slate-200 rounded-lg p-0.5', className)}>
       {options.map((opt) => (
-        <button
+        <Button
           key={opt.key}
           type="button"
           onClick={() => onChange(opt.key)}
@@ -31,7 +32,7 @@ export function ViewSwitcher({ value, onChange, className }: ViewSwitcherProps) 
           )}
         >
           {opt.label}
-        </button>
+        </Button>
       ))}
     </div>
   );

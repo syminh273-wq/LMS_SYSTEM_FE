@@ -158,13 +158,13 @@ export default function PublicProfilePage() {
     return (
       <WorkspaceShell>
         <div className="mx-auto w-full max-w-[75vw] py-6 sm:py-8">
-          <button
+          <Button
             onClick={() => router.push('/consumer/classroom')}
             className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 hover:text-slate-900 mb-4"
           >
             <ArrowLeft size={16} />
             Trở lại
-          </button>
+          </Button>
           <div className="flex items-center justify-center py-32">
             <Loader2 className="size-10 text-indigo-600 animate-spin" />
           </div>
@@ -177,13 +177,13 @@ export default function PublicProfilePage() {
     return (
       <WorkspaceShell>
         <div className="mx-auto w-full max-w-[75vw] py-6 sm:py-8">
-          <button
+          <Button
             onClick={() => router.push('/consumer/classroom')}
             className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 hover:text-slate-900 mb-4"
           >
             <ArrowLeft size={16} />
             Trở lại
-          </button>
+          </Button>
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
               <UserIcon className="text-muted-foreground" size={36} />

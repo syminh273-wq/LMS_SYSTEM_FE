@@ -376,14 +376,14 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
           >
             <Download size={14} />
           </a>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
             title="Đóng"
           >
             <X size={16} />
-          </button>
+          </Button>
         </div>
 
         {noteMode && imageable && (
@@ -427,7 +427,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                       const top = `${n.y_pct * 100}%`;
                       const colorCls = NOTE_COLORS[n.color] || NOTE_COLORS.yellow;
                       return (
-                        <button
+                        <Button
                           key={n.uid}
                           type="button"
                           onClick={(e) => {
@@ -440,7 +440,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                           title={n.content}
                         >
                           N
-                        </button>
+                        </Button>
                       );
                     })}
 
@@ -493,7 +493,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                     const top = `${n.y_pct * 100}%`;
                     const colorCls = NOTE_COLORS[n.color] || NOTE_COLORS.yellow;
                     return (
-                      <button
+                      <Button
                         key={n.uid}
                         type="button"
                         onClick={(e) => {
@@ -505,7 +505,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                         title={`Trang ${n.page ?? 1} — ${n.content}`}
                       >
                         N{n.page ?? 1}
-                      </button>
+                      </Button>
                     );
                   })}
 
@@ -547,7 +547,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                     const colorCls = NOTE_COLORS[n.color] || NOTE_COLORS.yellow;
                     const isCurrentPage = pdfable && (n.page ?? 1) === pdfPage;
                     return (
-                      <button
+                      <Button
                         key={n.uid}
                         type="button"
                         onClick={() => jumpToNote(n)}
@@ -573,7 +573,7 @@ export function DocViewerPanel({ doc, ctx, open, onClose, onProgressChange, t }:
                           </span>
                         </div>
                         <p className="text-xs text-slate-700 line-clamp-3">{n.content}</p>
-                      </button>
+                      </Button>
                     );
                   })
                 )}

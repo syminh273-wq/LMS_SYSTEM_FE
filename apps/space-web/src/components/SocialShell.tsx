@@ -130,7 +130,7 @@ export function SocialShell({ children }: { children: React.ReactNode }) {
                 <NotificationBell />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="ml-1 flex items-center gap-1 rounded-full p-0.5 outline-none ring-offset-background hover:ring-2 hover:ring-primary-brand/30 transition-all">
+                    <Button className="ml-1 flex items-center gap-1 rounded-full p-0.5 outline-none ring-offset-background hover:ring-2 hover:ring-primary-brand/30 transition-all">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={profile?.avatar_url || ''} alt={profile?.full_name || ''} />
                         <AvatarFallback className="bg-gradient-to-br from-primary-brand to-fuchsia-500 text-xs font-black text-white">
@@ -138,7 +138,7 @@ export function SocialShell({ children }: { children: React.ReactNode }) {
                         </AvatarFallback>
                       </Avatar>
                       <ChevronDown size={12} className="text-muted-foreground" />
-                    </button>
+                    </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" sideOffset={8} className="rounded-2xl border border-border bg-card p-1.5 shadow-xl w-64">
                     <div className="px-3 py-2.5">
@@ -146,28 +146,28 @@ export function SocialShell({ children }: { children: React.ReactNode }) {
                       <p className="text-xs text-muted-foreground truncate">{profile?.email || ''}</p>
                     </div>
                     <div className="h-px bg-border my-1" />
-                    <button
+                    <Button
                       onClick={() => router.push('/space')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted"
                     >
                       <User size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">Back to dashboard</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => router.push('/space/settings')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted"
                     >
                       <Settings size={14} className="text-muted-foreground" />
                       <span className="text-sm font-medium">Settings</span>
-                    </button>
+                    </Button>
                     <div className="h-px bg-border my-1" />
-                    <button
+                    <Button
                       onClick={handleLogout}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left transition-colors hover:bg-destructive/5"
                     >
                       <LogOut size={14} className="text-destructive" />
                       <span className="text-sm font-medium text-destructive">Đăng xuất</span>
-                    </button>
+                    </Button>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>

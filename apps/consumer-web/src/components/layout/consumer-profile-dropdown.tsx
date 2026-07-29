@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
@@ -129,7 +130,7 @@ export function ConsumerProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           type="button"
           aria-label="Mở menu tài khoản"
           className="flex max-w-[220px] items-center gap-2.5 rounded-2xl border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group"
@@ -147,7 +148,7 @@ export function ConsumerProfileDropdown() {
             </p>
           </div>
           <ChevronDown size={14} className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -156,7 +157,7 @@ export function ConsumerProfileDropdown() {
         style={{ width: '280px', minWidth: '280px' }}
         className="rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl"
       >
-        <button
+        <Button
           onClick={goToProfile}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-gray-50"
         >
@@ -173,11 +174,11 @@ export function ConsumerProfileDropdown() {
               Xem trang cá nhân →
             </p>
           </div>
-        </button>
+        </Button>
 
         <div className="mx-1 my-1 h-px bg-gray-100" />
 
-        <button
+        <Button
           onClick={() => router.push('/consumer/feed')}
           className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
         >
@@ -188,13 +189,13 @@ export function ConsumerProfileDropdown() {
           <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
             MỚI
           </span>
-        </button>
+        </Button>
 
         <div className="mx-1 my-1 h-px bg-gray-100" />
 
         <div className="space-y-0.5">
           {menuItems.map(({ label, Icon, bg, color, path }) => (
-            <button
+            <Button
               key={path}
               onClick={() => router.push(path)}
               className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
@@ -203,7 +204,7 @@ export function ConsumerProfileDropdown() {
                 <Icon size={13} strokeWidth={2.5} />
               </div>
               <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -211,7 +212,7 @@ export function ConsumerProfileDropdown() {
 
         <div className="grid grid-cols-4 gap-1 px-1 py-1">
           {quickItems.map(({ label, Icon, bg, color }) => (
-            <button
+            <Button
               key={label}
               onClick={() => {
                 if (label === 'Thông báo') router.push('/consumer/notifications');
@@ -232,13 +233,13 @@ export function ConsumerProfileDropdown() {
               <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900">
                 {label}
               </span>
-            </button>
+            </Button>
           ))}
         </div>
 
         <div className="mx-1 my-1 h-px bg-gray-100" />
 
-        <button
+        <Button
           onClick={() => router.push('/consumer/profile/edit')}
           className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
         >
@@ -246,9 +247,9 @@ export function ConsumerProfileDropdown() {
             <FileText size={13} strokeWidth={2.5} />
           </div>
           <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Chỉnh sửa hồ sơ</span>
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={handleLogout}
           className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-red-50 group"
         >
@@ -256,7 +257,7 @@ export function ConsumerProfileDropdown() {
             <LogOut size={13} strokeWidth={2.5} />
           </div>
           <span className="text-sm font-medium text-red-500 group-hover:text-red-600">Đăng xuất</span>
-        </button>
+        </Button>
       </DropdownMenuContent>
     </DropdownMenu>
   );

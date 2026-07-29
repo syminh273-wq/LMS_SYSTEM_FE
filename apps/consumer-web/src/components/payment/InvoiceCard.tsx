@@ -104,13 +104,13 @@ export function InvoiceCard({ payment, classroomName, courseName, teacherName }:
               <code className="px-2 py-1 rounded-md bg-slate-100 text-[12px] font-mono text-slate-700 truncate">
                 {payment.trans_id && payment.trans_id > 0 ? String(payment.trans_id) : payment.order_id}
               </code>
-              <button
+              <Button
                 onClick={() => copy(payment.trans_id && payment.trans_id > 0 ? String(payment.trans_id) : payment.order_id, 'mã giao dịch')}
                 className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
                 aria-label="Sao chép mã"
               >
                 <Copy size={13} />
-              </button>
+              </Button>
             </div>
           </Field>
         </div>

@@ -1,12 +1,14 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, CheckCircle, Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
+import { Label } from '@shared/components/ui/label';
 
 type FormValues = { new_password: string; confirm_password: string };
 
@@ -77,7 +79,7 @@ function SpaceResetPasswordContent() {
           <div className="p-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Mật khẩu mới</label>
+                <Label className="block text-sm font-semibold text-foreground mb-2">Mật khẩu mới</Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
                     <Lock size={18} />
@@ -91,15 +93,15 @@ function SpaceResetPasswordContent() {
                     className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.new_password ? 'border-red-500' : 'border-border'}`}
                     placeholder="••••••••"
                   />
-                  <button type="button" onClick={() => setShowNew(v => !v)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground">
+                  <Button type="button" onClick={() => setShowNew(v => !v)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground">
                     {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  </Button>
                 </div>
                 {errors.new_password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.new_password.message}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Xác nhận mật khẩu</label>
+                <Label className="block text-sm font-semibold text-foreground mb-2">Xác nhận mật khẩu</Label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
                     <Lock size={18} />
@@ -113,20 +115,20 @@ function SpaceResetPasswordContent() {
                     className={`block w-full pl-10 pr-10 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.confirm_password ? 'border-red-500' : 'border-border'}`}
                     placeholder="••••••••"
                   />
-                  <button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground">
+                  <Button type="button" onClick={() => setShowConfirm(v => !v)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground">
                     {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  </Button>
                 </div>
                 {errors.confirm_password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.confirm_password.message}</p>}
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={loading}
                 className="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 disabled:bg-slate-400 transition-all shadow-lg active:scale-[0.98]"
               >
                 {loading ? 'Đang cập nhật...' : 'Đặt lại mật khẩu'}
-              </button>
+              </Button>
             </form>
 
             <div className="mt-6 text-center">

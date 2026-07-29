@@ -157,13 +157,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 goldColor={mounted ? brandColors.goldColor : '#d4a843'}
               />
             </Link>
-            <button
+            <Button
               onClick={() => setSidebarCollapsed(false)}
               title={t('layout.actions.expand_menu')}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
             >
               <ChevronsRight size={16} />
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="p-5 pb-4 flex items-center justify-between gap-2">
@@ -181,13 +181,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 className="h-10 w-auto"
               />
             </Link>
-            <button
+            <Button
               onClick={() => setSidebarCollapsed(true)}
               title={t('layout.actions.collapse_menu')}
               className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0 cursor-pointer"
             >
               <ChevronsLeft size={16} />
-            </button>
+            </Button>
           </div>
         )}
 
@@ -205,7 +205,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     onMouseEnter={() => setHoveredGroup(item.key)}
                     onMouseLeave={() => setHoveredGroup(null)}
                   >
-                    <button
+                    <Button
                       type="button"
                       title={item.label}
                       className={`w-full flex items-center justify-center py-3 px-2 rounded-xl transition-all duration-200 cursor-pointer ${
@@ -215,7 +215,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       }`}
                     >
                       <item.icon size={20} className={isGroupActive ? 'text-primary-brand' : 'text-muted-foreground'} />
-                    </button>
+                    </Button>
                     {hoveredGroup === item.key && (
                       <div className="absolute left-full top-0 ml-2 z-50 min-w-[200px] rounded-xl border border-border bg-card shadow-xl py-2">
                         <div className="px-4 py-1.5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
@@ -245,7 +245,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
               return (
                 <div key={item.key}>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setExpandedGroups(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
@@ -261,7 +261,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                       size={14}
                       className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                     />
-                  </button>
+                  </Button>
                   {isExpanded && (
                     <div className="mt-1 ml-4 pl-4 border-l border-border space-y-1">
                       {item.children.map(child => {

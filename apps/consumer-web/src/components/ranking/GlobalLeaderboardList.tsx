@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { Award, Crown, Medal, Trophy } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import { Card, CardContent } from '@shared/components/ui/card';
@@ -94,7 +95,7 @@ export function GlobalLeaderboardList({
 
         <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
           {PERIODS.map((p) => (
-            <button
+            <Button
               key={p.key}
               type="button"
               onClick={() => handlePeriod(p.key)}
@@ -106,7 +107,7 @@ export function GlobalLeaderboardList({
               )}
             >
               {t(`ranking.${p.label}`, p.key)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

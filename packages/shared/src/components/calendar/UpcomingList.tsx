@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { cn } from '@shared/lib/utils';
@@ -97,7 +98,7 @@ export function UpcomingList({
             const Icon = TYPE_ICON[event.type] ?? Clock;
             const color = event.color ?? CALENDAR_TYPE_COLORS[event.type] ?? 'slate';
             return (
-              <button
+              <Button
                 type="button"
                 key={event.uid}
                 onClick={() => onSelectEvent?.(event)}
@@ -116,7 +117,7 @@ export function UpcomingList({
                     <p className="text-[10.5px] text-slate-400 truncate">{event.classroom_name}</p>
                   )}
                 </div>
-              </button>
+              </Button>
             );
           })}
         </div>

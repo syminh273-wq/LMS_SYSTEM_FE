@@ -30,6 +30,14 @@ import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { Textarea } from '@shared/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
+import { Controller } from 'react-hook-form';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -60,7 +68,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<any>(null);
 
-  const { register, handleSubmit, watch, formState: { errors }, setError: setFormError, reset } = useForm<UpdateClassroomRequest>({
+  const { register, handleSubmit, watch, control, formState: { errors }, setError: setFormError, reset } = useForm<UpdateClassroomRequest>({
     defaultValues: {
       name: '',
       description: '',
@@ -306,20 +314,20 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
             <div className="space-y-3">
               <Label>Hình thức</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${pricingType === 'free' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
-                  <input type="radio" value="free" {...register('pricing_type')} className="mt-1 accent-primary" />
+                <Label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${pricingType === 'free' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <Input type="radio" value="free" {...register('pricing_type')} className="mt-1 accent-primary" />
                   <div>
                     <div className="font-medium text-foreground">Miễn phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh tham gia tự do, xem tất cả tài liệu.</div>
                   </div>
-                </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${pricingType === 'paid' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
-                  <input type="radio" value="paid" {...register('pricing_type')} className="mt-1 accent-primary" />
+                </Label>
+                <Label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${pricingType === 'paid' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <Input type="radio" value="paid" {...register('pricing_type')} className="mt-1 accent-primary" />
                   <div>
                     <div className="font-medium text-foreground">Trả phí</div>
                     <div className="text-xs text-muted-foreground">Học sinh phải thanh toán MoMo trước khi vào.</div>
                   </div>
-                </label>
+                </Label>
               </div>
             </div>
 
@@ -361,36 +369,50 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                 <Tag className="size-4 text-primary" />
                 Danh mục <span className="text-destructive">*</span>
               </Label>
-              <select
-                id="category"
-                {...register('category', { required: 'Vui lòng chọn danh mục' })}
-                className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none transition-colors focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-500/20 aria-invalid:border-red-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100"
-                aria-invalid={!!errors.category}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="category"
+                rules={{ required: 'Vui lòng chọn danh mục' }}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      id="category"
+                      className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 aria-invalid:border-red-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100"
+                      aria-invalid={!!errors.category}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.category && <p className="text-xs font-medium text-destructive">{errors.category.message}</p>}
             </div>
 
             <div className="space-y-3">
               <Label>Chế độ hiển thị</Label>
               <div className="grid grid-cols-2 gap-3">
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${visibilityType === 'public' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
-                  <input type="radio" value="public" {...register('visibility_type')} className="mt-1 accent-primary" />
+                <Label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${visibilityType === 'public' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <Input type="radio" value="public" {...register('visibility_type')} className="mt-1 accent-primary" />
                   <div>
                     <div className="font-medium text-foreground flex items-center gap-1"><Globe className="size-4" /> Công khai</div>
                     <div className="text-xs text-muted-foreground">Hiện trong trang Khám phá, học sinh tham gia trực tiếp.</div>
                   </div>
-                </label>
-                <label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${visibilityType === 'private' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
-                  <input type="radio" value="private" {...register('visibility_type')} className="mt-1 accent-primary" />
+                </Label>
+                <Label className={`flex items-start gap-3 p-4 border rounded-xl cursor-pointer transition-colors ${visibilityType === 'private' ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
+                  <Input type="radio" value="private" {...register('visibility_type')} className="mt-1 accent-primary" />
                   <div>
                     <div className="font-medium text-foreground flex items-center gap-1"><Lock className="size-4" /> Riêng tư</div>
                     <div className="text-xs text-muted-foreground">Chỉ tham gia qua mã mời. Không hiện trong Khám phá.</div>
                   </div>
-                </label>
+                </Label>
               </div>
             </div>
           </CardContent>

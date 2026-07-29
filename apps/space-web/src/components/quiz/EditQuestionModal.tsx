@@ -82,7 +82,7 @@ export default function EditQuestionModal({
               const optionText =
                 question[`option_${key}` as keyof QuizQuestion] as string;
               return (
-                <button
+                <Button
                   key={key}
                   type="button"
                   onClick={() => setCorrect(key)}
@@ -105,7 +105,7 @@ export default function EditQuestionModal({
                   {isSelected && (
                     <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
                   )}
-                </button>
+                </Button>
               );
             })}
           </div>

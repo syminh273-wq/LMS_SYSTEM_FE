@@ -51,14 +51,14 @@ export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDe
             {doc.name}
           </p>
           {canManage && onDelete && (
-            <button
+            <Button
               type="button"
               onClick={() => onDelete(doc)}
               className="p-2 rounded-md hover:bg-rose-50 text-slate-500 hover:text-rose-600"
               title={t('classroom.docs.delete', 'Xóa')}
             >
               <Trash2 size={14} />
-            </button>
+            </Button>
           )}
           <a
             href={doc.url}
@@ -70,14 +70,14 @@ export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDe
           >
             <Download size={14} />
           </a>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
             title={t('classroom.docs.close', 'Đóng')}
           >
             <X size={16} />
-          </button>
+          </Button>
         </div>
 
         <div className="flex-1 min-h-0 flex items-center justify-center bg-slate-100 p-4 overflow-auto">

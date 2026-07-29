@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 import { Filter, Loader2 } from 'lucide-react';
 import { classroomApi } from '@/lib/api/classroom';
 import { cn } from '@shared/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shared/components/ui/select';
 
 export type ClassroomOption = {
   uid: string;
@@ -49,19 +56,23 @@ export function ClassroomFilter({ value, onChange, className }: Props) {
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <Filter size={14} className="text-slate-500" />
-      <select
+      <Select
         value={value}
-        onChange={(e) => onChange(e.target.value as string | 'all')}
+        onValueChange={(v) => onChange(v as string | 'all')}
         disabled={loading}
-        className="px-3 py-1.5 rounded-lg text-[12px] font-bold border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:opacity-60"
       >
-        <option value="all">Tất cả lớp</option>
-        {options.map((opt) => (
-          <option key={opt.uid} value={opt.uid}>
-            {opt.name}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger className="px-3 py-1.5 rounded-lg text-[12px] font-bold border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 h-auto">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Tất cả lớp</SelectItem>
+          {options.map((opt) => (
+            <SelectItem key={opt.uid} value={opt.uid}>
+              {opt.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       {loading && <Loader2 size={12} className="animate-spin text-slate-400" />}
       {error && <span className="text-[11px] text-rose-500">{error}</span>}
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { ClipboardList, Filter, Inbox, Layers } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
@@ -130,7 +131,7 @@ export default function SpaceLeaveRequestsPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <Filter size={14} className="text-slate-400" />
           {FILTERS.map((f) => (
-            <button
+            <Button
               key={f.key}
               type="button"
               onClick={() => setFilter(f.key)}
@@ -142,14 +143,14 @@ export default function SpaceLeaveRequestsPage() {
               )}
             >
               {t(f.labelKey, f.key)}
-            </button>
+            </Button>
           ))}
         </div>
 
         {classrooms.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             <Layers size={14} className="text-slate-400" />
-            <button
+            <Button
               type="button"
               onClick={() => setClassroomId(null)}
               className={cn(
@@ -160,9 +161,9 @@ export default function SpaceLeaveRequestsPage() {
               )}
             >
               {t('leave_request.page.filter_all_classrooms', 'Tất cả lớp')}
-            </button>
+            </Button>
             {classrooms.map((c) => (
-              <button
+              <Button
                 key={c.id}
                 type="button"
                 onClick={() => setClassroomId(c.id)}
@@ -174,7 +175,7 @@ export default function SpaceLeaveRequestsPage() {
                 )}
               >
                 {c.name}
-              </button>
+              </Button>
             ))}
           </div>
         )}

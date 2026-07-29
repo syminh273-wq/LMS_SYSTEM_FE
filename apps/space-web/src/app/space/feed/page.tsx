@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { socialApi } from '@/lib/api/social';
@@ -133,14 +134,14 @@ export default function FeedPage() {
               ))}
               {hasMore && (
                 <div className="flex justify-center pt-2">
-                  <button
+                  <Button
                     onClick={loadMore}
                     disabled={loadingMore}
                     className="inline-flex items-center gap-1.5 px-5 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-60"
                   >
                     {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
                     Xem thêm
-                  </button>
+                  </Button>
                 </div>
               )}
             </div>

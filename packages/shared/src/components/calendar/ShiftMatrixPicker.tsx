@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { SHIFTS } from '@shared/lib/calendar/shifts';
 import { DayShiftMap } from '@shared/lib/calendar/recurrence';
@@ -63,7 +64,7 @@ export function ShiftMatrixPicker({ value, onChange, className }: ShiftMatrixPic
               {DAY_KEYS.map((d) => {
                 const active = isSelected(d.dow, shift.id);
                 return (
-                  <button
+                  <Button
                     type="button"
                     key={`${d.dow}-${shift.id}`}
                     onClick={() => toggle(d.dow, shift.id)}

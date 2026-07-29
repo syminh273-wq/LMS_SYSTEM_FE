@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Loader2, UserPlus, Check, User as UserIcon } from 'lucide-react';
@@ -115,7 +116,7 @@ export function ConnectSuggestions() {
                       )}
                     </Link>
                   </div>
-                  <button
+                  <Button
                     onClick={() => handleFollow(u.consumer_uid)}
                     disabled={isBusy}
                     className={cn(
@@ -134,7 +135,7 @@ export function ConnectSuggestions() {
                       <UserPlus size={11} />
                     )}
                     <span>{isFollowing ? 'Đang theo dõi' : 'Theo dõi'}</span>
-                  </button>
+                  </Button>
                 </li>
               );
             })}

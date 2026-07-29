@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -161,18 +162,18 @@ export default function TaskCenterPanel({ onClose }: Props) {
             </span>
           )}
         </div>
-        <button
+        <Button
           onClick={onClose}
           className="p-1 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
           aria-label="Close"
         >
           <X size={16} />
-        </button>
+        </Button>
       </div>
 
       <div className="flex items-center gap-1 px-3 py-2 border-b border-border bg-muted/30">
         {TABS.map(key => (
-          <button
+          <Button
             key={key}
             onClick={() => dispatch(setActiveTab(key))}
             className={`flex-1 px-2 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wide transition ${
@@ -182,7 +183,7 @@ export default function TaskCenterPanel({ onClose }: Props) {
             }`}
           >
             {t(`quizTasks.panel.tabs.${key}`)}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -292,34 +293,34 @@ function TaskRow({ task, now, busy, onOpen, onRetry, onDismiss }: RowProps) {
 
           <div className="mt-2 flex items-center gap-2">
             {isCompleted && task.quiz_uid && (
-              <button
+              <Button
                 onClick={onOpen}
                 disabled={busy}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black bg-primary-brand text-white hover:bg-primary-brand-dark transition disabled:opacity-50"
               >
                 <ExternalLink size={11} />
                 {t('quizTasks.actions.open')}
-              </button>
+              </Button>
             )}
             {isFailed && (
-              <button
+              <Button
                 onClick={onRetry}
                 disabled={busy}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black border border-border text-foreground hover:bg-muted transition disabled:opacity-50"
               >
                 {busy ? <Loader2 size={11} className="animate-spin" /> : <RotateCw size={11} />}
                 {t('quizTasks.actions.retry')}
-              </button>
+              </Button>
             )}
             {(isCompleted || isFailed) && (
-              <button
+              <Button
                 onClick={onDismiss}
                 disabled={busy}
                 className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition disabled:opacity-50"
                 aria-label={t('quizTasks.actions.dismiss')}
               >
                 <Trash2 size={11} />
-              </button>
+              </Button>
             )}
           </div>
         </div>

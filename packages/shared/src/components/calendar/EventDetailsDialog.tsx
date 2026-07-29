@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { cn } from '@shared/lib/utils';
@@ -60,14 +61,14 @@ export function EventDetailsDialog({
 
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <h2 className="text-base font-bold text-slate-900">{event.title}</h2>
-          <button
+          <Button
             type="button"
             onClick={() => onOpenChange(false)}
             className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
             aria-label="Close"
           >
             <X size={18} />
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 space-y-4">
@@ -102,7 +103,7 @@ export function EventDetailsDialog({
 
           <div className="flex flex-col gap-2">
             {showLeaveRequest && onRequestLeave && event.classroom_id && (
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   onRequestLeave(event);
@@ -112,15 +113,15 @@ export function EventDetailsDialog({
               >
                 <CalendarOff size={15} />
                 {t('calendar.event.request_leave', 'Xin nghỉ buổi này')}
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               type="button"
               onClick={() => onOpenChange(false)}
               className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[13px] font-semibold"
             >
               {t('calendar.dialog.close', 'Close')}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import {
   ChevronLeft,
   ChevronRight,
@@ -122,7 +123,7 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
         <div className="flex items-center gap-1">
           {(canScrollLeft || canScrollRight) && (
             <>
-              <button
+              <Button
                 type="button"
                 onClick={() => scrollBy(-320)}
                 disabled={!canScrollLeft}
@@ -130,8 +131,8 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
                 aria-label="Scroll left"
               >
                 <ChevronLeft className="size-4" />
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => scrollBy(320)}
                 disabled={!canScrollRight}
@@ -139,17 +140,17 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
                 aria-label="Scroll right"
               >
                 <ChevronRight className="size-4" />
-              </button>
+              </Button>
             </>
           )}
           {isOwner && (
-            <button
+            <Button
               onClick={() => setAdding(true)}
               className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
               aria-label={t('portfolio.me.add')}
             >
               <Plus className="size-4" />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -205,14 +206,14 @@ export function FeaturesSection({ items, isOwner = true, onChanged }: Props) {
       <Dialog open={!!lightbox} onOpenChange={(o) => !o && setLightbox(null)}>
         <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl p-0 gap-0 bg-black/95 border-none">
           <DialogTitle className="sr-only">{lightbox?.title}</DialogTitle>
-          <button
+          <Button
             type="button"
             onClick={() => setLightbox(null)}
             className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
             aria-label="Đóng"
           >
             <X className="size-4" />
-          </button>
+          </Button>
           {lightbox && (
             <div className="flex flex-col items-center">
               <img
@@ -292,7 +293,7 @@ function FeatureCard({
               <span className="text-[10px] font-bold uppercase tracking-wider">FILE</span>
             </a>
           ) : (
-            <button type="button" onClick={onOpenImage} className="block w-full h-full">
+            <Button type="button" onClick={onOpenImage} className="block w-full h-full">
               <img
                 src={feature.image}
                 alt={feature.title}
@@ -302,7 +303,7 @@ function FeatureCard({
                   (e.currentTarget as HTMLImageElement).style.display = 'none';
                 }}
               />
-            </button>
+            </Button>
           )
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-indigo-50 to-fuchsia-50 flex items-center justify-center">

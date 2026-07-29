@@ -1,6 +1,7 @@
 'use client';
 
 import { FileText, ExternalLink, Layers, Loader2 } from 'lucide-react';
+import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { LeaveRequest } from '@shared/lib/api/leaveRequest';
 import { LeaveRequestStatusBadge } from './LeaveRequestStatusBadge';
@@ -136,7 +137,7 @@ interface RequestCardProps {
 
 function RequestCard({ req, onSelect, showStudent, showEvent, t, locale }: RequestCardProps) {
   return (
-    <button
+    <Button
       type="button"
       onClick={() => onSelect?.(req)}
       className="w-full text-left rounded-xl border border-slate-200 bg-white p-4 hover:border-indigo-300 hover:shadow-sm transition-all"
@@ -199,7 +200,7 @@ function RequestCard({ req, onSelect, showStudent, showEvent, t, locale }: Reque
           {req.rejection_reason}
         </div>
       )}
-    </button>
+    </Button>
   );
 }
 

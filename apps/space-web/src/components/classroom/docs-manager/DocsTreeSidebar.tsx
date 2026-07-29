@@ -65,7 +65,7 @@ function NodeRow({
         style={{ paddingLeft: 8 + depth * 12 }}
         onClick={() => onSelect(node.uid)}
       >
-        <button
+        <Button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
@@ -79,7 +79,7 @@ function NodeRow({
           ) : (
             <span className="inline-block w-[14px]" />
           )}
-        </button>
+        </Button>
         {open ? (
           <FolderOpen size={15} className="shrink-0" />
         ) : (
@@ -88,14 +88,14 @@ function NodeRow({
         <span className="truncate flex-1 ml-1">{node.name}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
+            <Button
               type="button"
               onClick={(e) => e.stopPropagation()}
               className="p-1 rounded hover:bg-white/60 opacity-0 group-hover:opacity-100"
               aria-label="Folder actions"
             >
               <MoreVertical size={14} />
-            </button>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onAddChild(node)}>

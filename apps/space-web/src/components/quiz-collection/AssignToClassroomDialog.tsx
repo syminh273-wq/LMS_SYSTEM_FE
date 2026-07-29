@@ -52,7 +52,7 @@ export function AssignToClassroomDialog({ open, onOpenChange, classrooms, existi
         ) : (
           <div className="space-y-2 max-h-80 overflow-y-auto">
             {available.map(c => (
-              <button
+              <Button
                 key={c.uid}
                 onClick={() => setSelected(c.uid === selected ? null : c.uid)}
                 className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
@@ -64,7 +64,7 @@ export function AssignToClassroomDialog({ open, onOpenChange, classrooms, existi
                   <p className="text-sm font-bold truncate">{c.name}</p>
                   <p className="text-[11px] text-muted-foreground">PID: {c.pid}</p>
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         )}

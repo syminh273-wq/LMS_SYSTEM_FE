@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import {
@@ -140,13 +141,13 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <button
+            <Button
               onClick={() => router.push('/consumer/classroom')}
               className="inline-flex items-center gap-1.5 px-4 h-10 rounded-lg bg-white text-indigo-700 text-[13px] font-semibold hover:bg-indigo-50 transition-colors shadow-md"
             >
               <Plus size={15} strokeWidth={2.5} />
               Tham gia lớp mới
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -197,7 +198,7 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-0.5">
                 {['Tuần', 'Tháng', 'Học kỳ'].map((v) => (
-                  <button
+                  <Button
                     key={v}
                     className={cn(
                       "px-2.5 py-1 text-[11px] font-semibold rounded-md transition-colors",
@@ -207,7 +208,7 @@ export default function DashboardPage() {
                     )}
                   >
                     {v}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -252,9 +253,9 @@ export default function DashboardPage() {
                 <CalendarIcon size={15} className="text-indigo-600" />
                 Hôm nay
               </h3>
-              <button className="text-[11px] font-semibold text-indigo-600 hover:underline">
+              <Button className="text-[11px] font-semibold text-indigo-600 hover:underline">
                 Xem tất cả
-              </button>
+              </Button>
             </div>
             <div className="space-y-2.5">
               {SCHEDULE.map((item) => (
@@ -287,13 +288,13 @@ export default function DashboardPage() {
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">5 bài đánh giá mới nhất</p>
             </div>
-            <button
+            <Button
               onClick={() => router.push('/consumer/grades')}
               className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:underline"
             >
               Xem tất cả
               <ArrowUpRight size={13} />
-            </button>
+            </Button>
           </div>
 
           <div className="overflow-x-auto">

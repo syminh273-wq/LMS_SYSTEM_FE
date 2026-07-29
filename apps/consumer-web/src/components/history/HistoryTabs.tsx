@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Button } from '@shared/components/ui/button';
 import { cn } from '@shared/lib/utils';
 
 export type HistoryTab = 'payments' | 'joins';
@@ -22,7 +23,7 @@ export function HistoryTabs({ value, onChange, counts }: Props) {
       {TABS.map((t) => {
         const active = value === t.key;
         return (
-          <button
+          <Button
             key={t.key}
             onClick={() => onChange(t.key)}
             className={cn(
@@ -43,7 +44,7 @@ export function HistoryTabs({ value, onChange, counts }: Props) {
                 {counts[t.key]}
               </span>
             )}
-          </button>
+          </Button>
         );
       })}
     </div>

@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api/auth';
 
@@ -84,9 +86,9 @@ export default function VerifyOTPPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-[12px] font-semibold text-slate-700">
+            <Label className="text-[12px] font-semibold text-slate-700">
               Mã OTP
-            </label>
+            </Label>
             <Input
               {...register('otp_code', {
                 required: 'Vui lòng nhập mã OTP',
@@ -101,7 +103,7 @@ export default function VerifyOTPPage() {
             )}
           </div>
 
-          <button
+          <Button
             type="submit"
             disabled={loading}
             className="mt-2 w-full h-11 rounded-lg font-semibold text-[14px] text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -117,11 +119,11 @@ export default function VerifyOTPPage() {
                 <ArrowRight size={16} strokeWidth={2.5} />
               </>
             )}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 text-center">
-          <button
+          <Button
             type="button"
             onClick={handleResend}
             disabled={resending || countdown > 0}
@@ -129,7 +131,7 @@ export default function VerifyOTPPage() {
           >
             <RefreshCw size={13} className={resending ? 'animate-spin' : ''} />
             {countdown > 0 ? `Gửi lại sau ${countdown}s` : 'Gửi lại mã OTP'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

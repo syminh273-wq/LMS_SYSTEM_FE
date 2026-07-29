@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
+import { Label } from '@shared/components/ui/label';
+import { Textarea } from '@shared/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -67,10 +70,10 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">
+            <Label className="text-xs font-bold text-foreground block mb-1.5">
               {t('certificate.create_modal.name_label')}
-            </label>
-            <input
+            </Label>
+            <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -80,10 +83,10 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">
+            <Label className="text-xs font-bold text-foreground block mb-1.5">
               {t('certificate.create_modal.description_label')}
-            </label>
-            <textarea
+            </Label>
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('certificate.create_modal.description_placeholder')}
@@ -92,9 +95,9 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
             />
           </div>
           <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">
+            <Label className="text-xs font-bold text-foreground block mb-1.5">
               {t('certificate.create_modal.template_image_label')}
-            </label>
+            </Label>
             <ImageUploader
               value={existingUrl}
               file={templateFile}
