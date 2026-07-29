@@ -1,5 +1,3 @@
-'use client';
-
 import { Check, Image as ImageIcon, Loader2, WifiOff } from 'lucide-react';
 import type { WorkspaceMessage } from '@/lib/api/community';
 import { useEffect, useMemo, useRef } from 'react';

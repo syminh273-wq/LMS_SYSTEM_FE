@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Plus, Upload, Loader2, Folder as FolderIcon, RefreshCcw } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

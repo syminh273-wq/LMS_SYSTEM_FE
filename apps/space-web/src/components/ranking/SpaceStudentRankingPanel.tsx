@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { Flame, Sparkles, Star, Trophy, Zap, BookOpen, CheckCircle2, Lock } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';

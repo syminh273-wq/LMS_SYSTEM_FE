@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Wand2, Plus, Gamepad2, Clock, RefreshCw, Trophy, X, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

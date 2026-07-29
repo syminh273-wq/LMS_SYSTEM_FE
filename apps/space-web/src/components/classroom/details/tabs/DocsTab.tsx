@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { ClassroomDocsManager } from '@/components/classroom/docs-manager/ClassroomDocsManager';
 

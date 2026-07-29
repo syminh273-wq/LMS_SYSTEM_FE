@@ -1,5 +1,3 @@
-'use client';
-
 import { Camera, Loader2, UserCheck, UserPlus } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';

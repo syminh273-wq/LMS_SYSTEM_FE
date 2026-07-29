@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Loader2, Trophy, Medal, Award, Clock, ChevronRight, X } from 'lucide-react';

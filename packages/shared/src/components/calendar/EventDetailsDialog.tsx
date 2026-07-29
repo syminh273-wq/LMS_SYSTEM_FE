@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { CalendarEvent, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';

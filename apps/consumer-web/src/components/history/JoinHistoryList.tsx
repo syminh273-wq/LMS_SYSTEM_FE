@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import Link from 'next/link';
 import { BookOpen, CheckCircle2, Clock, XCircle, AlertTriangle, Loader2, History as HistoryIcon } from 'lucide-react';

@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { LeaveRequestTab } from '@shared/components/leave-request';
 import { spaceLeaveRequestApi, calendarApi as spaceCalendarApi } from '@/lib/api';

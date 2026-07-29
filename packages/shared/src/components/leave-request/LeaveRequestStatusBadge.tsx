@@ -1,5 +1,3 @@
-'use client';
-
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { cn } from '@shared/lib/utils';
 import { LeaveRequestStatus } from '@shared/lib/api/leaveRequest';

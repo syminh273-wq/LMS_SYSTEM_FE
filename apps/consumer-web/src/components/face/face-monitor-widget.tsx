@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';

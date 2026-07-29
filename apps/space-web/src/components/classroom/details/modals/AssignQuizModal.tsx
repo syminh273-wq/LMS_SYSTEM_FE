@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { quizApi } from '@/lib/api/quiz';

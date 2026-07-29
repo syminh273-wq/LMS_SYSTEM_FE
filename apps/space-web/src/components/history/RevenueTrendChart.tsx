@@ -1,5 +1,3 @@
-'use client';
-
 import dynamic from 'next/dynamic';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Loader2, TrendingUp } from 'lucide-react';

@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { Smile, Send, Loader2, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';

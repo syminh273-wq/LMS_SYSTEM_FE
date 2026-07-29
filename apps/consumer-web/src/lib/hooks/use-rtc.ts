@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 import { meetingRoomApi } from '@/lib/api/meeting-room';

@@ -1,5 +1,3 @@
-'use client';
-
 import BaseRestApiClient from './client';
 import { ApiException } from './exceptions';
 import type { Address, AddressPayload } from './address';

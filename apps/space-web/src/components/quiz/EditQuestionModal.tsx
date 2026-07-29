@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { Loader2, X, CheckCircle2, Save } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

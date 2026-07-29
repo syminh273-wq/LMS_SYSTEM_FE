@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { Award, Crown, Medal, Trophy } from 'lucide-react';

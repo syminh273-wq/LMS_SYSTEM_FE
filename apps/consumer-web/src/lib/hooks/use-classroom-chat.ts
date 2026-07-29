@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { classroomApi } from '@/lib/api';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';

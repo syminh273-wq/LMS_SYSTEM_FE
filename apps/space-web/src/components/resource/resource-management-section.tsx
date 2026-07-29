@@ -1,5 +1,3 @@
-"use client"
-
 import { ReactNode } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@shared/components/ui/card"
 

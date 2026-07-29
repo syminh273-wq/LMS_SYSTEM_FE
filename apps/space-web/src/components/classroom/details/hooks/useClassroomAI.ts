@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { BookOpen, Users, Sparkles } from 'lucide-react';

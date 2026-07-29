@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { MoreVertical, UserX, Users, ShieldBan, ClipboardCheck, BarChart2, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

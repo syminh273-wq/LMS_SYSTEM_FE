@@ -1,5 +1,3 @@
-'use client';
-
 import { Flame, Sparkles, Star, Trophy, TrendingUp, Zap } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { cn } from '@/lib/utils';

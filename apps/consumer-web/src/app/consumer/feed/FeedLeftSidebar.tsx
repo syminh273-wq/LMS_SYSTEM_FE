@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';

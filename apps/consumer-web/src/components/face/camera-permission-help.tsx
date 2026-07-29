@@ -1,5 +1,3 @@
-'use client';
-
 import { Lock, RefreshCw, VideoOff } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 

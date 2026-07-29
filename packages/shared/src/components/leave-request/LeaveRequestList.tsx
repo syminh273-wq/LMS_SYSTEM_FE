@@ -1,5 +1,3 @@
-'use client';
-
 import { FileText, ExternalLink, Layers, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';

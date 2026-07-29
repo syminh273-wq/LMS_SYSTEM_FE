@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { ArrowLeft, Settings, Users } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

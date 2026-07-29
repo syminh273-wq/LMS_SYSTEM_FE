@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Bot, Sparkles, Send, Mic, Square, Plus, BookOpen, Users, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

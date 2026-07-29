@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Video, MonitorUp, Camera, Wifi, WifiOff, Users, X, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

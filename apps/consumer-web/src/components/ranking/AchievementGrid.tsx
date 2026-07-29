@@ -1,5 +1,3 @@
-'use client';
-
 import { Award, CheckCircle2, Lock, Star, Trophy, Medal, Sparkles, School, Verified, PlayCircle, CalendarCheck, CalendarDays, Compass, LayoutDashboard, Flame } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { cn } from '@/lib/utils';

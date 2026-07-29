@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState, useCallback } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { Loader2, Plus, Sparkles, X } from 'lucide-react';

@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Button } from './ui/button';
 import { Settings, Loader2, Volume2, VolumeX, Check, Play } from 'lucide-react';

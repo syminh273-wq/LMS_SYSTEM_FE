@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useMemo } from 'react';
 import { Plus, FileText, Clock, Calendar, MoreVertical, Pencil, Trash2, ClipboardList, Loader2 } from 'lucide-react';

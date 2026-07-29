@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import Link from 'next/link';
 import { CreditCard, CheckCircle2, Clock, XCircle, AlertTriangle, Loader2, FileText } from 'lucide-react';

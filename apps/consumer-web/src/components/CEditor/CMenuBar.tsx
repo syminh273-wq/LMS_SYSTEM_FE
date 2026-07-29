@@ -1,5 +1,3 @@
-'use client';
-
 import { type Editor } from '@tiptap/react';
 import { Button } from '@shared/components/ui/button';
 import {

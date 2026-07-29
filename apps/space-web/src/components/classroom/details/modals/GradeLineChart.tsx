@@ -1,5 +1,3 @@
-'use client';
-
 import { useTranslation } from '@shared/components/LocaleProvider';
 import {
   CartesianGrid,

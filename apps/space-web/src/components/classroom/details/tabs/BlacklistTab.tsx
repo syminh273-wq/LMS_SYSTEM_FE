@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { ShieldBan, ShieldOff, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

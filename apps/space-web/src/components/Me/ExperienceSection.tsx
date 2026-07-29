@@ -1,5 +1,3 @@
-'use client';
-
 import { useMemo, useState } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { Briefcase, Plus, MoreHorizontal, Trash2 } from 'lucide-react';

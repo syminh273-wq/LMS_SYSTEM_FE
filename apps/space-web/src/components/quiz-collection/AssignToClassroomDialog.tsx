@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useMemo } from 'react';
 import { Users } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

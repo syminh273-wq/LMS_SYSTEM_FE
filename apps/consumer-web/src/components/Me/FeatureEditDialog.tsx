@@ -1,5 +1,3 @@
-'use client';
-
 import { useRef, useState } from 'react';
 import { FileText, ImageIcon, Loader2, Upload, X } from 'lucide-react';
 import {

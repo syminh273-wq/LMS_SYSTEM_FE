@@ -1,5 +1,3 @@
-'use client';
-
 import { Loader2, UserX } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import {

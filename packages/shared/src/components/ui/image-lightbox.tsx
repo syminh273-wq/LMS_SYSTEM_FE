@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { Button } from './button';
 import { ChevronLeft, ChevronRight, X } from "lucide-react"

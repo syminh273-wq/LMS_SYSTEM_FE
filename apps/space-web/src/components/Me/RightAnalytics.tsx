@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { Languages, Loader2, Plus, X } from 'lucide-react';

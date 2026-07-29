@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Award, Crown, Medal, Sparkles, Trophy, TrendingUp, Users } from 'lucide-react';

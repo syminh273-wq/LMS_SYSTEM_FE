@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect, useCallback } from 'react';
 import { usePendingRealtime } from '@/lib/hooks/use-pending-realtime';
 import { spaceApi } from '@/lib/api';

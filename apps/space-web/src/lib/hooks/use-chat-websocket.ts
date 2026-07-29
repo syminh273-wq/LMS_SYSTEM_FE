@@ -1,4 +1,3 @@
-'use client';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 import type { ChatMessage } from '@/lib/api/types';

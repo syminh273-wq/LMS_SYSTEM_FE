@@ -1,5 +1,3 @@
-'use client';
-
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { Button } from '../ui/button';
 import { cn } from '@shared/lib/utils';

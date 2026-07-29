@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Camera, CheckCircle2, Loader2, X } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';

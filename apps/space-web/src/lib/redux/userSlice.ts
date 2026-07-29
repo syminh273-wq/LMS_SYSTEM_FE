@@ -6,24 +6,13 @@ interface UserState {
   isAuthenticated: boolean;
 }
 
+// profile always starts null on both server and client render; AppInitializer
+// rehydrates it from localStorage in a useEffect after mount to avoid a
+// hydration mismatch (SSR never has access to localStorage).
 const initialState: UserState = {
   profile: null,
   isAuthenticated: false,
 };
-
-// Try to load initial state from localStorage if available
-if (typeof window !== 'undefined') {
-  const savedProfile = localStorage.getItem('userProfile');
-  const token = localStorage.getItem('accessToken');
-  if (savedProfile && token) {
-    try {
-      initialState.profile = JSON.parse(savedProfile);
-      initialState.isAuthenticated = true;
-    } catch (e) {
-      console.error("Failed to parse userProfile from localStorage", e);
-    }
-  }
-}
 
 const userSlice = createSlice({
   name: 'user',

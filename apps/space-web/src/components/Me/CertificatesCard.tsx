@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { Award, ExternalLink, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';

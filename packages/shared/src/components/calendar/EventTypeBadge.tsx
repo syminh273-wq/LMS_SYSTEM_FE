@@ -1,5 +1,3 @@
-'use client';
-
 import { CalendarEventType, CALENDAR_TYPE_COLORS } from '@shared/lib/api/calendar';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { cn } from '@shared/lib/utils';

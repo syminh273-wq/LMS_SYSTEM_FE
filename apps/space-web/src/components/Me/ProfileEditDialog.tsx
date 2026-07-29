@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';

@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { Button } from '../ui/button';
 import { AlertTriangle, MapPin, Pencil, Plus, Search, Trash2, X } from 'lucide-react';

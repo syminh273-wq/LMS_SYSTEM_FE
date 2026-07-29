@@ -1,5 +1,3 @@
-'use client';
-
 import { useCallback, useEffect, useState } from 'react';
 import { spacePaymentApi } from '@/lib/api/space-payment';
 import type {

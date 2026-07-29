@@ -1,5 +1,3 @@
-'use client';
-
 import { useRef } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useDispatch, useSelector } from 'react-redux';

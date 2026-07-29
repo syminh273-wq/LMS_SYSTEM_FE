@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { spaceApi, Exam } from '@/lib/api';

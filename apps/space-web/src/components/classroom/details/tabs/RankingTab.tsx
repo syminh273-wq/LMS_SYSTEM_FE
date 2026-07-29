@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import SpaceClassroomRankingView from '@/components/ranking/SpaceClassroomRankingView';
 

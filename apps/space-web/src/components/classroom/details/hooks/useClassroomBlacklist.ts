@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect, useCallback } from 'react';
 import { spaceApi } from '@/lib/api';
 import type { BlacklistEntry } from '@/lib/api/types';

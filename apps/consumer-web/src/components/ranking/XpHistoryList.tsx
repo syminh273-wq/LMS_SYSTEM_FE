@@ -1,5 +1,3 @@
-'use client';
-
 import {
   BookOpen, CalendarCheck, CheckCircle2, FileText, GraduationCap,
   Layers, PlayCircle, Star as StarIcon, Trophy,

@@ -1,5 +1,3 @@
-'use client';
-
 import type { ReferenceData, ReferenceProvince, ReferenceWard } from './location-types';
 
 const CACHE_KEY  = 'vn_provinces_v2';

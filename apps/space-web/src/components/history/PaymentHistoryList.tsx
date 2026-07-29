@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { CreditCard, CheckCircle2, Clock, XCircle, AlertTriangle, Loader2, FileText } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';

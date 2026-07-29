@@ -100,7 +100,6 @@ function getGreeting(hour: number, t: (key: string) => string): { text: string; 
   return          { text: t('dashboard.greeting.evening'),   emoji: '🌆', gradient: 'from-indigo-600 via-purple-600 to-slate-700' };
 }
 
-// ── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function SpaceDashboardPage() {
   const { t, formatDate: localeFormatDate, formatTime: localeFormatTime } = useTranslation();

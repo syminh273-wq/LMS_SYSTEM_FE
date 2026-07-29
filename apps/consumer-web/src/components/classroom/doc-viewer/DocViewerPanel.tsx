@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';

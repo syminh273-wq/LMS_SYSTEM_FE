@@ -1,5 +1,3 @@
-'use client';
-
 import { Loader2, X, Check, Users, RefreshCw } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import type { ClassroomMember } from '@/lib/api/types';
