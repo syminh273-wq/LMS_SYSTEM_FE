@@ -579,8 +579,6 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
               </div>
             </section>
 
-            <CompactProgress submission={submission} isGraded={grade !== null} hasFeedback={hasFeedback} />
-
             <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <MessageSquareText size={16} className="text-primary" />
@@ -625,38 +623,6 @@ function SidebarRow({ label, value }: { label: string; value: ReactNode }) {
       <span className="font-medium text-muted-foreground">{label}</span>
       <span className="text-right font-bold text-foreground">{value}</span>
     </div>
-  );
-}
-
-function CompactProgress({ submission, isGraded, hasFeedback }: { submission: ExamSubmission | null; isGraded: boolean; hasFeedback: boolean }) {
-  const steps = [
-    { label: 'Đề bài', done: true, current: !submission },
-    { label: 'Đã nộp', done: Boolean(submission), current: Boolean(submission) && !isGraded },
-    { label: 'Đã chấm', done: isGraded, current: isGraded && !hasFeedback },
-    { label: 'Feedback', done: hasFeedback, current: false },
-  ] as const;
-
-  return (
-    <section className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-      <h2 className="mb-4 text-sm font-black text-foreground">Tiến độ bài thi</h2>
-      <div className="flex items-start">
-        {steps.map((step, index) => (
-          <div key={step.label} className="relative flex min-w-0 flex-1 flex-col items-center text-center">
-            {index < steps.length - 1 && (
-              <span className={`absolute left-1/2 top-3 h-0.5 w-full ${steps[index + 1].done ? 'bg-success/40' : 'bg-border'}`} />
-            )}
-            <span className={`relative z-[1] flex h-6 w-6 items-center justify-center rounded-full ${
-              step.done ? 'bg-success/10 text-success' : step.current ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-            }`}>
-              {step.done ? <CheckCircle2 size={14} /> : <span className="h-2 w-2 rounded-full bg-current" />}
-            </span>
-            <div className="relative z-[1] mt-2 bg-card px-1">
-              <p className={`text-[10px] font-bold ${step.done || step.current ? 'text-foreground' : 'text-muted-foreground'}`}>{step.label}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
 

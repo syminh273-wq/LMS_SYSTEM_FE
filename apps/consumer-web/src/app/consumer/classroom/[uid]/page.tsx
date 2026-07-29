@@ -9,7 +9,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import type {
   Message as ChatMessage, ExamSessionInfo, QuizSummary,
-  QuizCollection, QuizCollectionDetail, QuizCollectionProgress,
+  QuizCollection, QuizCollectionDetail,
   IssuedCertificate, QuizPublicDetail,
 } from '@/lib/api/types';
 import {
@@ -291,7 +291,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     }
   }, [searchParams]);
   const [collections, setCollections] = useState<QuizCollection[]>([]);
-  const [collectionProgress, setCollectionProgress] = useState<Record<string, QuizCollectionProgress>>({});
   const [loadingCollections, setLoadingCollections] = useState(false);
   const [expandedCollectionUid, setExpandedCollectionUid] = useState<string | null>(null);
   const [collectionDetailsByUid, setCollectionDetailsByUid] = useState<Record<string, QuizCollectionDetail | undefined>>({});
@@ -456,15 +455,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         const list = await consumerQuizCollectionApi.listByClassroom(uid);
         setCollections(list);
-        const pMap: Record<string, QuizCollectionProgress> = {};
-        for (const c of list) {
-          try {
-            pMap[c.uid] = await consumerQuizCollectionApi.getProgress(c.uid, uid);
-          } catch {
-            pMap[c.uid] = { total: c.quiz_count, passed: 0, is_completed: false, percent: 0, passed_quiz_ids: [], missing_quiz_ids: [] };
-          }
-        }
-        setCollectionProgress(pMap);
       } catch {
         setCollections([]);
       } finally {
@@ -923,7 +913,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                       const isExpanded = expandedCollectionUid === c.uid;
                       const detail = collectionDetailsByUid[c.uid];
                       const isLoadingDetail = loadingCollectionDetailUid === c.uid;
-                      const p = collectionProgress[c.uid];
                       return (
                         <div
                           key={c.uid}
@@ -937,30 +926,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                             onClick={() => void handleToggleCollection(c)}
                             className="w-full text-left p-4 flex items-center gap-4 cursor-pointer hover:bg-muted/50 transition-colors"
                           >
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                              p?.is_completed ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'
-                            }`}>
-                              {p?.is_completed ? <Trophy size={22} /> : <Layers size={22} />}
+                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-primary/10 text-primary">
+                              <Layers size={22} />
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-black text-foreground text-sm truncate">{c.title}</h4>
                               {c.description && (
                                 <p className="text-xs text-muted-foreground font-medium mt-0.5 line-clamp-1">{c.description}</p>
-                              )}
-                              {p && p.total > 0 && (
-                                <div className="mt-2 flex items-center gap-2">
-                                  <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                                    <div
-                                      className={`h-full transition-all ${
-                                        p.is_completed ? 'bg-warning' : 'bg-primary'
-                                      }`}
-                                      style={{ width: `${p.percent}%` }}
-                                    />
-                                  </div>
-                                  <span className="text-[10px] font-black text-muted-foreground shrink-0">
-                                    {t('quizCollection.card_progress', undefined, { done: p.passed, total: p.total })}
-                                  </span>
-                                </div>
                               )}
                             </div>
                             {isExpanded ? <ChevronUp size={18} className="text-muted-foreground" /> : <ChevronDown size={18} className="text-muted-foreground" />}
@@ -976,7 +948,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                 <CollectionExpandedPanel
                                   classroomUid={uid}
                                   detail={detail}
-                                  progress={p ?? null}
                                 />
                               ) : null}
                             </div>
@@ -1713,11 +1684,10 @@ function formatDateTime(value: string | null) {
 }
 
 function CollectionExpandedPanel({
-  classroomUid, detail, progress,
+  classroomUid, detail,
 }: {
   classroomUid: string;
   detail: QuizCollectionDetail;
-  progress: QuizCollectionProgress | null;
 }) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -1725,18 +1695,10 @@ function CollectionExpandedPanel({
   const [certificate, setCertificate] = useState<IssuedCertificate | null>(null);
   const [loadingCert, setLoadingCert] = useState(false);
 
-  const passedSet = new Set(progress?.passed_quiz_ids ?? []);
-  const certUnlocked = !!progress?.is_completed && !!detail.certificate_id;
   const hasCertificateConfig = !!detail.certificate_id;
 
-  React.useEffect(() => {
-    if (progress?.is_completed && detail.certificate_id) {
-      setMode('certificate');
-    }
-  }, [progress?.is_completed, detail.certificate_id]);
-
   const handleSelectMode = (next: 'game' | 'certificate') => {
-    if (next === 'certificate' && !certUnlocked) return;
+    if (next === 'certificate' && !hasCertificateConfig) return;
     setMode(next);
     if (next === 'certificate' && !certificate && detail.certificate_id) {
       void loadCertificate();
@@ -1763,30 +1725,6 @@ function CollectionExpandedPanel({
         )}
       </div>
 
-      {progress && progress.total > 0 && (
-        <section className="bg-card border border-border rounded-xl p-3 space-y-1.5">
-          <div className="flex items-center justify-between">
-            <h5 className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-              {t('quizCollection.progress_label')}
-            </h5>
-            <span className="text-[11px] font-black text-foreground">
-              {t('quizCollection.progress_percent', undefined, { percent: Math.round(progress.percent) })}
-            </span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div
-              className={`h-full transition-all ${
-                progress.is_completed ? 'bg-warning' : 'bg-primary'
-              }`}
-              style={{ width: `${progress.percent}%` }}
-            />
-          </div>
-          <p className="text-[10px] text-muted-foreground text-center">
-            {t('quizCollection.card_progress', undefined, { done: progress.passed, total: progress.total })}
-          </p>
-        </section>
-      )}
-
       <div className="bg-card border border-border rounded-xl p-1 flex gap-1">
         <Button
           type="button"
@@ -1803,16 +1741,16 @@ function CollectionExpandedPanel({
         <Button
           type="button"
           onClick={() => handleSelectMode('certificate')}
-          disabled={!certUnlocked}
+          disabled={!hasCertificateConfig}
           className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all ${
             mode === 'certificate'
               ? 'bg-warning text-white shadow-sm'
-              : certUnlocked
+              : hasCertificateConfig
               ? 'text-muted-foreground hover:bg-muted'
               : 'text-muted-foreground/60 cursor-not-allowed'
           }`}
         >
-          {certUnlocked ? <Award size={12} /> : <Lock size={10} />}
+          {hasCertificateConfig ? <Award size={12} /> : <Lock size={10} />}
           {t('quizCollection.mode_certificate')}
         </Button>
       </div>
@@ -1827,14 +1765,12 @@ function CollectionExpandedPanel({
           ) : (
             <div className="space-y-2">
               {detail.items.map((item, idx) => {
-                const passed = passedSet.has(item.quiz_id);
                 return (
                   <MissionAccordion
                     key={item.quiz_id}
                     classroomUid={classroomUid}
                     quizId={item.quiz_id}
                     index={idx + 1}
-                    passed={passed}
                     onStart={() => router.push(`/consumer/classroom/${classroomUid}/quiz/${item.quiz_id}`)}
                   />
                 );
@@ -1898,12 +1834,11 @@ function CollectionExpandedPanel({
 }
 
 function MissionAccordion({
-  classroomUid, quizId, index, passed, onStart,
+  classroomUid, quizId, index, onStart,
 }: {
   classroomUid: string;
   quizId: string;
   index: number;
-  passed: boolean;
   onStart: () => void;
 }) {
   const { t } = useTranslation();
@@ -1911,14 +1846,10 @@ function MissionAccordion({
   const [detail, setDetail] = useState<QuizPublicDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'not_started' | 'in_progress' | 'passed'>(
-    passed ? 'passed' : 'not_started'
+    'not_started'
   );
 
   React.useEffect(() => {
-    if (passed) {
-      setStatus('passed');
-      return;
-    }
     let cancelled = false;
     const load = async () => {
       try {
@@ -1935,7 +1866,7 @@ function MissionAccordion({
     };
     void load();
     return () => { cancelled = true; };
-  }, [quizId, classroomUid, passed]);
+  }, [quizId, classroomUid]);
 
   const handleToggle = async () => {
     if (status === 'not_started') return;

@@ -2,7 +2,6 @@ import BaseRestApiClient from './client';
 import type {
   QuizCollection,
   QuizCollectionDetail,
-  QuizCollectionProgress,
   IssuedCertificate,
 } from './types';
 
@@ -17,12 +16,6 @@ class ConsumerQuizCollectionApiClient extends BaseRestApiClient {
   public async retrieve(uid: string, classroomId: string): Promise<QuizCollectionDetail> {
     return this.get<QuizCollectionDetail>(
       `/api/v1/consumer/quiz-collection/${uid}/?classroom_id=${encodeURIComponent(classroomId)}`
-    );
-  }
-
-  public async getProgress(uid: string, classroomId: string): Promise<QuizCollectionProgress> {
-    return this.get<QuizCollectionProgress>(
-      `/api/v1/consumer/quiz-collection/${uid}/progress/?classroom_id=${encodeURIComponent(classroomId)}`
     );
   }
 
