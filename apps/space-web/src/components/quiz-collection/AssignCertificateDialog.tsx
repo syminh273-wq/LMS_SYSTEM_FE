@@ -39,7 +39,7 @@ export function AssignCertificateDialog({ open, onOpenChange, certificates, curr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('quizCollection.certificate_modal.title')}</DialogTitle>
         </DialogHeader>
@@ -59,6 +59,7 @@ export function AssignCertificateDialog({ open, onOpenChange, certificates, curr
             {certificates.map(c => (
               <Button
                 key={c.uid}
+                variant="ghost"
                 onClick={() => setSelected(c.uid === selected ? null : c.uid)}
                 className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                   c.uid === selected ? 'bg-primary-brand/10 border border-primary-brand/30' : 'hover:bg-muted/50 border border-transparent'

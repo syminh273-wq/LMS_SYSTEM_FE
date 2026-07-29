@@ -90,18 +90,20 @@ export function MessageInput({ onSend, disabled }: Props) {
           <img src={previewUrl} alt="preview" className="h-20 w-20 object-cover rounded-lg border border-border" />
           <Button
             onClick={() => { if (previewUrl) URL.revokeObjectURL(previewUrl); setPreviewUrl(null); setPendingFile(null); }}
-            className="absolute -top-2 -right-2 w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center hover:bg-slate-700"
+            variant="ghost"
+            size="icon"
+            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-foreground text-background"
           >
             <X size={12} />
           </Button>
         </div>
       )}
-      <div className="flex items-center gap-2 bg-muted/40 p-2 rounded-2xl border border-border focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all">
+      <div className="flex items-center gap-2 bg-muted/40 p-2 rounded-2xl border border-border focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all">
         <Input id="dm-file" type="file" accept="image/*" className="hidden" onChange={handleFile} />
         <Button
           variant="ghost" size="icon"
           onClick={() => document.getElementById('dm-file')?.click()}
-          className="h-9 w-9 text-muted-foreground hover:text-indigo-600"
+          className="h-9 w-9 text-muted-foreground"
         >
           <ImageIcon size={18} />
         </Button>
@@ -122,19 +124,21 @@ export function MessageInput({ onSend, disabled }: Props) {
           <Button
             variant="ghost" size="icon"
             onClick={() => setShowEmoji(!showEmoji)}
-            className="h-9 w-9 text-muted-foreground hover:text-amber-500"
+            className="h-9 w-9 text-muted-foreground"
           >
             <Smile size={18} />
           </Button>
           {showEmoji && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowEmoji(false)} />
-              <div className="absolute bottom-12 right-0 z-20 w-72 max-h-64 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-2xl p-2 grid grid-cols-10 gap-1">
+              <div className="absolute bottom-12 right-0 z-20 w-72 max-h-64 overflow-y-auto bg-popover border border-border rounded-xl shadow-2xl p-2 grid grid-cols-10 gap-1">
                 {EMOJIS.map((e, i) => (
                   <Button
                     key={i}
+                    variant="ghost"
+                    size="icon"
                     onClick={() => { handleEmoji(e); setShowEmoji(false); }}
-                    className="text-xl hover:bg-slate-100 rounded p-1"
+                    className="text-xl p-1"
                   >
                     {e}
                   </Button>
@@ -146,7 +150,7 @@ export function MessageInput({ onSend, disabled }: Props) {
         <Button
           onClick={handleSend}
           disabled={(!text.trim() && !pendingFile) || disabled || uploading}
-          className="h-9 w-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl"
+          className="h-9 w-9 rounded-xl"
         >
           {uploading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
         </Button>

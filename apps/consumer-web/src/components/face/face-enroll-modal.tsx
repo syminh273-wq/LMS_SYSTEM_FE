@@ -84,13 +84,13 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4">
-      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+      <div className="w-full max-w-md overflow-hidden rounded-3xl bg-card shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h2 className="text-base font-black text-slate-900">Đăng ký khuôn mặt</h2>
-            <p className="text-xs font-medium text-slate-500">Nhìn thẳng vào camera rồi nhấn chụp</p>
+            <h2 className="text-base font-black text-foreground">Đăng ký khuôn mặt</h2>
+            <p className="text-xs font-medium text-muted-foreground">Nhìn thẳng vào camera rồi nhấn chụp</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full">
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <X size={18} />
           </Button>
         </div>
@@ -114,7 +114,7 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
 
               {status === 'success' && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-emerald-950/70">
-                  <CheckCircle2 size={48} className="text-emerald-400" />
+                  <CheckCircle2 size={48} className="text-success" />
                   <p className="text-sm font-black text-white">Đăng ký thành công!</p>
                 </div>
               )}
@@ -122,14 +122,14 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
 
             <div className="space-y-3 p-5">
               {errorMsg && (
-                <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-600">
+                <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
                   {errorMsg}
                 </div>
               )}
               <Button
                 onClick={() => void handleCapture()}
                 disabled={status !== 'ready'}
-                className="h-12 w-full rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-700 disabled:bg-slate-300"
+                className="h-12 w-full"
               >
                 {status === 'capturing' ? (
                   <><Loader2 size={16} className="mr-2 animate-spin" />Đang xử lý...</>
@@ -137,7 +137,7 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
                   <><Camera size={16} className="mr-2" />Chụp và đăng ký</>
                 )}
               </Button>
-              <p className="text-center text-xs font-medium text-slate-400">
+              <p className="text-center text-xs font-medium text-muted-foreground">
                 Đảm bảo khuôn mặt nằm trong khung và đủ ánh sáng
               </p>
             </div>

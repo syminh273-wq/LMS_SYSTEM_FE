@@ -75,7 +75,7 @@ export default function CloseScheduleDialog({ quizUid, assignment, onClose, onUp
           <div className="flex items-center gap-2">
             {isClosed
               ? <Unlock size={20} className="text-emerald-500" />
-              : <Lock size={20} className="text-rose-500" />}
+              : <Lock size={20} className="text-destructive" />}
             <h2 className="font-black text-foreground">
               {isClosed ? 'Mở lại bài quiz' : 'Đóng bài quiz'}
             </h2>
@@ -87,7 +87,7 @@ export default function CloseScheduleDialog({ quizUid, assignment, onClose, onUp
 
         <div className="p-6 space-y-5">
           {isClosed && (
-            <div className="flex items-start gap-2 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700">
+            <div className="flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
               <AlertCircle size={14} className="mt-0.5 shrink-0" />
               <span>Bài quiz hiện đang đóng. Học sinh không thể nộp bài và không xem được bảng vàng.</span>
             </div>
@@ -138,7 +138,8 @@ export default function CloseScheduleDialog({ quizUid, assignment, onClose, onUp
             <Button
               onClick={() => void handleClose()}
               disabled={busy}
-              className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs h-11 gap-2"
+              variant="destructive"
+              className="flex-1 rounded-xl font-bold text-xs h-11 gap-2"
             >
               {busy ? <Loader2 size={14} className="animate-spin" /> : <Lock size={14} />}
               ĐÓNG QUIZ

@@ -96,24 +96,24 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
   }, [uid, router, t]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <Button
           variant="ghost"
           onClick={() => router.push(`/consumer/classroom/${uid}`)}
-          className="mb-4 rounded-xl gap-2"
+          className="mb-4 gap-2"
         >
           <ArrowLeft size={16} /> Quay lại lớp học
         </Button>
 
-        <Card className="border-border">
-          <CardContent className="p-8 text-center space-y-5">
+        <Card>
+          <CardContent className="text-center space-y-5">
             {classroom && (
               <div className="space-y-1">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Lớp học</div>
                 <div className="text-lg font-black text-foreground">{classroom.name}</div>
                 {classroom.price_vnd ? (
-                  <div className="text-sm font-bold text-amber-600">
+                  <div className="text-sm font-bold text-warning">
                     {(classroom.price_vnd).toLocaleString('vi-VN')}đ
                   </div>
                 ) : null}
@@ -122,14 +122,14 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
 
             {status === 'initiating' && (
               <>
-                <Loader2 size={48} className="mx-auto text-indigo-600 animate-spin" />
+                <Loader2 size={48} className="mx-auto text-primary animate-spin" />
                 <h2 className="text-xl font-bold">Đang khởi tạo thanh toán...</h2>
               </>
             )}
 
             {status === 'redirecting' && (
               <>
-                <Loader2 size={48} className="mx-auto text-indigo-600 animate-spin" />
+                <Loader2 size={48} className="mx-auto text-primary animate-spin" />
                 <h2 className="text-xl font-bold">Đang chuyển đến MoMo...</h2>
               </>
             )}
@@ -137,8 +137,8 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
             {status === 'processing' && (
               <>
                 <div className="relative mx-auto w-20 h-20">
-                  <Clock size={64} className="text-indigo-600 mx-auto" />
-                  <Loader2 size={20} className="absolute inset-0 m-auto animate-spin text-indigo-400" />
+                  <Clock size={64} className="text-primary mx-auto" />
+                  <Loader2 size={20} className="absolute inset-0 m-auto animate-spin text-primary" />
                 </div>
                 <h2 className="text-xl font-bold">Đang xác nhận thanh toán...</h2>
               </>
@@ -146,32 +146,31 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
 
             {status === 'success' && (
               <>
-                <CheckCircle2 size={64} className="mx-auto text-emerald-500" />
+                <CheckCircle2 size={64} className="mx-auto text-success" />
                 <h2 className="text-xl font-bold">Thanh toán thành công!</h2>
-                <p className="text-slate-500 text-sm">Đang mở khóa nội dung lớp học...</p>
+                <p className="text-muted-foreground text-sm">Đang mở khóa nội dung lớp học...</p>
               </>
             )}
 
             {status === 'failed' && (
               <>
-                <XCircle size={64} className="mx-auto text-rose-500" />
+                <XCircle size={64} className="mx-auto text-destructive" />
                 <h2 className="text-xl font-bold">Thanh toán thất bại</h2>
-                <p className="text-slate-500 text-sm">{errorMsg}</p>
+                <p className="text-muted-foreground text-sm">{errorMsg}</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
+                    variant="destructive"
                     onClick={() => {
                       startedRef.current = false;
                       setStatus('initiating');
                       setErrorMsg('');
                     }}
-                    className="bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold"
                   >
                     Thử lại
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => router.push(`/consumer/classroom/${uid}`)}
-                    className="rounded-xl"
                   >
                     Hủy
                   </Button>
@@ -181,14 +180,13 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
 
             {status === 'timeout' && (
               <>
-                <AlertTriangle size={64} className="mx-auto text-amber-500" />
+                <AlertTriangle size={64} className="mx-auto text-warning" />
                 <h2 className="text-xl font-bold">Đang xử lý</h2>
-                <p className="text-slate-500 text-sm">Vui lòng quay lại lớp học sau vài phút để kiểm tra.</p>
+                <p className="text-muted-foreground text-sm">Vui lòng quay lại lớp học sau vài phút để kiểm tra.</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
                     onClick={() => router.push(`/consumer/classroom/${uid}`)}
                     variant="outline"
-                    className="rounded-xl"
                   >
                     Quay lại lớp học
                   </Button>

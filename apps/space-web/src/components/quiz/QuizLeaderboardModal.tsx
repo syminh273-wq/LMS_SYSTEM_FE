@@ -27,7 +27,7 @@ function fmtTime(iso: string | null): string {
 
 function rankBadge(rank: number) {
   if (rank === 1) return <Crown size={18} className="text-amber-500" />;
-  if (rank === 2) return <Medal size={18} className="text-slate-400" />;
+  if (rank === 2) return <Medal size={18} className="text-muted-foreground" />;
   if (rank === 3) return <Award size={18} className="text-orange-600" />;
   return <span className="text-xs font-black text-muted-foreground">#{rank}</span>;
 }
@@ -49,7 +49,7 @@ function rankRing(rank: number) {
 function scoreColor(p: number) {
   if (p >= 80) return 'text-emerald-600';
   if (p >= 50) return 'text-amber-600';
-  return 'text-rose-600';
+  return 'text-destructive';
 }
 
 function avatarFor(name: string, avatarUrl: string | undefined, size: 'sm' | 'lg' = 'sm') {
@@ -145,8 +145,8 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
             </div>
           ) : error ? (
             <div className="flex-1 flex flex-col items-center justify-center py-20 gap-3 text-center px-8">
-              <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center">
-                <X size={28} className="text-rose-500" />
+              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                <X size={28} className="text-destructive" />
               </div>
               <p className="text-sm font-bold text-foreground">{error}</p>
             </div>
@@ -239,7 +239,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <Medal size={16} className="text-slate-400" />
+                      <Medal size={16} className="text-muted-foreground" />
                       <h3 className="text-sm font-black uppercase tracking-widest text-foreground">Bảng đầy đủ</h3>
                     </div>
                     <span className="text-[10px] font-bold text-muted-foreground">Bấm CHI TIẾT để xem các lượt làm</span>

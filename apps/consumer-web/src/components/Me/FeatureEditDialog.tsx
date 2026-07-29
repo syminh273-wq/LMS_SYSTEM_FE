@@ -29,8 +29,7 @@ type FormState = {
   image: string;
 };
 
-const inputCls =
-  'w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none';
+const inputCls = 'w-full';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
@@ -141,15 +140,15 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-lg p-0 gap-0">
-        <DialogHeader className="px-5 py-4 border-b border-slate-100">
-          <DialogTitle className="text-base font-bold text-slate-900">
+        <DialogHeader className="px-5 py-4 border-b border-border">
+          <DialogTitle className="text-base font-bold text-foreground">
             {initial ? 'Chỉnh sửa feature' : 'Thêm feature'}
           </DialogTitle>
         </DialogHeader>
 
         <div className="p-5 space-y-3">
           <div>
-            <Label className="text-xs font-bold text-slate-700 mb-1 block">Tiêu đề</Label>
+            <Label className="text-xs font-bold text-foreground mb-1 block">Tiêu đề</Label>
             <Input
               type="text"
               value={form.title}
@@ -161,8 +160,8 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <Label className="text-xs font-bold text-slate-700 mb-1 block">
-              Mô tả <span className="text-slate-400 font-normal">(tuỳ chọn)</span>
+            <Label className="text-xs font-bold text-foreground mb-1 block">
+              Mô tả <span className="text-muted-foreground font-normal">(tuỳ chọn)</span>
             </Label>
             <Textarea
               value={form.description}
@@ -175,8 +174,8 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <Label className="text-xs font-bold text-slate-700 mb-1 block">
-              Link <span className="text-slate-400 font-normal">(tuỳ chọn)</span>
+            <Label className="text-xs font-bold text-foreground mb-1 block">
+              Link <span className="text-muted-foreground font-normal">(tuỳ chọn)</span>
             </Label>
             <Input
               type="url"
@@ -188,8 +187,8 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <Label className="text-xs font-bold text-slate-700 mb-1 block">
-              File <span className="text-slate-400 font-normal">(tuỳ chọn, ảnh/PDF ≤ 10MB, sẽ upload cùng lúc khi lưu)</span>
+            <Label className="text-xs font-bold text-foreground mb-1 block">
+              File <span className="text-muted-foreground font-normal">(tuỳ chọn, ảnh/PDF ≤ 10MB, sẽ upload cùng lúc khi lưu)</span>
             </Label>
             <Input
               ref={fileRef}
@@ -220,7 +219,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
                   size="icon"
                   onClick={clearImage}
                   disabled={saving}
-                  className="shrink-0 h-9 w-9 text-slate-400 hover:text-red-600"
+                  className="shrink-0 h-9 w-9 text-muted-foreground hover:text-destructive"
                   title="Xoá file"
                 >
                   <X className="size-4" />
@@ -228,7 +227,7 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
               )}
             </div>
             {form.image ? (
-              <div className="mt-2 relative aspect-[16/9] w-full overflow-hidden rounded-md border border-slate-200 bg-slate-50">
+              <div className="mt-2 relative aspect-[16/9] w-full overflow-hidden rounded-md border border-border bg-muted">
                 {showImagePreview ? (
                   <img
                     src={form.image}
@@ -247,14 +246,14 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
                 ) : existingFileMeta?.type === 'application/pdf' && form.image ? (
                   <PdfThumbnail url={form.image} title={form.title} />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 gap-1">
-                    <FileText className="size-10 text-slate-400" />
+                  <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-1">
+                    <FileText className="size-10 text-muted-foreground" />
                     <p className="text-xs font-semibold truncate max-w-[90%]">{fileName}</p>
                     <a
                       href={form.image}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-[10px] text-indigo-600 hover:underline"
+                      className="text-[10px] text-primary hover:underline"
                       onClick={(e) => e.stopPropagation()}
                     >
                       Mở file
@@ -262,24 +261,24 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
                   </div>
                 )}
                 {pendingFile && showImagePreview && (
-                  <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold rounded bg-amber-100 text-amber-700 border border-amber-200">
+                  <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold rounded bg-warning/10 text-warning border border-warning/30">
                     Chưa upload
                   </span>
                 )}
               </div>
             ) : (
-              <div className="mt-2 aspect-[16/9] w-full rounded-md border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300">
+              <div className="mt-2 aspect-[16/9] w-full rounded-md border border-dashed border-border bg-muted flex items-center justify-center text-muted-foreground">
                 <ImageIcon className="size-10" />
               </div>
             )}
           </div>
 
-          <p className="text-[11px] text-slate-400 pt-1">
+          <p className="text-[11px] text-muted-foreground pt-1">
             Cần ít nhất <strong>tiêu đề</strong> và <strong>link</strong> hoặc <strong>file</strong>.
           </p>
         </div>
 
-        <div className="px-5 py-3 border-t border-slate-100 flex justify-end gap-2">
+        <div className="px-5 py-3 border-t border-border flex justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={onClose} disabled={saving}>
             Huỷ
           </Button>
@@ -287,7 +286,6 @@ export function FeatureEditDialog({ initial, onClose, onSaved }: Props) {
             size="sm"
             onClick={handleSave}
             disabled={!isValid || saving}
-            className="bg-indigo-600 hover:bg-indigo-700"
           >
             {saving && <Loader2 className="size-3.5 animate-spin" />}
             {initial ? 'Lưu' : 'Thêm'}

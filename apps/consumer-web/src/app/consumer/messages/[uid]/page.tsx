@@ -128,23 +128,25 @@ export default function DirectChatPage() {
   return (
     <WorkspaceShell>
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col h-[calc(100vh-160px)]">
-          <div className="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
+        <div className="bg-card border border-border rounded-2xl shadow-sm flex flex-col h-[calc(100vh-160px)]">
+          <div className="px-4 py-3 border-b border-border flex items-center gap-3">
             <Button
+              variant="ghost"
+              size="icon"
               onClick={() => router.push('/consumer/messages')}
-              className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"
+              className="w-8 h-8 flex items-center justify-center"
             >
               <ArrowLeft size={18} />
             </Button>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[14px] text-slate-900 truncate">
+              <p className="font-semibold text-[14px] text-foreground truncate">
                 {conv?.other_user.name || 'Đang tải...'}
               </p>
             </div>
           </div>
 
           {loading ? (
-            <div className="flex-1 flex items-center justify-center text-slate-500 text-sm">
+            <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
               Đang tải cuộc trò chuyện...
             </div>
           ) : (

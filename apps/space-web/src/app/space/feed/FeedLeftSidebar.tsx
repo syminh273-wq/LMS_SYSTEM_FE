@@ -1,8 +1,9 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@shared/components/ui/button';
-import { useRouter, usePathname } from 'next/navigation';
 import {
   User as UserIcon,
   Newspaper,
@@ -31,7 +32,6 @@ type NavItem = {
 };
 
 export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Profile; followingCount?: number }) {
-  const router = useRouter();
   const pathname = usePathname();
   const initials = (profile.full_name || '?').slice(0, 2).toUpperCase();
 
@@ -74,29 +74,34 @@ export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Prof
             return (
               <li key={path}>
                 <Button
-                  onClick={() => router.push(path)}
-                  className={cn(
-                    'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-[13.5px] font-medium transition-colors',
-                    active
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                  )}
+                  asChild
+                  variant="ghost"
+                  data-active={active}
+                  className="w-full justify-start gap-3 px-3 py-2.5 h-auto rounded-lg text-[13.5px] font-medium text-muted-foreground data-[active=true]:text-foreground data-[active=true]:font-semibold"
                 >
-                  <span className={cn(
-                    'w-8 h-8 rounded-lg flex items-center justify-center shrink-0',
-                    active ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'
-                  )}>
-                    <Icon size={15} />
-                  </span>
-                  <span className="truncate flex-1">{label}</span>
-                  {typeof badge === 'number' && badge > 0 && (
-                    <span className={cn(
-                      'shrink-0 text-[11px] font-bold px-1.5 py-0.5 rounded-md min-w-[22px] text-center',
-                      active ? 'bg-white text-indigo-600' : 'bg-slate-100 text-slate-600'
-                    )}>
-                      {badge > 999 ? '999+' : badge}
+                  <Link href={path} aria-current={active ? 'page' : undefined}>
+                    <span
+                      data-active={active}
+                      className={cn(
+                        'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground',
+                        'data-[active=true]:text-foreground data-[active=true]:font-semibold',
+                      )}
+                    >
+                      <Icon size={15} />
                     </span>
-                  )}
+                    <span className="flex-1 truncate text-left">{label}</span>
+                    {typeof badge === 'number' && badge > 0 && (
+                      <span
+                        data-active={active}
+                        className={cn(
+                          'shrink-0 rounded-md bg-card px-1.5 py-0.5 text-[11px] font-bold text-foreground min-w-[22px] text-center border border-border',
+                          'data-[active=true]:text-foreground data-[active=true]:font-semibold',
+                        )}
+                      >
+                        {badge > 999 ? '999+' : badge}
+                      </span>
+                    )}
+                  </Link>
                 </Button>
               </li>
             );
@@ -105,11 +110,14 @@ export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Prof
       </nav>
 
       <Button
-        onClick={() => router.push('/space/me')}
-        className="w-full inline-flex items-center justify-center gap-2 h-11 bg-white border border-slate-200 rounded-xl text-[13.5px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors card-elevated"
+        asChild
+        variant="outline"
+        className="w-full h-11 gap-2 rounded-xl text-[13.5px] font-semibold card-elevated"
       >
-        <PenLine size={14} />
-        Chỉnh sửa hồ sơ
+        <Link href="/space/me">
+          <PenLine size={14} />
+          Chỉnh sửa hồ sơ
+        </Link>
       </Button>
     </aside>
   );

@@ -119,20 +119,20 @@ export default function ConsumerLeaveRequestsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold mb-2">
             <ClipboardList size={11} />
             {t('leave_request.page.title_student')}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
             {t('leave_request.page.title_student')}
           </h1>
-          <p className="text-slate-600 text-[14px] mt-1">
+          <p className="text-muted-foreground text-[14px] mt-1">
             {t('leave_request.page.subtitle_student')}
           </p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="h-10 px-3.5 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 gap-1.5"
+          className="h-10 gap-1.5"
         >
           <Plus size={15} strokeWidth={2.5} />
           {t('leave_request.page.new_request')}
@@ -147,18 +147,14 @@ export default function ConsumerLeaveRequestsPage() {
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
-        <Filter size={14} className="text-slate-400" />
+        <Filter size={14} className="text-muted-foreground" />
         {FILTERS.map((f) => (
           <Button
             key={f.key}
             type="button"
+            variant={filter === f.key ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setFilter(f.key)}
-            className={cn(
-              'h-8 px-3 rounded-lg text-[12px] font-semibold border transition-colors',
-              filter === f.key
-                ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-            )}
           >
             {t(f.labelKey, f.key)}
           </Button>
@@ -195,10 +191,10 @@ function StatCard({
   tone: 'slate' | 'amber' | 'emerald' | 'rose';
 }) {
   const TONES: Record<typeof tone, string> = {
-    slate: 'bg-slate-50 text-slate-700 border-slate-200',
-    amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    emerald: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    rose: 'bg-rose-50 text-rose-700 border-rose-200',
+    slate: 'bg-muted text-foreground border-border',
+    amber: 'bg-warning/10 text-warning border-warning/30',
+    emerald: 'bg-success/10 text-success border-success/30',
+    rose: 'bg-destructive/10 text-destructive border-destructive/30',
   };
   return (
     <div className={cn('rounded-xl border p-3', TONES[tone])}>

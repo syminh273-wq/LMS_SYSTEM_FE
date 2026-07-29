@@ -81,7 +81,7 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
   return (
     <section className="space-y-3">
       {composerOpen && (
-        <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <div className="bg-card rounded-lg border border-border p-6">
           <CreatePost
             profile={{ full_name: profile.full_name, avatar_url: profile.avatar_url }}
             onCreated={handleCreated}
@@ -93,8 +93,9 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
         <div className="flex items-center justify-end">
           <Button
             type="button"
+            variant="outline"
             onClick={() => setComposerOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+            className="gap-1.5 px-4 h-10 rounded-full text-[13px] font-semibold"
           >
             <Plus className="size-4" />
             Tạo bài đăng
@@ -104,16 +105,16 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <Loader2 size={24} className="animate-spin text-indigo-600" />
-          <p className="text-[12.5px] text-slate-500">Đang tải bài đăng...</p>
+          <Loader2 size={24} className="animate-spin text-primary" />
+          <p className="text-[12.5px] text-muted-foreground">Đang tải bài đăng...</p>
         </div>
       ) : posts.length === 0 ? (
-        <div className="text-center py-12 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white flex items-center justify-center">
-            <Sparkles size={24} className="text-slate-400" />
+        <div className="text-center py-12 bg-muted border border-dashed border-border rounded-xl">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-background flex items-center justify-center">
+            <Sparkles size={24} className="text-muted-foreground" />
           </div>
-          <p className="font-semibold text-slate-900 text-[14px]">Chưa có bài đăng nào</p>
-          <p className="text-[12.5px] text-slate-500 mt-1">Nhấn "Tạo bài đăng" để chia sẻ bài đăng đầu tiên.</p>
+          <p className="font-semibold text-foreground text-[14px]">Chưa có bài đăng nào</p>
+          <p className="text-[12.5px] text-muted-foreground mt-1">Nhấn "Tạo bài đăng" để chia sẻ bài đăng đầu tiên.</p>
         </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
@@ -135,9 +136,10 @@ export function MyPostsSection({ profile, onCountChange }: Props) {
             <div className="flex justify-center pt-2">
               <Button
                 type="button"
+                variant="outline"
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="inline-flex items-center gap-1.5 px-5 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-60"
+                className="gap-1.5 px-5 h-10 rounded-full text-[13px] font-semibold"
               >
                 {loadingMore ? <Loader2 size={14} className="animate-spin" /> : null}
                 Xem thêm

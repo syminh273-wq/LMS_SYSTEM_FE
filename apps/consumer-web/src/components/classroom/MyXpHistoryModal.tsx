@@ -62,7 +62,7 @@ export function MyXpHistoryModal({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <HistoryIcon className="h-5 w-5 text-indigo-500" />
+            <HistoryIcon className="h-5 w-5 text-primary" />
             {t('ranking.history_title', 'Lịch sử XP của tôi')}
           </DialogTitle>
           <DialogDescription>
@@ -78,7 +78,7 @@ export function MyXpHistoryModal({
         <div className="-mx-4 max-h-[60vh] overflow-y-auto px-4">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 size={28} className="animate-spin text-indigo-400" />
+              <Loader2 size={28} className="animate-spin text-primary" />
             </div>
           ) : (
             <XpHistoryList transactions={items} t={t} />

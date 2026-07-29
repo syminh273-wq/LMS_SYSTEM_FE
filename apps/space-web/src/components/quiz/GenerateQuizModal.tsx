@@ -167,11 +167,8 @@ export default function GenerateQuizModal({ onClose }: { onClose: () => void }) 
                   type="button"
                   onClick={() => setMode(key)}
                   disabled={submitting}
-                  className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
-                    mode === key
-                      ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20'
-                      : 'bg-muted text-muted-foreground hover:text-foreground'
-                  } disabled:opacity-60`}
+                  data-selected={mode === key}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-black bg-muted text-muted-foreground data-[selected=true]:border-2 data-[selected=true]:border-primary data-[selected=true]:text-primary disabled:opacity-60"
                 >
                   {label}
                 </Button>

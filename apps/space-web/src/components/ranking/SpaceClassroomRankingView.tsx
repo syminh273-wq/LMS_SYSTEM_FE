@@ -36,7 +36,7 @@ function rankBadge(rank: number) {
     );
   }
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600">
+    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground">
       {rank}
     </div>
   );
@@ -91,7 +91,7 @@ export default function SpaceClassroomRankingView({
   if (error) {
     return (
       <Card>
-        <CardContent className="p-10 text-center text-sm text-slate-500">
+        <CardContent className="p-10 text-center text-sm text-muted-foreground">
           {error}
         </CardContent>
       </Card>
@@ -101,12 +101,12 @@ export default function SpaceClassroomRankingView({
   if (!data || data.entries.length === 0) {
     return (
       <Card>
-        <CardContent className="flex flex-col items-center justify-center gap-3 p-12 text-center text-slate-500">
-          <Trophy className="h-10 w-10 text-slate-300" />
+        <CardContent className="flex flex-col items-center justify-center gap-3 p-12 text-center text-muted-foreground">
+          <Trophy className="h-10 w-10 text-muted-foreground/40" />
           <p className="text-sm font-bold">
             {t('ranking.no_data', 'No ranking data yet.')}
           </p>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             {t(
               'ranking.no_data_hint',
               'Students will appear here once they earn XP from classroom activities.',
@@ -157,7 +157,7 @@ export default function SpaceClassroomRankingView({
           <CardContent className="p-6">
             <div className="mb-4 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-500" />
-              <h3 className="text-sm font-black uppercase tracking-wider text-slate-700">
+              <h3 className="text-sm font-black uppercase tracking-wider text-foreground">
                 {t('ranking.top3', 'Top 3')}
               </h3>
             </div>
@@ -186,23 +186,23 @@ export default function SpaceClassroomRankingView({
       {/* Full ranking list */}
       <Card>
         <CardContent className="p-0">
-          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-indigo-500" />
-              <h3 className="text-sm font-black uppercase tracking-wider text-slate-700">
+              <Trophy className="h-4 w-4 text-primary-brand" />
+              <h3 className="text-sm font-black uppercase tracking-wider text-foreground">
                 {t('ranking.full_list', 'Full ranking')}
               </h3>
             </div>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-muted-foreground">
               {t('ranking.entries_count', '{{count}} students', { count: data.entries.length })}
             </span>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {data.entries.map((entry) => (
               <li
                 key={entry.student_id}
                 onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${entry.student_id}`)}
-                className="flex cursor-pointer items-center gap-3 px-5 py-3 transition hover:bg-slate-50"
+                className="flex cursor-pointer items-center gap-3 px-5 py-3 transition hover:bg-muted"
               >
                 {rankBadge(entry.rank)}
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-black text-white">
@@ -219,31 +219,31 @@ export default function SpaceClassroomRankingView({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-bold text-slate-900">
+                    <p className="truncate text-sm font-bold text-foreground">
                       {entry.student_name}
                     </p>
                     {entry.level_title && (
-                      <span className="shrink-0 rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">
+                      <span className="shrink-0 rounded-full bg-primary-brand/10 px-2 py-0.5 text-[10px] font-bold text-primary-brand">
                         {entry.level_title}
                       </span>
                     )}
                   </div>
-                  <p className="truncate text-xs text-slate-500">
+                  <p className="truncate text-xs text-muted-foreground">
                     {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
                   </p>
                   {entry.explanation && (
-                    <p className="truncate text-[10px] text-slate-400">
+                    <p className="truncate text-[10px] text-muted-foreground">
                       {entry.explanation}
                     </p>
                   )}
                 </div>
-                <div className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-700">
+                <div className="rounded-full bg-primary-brand/10 px-2.5 py-0.5 text-xs font-bold text-primary-brand">
                   Lv {entry.level}
                 </div>
               </li>
             ))}
             {rest.length === 0 && top3.length === data.entries.length && (
-              <li className="px-5 py-6 text-center text-xs text-slate-400">
+              <li className="px-5 py-6 text-center text-xs text-muted-foreground">
                 {t('ranking.only_top3', 'Only top 3 students have earned XP so far.')}
               </li>
             )}
@@ -256,7 +256,7 @@ export default function SpaceClassroomRankingView({
           variant="ghost"
           size="sm"
           onClick={() => setRefreshKey((k) => k + 1)}
-          className="text-xs text-slate-500"
+          className="text-muted-foreground"
         >
           {t('common.refresh', 'Refresh')}
         </Button>
@@ -291,11 +291,11 @@ function StatCard({
             <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               {label}
             </p>
-            <p className="truncate text-lg font-black text-slate-900">{value}</p>
-            {sub && <p className="text-[10px] text-slate-400">{sub}</p>}
+            <p className="truncate text-lg font-black text-foreground">{value}</p>
+            {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
           </div>
         </div>
       </CardContent>
@@ -321,7 +321,7 @@ function PodiumCell({
       className="group flex flex-col items-center justify-end gap-2 text-center"
     >
       <div className="flex flex-col items-center gap-1">
-        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-xs font-black text-slate-600 ring-2 ring-white">
+        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-muted text-xs font-black text-muted-foreground ring-2 ring-white">
           {entry.student_avatar ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={entry.student_avatar} alt={entry.student_name} className="h-full w-full object-cover" />
@@ -329,15 +329,15 @@ function PodiumCell({
             initials(entry.student_name)
           )}
         </div>
-        <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-slate-800 group-hover:text-indigo-600">
+        <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-foreground group-hover:text-primary-brand">
           {entry.student_name}
         </p>
         {entry.level_title && (
-          <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-bold text-indigo-700">
+          <span className="rounded-full bg-primary-brand/10 px-2 py-0.5 text-[9px] font-bold text-primary-brand">
             {entry.level_title}
           </span>
         )}
-        <p className="text-[10px] text-slate-500">
+        <p className="text-[10px] text-muted-foreground">
           {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
         </p>
       </div>

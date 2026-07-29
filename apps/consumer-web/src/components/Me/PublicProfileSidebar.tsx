@@ -24,36 +24,36 @@ export function PublicProfileSidebar({
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-      <div className="bg-white border border-slate-200 rounded-xl p-5 card-elevated">
+      <div className="bg-card border border-border rounded-xl p-5 card-elevated">
         <div className="flex items-center gap-2 mb-4">
-          <BarChart3 size={13} className="text-slate-400" />
-          <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-wider">
+          <BarChart3 size={13} className="text-muted-foreground" />
+          <h3 className="text-[11px] font-black text-muted-foreground uppercase tracking-wider">
             {t('portfolio.me.stats_title')}
           </h3>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
-          <div className="text-center px-1 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
-            <div className="text-base font-black text-slate-900 tabular-nums">
+          <div className="text-center px-1 py-2.5 rounded-lg bg-muted border border-border">
+            <div className="text-base font-black text-foreground tabular-nums">
               {formatCount(followersCount)}
             </div>
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mt-0.5">
               {t('portfolio.me.followers')}
             </div>
           </div>
-          <div className="text-center px-1 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
-            <div className="text-base font-black text-slate-900 tabular-nums">
+          <div className="text-center px-1 py-2.5 rounded-lg bg-muted border border-border">
+            <div className="text-base font-black text-foreground tabular-nums">
               {formatCount(followingCount)}
             </div>
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mt-0.5">
               {t('portfolio.me.following_count')}
             </div>
           </div>
-          <div className="text-center px-1 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
-            <div className="text-base font-black text-slate-900 tabular-nums">
+          <div className="text-center px-1 py-2.5 rounded-lg bg-muted border border-border">
+            <div className="text-base font-black text-foreground tabular-nums">
               {formatCount(postsCount)}
             </div>
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mt-0.5">
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mt-0.5">
               {t('portfolio.me.posts')}
             </div>
           </div>

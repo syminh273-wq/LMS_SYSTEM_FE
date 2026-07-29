@@ -86,7 +86,7 @@ export default function MePage() {
     return (
       <WorkspaceShell>
         <div className="flex items-center justify-center py-32">
-          <Loader2 className="size-10 text-indigo-600 animate-spin" />
+          <Loader2 className="size-10 text-primary animate-spin" />
         </div>
       </WorkspaceShell>
     );

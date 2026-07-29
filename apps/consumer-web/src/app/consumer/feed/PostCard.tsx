@@ -149,43 +149,43 @@ export function PostCard({
     <article
       className={
         embedded
-          ? 'bg-white rounded-xl overflow-hidden'
-          : 'bg-white border border-slate-200 rounded-xl overflow-hidden card-elevated'
+          ? 'bg-card rounded-xl overflow-hidden'
+          : 'bg-card border border-border rounded-xl overflow-hidden card-elevated'
       }
     >
       <div className="flex items-start justify-between p-4 sm:p-5 pb-3">
         <div className="flex items-center gap-3 min-w-0">
           <AuthorLink post={post}>
             <div className="relative shrink-0">
-              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-[12px] overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold text-[12px] overflow-hidden">
                 {post.author_avatar
                   ? <img src={post.author_avatar} alt="" className="w-full h-full object-cover" />
                   : (post.author_name || '??').slice(0, 2).toUpperCase()
                 }
               </div>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-success rounded-full border-2 border-white" />
             </div>
           </AuthorLink>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               <AuthorLink post={post} className="min-w-0 max-w-full">
-                <p className="text-[13.5px] font-semibold text-slate-900 leading-none truncate hover:underline">{post.author_name || 'Ẩn danh'}</p>
+                <p className="text-[13.5px] font-semibold text-foreground leading-none truncate hover:underline">{post.author_name || 'Ẩn danh'}</p>
               </AuthorLink>
               {post.author_type === 'space' && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
                   Giáo viên
                 </span>
               )}
               {emotion && (
-                <span className="text-[11.5px] text-slate-500 inline-flex items-center gap-0.5">
+                <span className="text-[11.5px] text-muted-foreground inline-flex items-center gap-0.5">
                   đang {emotion.label.toLowerCase()} <span>{emotion.emoji}</span>
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[11px] text-slate-500">{timeAgo(post.created_at)}</span>
+              <span className="text-[11px] text-muted-foreground">{timeAgo(post.created_at)}</span>
               <span className="text-slate-300">·</span>
-              <VisIcon size={11} className="text-slate-500" />
+              <VisIcon size={11} className="text-muted-foreground" />
             </div>
           </div>
         </div>
@@ -193,8 +193,10 @@ export function PostCard({
         {isMe && (
           <div className="relative shrink-0">
             <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setMenuOpen(p => !p)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+              className="rounded-lg hover:bg-muted text-muted-foreground transition-colors"
               aria-label="Tùy chọn"
             >
               <MoreHorizontal size={16} />
@@ -202,10 +204,11 @@ export function PostCard({
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
+                <div className="absolute right-0 top-9 bg-card border border-border rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
                   <Button
+                    variant="ghost"
                     onClick={() => { setMenuOpen(false); handleDelete(); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                   >
                     <Trash2 size={13} /> Xóa bài
                   </Button>
@@ -217,7 +220,7 @@ export function PostCard({
       </div>
 
       {post.content && (
-        <div className="px-4 sm:px-5 pb-3 text-[14px] text-slate-800 leading-relaxed prose prose-sm max-w-none">
+        <div className="px-4 sm:px-5 pb-3 text-[14px] text-foreground leading-relaxed prose prose-sm max-w-none">
           {parse(post.content)}
         </div>
       )}
@@ -233,7 +236,7 @@ export function PostCard({
 
       {(post.classroom_tag || []).length > 0 && (
         <div className="px-4 sm:px-5 pb-3 flex flex-wrap items-center gap-1.5">
-          <span className="text-[11.5px] text-slate-500 font-medium inline-flex items-center gap-1">
+          <span className="text-[11.5px] text-muted-foreground font-medium inline-flex items-center gap-1">
             <BookOpen size={11} /> Chia sẻ với
           </span>
           {(Array.isArray(post.classroom_tag) ? post.classroom_tag : post.classroom_tag ? [post.classroom_tag] : []).map((uid) => {
@@ -244,7 +247,7 @@ export function PostCard({
                 href={`/consumer/classroom/preview/${uid}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-semibold border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-success/10 text-success text-[12px] font-semibold border border-success/20 hover:bg-success/10 transition-colors"
               >
                 <BookOpen size={11} />
                 {name}
@@ -256,40 +259,49 @@ export function PostCard({
       )}
 
       {(post.likes_count > 0 || post.comments_count > 0) && (
-        <div className="flex items-center justify-between px-4 sm:px-5 py-2 text-xs text-slate-500 border-t border-slate-100">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-2 text-xs text-muted-foreground border-t border-border">
           {post.likes_count > 0 && (
             <span className="flex items-center gap-1.5">
-              <span className="w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[9px]">
+              <span className="w-4 h-4 bg-destructive rounded-full flex items-center justify-center text-white text-[9px]">
                 <Heart size={9} fill="currentColor" strokeWidth={0} />
               </span>
               {post.likes_count}
             </span>
           )}
           {post.comments_count > 0 && (
-            <Button onClick={toggleComments} className="hover:text-slate-900 hover:underline ml-auto transition-colors">
+            <Button onClick={toggleComments} className="hover:text-foreground hover:underline ml-auto transition-colors">
               {post.comments_count} bình luận
             </Button>
           )}
         </div>
       )}
 
-      <div className="grid grid-cols-3 border-t border-slate-200">
+      <div className="grid grid-cols-3 border-t border-border">
         {[
-          { key: 'like', icon: Heart, label: 'Thích', onClick: handleLike, active: post.liked_by_me, activeColor: 'text-rose-600' },
+          { key: 'like', icon: Heart, label: 'Thích', onClick: handleLike, active: post.liked_by_me, activeColor: 'text-destructive' },
           { key: 'comment', icon: MessageCircle, label: 'Bình luận', onClick: toggleComments, active: false, activeColor: '' },
           { key: 'share', icon: Share2, label: 'Chia sẻ', onClick: () => {}, active: false, activeColor: '' },
         ].map(({ key, icon: Icon, label, onClick, active, activeColor }) => (
           <Button
             key={key}
+            variant="ghost"
             onClick={onClick}
+            data-active={active || undefined}
             className={cn(
-              "flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-medium transition-colors",
-              active
-                ? activeColor
-                : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+              "flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-medium text-muted-foreground",
+              active && activeColor,
             )}
           >
-            <Icon size={16} strokeWidth={2} fill={active ? 'currentColor' : 'none'} />
+            <Icon
+              size={16}
+              strokeWidth={2}
+              data-active={active || undefined}
+              className={cn(
+                'data-[active=true]:text-foreground',
+                active ? 'fill-current' : 'fill-none',
+                'data-[active=true]:fill-current',
+              )}
+            />
             <span className="hidden sm:inline">{label}</span>
           </Button>
         ))}
@@ -298,19 +310,19 @@ export function PostCard({
       {lightbox.element}
 
       {showComments && (
-        <div className="border-t border-slate-200 bg-slate-50 p-4 sm:p-5 space-y-3 animate-fade-down">
+        <div className="border-t border-border bg-muted p-4 sm:p-5 space-y-3 animate-fade-down">
           {loadingComments ? (
             <div className="flex justify-center py-3">
-              <Loader2 size={18} className="animate-spin text-indigo-600" />
+              <Loader2 size={18} className="animate-spin text-primary" />
             </div>
           ) : comments.length === 0 ? (
-            <p className="text-center text-xs text-slate-500 py-2">Chưa có bình luận nào.</p>
+            <p className="text-center text-xs text-muted-foreground py-2">Chưa có bình luận nào.</p>
           ) : (
             comments.map(c => {
               const isMine = currentUserId !== null && c.consumer_uid === currentUserId;
               return (
                 <div key={c.uid} className={`flex items-start gap-2.5 ${isMine ? 'flex-row-reverse' : ''}`}>
-                  <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
+                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
                     {c.author_avatar
                       ? <img src={c.author_avatar} alt="" className="w-full h-full object-cover" />
                       : (c.author_name || '??').slice(0, 2).toUpperCase()
@@ -319,13 +331,13 @@ export function PostCard({
                   <div className={`flex-1 min-w-0 ${isMine ? 'flex flex-col items-end' : ''}`}>
                     <div className={`rounded-2xl px-3 py-2 inline-block max-w-full ${
                       isMine
-                        ? 'bg-indigo-600 text-white border border-indigo-600'
-                        : 'bg-white border border-slate-200'
+                        ? 'bg-primary text-white border border-indigo-600'
+                        : 'bg-card border border-border'
                     }`}>
-                      <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-indigo-100' : 'text-slate-900'}`}>{c.author_name}</p>
-                      <p className={`text-[13px] break-words ${isMine ? 'text-white' : 'text-slate-800'}`}>{c.content}</p>
+                      <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-primary-foreground/80' : 'text-foreground'}`}>{c.author_name}</p>
+                      <p className={`text-[13px] break-words ${isMine ? 'text-white' : 'text-foreground'}`}>{c.content}</p>
                     </div>
-                    <p className={`text-[10px] text-slate-400 mt-1 px-1 ${isMine ? 'text-right' : 'text-left'}`}>
+                    <p className={`text-[10px] text-muted-foreground mt-1 px-1 ${isMine ? 'text-right' : 'text-left'}`}>
                       {formatFullDateTime(c.created_at)}
                     </p>
                   </div>
@@ -335,7 +347,7 @@ export function PostCard({
           )}
 
           <form onSubmit={handleComment} className="flex items-center gap-2 pt-1">
-            <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-[10px] shrink-0">
+            <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] shrink-0">
               {currentUserId ? 'U' : '?'}
             </div>
             <div className="flex-1 relative">
@@ -343,12 +355,12 @@ export function PostCard({
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
                 placeholder="Viết bình luận..."
-                className="w-full text-[13px] bg-white border border-slate-200 rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-indigo-500 transition-colors text-slate-900 placeholder:text-slate-400"
+                className="w-full text-[13px] bg-card border border-border rounded-full pl-3.5 pr-10 py-2 outline-none focus:border-primary transition-colors text-foreground placeholder:text-muted-foreground"
               />
               <Button
                 type="submit"
                 disabled={!newComment.trim() || submitting}
-                className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center disabled:opacity-30 hover:bg-indigo-700 transition-colors"
+                className="absolute right-1 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center disabled:opacity-30 hover:bg-primary transition-colors"
                 aria-label="Gửi bình luận"
               >
                 {submitting ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}

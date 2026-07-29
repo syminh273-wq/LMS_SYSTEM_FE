@@ -182,11 +182,13 @@ export default function StudentDetailsPage({
                 {blockMenu && (
                   <div className="absolute right-0 top-full mt-1 z-50 min-w-[180px] rounded-xl border border-border bg-card shadow-lg overflow-hidden">
                     <Button
+                      variant="ghost"
                       className="w-full px-4 py-2.5 text-left text-xs font-bold hover:bg-muted transition-colors"
                       onClick={() => handleBlock('classroom')}>
                       Chặn khỏi lớp này
                     </Button>
                     <Button
+                      variant="ghost"
                       className="w-full px-4 py-2.5 text-left text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                       onClick={() => handleBlock('global')}>
                       Chặn toàn bộ lớp học

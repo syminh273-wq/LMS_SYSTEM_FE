@@ -154,6 +154,8 @@ export default function DirectChatByConvPage() {
           <div className="px-4 py-3 border-b border-slate-200 flex items-center gap-3">
             <Button
               onClick={() => router.push('/space/messages')}
+              variant="ghost"
+              size="icon"
               className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"
             >
               <ArrowLeft size={18} />

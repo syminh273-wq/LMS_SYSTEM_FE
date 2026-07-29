@@ -164,7 +164,9 @@ export default function TaskCenterPanel({ onClose }: Props) {
         </div>
         <Button
           onClick={onClose}
-          className="p-1 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
+          variant="ghost"
+          size="icon"
+          className="rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
           aria-label="Close"
         >
           <X size={16} />
@@ -176,11 +178,8 @@ export default function TaskCenterPanel({ onClose }: Props) {
           <Button
             key={key}
             onClick={() => dispatch(setActiveTab(key))}
-            className={`flex-1 px-2 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wide transition ${
-              tab === key
-                ? 'bg-primary-brand text-white shadow-sm'
-                : 'text-muted-foreground hover:bg-muted'
-            }`}
+            data-active={tab === key}
+            className="flex-1 px-2 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wide text-muted-foreground data-[active=true]:text-foreground data-[active=true]:font-semibold data-[active=true]:border-b-2 data-[active=true]:border-primary"
           >
             {t(`quizTasks.panel.tabs.${key}`)}
           </Button>
@@ -306,6 +305,7 @@ function TaskRow({ task, now, busy, onOpen, onRetry, onDismiss }: RowProps) {
               <Button
                 onClick={onRetry}
                 disabled={busy}
+                variant="ghost"
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black border border-border text-foreground hover:bg-muted transition disabled:opacity-50"
               >
                 {busy ? <Loader2 size={11} className="animate-spin" /> : <RotateCw size={11} />}
@@ -316,6 +316,7 @@ function TaskRow({ task, now, busy, onOpen, onRetry, onDismiss }: RowProps) {
               <Button
                 onClick={onDismiss}
                 disabled={busy}
+                variant="ghost"
                 className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition disabled:opacity-50"
                 aria-label={t('quizTasks.actions.dismiss')}
               >

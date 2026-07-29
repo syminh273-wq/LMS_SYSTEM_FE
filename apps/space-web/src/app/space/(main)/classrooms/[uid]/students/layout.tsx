@@ -44,6 +44,7 @@ export default function StudentsLayout({
             <Button
               onClick={() => setSidebarCollapsed(false)}
               title="Mở rộng sidebar"
+              variant="ghost"
               className="w-full flex justify-center py-3 hover:bg-muted/50 transition-colors"
             >
               <ChevronsRight size={16} className="text-muted-foreground" />
@@ -87,7 +88,9 @@ export default function StudentsLayout({
               <Button
                 onClick={() => setSidebarCollapsed(true)}
                 title="Thu nhỏ sidebar"
-                className="rounded-lg p-1 hover:bg-muted transition-colors"
+                variant="ghost"
+                size="icon"
+                className="rounded-lg hover:bg-muted transition-colors"
               >
                 <ChevronsLeft size={15} className="text-muted-foreground" />
               </Button>
@@ -96,6 +99,7 @@ export default function StudentsLayout({
             {/* Nhóm 1: Thông tin lớp */}
             <Button
               onClick={() => toggleGroup('classroom')}
+              variant="ghost"
               className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               Thông tin lớp
@@ -115,6 +119,7 @@ export default function StudentsLayout({
                   <Button
                     key={id}
                     onClick={() => goToTab(id)}
+                    variant="ghost"
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-muted-foreground hover:bg-muted/50 group"
                   >
                     <Icon size={18} className="text-muted-foreground group-hover:text-muted-foreground" />
@@ -129,6 +134,7 @@ export default function StudentsLayout({
             {/* Nhóm 2: Học tập & Đánh giá */}
             <Button
               onClick={() => toggleGroup('learning')}
+              variant="ghost"
               className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               Học tập & Đánh giá
@@ -146,6 +152,7 @@ export default function StudentsLayout({
                   <Button
                     key={id}
                     onClick={() => goToTab(id)}
+                    variant="ghost"
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all text-muted-foreground hover:bg-muted/50 group"
                   >
                     <Icon size={18} className="text-muted-foreground group-hover:text-muted-foreground" />
@@ -160,6 +167,7 @@ export default function StudentsLayout({
             {/* Nhóm 3: Quản lý sinh viên — always active */}
             <Button
               onClick={() => toggleGroup('students')}
+              variant="ghost"
               className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/50 transition-colors"
             >
               Quản lý sinh viên

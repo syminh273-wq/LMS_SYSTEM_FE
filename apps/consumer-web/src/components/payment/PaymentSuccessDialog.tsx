@@ -79,8 +79,8 @@ export function PaymentSuccessDialog({
         showCloseButton={false}
       >
         <DialogHeader className="items-center text-center space-y-3 pt-2">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <CheckCircle2 size={40} className="text-emerald-500" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15">
+            <CheckCircle2 size={40} className="text-success" />
           </div>
           <DialogTitle className="text-lg font-black text-center">{title}</DialogTitle>
           {isClassroom && classroomName ? (
@@ -99,7 +99,7 @@ export function PaymentSuccessDialog({
           {!isClassroom && courseName ? (
             <div className="text-sm font-bold text-foreground">{courseName}</div>
           ) : null}
-          <DialogDescription className="text-center text-slate-500 leading-relaxed">
+          <DialogDescription className="text-center leading-relaxed">
             {body}
           </DialogDescription>
         </DialogHeader>
@@ -108,14 +108,14 @@ export function PaymentSuccessDialog({
             variant="outline"
             onClick={() => onClose?.()}
             disabled={navigating}
-            className="rounded-xl font-bold flex-1"
+            className="flex-1"
           >
             {closeLabel}
           </Button>
           <Button
             onClick={handleGoTo}
             disabled={navigating}
-            className="rounded-xl font-bold bg-emerald-500 hover:bg-emerald-600 text-white flex-1"
+            className="bg-success hover:bg-success/90 text-success-foreground flex-1"
           >
             {navigating ? <Loader2 size={16} className="animate-spin" /> : goToLabel}
           </Button>

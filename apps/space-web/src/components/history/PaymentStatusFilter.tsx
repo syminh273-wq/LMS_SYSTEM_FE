@@ -29,8 +29,8 @@ export function PaymentStatusFilter({ value, onChange }: Props) {
             className={cn(
               'px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors ring-1',
               active
-                ? 'bg-indigo-600 text-white ring-indigo-600'
-                : 'bg-white text-slate-600 ring-slate-200 hover:ring-indigo-300 hover:text-indigo-700'
+                ? 'bg-primary-brand text-primary-foreground ring-primary-brand'
+                : 'bg-background text-muted-foreground ring-border hover:ring-primary-brand/40 hover:text-primary-brand'
             )}
           >
             {s.label}

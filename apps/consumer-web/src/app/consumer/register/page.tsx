@@ -58,7 +58,7 @@ export default function RegisterPage() {
       const response = await consumerApi.auth.register(data);
       toast.success('Chúc mừng! Đăng ký tài khoản thành công.', {
         description: 'Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.',
-        icon: <PartyPopper className="text-emerald-500" size={20} />,
+        icon: <PartyPopper className="text-success" size={20} />,
         duration: 4000,
       });
       setSuccess(response.message || 'Đăng ký thành công. Vui lòng đăng nhập.');
@@ -86,34 +86,34 @@ export default function RegisterPage() {
   return (
     <MasterLayout footer={null}>
       <MasterBody className="min-h-screen">
-        <div className="flex min-h-screen flex-col lg:flex-row bg-slate-50 dark:bg-slate-950">
+        <div className="flex min-h-screen flex-col lg:flex-row bg-muted">
 
           {/* Right Side - Form */}
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-background relative">
             <div className="w-full max-w-[480px] animate-fade-up">
               <div className="mb-8 flex justify-center">
                 <Image src="/logo-icon.svg" alt="LMS System" width={140} height={150} />
               </div>
 
               <div className="mb-7 text-center">
-                <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
+                <h2 className="text-3xl font-bold text-foreground mb-2 tracking-tight text-balance">
                   Đăng Ký
                 </h2>
-                <p className="text-slate-600 text-[15px] dark:text-slate-400">
+                <p className="text-muted-foreground text-[15px]">
                   Trở thành học viên của LMS System ngay hôm nay.
                 </p>
               </div>
 
               {globalError && (
-                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-fade-down dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-fade-down">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 shrink-0" />
                   <span className="font-medium">{globalError}</span>
                 </div>
               )}
 
               {success && (
-                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 animate-fade-down dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-300">
-                  <CheckCircle2 size={16} className="text-emerald-500 mt-0.5 shrink-0" />
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm text-success animate-fade-down">
+                  <CheckCircle2 size={16} className="text-success mt-0.5 shrink-0" />
                   <span className="font-medium">{success}</span>
                 </div>
               )}
@@ -121,67 +121,69 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit(onRegister)} className="space-y-3.5">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Họ</Label>
+                    <Label>Họ</Label>
                     <Input
                       {...register('last_name', { required: 'Bắt buộc' })}
                       placeholder="Nguyễn"
-                      className="h-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                      className="h-11"
                     />
-                    {errors.last_name && <p className="text-rose-600 text-xs font-medium">{errors.last_name.message}</p>}
+                    {errors.last_name && <p className="text-destructive text-xs font-medium">{errors.last_name.message}</p>}
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Tên</Label>
+                    <Label>Tên</Label>
                     <Input
                       {...register('first_name', { required: 'Bắt buộc' })}
                       placeholder="An"
-                      className="h-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                      className="h-11"
                     />
-                    {errors.first_name && <p className="text-rose-600 text-xs font-medium">{errors.first_name.message}</p>}
+                    {errors.first_name && <p className="text-destructive text-xs font-medium">{errors.first_name.message}</p>}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Email</Label>
+                  <Label>Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
                     <Input
                       {...register('email', { required: 'Bắt buộc' })}
                       type="email"
                       autoComplete="email"
                       placeholder="name@company.com"
-                      className="h-11 pl-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                      className="h-11 pl-10"
                     />
                   </div>
-                  {errors.email && <p className="text-rose-600 text-xs font-medium">{errors.email.message}</p>}
+                  {errors.email && <p className="text-destructive text-xs font-medium">{errors.email.message}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Mật khẩu</Label>
+                    <Label>Mật khẩu</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
                       <Input
                         type={showPassword ? 'text' : 'password'}
                         autoComplete="new-password"
                         {...register('password', { required: 'Bắt buộc', minLength: { value: 8, message: 'Tối thiểu 8 ký tự' } })}
                         placeholder="••••••••"
-                        className="h-11 pl-10 pr-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                        className="h-11 pl-10 pr-10"
                       />
                       <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
                       >
                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </Button>
                     </div>
-                    {errors.password && <p className="text-rose-600 text-xs font-medium">{errors.password.message}</p>}
+                    {errors.password && <p className="text-destructive text-xs font-medium">{errors.password.message}</p>}
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">Xác nhận</Label>
+                    <Label>Xác nhận</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
                       <Input
                         type={showConfirmPassword ? 'text' : 'password'}
                         autoComplete="new-password"
@@ -190,17 +192,19 @@ export default function RegisterPage() {
                           validate: (val) => val === password || 'Mật khẩu không khớp',
                         })}
                         placeholder="••••••••"
-                        className="h-11 pl-10 pr-10 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:bg-slate-900 dark:border-slate-700"
+                        className="h-11 pl-10 pr-10"
                       />
                       <Button
                         type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7"
                       >
                         {showConfirmPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </Button>
                     </div>
-                    {errors.confirm_password && <p className="text-rose-600 text-xs font-medium">{errors.confirm_password.message}</p>}
+                    {errors.confirm_password && <p className="text-destructive text-xs font-medium">{errors.confirm_password.message}</p>}
                   </div>
                 </div>
 
@@ -211,13 +215,13 @@ export default function RegisterPage() {
                         key={c.label}
                         className={cn(
                           "flex items-center gap-1.5 text-xs font-medium",
-                          c.ok ? "text-emerald-600 dark:text-emerald-400" : "text-slate-500"
+                          c.ok ? "text-success" : "text-muted-foreground"
                         )}
                       >
                         <span
                           className={cn(
                             "w-3.5 h-3.5 rounded-full flex items-center justify-center transition-colors shrink-0",
-                            c.ok ? "bg-emerald-500 text-white" : "bg-slate-200 dark:bg-slate-700"
+                            c.ok ? "bg-success text-white" : "bg-muted"
                           )}
                         >
                           {c.ok && <CheckCircle2 size={10} strokeWidth={3} />}
@@ -231,7 +235,7 @@ export default function RegisterPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 w-full h-11 rounded-lg font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-2 w-full h-11 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -249,10 +253,10 @@ export default function RegisterPage() {
 
               <div className="relative my-5">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold dark:bg-slate-950">
+                  <span className="bg-background px-3 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
                     Hoặc
                   </span>
                 </div>
@@ -260,11 +264,12 @@ export default function RegisterPage() {
 
               <Button
                 type="button"
+                variant="outline"
                 onClick={() => {
                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
                   window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
                 }}
-                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="w-full h-11 flex items-center justify-center gap-2.5"
               >
                 <GoogleIcon />
                 Tiếp tục với Google
@@ -272,7 +277,7 @@ export default function RegisterPage() {
 
               <Link
                 href="/consumer/login"
-                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
+                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-primary bg-background border border-primary/20 hover:bg-primary/10 hover:border-primary/40 transition-colors flex items-center justify-center gap-2"
               >
                 Đã có tài khoản? Đăng nhập
               </Link>

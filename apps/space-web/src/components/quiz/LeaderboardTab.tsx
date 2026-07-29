@@ -26,7 +26,7 @@ function fmtTime(iso: string | null): string {
 
 function rankBadge(rank: number) {
   if (rank === 1) return <Trophy size={16} className="text-amber-500" />;
-  if (rank === 2) return <Medal size={16} className="text-slate-400" />;
+  if (rank === 2) return <Medal size={16} className="text-muted-foreground" />;
   if (rank === 3) return <Award size={16} className="text-orange-600" />;
   return <span className="text-xs font-black text-muted-foreground">#{rank}</span>;
 }
@@ -41,7 +41,7 @@ function rankBg(rank: number) {
 function scoreColor(p: number) {
   if (p >= 80) return 'text-emerald-600';
   if (p >= 50) return 'text-amber-600';
-  return 'text-rose-600';
+  return 'text-destructive';
 }
 
 export default function LeaderboardTab({ quizUid, classroomId }: Props) {

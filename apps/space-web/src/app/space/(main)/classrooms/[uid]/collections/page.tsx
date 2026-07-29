@@ -61,8 +61,9 @@ export default function ClassroomCollectionsPage({ params }: Props) {
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
       <Button
+        variant="ghost"
         onClick={() => router.push(`/space/classrooms/${classroomUid}/details?tab=quiz`)}
-        className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground"
+        className="flex items-center gap-1"
       >
         <ArrowLeft size={14} />
         {classroom?.name ?? '...'}

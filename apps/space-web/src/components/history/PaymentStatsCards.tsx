@@ -20,20 +20,20 @@ type StatItem = {
 };
 
 const TONE_CLASS: Record<Tone, string> = {
-  indigo: 'text-indigo-700',
+  indigo: 'text-primary-brand',
   emerald: 'text-emerald-700',
   amber: 'text-amber-700',
-  rose: 'text-rose-700',
-  slate: 'text-slate-900',
+  rose: 'text-destructive',
+  slate: 'text-foreground',
 };
 
 export function PaymentStatsCards({ stats }: { stats: StatItem[] }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
       {stats.map((s, idx) => (
-        <Card key={idx} className="border-slate-200">
+        <Card key={idx}>
           <CardContent className="p-4">
-            <p className="text-[11px] uppercase tracking-wide font-bold text-slate-500">
+            <p className="text-[11px] uppercase tracking-wide font-bold text-muted-foreground">
               {s.label}
             </p>
             <p

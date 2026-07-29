@@ -97,72 +97,71 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
   }, [uid, router, t]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <Button
           variant="ghost"
           onClick={() => router.push(`/consumer/course/${uid}`)}
-          className="mb-4 rounded-xl gap-2"
+          className="mb-4 gap-2"
         >
           <ArrowLeft size={16} /> {t('common.back', 'Back')}
         </Button>
 
-        <Card className="border-border">
-          <CardContent className="p-8 text-center space-y-5">
+        <Card>
+          <CardContent className="text-center space-y-5">
             {status === 'initiating' && (
               <>
-                <Loader2 size={48} className="mx-auto text-indigo-600 animate-spin" />
+                <Loader2 size={48} className="mx-auto text-primary animate-spin" />
                 <h2 className="text-xl font-bold">{t('course.detail.loading', 'Loading...')}</h2>
               </>
             )}
 
             {status === 'redirecting' && (
               <>
-                <Loader2 size={48} className="mx-auto text-indigo-600 animate-spin" />
+                <Loader2 size={48} className="mx-auto text-primary animate-spin" />
                 <h2 className="text-xl font-bold">{t('course.checkout.processing_title', 'Processing payment')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.processing_desc', 'Redirecting to MoMo...')}</p>
+                <p className="text-muted-foreground text-sm">{t('course.checkout.processing_desc', 'Redirecting to MoMo...')}</p>
               </>
             )}
 
             {status === 'processing' && (
               <>
                 <div className="relative mx-auto w-20 h-20">
-                  <Clock size={64} className="text-indigo-600 mx-auto" />
-                  <Loader2 size={20} className="absolute inset-0 m-auto animate-spin text-indigo-400" />
+                  <Clock size={64} className="text-primary mx-auto" />
+                  <Loader2 size={20} className="absolute inset-0 m-auto animate-spin text-primary" />
                 </div>
                 <h2 className="text-xl font-bold">{t('course.checkout.processing_title', 'Processing payment')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.processing_desc', 'Waiting for MoMo to confirm.')}</p>
+                <p className="text-muted-foreground text-sm">{t('course.checkout.processing_desc', 'Waiting for MoMo to confirm.')}</p>
               </>
             )}
 
             {status === 'success' && (
               <>
-                <CheckCircle2 size={64} className="mx-auto text-emerald-500" />
+                <CheckCircle2 size={64} className="mx-auto text-success" />
                 <h2 className="text-xl font-bold">{t('course.checkout.success_title', 'Payment successful!')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.success_desc', 'Redirecting to your classroom...')}</p>
+                <p className="text-muted-foreground text-sm">{t('course.checkout.success_desc', 'Redirecting to your classroom...')}</p>
               </>
             )}
 
             {status === 'failed' && (
               <>
-                <XCircle size={64} className="mx-auto text-rose-500" />
+                <XCircle size={64} className="mx-auto text-destructive" />
                 <h2 className="text-xl font-bold">{t('course.checkout.failed_title', 'Payment failed')}</h2>
-                <p className="text-slate-500 text-sm">{errorMsg}</p>
+                <p className="text-muted-foreground text-sm">{errorMsg}</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
+                    variant="destructive"
                     onClick={() => {
                       startedRef.current = false;
                       setStatus('initiating');
                       setErrorMsg('');
                     }}
-                    className="bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold"
                   >
                     {t('course.checkout.retry', 'Retry')}
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => router.push(`/consumer/course/${uid}`)}
-                    className="rounded-xl"
                   >
                     {t('course.checkout.cancel', 'Cancel')}
                   </Button>
@@ -172,14 +171,13 @@ export default function CheckoutPage({ params }: { params: Promise<{ uid: string
 
             {status === 'timeout' && (
               <>
-                <AlertTriangle size={64} className="mx-auto text-amber-500" />
+                <AlertTriangle size={64} className="mx-auto text-warning" />
                 <h2 className="text-xl font-bold">{t('course.checkout.timeout_title', 'Still processing')}</h2>
-                <p className="text-slate-500 text-sm">{t('course.checkout.timeout_desc', 'Please check back in a few minutes.')}</p>
+                <p className="text-muted-foreground text-sm">{t('course.checkout.timeout_desc', 'Please check back in a few minutes.')}</p>
                 <div className="flex flex-col gap-2 pt-2">
                   <Button
                     onClick={() => router.push('/consumer/course')}
                     variant="outline"
-                    className="rounded-xl"
                   >
                     {t('course.checkout.go_to_courses', 'Go to my courses')}
                   </Button>

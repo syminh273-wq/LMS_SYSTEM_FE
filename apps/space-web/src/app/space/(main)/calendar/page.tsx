@@ -235,14 +235,14 @@ export default function SpaceCalendarPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-brand-light text-primary-brand text-[11px] font-semibold mb-2">
             <CalendarIcon size={11} />
             {t('calendar.labels.title', 'Academic Calendar')}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
             {t('calendar.labels.title', 'Academic Calendar')}
           </h1>
-          <p className="text-slate-600 text-[14px] mt-1">
+          <p className="text-muted-foreground text-[14px] mt-1">
             {t('calendar.labels.subtitle', 'Manage your study schedule and upcoming deadlines.')}
           </p>
         </div>
@@ -252,7 +252,7 @@ export default function SpaceCalendarPage() {
             value={classroomFilter}
             onValueChange={(v) => setClassroomFilter(v)}
           >
-            <SelectTrigger className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 min-w-[180px]">
+            <SelectTrigger className="h-10 min-w-[180px]">
               <SelectValue placeholder={t('calendar.labels.all_classrooms', 'All classrooms')} />
             </SelectTrigger>
             <SelectContent>
@@ -268,7 +268,7 @@ export default function SpaceCalendarPage() {
             value={typeFilter}
             onValueChange={(v) => setTypeFilter(v as CalendarEventType | 'all')}
           >
-            <SelectTrigger className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-[13px] font-semibold text-slate-700 min-w-[140px]">
+            <SelectTrigger className="h-10 min-w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -282,7 +282,7 @@ export default function SpaceCalendarPage() {
           <div className="relative">
             <Button
               onClick={() => setCreateMenuOpen((o) => !o)}
-              className="h-10 px-3.5 rounded-lg bg-indigo-600 text-white text-[13px] font-semibold hover:bg-indigo-700 gap-1.5"
+              className="h-10 gap-1.5"
             >
               <Plus size={15} strokeWidth={2.5} />
               <span className="hidden sm:inline">{t('calendar.labels.new_event', 'New event')}</span>
@@ -291,27 +291,29 @@ export default function SpaceCalendarPage() {
             {createMenuOpen && (
               <>
                 <div className="fixed inset-0 z-30" onClick={() => setCreateMenuOpen(false)} />
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-40 overflow-hidden">
+                <div className="absolute right-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-lg z-40 overflow-hidden">
                   <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       setCreateMenuOpen(false);
                       handleCreate();
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] font-semibold text-slate-700 hover:bg-slate-50"
+                    className="w-full flex items-center gap-2 text-left"
                   >
-                    <CalendarPlus size={14} className="text-indigo-600" />
+                    <CalendarPlus size={14} className="text-primary-brand" />
                     {t('calendar.recurring.menu_one_day', 'Sự kiện 1 ngày')}
                   </Button>
                   <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       setCreateMenuOpen(false);
                       setRecurringOpen(true);
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-left text-[13px] font-semibold text-slate-700 hover:bg-slate-50 border-t border-slate-100"
+                    className="w-full flex items-center gap-2 text-left border-t border-border"
                   >
-                    <Repeat size={14} className="text-indigo-600" />
+                    <Repeat size={14} className="text-primary-brand" />
                     {t('calendar.recurring.menu_recurring', 'Thời khóa biểu')}
                   </Button>
                 </div>
@@ -323,20 +325,22 @@ export default function SpaceCalendarPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
+          <div className="flex items-center bg-background border border-border rounded-lg overflow-hidden">
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={goPrev}
-              className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Previous"
             >
               <ChevronLeft size={15} />
             </Button>
-            <div className="h-5 w-px bg-slate-200" />
+            <div className="h-5 w-px bg-border" />
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={goNext}
-              className="p-2 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Next"
             >
               <ChevronRight size={15} />
@@ -345,11 +349,12 @@ export default function SpaceCalendarPage() {
           <Button
             type="button"
             onClick={goToday}
-            className="h-10 px-3 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12.5px] font-semibold hover:bg-slate-50"
+            variant="outline"
+            className="h-10"
           >
             {locale === 'vi' ? 'Hôm nay' : 'Today'}
           </Button>
-          <span className="text-[15px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
+          <span className="text-[15px] font-bold text-foreground capitalize ml-2">{headerLabel}</span>
         </div>
 
         <ViewSwitcher value={view} onChange={setView} />
@@ -358,14 +363,14 @@ export default function SpaceCalendarPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 space-y-3">
           {error && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700">
+            <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">
               {error}
             </div>
           )}
 
           <div className="relative">
             {loading && (
-              <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 text-[11px] text-slate-500">
+              <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-background/90 px-2 py-1 rounded-md border border-border text-[11px] text-muted-foreground">
                 <Loader2 size={11} className="animate-spin" />
                 {t('calendar.labels.loading', 'Loading...')}
               </div>

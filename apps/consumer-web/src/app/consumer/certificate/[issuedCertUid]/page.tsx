@@ -84,17 +84,19 @@ export default function IssuedCertificateViewPage({ params }: Props) {
       <div className="flex items-center justify-between print:hidden">
         <Button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-foreground"
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-1"
         >
           <ArrowLeft size={14} />
           {t('certificate.back_btn')}
         </Button>
         <div className="flex items-center gap-2">
-          <Button onClick={handleCopy} variant="outline" className="gap-2 font-bold text-xs">
+          <Button onClick={handleCopy} variant="outline" size="sm" className="gap-2">
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {t('certificate.share_btn')}
           </Button>
-          <Button onClick={handlePrint} className="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs gap-2">
+          <Button onClick={handlePrint} size="sm" className="bg-warning hover:bg-warning/90 text-warning-foreground gap-2">
             <Printer size={14} />
             {t('certificate.download_btn')}
           </Button>
@@ -102,29 +104,29 @@ export default function IssuedCertificateViewPage({ params }: Props) {
       </div>
 
       <article
-        className="bg-card border-2 border-amber-500/30 rounded-3xl shadow-xl p-8 sm:p-12 text-center relative overflow-hidden print:shadow-none print:border-amber-500"
+        className="bg-card border-2 border-warning/30 rounded-3xl shadow-xl p-8 sm:p-12 text-center relative overflow-hidden print:shadow-none print:border-warning"
         style={{
           background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
         }}
       >
-        <div className="absolute top-4 left-4 w-16 h-16 border-2 border-amber-500/30 rounded-full" />
-        <div className="absolute top-4 right-4 w-16 h-16 border-2 border-amber-500/30 rounded-full" />
-        <div className="absolute bottom-4 left-4 w-16 h-16 border-2 border-amber-500/30 rounded-full" />
-        <div className="absolute bottom-4 right-4 w-16 h-16 border-2 border-amber-500/30 rounded-full" />
+        <div className="absolute top-4 left-4 w-16 h-16 border-2 border-warning/30 rounded-full" />
+        <div className="absolute top-4 right-4 w-16 h-16 border-2 border-warning/30 rounded-full" />
+        <div className="absolute bottom-4 left-4 w-16 h-16 border-2 border-warning/30 rounded-full" />
+        <div className="absolute bottom-4 right-4 w-16 h-16 border-2 border-warning/30 rounded-full" />
 
         <div className="relative z-10 space-y-6">
           <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-600">
+            <div className="w-20 h-20 rounded-full bg-warning/20 flex items-center justify-center text-warning">
               <Trophy size={40} />
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-700">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-warning">
               {t('certificate.view_title')}
             </p>
             {certTitle && (
-              <p className="text-base sm:text-lg font-bold text-amber-700 mt-2">
+              <p className="text-base sm:text-lg font-bold text-warning mt-2">
                 {certTitle}
               </p>
             )}
@@ -149,7 +151,7 @@ export default function IssuedCertificateViewPage({ params }: Props) {
           </p>
 
           <div>
-            <p className="text-lg font-bold text-amber-700">
+            <p className="text-lg font-bold text-warning">
               {collectionTitle}
             </p>
             {classroomName && (
@@ -159,7 +161,7 @@ export default function IssuedCertificateViewPage({ params }: Props) {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4 pt-6 border-t border-amber-500/20 max-w-md mx-auto">
+          <div className="grid grid-cols-2 gap-4 pt-6 border-t border-warning/20 max-w-md mx-auto">
             <div>
               <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                 {t('certificate.date_label')}
@@ -174,11 +176,11 @@ export default function IssuedCertificateViewPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-amber-500/20">
+          <div className="pt-4 border-t border-warning/20">
             <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
               {t('certificate.verification_label')}
             </p>
-            <p className="text-base font-mono font-bold text-amber-700 mt-1 tracking-widest">
+            <p className="text-base font-mono font-bold text-warning mt-1 tracking-widest">
               {cert.verification_code}
             </p>
           </div>

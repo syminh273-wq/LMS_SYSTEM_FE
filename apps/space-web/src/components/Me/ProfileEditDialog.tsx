@@ -53,11 +53,11 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
-          <DialogTitle className="text-xl font-bold">
+        <DialogHeader className="px-6 pt-5 pb-3 border-b border-border">
+          <DialogTitle>
             {t('workspace.profile.edit_about')}
           </DialogTitle>
-          <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
             {t('workspace.profile.edit_about_desc')}
           </p>
         </DialogHeader>
@@ -73,22 +73,23 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
           </div>
 
           <div>
-            <h3 className="text-base font-bold text-slate-900 mb-1">
+            <h3 className="text-base font-bold text-foreground mb-1">
               {t('workspace.profile.fields.skills')}
             </h3>
-            <p className="text-sm text-slate-500 mb-3 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
               {t('workspace.profile.fields.skills_desc')}
             </p>
             <div className="flex flex-wrap gap-1.5 mb-2">
               {skills.map((s, i) => (
                 <span
                   key={`${s}-${i}`}
-                  className="inline-flex items-center gap-1.5 pl-2.5 pr-2 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold"
+                  className="inline-flex items-center gap-1.5 pl-2.5 pr-2 py-1 rounded-full bg-primary-brand-light text-primary-brand text-xs font-semibold"
                 >
                   <Button
+                    variant="ghost"
                     onClick={() => setSkills(skills.filter((_, j) => j !== i))}
                     aria-label="Remove skill"
-                    className="-ml-1 hover:text-rose-600"
+                    className="-ml-1 hover:text-destructive"
                   >
                     <X size={12} />
                   </Button>
@@ -96,7 +97,7 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
                 </span>
               ))}
               {skills.length === 0 && (
-                <span className="text-xs text-slate-400 italic">—</span>
+                <span className="text-xs text-muted-foreground italic">—</span>
               )}
             </div>
             <div className="flex gap-2">
@@ -107,7 +108,7 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
                   if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
                 }}
                 placeholder={t('workspace.profile.fields.skills_placeholder')}
-                className="flex-1 px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                className="flex-1 px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/20"
               />
               <Button
                 type="button"
@@ -115,7 +116,6 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
                 size="sm"
                 variant="outline"
                 disabled={skills.length >= SKILL_LIMIT}
-                className="px-3"
               >
                 <Plus size={14} />
               </Button>
@@ -128,14 +128,13 @@ export function ProfileEditDialog({ profile, onClose, onSaved }: Props) {
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+        <div className="sticky bottom-0 bg-card border-t border-border px-6 py-3 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             {t('workspace.common.cancel')}
           </Button>
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {saving && <Loader2 className="size-4 animate-spin" />}
             {t('workspace.common.save')}

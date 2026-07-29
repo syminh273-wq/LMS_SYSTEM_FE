@@ -50,7 +50,7 @@ export default function SpaceStudentRankingPanel({
   if (!profile) {
     return (
       <Card>
-        <CardContent className="p-6 text-center text-sm text-slate-500">
+        <CardContent className="p-6 text-center text-sm text-muted-foreground">
           {t('ranking.no_data', 'No ranking data yet.')}
         </CardContent>
       </Card>
@@ -72,7 +72,7 @@ export default function SpaceStudentRankingPanel({
             </div>
             <div className="min-w-0 flex-1 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-bold text-indigo-700">
+                <span className="rounded-full bg-primary-brand/10 px-2.5 py-0.5 text-[11px] font-bold text-primary-brand">
                   {profile.level_title}
                 </span>
                 {streakActive && (
@@ -84,13 +84,13 @@ export default function SpaceStudentRankingPanel({
               </div>
               <div className="flex items-baseline gap-2">
                 <Trophy className="h-4 w-4 text-amber-500" />
-                <span className="text-2xl font-black text-slate-900">
+                <span className="text-2xl font-black text-foreground">
                   {profile.total_xp.toLocaleString()}
                 </span>
-                <span className="text-xs font-semibold text-slate-500">XP</span>
+                <span className="text-xs font-semibold text-muted-foreground">XP</span>
               </div>
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground">
                   <span>
                     {t('ranking.xp_to_next', '{{count}} XP to level {{level}}', {
                       count: profile.xp_to_next_level,
@@ -99,7 +99,7 @@ export default function SpaceStudentRankingPanel({
                   </span>
                   <span>{pct}%</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all"
                     style={{ width: `${pct}%` }}
@@ -154,10 +154,10 @@ export default function SpaceStudentRankingPanel({
         <Card>
           <CardContent className="p-5">
             <div className="mb-3 flex items-center justify-between">
-              <h4 className="text-sm font-black uppercase tracking-wider text-slate-700">
+              <h4 className="text-sm font-black uppercase tracking-wider text-foreground">
                 {t('ranking.achievements_title', 'Achievements')}
               </h4>
-              <span className="text-xs font-bold text-slate-500">
+              <span className="text-xs font-bold text-muted-foreground">
                 {unlocked}/{total}
               </span>
             </div>
@@ -171,7 +171,7 @@ export default function SpaceStudentRankingPanel({
                       'flex items-center gap-3 rounded-lg border p-2.5',
                       a.is_unlocked
                         ? 'border-amber-200 bg-amber-50/50'
-                        : 'border-slate-200 bg-slate-50/50 opacity-80',
+                        : 'border-border bg-muted/50 opacity-80',
                     )}
                   >
                     <div
@@ -179,7 +179,7 @@ export default function SpaceStudentRankingPanel({
                         'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
                         a.is_unlocked
                           ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white'
-                          : 'bg-slate-200 text-slate-400',
+                          : 'bg-muted text-muted-foreground',
                       )}
                     >
                       {a.is_unlocked ? (
@@ -189,16 +189,16 @@ export default function SpaceStudentRankingPanel({
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-xs font-bold text-slate-800">
+                      <p className="truncate text-xs font-bold text-foreground">
                         {a.title}
                       </p>
-                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-slate-100">
+                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-muted">
                         <div
                           className={cn(
                             'h-full rounded-full',
                             a.is_unlocked
                               ? 'bg-gradient-to-r from-amber-400 to-orange-500'
-                              : 'bg-indigo-500',
+                              : 'bg-primary-brand',
                           )}
                           style={{ width: `${p}%` }}
                         />
@@ -231,8 +231,8 @@ function CounterTile({
       <CardContent className="flex items-center gap-2.5 p-3">
         <Icon className={cn('h-4 w-4 shrink-0', color)} />
         <div className="min-w-0">
-          <div className="text-base font-black text-slate-900">{value}</div>
-          <div className="truncate text-[10px] font-medium uppercase tracking-wide text-slate-500">
+          <div className="text-base font-black text-foreground">{value}</div>
+          <div className="truncate text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
             {label}
           </div>
         </div>

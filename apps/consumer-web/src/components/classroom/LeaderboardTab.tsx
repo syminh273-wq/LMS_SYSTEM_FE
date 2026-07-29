@@ -21,27 +21,27 @@ const RANK_LIMIT = 50;
 function rankBadge(rank: number) {
   if (rank === 1) {
     return (
-      <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-        <Crown size={18} className="text-amber-500" />
+      <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center shrink-0">
+        <Crown size={18} className="text-warning" />
       </div>
     );
   }
   if (rank === 2) {
     return (
-      <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center shrink-0">
-        <Medal size={18} className="text-slate-500" />
+      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
+        <Medal size={18} className="text-muted-foreground" />
       </div>
     );
   }
   if (rank === 3) {
     return (
-      <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
-        <Award size={18} className="text-orange-500" />
+      <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center shrink-0">
+        <Award size={18} className="text-warning" />
       </div>
     );
   }
   return (
-    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500 font-black text-sm">
+    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0 text-muted-foreground font-black text-sm">
       {rank}
     </div>
   );
@@ -85,15 +85,15 @@ export function LeaderboardTab({ classroomUid }: Props) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 size={32} className="animate-spin text-indigo-400" />
+        <Loader2 size={32} className="animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <Card className="border-rose-200 bg-rose-50">
-        <CardContent className="p-6 text-center text-sm text-rose-600 font-medium">
+      <Card className="border-destructive/30 bg-destructive/10">
+        <CardContent className="p-6 text-center text-sm text-destructive font-medium">
           {error}
         </CardContent>
       </Card>
@@ -112,23 +112,23 @@ export function LeaderboardTab({ classroomUid }: Props) {
 
   return (
     <div className="space-y-4">
-      <Card className="border-indigo-100 bg-gradient-to-br from-indigo-50 to-white">
+      <Card className="border-primary/20 bg-gradient-to-br from-indigo-50 to-white">
         <CardContent className="p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shrink-0">
             <Trophy size={22} className="text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-black uppercase tracking-widest text-indigo-500">
+            <div className="text-xs font-black uppercase tracking-widest text-primary">
               Bảng xếp hạng
             </div>
-            <div className="text-base font-black text-slate-900 truncate">
+            <div className="text-base font-black text-foreground truncate">
               {totalStudents > 0
                 ? `${totalStudents} thành viên đang cạnh tranh`
                 : 'Chưa có dữ liệu xếp hạng'}
             </div>
             <Link
               href="/consumer/grading"
-              className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:underline"
+              className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
             >
               <Calculator size={11} />
               Bảng quy đổi điểm
@@ -138,7 +138,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
             variant="outline"
             size="sm"
             onClick={() => setHistoryOpen(true)}
-            className="shrink-0 gap-1.5 rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-50"
+            className="shrink-0 gap-1.5 rounded-full border-primary/30 text-primary"
           >
             <HistoryIcon size={14} />
             <span className="hidden sm:inline">Xem lịch sử của tôi</span>
@@ -146,14 +146,14 @@ export function LeaderboardTab({ classroomUid }: Props) {
           </Button>
           {myRank != null && (
             <div className="text-right shrink-0">
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                 Hạng của bạn
               </div>
-              <div className="text-2xl font-black text-indigo-600 leading-none">
+              <div className="text-2xl font-black text-primary leading-none">
                 #{myRank}
               </div>
               {myScore != null && (
-                <div className="text-[10px] font-bold text-slate-400 mt-1">
+                <div className="text-[10px] font-bold text-muted-foreground mt-1">
                   {myScore.toFixed(1)} điểm
                 </div>
               )}
@@ -165,23 +165,23 @@ export function LeaderboardTab({ classroomUid }: Props) {
       {entries.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
-            <Trophy size={40} className="mx-auto text-slate-300 mb-3" />
-            <div className="text-sm font-bold text-slate-500">
+            <Trophy size={40} className="mx-auto text-muted-foreground mb-3" />
+            <div className="text-sm font-bold text-muted-foreground">
               Chưa có ai nộp bài trong lớp này.
             </div>
-            <div className="text-xs text-slate-400 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               Hãy hoàn thành quiz hoặc bài kiểm tra để lên bảng xếp hạng.
             </div>
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+        <div className="bg-card rounded-2xl border border-border shadow-sm divide-y divide-border">
           {entries.map((e) => {
             const isMe = currentUserId && e.student_id === currentUserId;
             return (
               <div
                 key={e.student_id}
-                className={`px-4 py-3 ${isMe ? 'bg-indigo-50/60' : ''}`}
+                className={`px-4 py-3 ${isMe ? 'bg-primary/10' : ''}`}
               >
                 <div className="flex items-center gap-3">
                   {rankBadge(e.rank)}
@@ -189,20 +189,20 @@ export function LeaderboardTab({ classroomUid }: Props) {
                     {e.student_avatar ? (
                       <AvatarImage src={e.student_avatar} alt={e.student_name} />
                     ) : null}
-                    <AvatarFallback className="bg-slate-100 text-slate-600 text-xs font-black">
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs font-black">
                       {initials(e.student_name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-slate-900 truncate flex items-center gap-1.5">
+                    <div className="text-sm font-bold text-foreground truncate flex items-center gap-1.5">
                       {e.student_name}
                       {isMe && (
-                        <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                           Bạn
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] font-medium text-slate-400 flex items-center gap-2 mt-0.5">
+                    <div className="text-[11px] font-medium text-muted-foreground flex items-center gap-2 mt-0.5">
                       <span>Quiz: {e.quiz_count}</span>
                       <span>·</span>
                       <span>Thi: {e.exam_count}</span>
@@ -211,17 +211,17 @@ export function LeaderboardTab({ classroomUid }: Props) {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-base font-black text-slate-900 leading-none">
+                    <div className="text-base font-black text-foreground leading-none">
                       {e.total_score.toFixed(1)}
                     </div>
-                    <div className="text-[10px] font-bold text-slate-400 mt-1">
+                    <div className="text-[10px] font-bold text-muted-foreground mt-1">
                       Quiz {e.quiz_avg.toFixed(0)} · Thi {e.exam_avg.toFixed(0)}
                     </div>
                   </div>
                 </div>
                 {e.explanation && (
-                  <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-600">
-                    <Info size={12} className="mt-0.5 shrink-0 text-slate-400" />
+                  <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-muted px-3 py-2 text-[11px] leading-relaxed text-muted-foreground">
+                    <Info size={12} className="mt-0.5 shrink-0 text-muted-foreground" />
                     <span className="flex-1">{e.explanation}</span>
                   </div>
                 )}
@@ -233,25 +233,25 @@ export function LeaderboardTab({ classroomUid }: Props) {
 
       <Link
         href="/consumer/grading"
-        className="flex items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/40 px-4 py-2.5 text-xs font-bold text-indigo-600 transition hover:bg-indigo-50"
+        className="flex items-center justify-center gap-1.5 rounded-xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-xs font-bold text-primary transition hover:bg-primary/10"
       >
         <Calculator size={14} />
         Xem bảng quy đổi điểm chi tiết
       </Link>
 
       {showMyStickyRow && myRank != null && myScore != null && currentUserId && (
-        <Card className="border-indigo-200 bg-indigo-50/40 sticky bottom-4 shadow-lg">
+        <Card className="border-primary/30 bg-primary/5 sticky bottom-4">
           <CardContent className="p-3 flex items-center gap-3">
             {rankBadge(myRank)}
-            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
-              <User size={16} className="text-indigo-600" />
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <User size={16} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-slate-900 truncate">Bạn</div>
-              <div className="text-[11px] text-slate-500">Hạng {myRank}</div>
+              <div className="text-sm font-bold text-foreground truncate">Bạn</div>
+              <div className="text-[11px] text-muted-foreground">Hạng {myRank}</div>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-base font-black text-indigo-600">
+              <div className="text-base font-black text-primary">
                 {myScore.toFixed(1)}
               </div>
             </div>

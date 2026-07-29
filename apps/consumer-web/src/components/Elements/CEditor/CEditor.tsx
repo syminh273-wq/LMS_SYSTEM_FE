@@ -108,7 +108,7 @@ const CEditorContent = React.forwardRef<HTMLDivElement, any & { minHeight?: stri
     }, [value, editor])
 
     return (
-      <div className={`w-full rounded-lg ${hasError ? 'border-[1.5px] border-rose-500' : ''}`} ref={ref}>
+      <div className={`w-full rounded-lg ${hasError ? 'border-[1.5px] border-destructive' : ''}`} ref={ref}>
         <CMenuBar editor={editor as any} content={value} />
         <EditorContent editor={editor} {...props} />
       </div>

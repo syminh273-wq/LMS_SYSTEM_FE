@@ -45,22 +45,22 @@ export default function MessagesPage() {
     <WorkspaceShell>
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-2 mb-4">
-          <MessageCircle size={22} className="text-indigo-600" />
-          <h1 className="text-2xl font-bold text-slate-900">{t('workspace.messages.title')}</h1>
+          <MessageCircle size={22} className="text-primary" />
+          <h1 className="text-2xl font-bold text-foreground">{t('workspace.messages.title')}</h1>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="animate-spin text-indigo-600" size={28} />
+              <Loader2 className="animate-spin text-primary" size={28} />
             </div>
           ) : list.length === 0 ? (
             <div className="text-center py-16 px-4">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-slate-100 flex items-center justify-center">
-                <MessageCircle size={28} className="text-slate-400" />
+              <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-muted flex items-center justify-center">
+                <MessageCircle size={28} className="text-muted-foreground" />
               </div>
-              <p className="font-semibold text-slate-900 text-[15px]">{t('workspace.messages.empty_list')}</p>
-              <p className="text-[13px] text-slate-500 mt-1">{t('workspace.messages.empty_list_desc')}</p>
+              <p className="font-semibold text-foreground text-[15px]">{t('workspace.messages.empty_list')}</p>
+              <p className="text-[13px] text-muted-foreground mt-1">{t('workspace.messages.empty_list_desc')}</p>
             </div>
           ) : (
             <ul>
@@ -68,7 +68,7 @@ export default function MessagesPage() {
                 <li
                   key={c.conversation_uid}
                   onClick={() => router.push(`/consumer/messages/${c.other_user.uid}`)}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-b-0 transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0 transition-colors"
                 >
                   {c.other_user.avatar ? (
                     <img
@@ -83,11 +83,11 @@ export default function MessagesPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-[14px] text-slate-900 truncate">
+                      <p className="font-semibold text-[14px] text-foreground truncate">
                         {c.other_user.name || 'User'}
                       </p>
                       {c.last_msg?.at && (
-                        <span className="text-[11px] text-slate-400 shrink-0">
+                        <span className="text-[11px] text-muted-foreground shrink-0">
                           {timeAgo(c.last_msg.at)}
                         </span>
                       )}
@@ -95,12 +95,12 @@ export default function MessagesPage() {
                     <div className="flex items-center justify-between gap-2 mt-0.5">
                       <p className={cn(
                         "text-[12.5px] truncate",
-                        c.unread_count > 0 ? "text-slate-900 font-semibold" : "text-slate-500"
+                        c.unread_count > 0 ? "text-foreground font-semibold" : "text-muted-foreground"
                       )}>
                         {c.last_msg?.text || 'Chưa có tin nhắn'}
                       </p>
                       {c.unread_count > 0 && (
-                        <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center">
+                        <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-black flex items-center justify-center">
                           {c.unread_count > 99 ? '99+' : c.unread_count}
                         </span>
                       )}

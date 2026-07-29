@@ -50,15 +50,15 @@ export default function ResetPasswordPage() {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
+      <div className="min-h-screen bg-muted flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-[440px] text-center animate-scale-in">
           <div className="relative inline-block mb-5">
-            <div className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg mx-auto">
-              <CheckCircle2 className="text-white" size={40} strokeWidth={2.5} />
+            <div className="w-20 h-20 rounded-full bg-success flex items-center justify-center shadow-lg mx-auto">
+              <CheckCircle2 className="text-success-foreground" size={40} strokeWidth={2.5} />
             </div>
           </div>
-          <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 mb-2 tracking-tight">Thành công!</h1>
-          <p className="text-slate-500 text-[14px]">
+          <h1 className="text-2xl sm:text-[28px] font-bold text-foreground mb-2 tracking-tight">Thành công!</h1>
+          <p className="text-muted-foreground text-[14px]">
             Mật khẩu đã được cập nhật. Đang chuyển đến trang đăng nhập...
           </p>
         </div>
@@ -73,33 +73,33 @@ export default function ResetPasswordPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
+    <div className="min-h-screen bg-muted flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-[440px] animate-fade-up">
         <Link
           href="/consumer/forgot-password"
-          className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 hover:text-slate-900 font-semibold mb-8 transition-colors group"
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground hover:text-foreground font-semibold mb-8 transition-colors group"
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
           Quay lại
         </Link>
 
         <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-md mb-5">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground shadow-md mb-5">
             <Lock size={22} strokeWidth={2.2} />
           </div>
-          <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 mb-1.5 tracking-tight text-balance">
+          <h1 className="text-2xl sm:text-[28px] font-bold text-foreground mb-1.5 tracking-tight text-balance">
             Đặt mật khẩu mới
           </h1>
-          <p className="text-slate-500 text-[14px]">
+          <p className="text-muted-foreground text-[14px]">
             Mật khẩu mới phải có ít nhất 8 ký tự và bao gồm chữ cái, số.
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-slate-700">Mật khẩu mới</Label>
+            <Label>Mật khẩu mới</Label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
               <Input
                 type={showNew ? 'text' : 'password'}
                 {...register('new_password', {
@@ -107,25 +107,27 @@ export default function ResetPasswordPage() {
                   minLength: { value: 8, message: 'Mật khẩu ít nhất 8 ký tự' },
                 })}
                 placeholder="••••••••"
-                className="h-11 pl-10 pr-11 text-[14px] bg-white border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors"
+                className="h-11 pl-10 pr-11"
               />
               <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowNew(v => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
               >
                 {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
               </Button>
             </div>
             {errors.new_password && (
-              <p className="text-rose-600 text-[12px] font-medium mt-1">{errors.new_password.message}</p>
+              <p className="text-destructive text-[12px] font-medium mt-1">{errors.new_password.message}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-slate-700">Xác nhận mật khẩu</Label>
+            <Label>Xác nhận mật khẩu</Label>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
               <Input
                 type={showConfirm ? 'text' : 'password'}
                 {...register('confirm_password', {
@@ -133,18 +135,20 @@ export default function ResetPasswordPage() {
                   validate: v => v === password || 'Mật khẩu xác nhận không khớp',
                 })}
                 placeholder="••••••••"
-                className="h-11 pl-10 pr-11 text-[14px] bg-white border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors"
+                className="h-11 pl-10 pr-11"
               />
               <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowConfirm(v => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors"
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
               >
                 {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
               </Button>
             </div>
             {errors.confirm_password && (
-              <p className="text-rose-600 text-[12px] font-medium mt-1">{errors.confirm_password.message}</p>
+              <p className="text-destructive text-[12px] font-medium mt-1">{errors.confirm_password.message}</p>
             )}
           </div>
 
@@ -155,13 +159,13 @@ export default function ResetPasswordPage() {
                   key={c.label}
                   className={cn(
                     "flex items-center gap-1.5 text-[11.5px] font-medium",
-                    c.ok ? "text-emerald-700" : "text-slate-500"
+                    c.ok ? "text-success" : "text-muted-foreground"
                   )}
                 >
                   <span
                     className={cn(
                       "w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0",
-                      c.ok ? "bg-emerald-500 text-white" : "bg-slate-200"
+                      c.ok ? "bg-success text-success-foreground" : "bg-muted"
                     )}
                   >
                     {c.ok && <CheckCircle2 size={10} strokeWidth={3} />}
@@ -175,7 +179,7 @@ export default function ResetPasswordPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="mt-2 w-full h-11 rounded-lg font-semibold text-[14px] text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="mt-2 w-full h-11 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

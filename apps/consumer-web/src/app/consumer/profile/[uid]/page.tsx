@@ -159,14 +159,15 @@ export default function PublicProfilePage() {
       <WorkspaceShell>
         <div className="mx-auto w-full max-w-[75vw] py-6 sm:py-8">
           <Button
+            variant="ghost"
             onClick={() => router.push('/consumer/classroom')}
-            className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 hover:text-slate-900 mb-4"
+            className="inline-flex items-center gap-2 mb-4"
           >
             <ArrowLeft size={16} />
             Trở lại
           </Button>
           <div className="flex items-center justify-center py-32">
-            <Loader2 className="size-10 text-indigo-600 animate-spin" />
+            <Loader2 className="size-10 text-primary animate-spin" />
           </div>
         </div>
       </WorkspaceShell>
@@ -178,8 +179,9 @@ export default function PublicProfilePage() {
       <WorkspaceShell>
         <div className="mx-auto w-full max-w-[75vw] py-6 sm:py-8">
           <Button
+            variant="ghost"
             onClick={() => router.push('/consumer/classroom')}
-            className="inline-flex items-center gap-2 text-[13px] font-semibold text-slate-600 hover:text-slate-900 mb-4"
+            className="inline-flex items-center gap-2 mb-4"
           >
             <ArrowLeft size={16} />
             Trở lại
@@ -189,7 +191,7 @@ export default function PublicProfilePage() {
               <UserIcon className="text-muted-foreground" size={36} />
             </div>
             <p className="text-muted-foreground font-medium">Không tìm thấy người dùng</p>
-            <Button variant="outline" className="rounded-xl" onClick={() => router.push('/consumer/classroom')}>Quay lại</Button>
+            <Button variant="outline" onClick={() => router.push('/consumer/classroom')}>Quay lại</Button>
           </div>
         </div>
       </WorkspaceShell>
@@ -275,11 +277,7 @@ export default function PublicProfilePage() {
                     <Button
                       onClick={handleFollowToggle}
                       disabled={followBusy}
-                      className={
-                        isFollowing
-                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 hover:border-slate-300'
-                          : 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold'
-                      }
+                      variant={isFollowing ? 'secondary' : 'default'}
                     >
                       {followBusy ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -299,7 +297,6 @@ export default function PublicProfilePage() {
                       onClick={handleMessage}
                       disabled={messageBusy}
                       variant="outline"
-                      className="border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:text-indigo-600"
                     >
                       {messageBusy ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -317,11 +314,7 @@ export default function PublicProfilePage() {
                     <Button
                       onClick={handleFollowToggle}
                       disabled={followBusy}
-                      className={
-                        isFollowing
-                          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 hover:border-slate-300'
-                          : 'bg-indigo-600 hover:bg-indigo-700 text-white font-bold'
-                      }
+                      variant={isFollowing ? 'secondary' : 'default'}
                     >
                       {followBusy ? (
                         <Loader2 className="size-4 animate-spin" />
@@ -341,7 +334,6 @@ export default function PublicProfilePage() {
                       onClick={handleMessage}
                       disabled={messageBusy}
                       variant="outline"
-                      className="border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:text-indigo-600"
                     >
                       {messageBusy ? (
                         <Loader2 className="size-4 animate-spin" />

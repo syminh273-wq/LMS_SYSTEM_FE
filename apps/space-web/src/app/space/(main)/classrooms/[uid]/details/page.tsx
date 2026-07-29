@@ -990,7 +990,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             variant="outline"
             size="icon"
             onClick={() => router.push('/space/classrooms')}
-            className="w-12 h-12 rounded-full border-border bg-card shadow-sm hover:bg-accent transition-all hover:scale-110 active:scale-95"
+            className="w-12 h-12 rounded-full bg-card shadow-sm hover:bg-accent transition-all hover:scale-110 active:scale-95"
           >
             <ArrowLeft size={20} className="text-muted-foreground" />
           </Button>
@@ -1011,7 +1011,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           <Button
             variant="outline"
             onClick={() => router.push(`/space/classrooms/edit/${classroom.uid}`)}
-            className="h-12 rounded-xl px-6 gap-2.5 font-bold text-xs border-border hover:bg-card text-muted-foreground uppercase tracking-widest bg-muted/50"
+            className="h-12 rounded-xl px-6 gap-2.5 font-bold text-xs hover:bg-card text-muted-foreground uppercase tracking-widest bg-muted/50"
           >
             <Settings size={18} />
             {t('classroom.ui.settings_btn')}
@@ -1037,16 +1037,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         <div className={`shrink-0 transition-all duration-300 space-y-3 ${sidebarCollapsed ? 'w-[52px]' : 'w-[268px]'}`}>
           {sidebarCollapsed ? (
             /* ── Collapsed: icon-only ── */
-            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden py-1">
+            <div className="bg-card rounded-3xl shadow-sm overflow-hidden py-1">
               {/* Expand button */}
               <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setSidebarCollapsed(false)}
                 title={t('classroom.ui.expand_sidebar')}
-                className="w-full flex justify-center py-3 hover:bg-muted transition-colors"
+                className="w-full h-10 rounded-none hover:bg-muted transition-colors"
               >
                 <ChevronsRight size={16} className="text-muted-foreground" />
               </Button>
-              <div className="mx-3 border-t border-border mb-1" />
+              <div className="mx-3 mb-1" />
               {/* All tabs as icons */}
               {([
                 { id: 'info',     label: t('classroom.ui.tab_info'),     icon: Info },
@@ -1067,10 +1069,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 return (
                   <Button
                     key={id}
+                    variant="ghost"
+                    size="icon"
                     title={label}
                     onClick={() => goToTab(id as ActiveTab)}
-                    className={`w-full flex justify-center py-3 transition-colors relative ${
-                      isActive ? 'text-primary-brand bg-primary-brand-light' : 'text-muted-foreground hover:bg-muted hover:text-muted-foreground'
+                    className={`relative w-full h-10 rounded-xl transition-colors ${
+                      isActive
+                        ? 'bg-primary-brand-light text-primary-brand hover:bg-primary-brand-light hover:text-primary-brand'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     }`}
                   >
                     {isActive && <div className="absolute left-0 w-1 h-5 bg-primary-brand rounded-r-full top-1/2 -translate-y-1/2" />}
@@ -1084,14 +1090,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             </div>
           ) : (
             /* ── Expanded: full labels ── */
-            <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+            <div className="bg-card rounded-3xl shadow-sm overflow-hidden">
               {/* Collapse button */}
-              <div className="flex items-center justify-between px-5 py-2.5 border-b border-border">
+              <div className="flex items-center justify-between px-5 py-2.5">
                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">{t('classroom.ui.menu_label')}</span>
                 <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setSidebarCollapsed(true)}
                   title={t('classroom.ui.collapse_sidebar')}
-                  className="rounded-lg p-1 hover:bg-muted transition-colors"
+                  className="h-8 w-8 rounded-lg hover:bg-muted transition-colors"
                 >
                   <ChevronsLeft size={15} className="text-muted-foreground" />
                 </Button>
@@ -1099,8 +1107,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               {/* Nhóm 1: Thông tin lớp */}
               <Button
+                variant="ghost"
                 onClick={() => toggleGroup('classroom')}
-                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
+                className="w-full h-auto flex items-center justify-between px-5 py-3 rounded-none text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 {t('classroom.ui.group_class_info')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.classroom ? '' : '-rotate-90'}`} />
@@ -1119,13 +1128,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     return (
                       <Button
                         key={id}
+                        variant="ghost"
                         onClick={() => goToTab(id as ActiveTab)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        className={`w-full h-auto justify-start flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive
+                            ? 'bg-primary-brand-light text-primary-brand hover:bg-primary-brand-light hover:text-primary-brand'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                         {label}
                         {id === 'meeting' && activeMeeting && (
                           <span className="ml-auto flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -1136,12 +1148,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
               )}
 
-              <div className="mx-4 border-t border-border" />
+              <div className="mx-4" />
 
               {/* Nhóm 2: Học tập & Đánh giá */}
               <Button
+                variant="ghost"
                 onClick={() => toggleGroup('learning')}
-                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
+                className="w-full h-auto flex items-center justify-between px-5 py-3 rounded-none text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 {t('classroom.ui.group_learning')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.learning ? '' : '-rotate-90'}`} />
@@ -1157,13 +1170,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     return (
                       <Button
                         key={id}
+                        variant="ghost"
                         onClick={() => goToTab(id as ActiveTab)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        className={`w-full h-auto justify-start flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive
+                            ? 'bg-primary-brand-light text-primary-brand hover:bg-primary-brand-light hover:text-primary-brand'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
-                        <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        <Icon size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                         {label}
                       </Button>
                     );
@@ -1171,12 +1187,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
               )}
 
-              <div className="mx-4 border-t border-border" />
+              <div className="mx-4" />
 
               {/* Nhóm 3: Quản lý sinh viên */}
               <Button
+                variant="ghost"
                 onClick={() => toggleGroup('students')}
-                className="w-full flex items-center justify-between px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted transition-colors"
+                className="w-full h-auto flex items-center justify-between px-5 py-3 rounded-none text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
               >
                 {t('classroom.ui.group_students')}
                 <ChevronDown size={14} className={`transition-transform duration-200 ${openGroups.students ? '' : '-rotate-90'}`} />
@@ -1187,13 +1204,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     const isActive = activeTab === 'students';
                     return (
                       <Button
+                        variant="ghost"
                         onClick={() => goToTab('students')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        className={`w-full h-auto justify-start flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive
+                            ? 'bg-primary-brand-light text-primary-brand hover:bg-primary-brand-light hover:text-primary-brand'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
-                        <Users size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        <Users size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                         {t('classroom.ui.tab_students')}
                         {members.filter(m => m.role === 'student').length > 0 && (
                           <span className="ml-auto text-[10px] font-black bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
@@ -1207,13 +1227,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     const isActive = activeTab === 'ranking';
                     return (
                       <Button
+                        variant="ghost"
                         onClick={() => goToTab('ranking')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        className={`w-full h-auto justify-start flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive
+                            ? 'bg-primary-brand-light text-primary-brand hover:bg-primary-brand-light hover:text-primary-brand'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
-                        <Trophy size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        <Trophy size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                         {t('classroom.ui.tab_ranking')}
                       </Button>
                     );
@@ -1222,13 +1245,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     const isActive = activeTab === 'blacklist';
                     return (
                       <Button
+                        variant="ghost"
                         onClick={() => goToTab('blacklist')}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
-                          isActive ? 'bg-primary-brand-light text-primary-brand' : 'text-muted-foreground hover:bg-muted'
+                        className={`w-full h-auto justify-start flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all group relative ${
+                          isActive
+                            ? 'bg-primary-brand-light text-primary-brand hover:bg-primary-brand-light hover:text-primary-brand'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                         }`}
                       >
                         {isActive && <div className="absolute left-0 w-1.5 h-5 bg-primary-brand rounded-r-full" />}
-                        <ShieldBan size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-muted-foreground'} />
+                        <ShieldBan size={18} className={isActive ? 'text-primary-brand' : 'text-muted-foreground group-hover:text-foreground'} />
                         {t('classroom.ui.tab_blacklist')}
                         {blacklist.length > 0 && (
                           <span className="ml-auto text-[10px] font-black bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">
@@ -1244,7 +1270,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {!sidebarCollapsed && <>
-            <Card className="border-border shadow-sm rounded-[32px] overflow-hidden bg-card p-8">
+            <Card className="shadow-sm rounded-[32px] overflow-hidden bg-card p-8">
               <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] mb-4">{t('classroom.ui.class_size_title')}</h3>
               <div className="flex items-baseline gap-2 mb-6">
                 <span className="text-5xl font-bold text-foreground tracking-tighter">
@@ -1252,7 +1278,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </span>
                 <span className="text-muted-foreground font-bold text-lg">{t('classroom.ui.students_count_suffix', undefined, { count: classroom.max_students })}</span>
               </div>
-              <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden border border-border p-0.5">
+              <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden p-0.5">
                 <div
                   className="h-full bg-primary-brand rounded-full shadow-[0_0_8px_rgba(79,70,229,0.3)] transition-all duration-1000"
                   style={{ width: `${classroom.max_students > 0 ? Math.min(100, (members.filter(m => m.role === 'student').length / classroom.max_students) * 100) : 0}%` }}
@@ -1260,7 +1286,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
             </Card>
 
-            <Card className="border-none shadow-xl rounded-[32px] overflow-hidden bg-gradient-to-br from-primary-brand to-primary-brand-dark text-white p-8 relative group">
+            <Card className="shadow-xl rounded-[32px] overflow-hidden bg-gradient-to-br from-primary-brand to-primary-brand-dark text-white p-8 relative group">
               <div className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500">
                 <QrCode size={140} />
               </div>
@@ -1270,7 +1296,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 <Button
                   variant="ghost"
                   onClick={handleDownloadQr}
-                  className="w-full bg-card/10 hover:bg-card/20 backdrop-blur-md text-white rounded-2xl h-12 font-bold text-xs tracking-widest gap-3 border border-white/10 transition-all uppercase"
+                  className="w-full bg-card/10 hover:bg-card/20 backdrop-blur-md text-white rounded-2xl h-12 font-bold text-xs tracking-widest gap-3 transition-all uppercase"
                 >
                   <QrCode size={18} /> {t('classroom.ui.download_qr_action')}
                 </Button>
@@ -1284,14 +1310,14 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {activeTab === 'info' && (
             <div className="grid grid-cols-1 gap-8 animate-in fade-in duration-300">
               {/* Mô tả Card */}
-              <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm group">
+              <div className="bg-card rounded-[32px] p-10 shadow-sm group">
                 <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                     <Info size={22} />
                   </div>
                   {t('classroom.ui.info_description_title')}
                 </h3>
-                <div className="bg-muted/50 p-8 rounded-3xl border border-border text-muted-foreground font-medium leading-relaxed italic text-lg relative">
+                <div className="bg-muted/50 p-8 rounded-3xl text-muted-foreground font-medium leading-relaxed italic text-lg relative">
                   <span className="absolute -top-4 -left-2 text-6xl text-muted-foreground/10 font-serif opacity-50">&ldquo;</span>
                   {classroom.description}
                   <span className="absolute -bottom-10 -right-2 text-6xl text-muted-foreground/10 font-serif opacity-50">&rdquo;</span>
@@ -1300,15 +1326,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* QR Code Card */}
-                <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm flex flex-col items-center">
+                <div className="bg-card rounded-[32px] p-10 shadow-sm flex flex-col items-center">
                   <h3 className="text-lg font-bold text-foreground mb-8 self-start flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
                       <QrCode size={22} />
                     </div>
                     {t('classroom.ui.info_qr_card_title')}
                   </h3>
-                  <div className="p-10 bg-card rounded-[40px] border-2 border-dashed border-border mb-10 shadow-inner group transition-all hover:border-primary-brand/50">
-                    <div className="p-6 bg-muted rounded-[32px] border border-border group-hover:scale-105 transition-transform duration-500">
+                  <div className="p-10 bg-card rounded-[40px] mb-10 shadow-inner group transition-all">
+                    <div className="p-6 bg-muted rounded-[32px] group-hover:scale-105 transition-transform duration-500">
                       {linkData && (
                         <QRCodeSVG
                           id="classroom-qr"
@@ -1330,23 +1356,24 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 </div>
 
                 {/* Activity Log Timeline Card */}
-                <div className="bg-card rounded-[32px] p-10 border border-border shadow-sm flex flex-col">
-                  <div className="flex items-center justify-between mb-8">
+                <div className="bg-card rounded-[32px] p-10 shadow-sm flex flex-col">
+                  <div className="flex flex-col gap-4 mb-8">
                     <h3 className="text-lg font-bold text-foreground flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand">
+                      <div className="w-10 h-10 rounded-xl bg-primary-brand/10 flex items-center justify-center text-primary-brand shrink-0">
                         <RotateCcw size={22} />
                       </div>
-                      {t('classroom.ui.info_activity_title')}
+                      <span>{t('classroom.ui.info_activity_title')}</span>
                     </h3>
-                    <div className="flex items-center gap-2">
-                      <div className="flex bg-muted rounded-xl p-1 gap-1">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1">
                         {(['major', 'detail'] as const).map((lvl) => (
                           <Button
                             key={lvl}
+                            variant="ghost"
                             onClick={() => setActivityLevel(lvl)}
-                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all ${
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all bg-transparent! hover:bg-transparent! active:bg-transparent! focus-visible:bg-transparent! focus-visible:ring-0! shadow-none ${
                               activityLevel === lvl
-                                ? 'bg-card text-primary-brand shadow-sm'
+                                ? 'text-primary-brand font-black'
                                 : 'text-muted-foreground hover:text-foreground'
                             }`}
                           >
@@ -1355,8 +1382,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         ))}
                       </div>
                       <Button
+                        variant="ghost"
                         onClick={() => router.push(`/space/classrooms/${uid}/activity`)}
-                        className="flex items-center gap-1.5 text-[10px] font-black text-primary-brand hover:text-primary-brand uppercase tracking-widest px-3 py-1.5 rounded-xl hover:bg-primary-brand-light transition-all"
+                        className="flex items-center gap-1.5 text-[10px] font-black text-primary-brand hover:text-primary-brand uppercase tracking-widest px-3 py-1.5 rounded-xl bg-transparent! hover:bg-transparent! active:bg-transparent! focus-visible:bg-transparent! focus-visible:ring-0! shadow-none"
                       >
                         {t('classroom.ui.info_view_all')}
                         <ChevronRight size={13} />
@@ -1381,12 +1409,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         return (
                           <div
                             key={log.uid}
-                            className={`flex gap-4 items-start relative ${!isLast ? 'pb-6' : ''}`}
+                            className={`flex gap-4 items-start relative${!isLast ? ' pb-6' : ''}`}
                           >
                             {!isLast && (
                               <div className="absolute left-[13px] top-7 bottom-0 w-0.5 bg-muted" />
                             )}
-                            <div className={`w-7 h-7 rounded-full ${bg} flex items-center justify-center shrink-0 z-10 border-2 border-card`}>
+                            <div className={`w-7 h-7 rounded-full ${bg} flex items-center justify-center shrink-0 z-10`}>
                               <Icon size={13} className={color} />
                             </div>
                             <div className="flex-1 min-w-0 pt-0.5">
@@ -1410,7 +1438,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'docs' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm p-6">
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm p-6">
               <div className="mb-4">
                 <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.docs_title')}</h3>
                 <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.docs_subtitle')}</p>
@@ -1426,10 +1454,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'ai' && (
-            <div className="flex h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+            <div className="flex h-[calc(100vh-260px)] animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
               {/* AI Sidebar */}
-              <div className="w-72 border-r border-border bg-muted/20 flex flex-col hidden md:flex">
-                <div className="p-6 border-b border-border flex items-center justify-between bg-card">
+              <div className="w-72 bg-muted/20 flex flex-col hidden md:flex">
+                <div className="p-6 flex items-center justify-between bg-card">
                   <h4 className="font-bold text-sm text-foreground">{t('classroom.ui.ai_history_title')}</h4>
                   <Button variant="ghost" size="icon" onClick={createNewAiSession} className="h-8 w-8 rounded-lg hover:bg-primary-brand-light hover:text-primary-brand">
                     <Plus size={16} />
@@ -1444,11 +1472,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     aiSessions.map((s) => (
                       <Button
                         key={s.session_id}
+                        variant="ghost"
                         onClick={() => setAiSessionId(s.session_id)}
-                        className={`w-full text-left p-3 rounded-xl transition-all duration-200 group ${
+                        className={`w-full text-left p-3 rounded-xl transition-all duration-200 group justify-start ${
                           aiSessionId === s.session_id
-                            ? 'bg-primary-brand text-white shadow-md shadow-primary-brand/20'
-                            : 'hover:bg-primary-brand-light/50 text-muted-foreground hover:text-primary-brand'
+                            ? '!bg-primary-brand !text-white shadow-md shadow-primary-brand/20 hover:!bg-primary-brand hover:!text-white'
+                            : '!bg-transparent text-muted-foreground hover:!bg-primary-brand-light/50 hover:!text-primary-brand'
                         }`}
                       >
                         <p className={`text-xs font-bold truncate ${aiSessionId === s.session_id ? 'text-white' : 'text-foreground group-hover:text-primary-brand'}`}>
@@ -1471,7 +1500,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               {/* Chat Area */}
               <div className="flex-1 flex flex-col min-w-0 bg-card">
                 {/* Header */}
-                <div className="px-8 py-5 border-b border-border bg-card flex items-center gap-4">
+                <div className="px-8 py-5 bg-card flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-primary-brand flex items-center justify-center shadow-lg shadow-primary-brand-muted shrink-0">
                   <Bot size={24} className="text-white" />
                 </div>
@@ -1505,7 +1534,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               <div ref={aiScrollRef} className="flex-1 overflow-y-auto p-8 space-y-6">
                 {aiMessages.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <div className="w-20 h-20 rounded-full bg-primary-brand-light flex items-center justify-center mb-4 border border-primary-brand-muted">
+                    <div className="w-20 h-20 rounded-full bg-primary-brand-light flex items-center justify-center mb-4">
                       <Sparkles size={32} className="text-primary-brand" />
                     </div>
                     <p className="text-lg font-bold text-foreground">{t('classroom.ui.ai_greeting')}</p>
@@ -1525,7 +1554,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <div className={`max-w-[76%] rounded-2xl px-5 py-3.5 ${
                       msg.role === 'user'
                         ? 'bg-primary-brand text-white rounded-br-md shadow-md shadow-primary-brand/20'
-                        : 'bg-muted text-foreground rounded-bl-md border border-border'
+                        : 'bg-muted text-foreground rounded-bl-md'
                     }`}>
                       <div className="text-sm font-medium leading-relaxed space-y-1.5">
                         {msg.text
@@ -1550,7 +1579,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         }
                       </div>
                       {msg.tool_calls && msg.tool_calls.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                        <div className="mt-3 pt-3 space-y-1.5">
                           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('classroom.ui.ai_executed')}</p>
                           {msg.tool_calls.map((tc, j) => (
                             <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center gap-2">
@@ -1566,7 +1595,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         </div>
                       )}
                       {msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-border/40 space-y-1.5">
+                        <div className="mt-3 pt-3 space-y-1.5">
                           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t('classroom.ui.ai_sources')}</p>
                           {msg.sources.slice(0, 3).map((src, j) => (
                             <div key={j} className="text-[11px] text-muted-foreground bg-background/60 rounded-lg px-3 py-1.5 flex items-center justify-between gap-3">
@@ -1587,17 +1616,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
 
               {/* Input */}
-              <div className="p-6 border-t border-border bg-muted/30">
+              <div className="p-6 bg-muted/30">
                 {/* Mode selector */}
-                <div className="flex gap-2 mb-3">
+                <div className="flex flex-wrap gap-2 mb-3">
                   {AI_MODES.map(({ key, label, icon: Icon }) => (
                     <Button
                       key={key}
+                      variant="ghost"
                       onClick={() => setAiMode(key)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                         aiMode === key
-                          ? 'bg-primary-brand text-white shadow-md shadow-primary-brand/20'
-                          : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'
+                          ? '!bg-primary-brand !text-white shadow-md shadow-primary-brand/20 hover:!bg-primary-brand hover:!text-white'
+                          : '!bg-muted !text-muted-foreground hover:!bg-primary-brand-light hover:!text-primary-brand'
                       }`}
                     >
                       <Icon size={13} />
@@ -1605,12 +1635,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     </Button>
                   ))}
                 </div>
-                <div className="flex gap-3">
-                  <div className="flex-1 flex gap-2">
+                <div className="flex flex-wrap gap-3">
+                  <div className="flex-1 min-w-[200px] flex gap-2">
                     {isRecording ? (
                       <Button
+                        variant="ghost"
                         onClick={stopRecording}
-                        className="flex-1 h-12 flex items-center justify-center gap-2 bg-rose-500 text-white rounded-2xl text-xs font-black uppercase tracking-wide animate-pulse"
+                        className="flex-1 h-12 flex items-center justify-center gap-2 !bg-rose-500 !text-white rounded-2xl text-xs font-black uppercase tracking-wide animate-pulse hover:!bg-rose-500 hover:!text-white"
                       >
                         <Square size={14} fill="white" />
                         {t('classroom.ui.ai_speaking')}
@@ -1618,9 +1649,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     ) : (
                       <>
                         <Button
+                          variant="ghost"
                           disabled={aiLoading}
                           onClick={() => void startRecording()}
-                          className="h-12 w-12 flex items-center justify-center bg-muted text-muted-foreground rounded-2xl hover:bg-primary-brand-light hover:text-primary-brand disabled:opacity-50 transition-all shrink-0"
+                          className="h-12 w-12 flex items-center justify-center !bg-muted !text-muted-foreground rounded-2xl hover:!bg-primary-brand-light hover:!text-primary-brand disabled:opacity-50 transition-all shrink-0"
                           title={t('classroom.ui.ai_mic_title')}
                         >
                           <Mic size={18} />
@@ -1632,15 +1664,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleAiAsk(); } }}
                           placeholder={AI_MODES.find(m => m.key === aiMode)?.placeholder ?? t('classroom.ui.ai_placeholder')}
                           disabled={aiLoading}
-                          className="flex-1 h-12 rounded-2xl border border-border bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
+                          className="flex-1 h-12 min-w-0 rounded-2xl bg-background px-5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary-brand/30 disabled:opacity-60"
                         />
                       </>
                     )}
                   </div>
                   <Button
+                    variant="ghost"
                     onClick={() => void handleAiAsk()}
                     disabled={!aiQuestion.trim() || aiLoading || isRecording}
-                    className="h-12 w-12 rounded-2xl bg-primary-brand hover:bg-primary-brand-dark text-white p-0 shadow-lg shadow-primary-brand/20 disabled:opacity-50 shrink-0"
+                    className="h-12 w-12 rounded-2xl !bg-primary-brand hover:!bg-primary-brand-dark !text-white p-0 shadow-lg shadow-primary-brand/20 disabled:opacity-50 shrink-0 hover:!text-white"
                   >
                     {aiLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                   </Button>
@@ -1651,7 +1684,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
         )}
 
           {activeTab === 'chat' && (
-            <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm h-[calc(100vh-260px)] flex flex-col">
+            <div className="bg-card rounded-[32px] overflow-hidden shadow-sm h-[calc(100vh-260px)] flex flex-col">
               {conversationUid ? (
                 <ClassroomChatPanel
                   conversationUid={conversationUid}
@@ -1668,17 +1701,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'meeting' && (
-            <div className="flex h-full flex-col animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex h-full flex-col animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
+              <div className="p-10 bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.meeting_title')}</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.meeting_subtitle')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
+                  <span className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest ${
                     activeMeeting
-                      ? 'border-emerald-100 bg-emerald-50 text-emerald-600 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                      : 'border-border bg-card text-muted-foreground'
+                      ? 'bg-emerald-50 text-emerald-600 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                      : 'bg-card text-muted-foreground'
                   }`}>
                     {activeMeeting ? <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> : <WifiOff size={14} />}
                     {activeMeeting ? t('classroom.ui.meeting_status_active') : t('classroom.ui.meeting_status_offline')}
@@ -1692,7 +1725,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             onClick={() => void handleStartMeeting('camera')}
                             disabled={meetingAction !== null}
                             variant="outline"
-                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-border hover:bg-muted uppercase tracking-widest"
+                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold hover:bg-muted uppercase tracking-widest"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
                             {t('classroom.ui.meeting_enable_camera')}
@@ -1701,7 +1734,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             onClick={() => void handleStartMeeting('screen')}
                             disabled={meetingAction !== null}
                             variant="outline"
-                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-border hover:bg-muted uppercase tracking-widest"
+                            className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold hover:bg-muted uppercase tracking-widest"
                           >
                             {meetingAction === 'start' ? <Loader2 size={18} className="animate-spin" /> : <MonitorUp size={18} />}
                             {t('classroom.ui.meeting_share_screen')}
@@ -1712,7 +1745,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           onClick={stopMediaShare}
                           disabled={meetingAction !== null}
                           variant="outline"
-                          className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold border-rose-200 text-rose-600 hover:bg-rose-50 uppercase tracking-widest"
+                          className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 uppercase tracking-widest"
                         >
                           <WifiOff size={18} />
                           {t('classroom.ui.meeting_stop_streaming')}
@@ -1751,7 +1784,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 ) : (
                   <>
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
+                      <div className="rounded-3xl bg-card p-6 shadow-sm group transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_status_label')}</div>
                         <div className="text-lg font-bold text-foreground flex items-center gap-2">
                           {activeMeeting ? (
@@ -1765,7 +1798,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           {activeMeeting ? `${t('classroom.ui.meeting_started_at', undefined, { time: formatDateTime(activeMeeting.started_at || activeMeeting.created_at) })}` : t('classroom.ui.meeting_ready_desc')}
                         </div>
                       </div>
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
+                      <div className="rounded-3xl bg-card p-6 shadow-sm group transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Học viên đang tham gia</div>
                         <div className="flex items-center gap-3 text-lg font-bold text-foreground">
                           <Users size={20} className="text-indigo-500" />
@@ -1775,7 +1808,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           {activeMeeting ? 'Sinh viên đang ở trong phòng' : 'Mở lớp để học viên tham gia'}
                         </div>
                       </div>
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
+                      <div className="rounded-3xl bg-card p-6 shadow-sm group transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_real_time')}</div>
                         <div className="flex items-center gap-3 text-lg font-bold text-foreground">
                           {rtcConnected ? <Wifi size={20} className="text-emerald-500" /> : <WifiOff size={20} className="text-muted-foreground/50" />}
@@ -1783,7 +1816,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         </div>
                         <div className="mt-2 text-xs font-medium text-muted-foreground leading-relaxed">{t('classroom.ui.meeting_real_time_desc')}</div>
                       </div>
-                      <div className="rounded-3xl border border-border bg-card p-6 shadow-sm group hover:border-primary-brand-muted transition-all">
+                      <div className="rounded-3xl bg-card p-6 shadow-sm group transition-all">
                         <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">{t('classroom.ui.meeting_latest')}</div>
                         <div className="text-sm font-bold text-foreground truncate">
                           {latestMeeting?.title || t('classroom.ui.meeting_no_history')}
@@ -1794,17 +1827,17 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </div>
                     </div>
 
-                    <div className="rounded-[40px] border border-border bg-slate-950 p-6 shadow-2xl shadow-primary-brand/10">
+                    <div className="rounded-[40px] bg-slate-950 p-6 shadow-2xl shadow-primary-brand/10">
                       {remoteStream ? (
-                        <div className="rounded-[24px] overflow-hidden border border-slate-800">
+                        <div className="rounded-[24px] overflow-hidden">
                           <ScreenShareViewer stream={remoteStream} label={t('classroom.ui.meeting_remote_stream')} />
                         </div>
                       ) : localStream ? (
-                        <div className="rounded-[24px] overflow-hidden border border-slate-800">
+                        <div className="rounded-[24px] overflow-hidden">
                           <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? t('classroom.ui.meeting_camera_streaming') : t('classroom.ui.meeting_screen_sharing')} />
                         </div>
                       ) : (
-                        <div className="flex aspect-video flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-800 text-center text-muted-foreground bg-slate-900/50">
+                        <div className="flex aspect-video flex-col items-center justify-center rounded-[32px] text-center text-muted-foreground bg-slate-900/50">
                           <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center mb-6">
                             <Video size={32} className="opacity-40" />
                           </div>
@@ -1820,13 +1853,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'calendar' && (
-            <div className="animate-in fade-in duration-300 bg-card rounded-3xl border border-border shadow-sm p-6 sm:p-8">
+            <div className="animate-in fade-in duration-300 bg-card rounded-3xl shadow-sm p-6 sm:p-8">
               <ClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
             </div>
           )}
 
           {activeTab === 'leave_request' && (
-            <div className="animate-in fade-in duration-300 bg-card rounded-3xl border border-border shadow-sm p-6 sm:p-8">
+            <div className="animate-in fade-in duration-300 bg-card rounded-3xl shadow-sm p-6 sm:p-8">
               <LeaveRequestTab
                 role="teacher"
                 classroomId={uid}
@@ -1860,8 +1893,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           )}
 
           {activeTab === 'exams' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
+              <div className="p-10 bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.exams_title')}</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.exams_subtitle')}</p>
@@ -1878,15 +1911,16 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </div>
 
               <div className="p-10 flex-1 overflow-y-auto space-y-8">
-                <div className="flex items-center gap-3 bg-muted p-1.5 rounded-2xl border border-border w-fit">
+                <div className="flex flex-wrap items-center gap-3 bg-muted p-1.5 rounded-2xl w-fit">
                   {(['midterm', 'final', 'regular'] as ExamKind[]).map(kind => (
                     <Button
                       key={kind}
+                      variant="ghost"
                       onClick={() => goToExamKind(kind)}
                       className={`px-6 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all ${
                         selectedExamKind === kind
-                          ? 'bg-card text-primary-brand shadow-sm border border-border'
-                          : 'text-muted-foreground hover:text-muted-foreground'
+                          ? '!bg-card !text-primary-brand shadow-sm hover:!bg-card hover:!text-primary-brand'
+                          : '!bg-transparent !text-muted-foreground hover:!bg-transparent hover:!text-foreground'
                       }`}
                     >
                       {t(`classroom.ui.exam_kind_${kind}`)}
@@ -1900,7 +1934,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <Loader2 size={32} className="animate-spin" />
                     </div>
                   ) : filteredExams.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px]">
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <ClipboardList size={24} className="opacity-40" />
                       </div>
@@ -1910,7 +1944,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {filteredExams.map(exam => (
-                        <div key={exam.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-primary-brand-muted transition-all hover:shadow-lg">
+                        <div key={exam.uid} className="bg-card p-6 rounded-[24px] shadow-sm flex items-center gap-6 group transition-all hover:shadow-lg">
                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm transition-all group-hover:scale-110 ${
                             exam.status === 'published' ? 'bg-primary-brand-light text-primary-brand' : 'bg-muted text-muted-foreground'
                           }`}>
@@ -1919,8 +1953,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-3 mb-1">
                               <h4 className="text-base font-bold text-foreground group-hover:text-primary-brand transition-colors">{exam.title}</h4>
-                              <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider border ${
-                                exam.status === 'published' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-muted text-muted-foreground border-border'
+                              <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${
+                                exam.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-muted text-muted-foreground'
                               }`}>
                                 {exam.status === 'published' ? t('classroom.ui.exams_published') : t('classroom.ui.exams_draft')}
                               </span>
@@ -1936,7 +1970,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                           <div className="flex items-center gap-2">
                             <Button
                               onClick={() => router.push(`/space/classrooms/${uid}/exams/${exam.uid}`)}
-                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-primary-brand hover:text-white text-muted-foreground transition-all border border-border hover:border-primary-brand uppercase tracking-widest"
+                              className="h-10 rounded-xl px-4 font-bold text-xs bg-muted hover:bg-primary-brand hover:text-white text-muted-foreground transition-all uppercase tracking-widest"
                             >
                               {t('classroom.ui.exams_view_detail')}
                             </Button>
@@ -1947,7 +1981,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                     <MoreVertical size={20} />
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl border-border">
+                                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl">
                                   <DropdownMenuItem className="rounded-xl px-3 py-2.5 font-bold text-xs uppercase text-muted-foreground hover:text-primary-brand cursor-pointer" onClick={() => router.push(`/space/classrooms/${uid}/exams/edit/${exam.uid}`)}>
                                     <Pencil size={16} className="mr-3 text-muted-foreground" />
                                     {t('classroom.ui.exams_edit')}
@@ -1980,9 +2014,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             const tabExams = examSubTab === 'ongoing' ? activeExams : completedExams;
 
             return (
-              <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
+              <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
                 {/* Header */}
-                <div className="px-10 pt-10 pb-0 border-b border-border bg-muted/50">
+                <div className="px-10 pt-10 pb-0 bg-muted/50">
                   <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between mb-6">
                     <div>
                       <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.final_exams_title')}</h3>
@@ -2002,10 +2036,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <Button
                       type="button"
                       onClick={() => setExamSubTab('ongoing')}
-                      className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
+                      className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider transition-colors ${
                         examSubTab === 'ongoing'
-                          ? 'border-primary-brand text-primary-brand'
-                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                          ? 'text-primary-brand'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       <span className="relative flex h-2 w-2">
@@ -2020,10 +2054,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <Button
                       type="button"
                       onClick={() => setExamSubTab('closed')}
-                      className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider border-b-2 transition-colors ${
+                      className={`flex items-center gap-2 px-5 py-3 text-xs font-black uppercase tracking-wider transition-colors ${
                         examSubTab === 'closed'
-                          ? 'border-primary-brand text-primary-brand'
-                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                          ? 'text-primary-brand'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       {t('classroom.ui.final_exams_closed')}
@@ -2041,7 +2075,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <Loader2 size={32} className="animate-spin text-muted-foreground/40" />
                     </div>
                   ) : !hasAnySession ? (
-                    <div className="flex flex-col items-center justify-center py-24 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                    <div className="flex flex-col items-center justify-center py-24 bg-muted/30 rounded-[32px]">
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <BarChart2 size={24} className="opacity-40 text-muted-foreground" />
                       </div>
@@ -2056,7 +2090,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </Button>
                     </div>
                   ) : tabExams.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-[28px] border border-dashed border-border">
+                    <div className="flex flex-col items-center justify-center py-20 bg-muted/20 rounded-[28px]">
                       <BarChart2 size={28} className="opacity-20 text-muted-foreground mb-3" />
                       <p className="text-sm font-bold text-muted-foreground">
                         {examSubTab === 'ongoing' ? t('classroom.ui.final_exams_no_ongoing') : t('classroom.ui.final_exams_no_closed')}
@@ -2067,7 +2101,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       {examSubTab === 'ongoing' ? (
                         /* ── ĐANG THI cards ── */
                         tabExams.map(exam => (
-                          <div key={exam.uid} className="bg-card rounded-[20px] border-2 border-primary-brand-muted shadow-md shadow-primary-brand-light">
+                          <div key={exam.uid} className="bg-card rounded-[20px] shadow-md shadow-primary-brand-light">
                             <div className="flex items-center gap-5 p-5">
                               <div className="w-12 h-12 rounded-xl bg-primary-brand text-white flex items-center justify-center shrink-0 shadow-lg shadow-primary-brand-muted">
                                 <FileText size={20} />
@@ -2075,7 +2109,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                   <h4 className="text-sm font-black text-foreground truncate">{exam.title}</h4>
-                                  <span className="shrink-0 text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100 uppercase animate-pulse">
+                                  <span className="shrink-0 text-[9px] font-black px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 uppercase animate-pulse">
                                     {t('classroom.ui.final_exams_live')}
                                   </span>
                                 </div>
@@ -2083,15 +2117,15 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   {t('classroom.ui.final_exams_start', undefined, { time: exam.opened_at ? formatDateTime(exam.opened_at) : '--' })}
                                 </p>
                                 <div className="mt-2 flex flex-wrap gap-1.5">
-                                  <span className="flex items-center gap-1 rounded-full bg-primary-brand-light border border-primary-brand-muted px-2 py-0.5 text-[10px] font-black text-primary-brand">
+                                  <span className="flex items-center gap-1 rounded-full bg-primary-brand-light px-2 py-0.5 text-[10px] font-black text-primary-brand">
                                     <Timer size={9} />
                                     {exam.duration_seconds ? t('classroom.ui.final_exams_minutes', undefined, { count: Math.round(exam.duration_seconds / 60) }) : t('classroom.ui.quiz_no_limit')}
                                   </span>
-                                  <span className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-600">
+                                  <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-black text-amber-600">
                                     <Clock size={9} />
                                     {exam.late_threshold_seconds ? t('classroom.ui.final_exams_late', undefined, { minutes: Math.round(exam.late_threshold_seconds / 60) }) : t('classroom.ui.final_exams_no_late')}
                                   </span>
-                                  <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-black ${exam.camera_required ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-muted/50 border-border text-muted-foreground'}`}>
+                                  <span className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-black ${exam.camera_required ? 'bg-emerald-50 text-emerald-600' : 'bg-muted/50 text-muted-foreground'}`}>
                                     <Camera size={9} />
                                     {exam.camera_required ? t('classroom.ui.final_exams_camera') : t('classroom.ui.final_exams_no_camera')}
                                   </span>
@@ -2111,7 +2145,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       ) : (
                         /* ── ĐÃ THI cards ── */
                         tabExams.map(exam => (
-                          <div key={exam.uid} className="bg-muted/40 rounded-[20px] border border-border flex items-center gap-5 p-5 hover:bg-card hover:border-primary-brand-muted transition-all group">
+                          <div key={exam.uid} className="bg-muted/40 rounded-[20px] flex items-center gap-5 p-5 hover:bg-card transition-all group">
                             <div className="w-12 h-12 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0 group-hover:bg-primary-brand-light group-hover:text-primary-brand transition-colors">
                               <FileText size={20} />
                             </div>
@@ -2136,8 +2170,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             );
           })()}
           {activeTab === 'quiz' && (
-            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              <div className="p-10 border-b border-border bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex flex-col h-full animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
+              <div className="p-10 bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.quiz_section_title')}</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.quiz_section_subtitle')}</p>
@@ -2167,7 +2201,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <Loader2 size={32} className="animate-spin" />
                   </div>
                 ) : assignedQuizzes.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px]">
                     <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Gamepad2 size={24} className="opacity-40" />
                     </div>
@@ -2180,7 +2214,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       const assignment = quiz.assigned_classrooms?.[0];
                       const timeLimitMin = assignment?.time_limit_seconds ? Math.round(assignment.time_limit_seconds / 60) : 0;
                       return (
-                        <div key={quiz.uid} className="bg-card p-6 rounded-[24px] border border-border shadow-sm flex items-center gap-6 group hover:border-primary-brand-muted transition-all hover:shadow-lg">
+                        <div key={quiz.uid} className="bg-card p-6 rounded-[24px] shadow-sm flex items-center gap-6 group transition-all hover:shadow-lg">
                           <div className="w-14 h-14 rounded-2xl bg-primary-brand-light text-primary-brand flex items-center justify-center shadow-sm transition-all group-hover:scale-110">
                             <Gamepad2 size={24} />
                           </div>
@@ -2196,7 +2230,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-10 rounded-xl px-4 gap-2 text-xs font-black uppercase tracking-wider text-amber-600 border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                              className="h-10 rounded-xl px-4 gap-2 text-xs font-black uppercase tracking-wider text-amber-600 hover:bg-amber-50"
                               onClick={() => setLeaderboardQuiz(quiz)}
                             >
                               <Trophy size={14} />
@@ -2205,7 +2239,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-11 w-11 rounded-xl text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                              className="h-11 w-11 rounded-xl text-muted-foreground/50 hover:text-rose-500 hover:bg-rose-50"
                               onClick={() => void handleUnassignQuiz(quiz)}
                               disabled={unassigningUid === quiz.uid}
                             >
@@ -2231,8 +2265,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {activeTab === 'blacklist' && (
             <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-              <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-                <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
+              <div className="bg-card rounded-[32px] overflow-hidden shadow-sm">
+                <div className="p-10 bg-muted/50 flex items-center justify-between">
                   <div>
                     <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.blacklist_title')}</h3>
                     <p className="text-sm text-muted-foreground font-medium mt-1">
@@ -2252,7 +2286,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <Loader2 size={32} className="animate-spin" />
                     </div>
                   ) : blacklist.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px]">
                       <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                         <ShieldBan size={24} className="opacity-40" />
                       </div>
@@ -2260,10 +2294,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       <p className="text-xs font-medium mt-1">{t('classroom.ui.blacklist_empty_hint')}</p>
                     </div>
                   ) : (
-                    <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-sm">
+                    <div className="overflow-hidden rounded-[24px] bg-card shadow-sm">
                       <table className="w-full text-left">
                         <thead>
-                          <tr className="border-b border-border text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                          <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                             <th className="px-6 py-4">{t('classroom.ui.blacklist_th_user')}</th>
                             <th className="px-6 py-4">{t('classroom.ui.blacklist_th_reason')}</th>
                             <th className="px-6 py-4">{t('classroom.ui.blacklist_th_blocked_at')}</th>
@@ -2272,7 +2306,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         </thead>
                         <tbody>
                           {blacklist.map(entry => (
-                            <tr key={entry.consumer_uid} className="border-b border-border last:border-0 hover:bg-rose-50/20 transition-colors">
+                            <tr key={entry.consumer_uid} className="hover:bg-rose-50/20 transition-colors">
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${entry.scope === 'global' ? 'bg-rose-100' : 'bg-orange-100'}`}>
@@ -2301,7 +2335,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                                   variant="outline"
                                   size="sm"
                                   disabled={unblockingId === entry.consumer_uid}
-                                  className="rounded-xl gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:border-emerald-300"
+                                  className="rounded-xl gap-2 text-xs font-bold text-emerald-600 hover:text-emerald-700"
                                   onClick={async () => {
                                     setUnblockingId(entry.consumer_uid);
                                     try {
@@ -2338,8 +2372,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {activeTab === 'ranking' && (
             <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-              <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-                <div className="p-10 border-b border-border bg-muted/50">
+              <div className="bg-card rounded-[32px] overflow-hidden shadow-sm">
+                <div className="p-10 bg-muted/50">
                   <h3 className="text-xl font-bold text-foreground">
                     {t('classroom.ui.tab_ranking', 'Ranking')}
                   </h3>
@@ -2356,8 +2390,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
           {activeTab === 'students' && (
             <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-              <div className="bg-card rounded-[32px] overflow-hidden border border-border shadow-sm">
-              <div className="p-10 border-b border-border bg-muted/50 flex items-center justify-between">
+              <div className="bg-card rounded-[32px] overflow-hidden shadow-sm">
+              <div className="p-10 bg-muted/50 flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-foreground">{t('classroom.ui.students_title')}</h3>
                   <p className="text-sm text-muted-foreground font-medium mt-1">
@@ -2372,7 +2406,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <Loader2 size={32} className="animate-spin" />
                   </div>
                 ) : members.filter(m => m.role === 'student').length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px] border-2 border-dashed border-border">
+                  <div className="flex flex-col items-center justify-center py-20 text-muted-foreground/50 bg-muted/30 rounded-[32px]">
                     <div className="w-16 h-16 rounded-full bg-card flex items-center justify-center mb-4 shadow-sm">
                       <Users size={24} className="opacity-40" />
                     </div>
@@ -2380,10 +2414,10 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                     <p className="text-xs font-medium mt-1">{t('classroom.ui.students_empty_hint')}</p>
                   </div>
                 ) : (
-                  <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-sm">
+                  <div className="overflow-hidden rounded-[24px] bg-card shadow-sm">
                     <table className="w-full text-left">
                       <thead>
-                        <tr className="border-b border-border text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                        <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                           <th className="px-6 py-4">{t('classroom.ui.students_th_member')}</th>
                           <th className="px-6 py-4">{t('classroom.ui.students_th_joined_at')}</th>
                           <th className="px-6 py-4 text-right">{t('classroom.ui.students_th_actions')}</th>
@@ -2391,12 +2425,12 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                       </thead>
                       <tbody>
                         {members.filter(m => m.role === 'student').map(member => (
-                          <tr key={member.member_id} className="border-b border-slate-50 last:border-0 hover:bg-rose-50/20 transition-colors">
+                          <tr key={member.member_id} className="hover:bg-rose-50/20 transition-colors">
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-4">
                                 {member.member_avatar ? (
                                   // eslint-disable-next-line @next/next/no-img-element
-                                  <img src={member.member_avatar} alt={member.member_name} className="w-10 h-10 rounded-2xl object-cover border border-border" />
+                                  <img src={member.member_avatar} alt={member.member_name} className="w-10 h-10 rounded-2xl object-cover" />
                                 ) : (
                                   <div className="w-10 h-10 rounded-2xl bg-primary-brand-light flex items-center justify-center text-primary-brand font-black text-sm">
                                     {member.member_name.charAt(0).toUpperCase()}
@@ -2505,7 +2539,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
       {/* ── Kick dialog ── */}
       <Dialog open={!!memberToKick} onOpenChange={(open) => { if (!open) setMemberToKick(null); }}>
-        <DialogContent showCloseButton={false} className="max-w-sm rounded-[28px] p-0 overflow-hidden border-0 shadow-2xl">
+        <DialogContent showCloseButton={false} className="max-w-sm rounded-[28px] p-0 overflow-hidden shadow-2xl">
           {/* Header strip */}
           <div className="relative bg-gradient-to-br from-rose-500 to-rose-700 px-8 pt-8 pb-12">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
@@ -2514,9 +2548,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {memberToKick?.member_avatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={memberToKick.member_avatar} alt={memberToKick.member_name}
-                    className="w-20 h-20 rounded-2xl object-cover border-4 border-white/30 shadow-xl" />
+                    className="w-20 h-20 rounded-2xl object-cover shadow-xl" />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-white/20 border-4 border-white/30 flex items-center justify-center text-white font-black text-3xl shadow-xl">
+                  <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-3xl shadow-xl">
                     {memberToKick?.member_name.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -2541,7 +2575,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               </p>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm border-border"
+              <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm"
                 onClick={() => setMemberToKick(null)} disabled={!!kickingId}>
                 {t('classroom.ui.kick_dialog_cancel')}
               </Button>
@@ -2557,7 +2591,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
 
       {/* ── Block dialog ── */}
       <Dialog open={!!memberToBlock} onOpenChange={(open) => { if (!open) setMemberToBlock(null); }}>
-        <DialogContent showCloseButton={false} className="max-w-sm rounded-[28px] p-0 overflow-hidden border-0 shadow-2xl">
+        <DialogContent showCloseButton={false} className="max-w-sm rounded-[28px] p-0 overflow-hidden shadow-2xl">
           {/* Header strip — orange for classroom, rose for global */}
           <div className={`relative px-8 pt-8 pb-12 bg-gradient-to-br ${
             memberToBlock?.scope === 'global'
@@ -2570,9 +2604,9 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                 {memberToBlock?.member.member_avatar ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={memberToBlock.member.member_avatar} alt={memberToBlock.member.member_name}
-                    className="w-20 h-20 rounded-2xl object-cover border-4 border-white/30 shadow-xl" />
+                    className="w-20 h-20 rounded-2xl object-cover shadow-xl" />
                 ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-white/20 border-4 border-white/30 flex items-center justify-center text-white font-black text-3xl shadow-xl">
+                  <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-3xl shadow-xl">
                     {memberToBlock?.member.member_name.charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -2612,7 +2646,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               )}
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm border-border"
+              <Button variant="outline" className="flex-1 h-11 rounded-xl font-bold text-sm"
                 onClick={() => setMemberToBlock(null)} disabled={!!blockingMemberId}>
                 {t('classroom.ui.block_dialog_cancel')}
               </Button>
@@ -2660,7 +2694,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
           {/* Panel */}
           <div className="relative z-10 flex h-full w-full max-w-[480px] flex-col bg-card shadow-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-border px-8 py-6">
+            <div className="flex items-center justify-between px-8 py-6">
               <div>
                 <h2 className="text-xl font-black text-foreground">{t('classroom.ui.pending_title')}</h2>
                 <p className="mt-1 text-sm font-medium text-muted-foreground">
@@ -2707,7 +2741,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                   {pendingMembers.map(member => (
                     <div
                       key={member.member_id}
-                      className="flex items-center gap-4 rounded-2xl border border-border bg-muted p-4"
+                      className="flex items-center gap-4 rounded-2xl bg-muted p-4"
                     >
                       {member.member_avatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -2742,7 +2776,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-8 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold px-3 gap-1"
+                          className="h-8 rounded-xl text-rose-600 hover:bg-rose-50 text-xs font-bold px-3 gap-1"
                           disabled={approvingId === member.member_id || rejectingId === member.member_id}
                           onClick={() => void handleRejectMember(member)}
                         >
@@ -2759,7 +2793,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             </div>
 
             {/* Footer */}
-            <div className="border-t border-border px-8 py-4">
+            <div className="px-8 py-4">
               <Button
                 onClick={() => { loadPendingMembers(); }}
                 className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-muted-foreground transition-colors"
@@ -2834,7 +2868,7 @@ function AssignQuizModal({
     return (
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-8 border-b border-border flex items-center justify-between">
+          <div className="p-8 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold text-foreground">{t('quiz.assign_modal.settings_title')}</h2>
               <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{pendingQuiz.title}</p>
@@ -2849,12 +2883,12 @@ function AssignQuizModal({
               <div className="space-y-2.5">
                 <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.assign_modal.time_label')}</Label>
                 <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
+                  className="w-full h-12 rounded-2xl bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
               <div className="space-y-2.5">
                 <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.assign_modal.max_attempts_label')}</Label>
                 <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                  className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
+                  className="w-full h-12 rounded-2xl bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
               </div>
             </div>
 
@@ -2864,19 +2898,19 @@ function AssignQuizModal({
                 { label: t('quiz.assign_modal.shuffle_options'), icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
                 { label: t('quiz.assign_modal.show_explanation'), icon: HelpCircle, val: showExplanation, set: setShowExplanation },
               ].map(item => (
-                <Label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
+                <Label key={item.label} className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted cursor-pointer group transition-all">
                   <div className="flex items-center gap-3 text-sm font-bold text-foreground">
                     <item.icon size={16} className="text-muted-foreground group-hover:text-primary-brand" /> {item.label}
                   </div>
                   <Input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
-                    className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand border-border transition-all" />
+                    className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand transition-all" />
                 </Label>
               ))}
             </div>
           </div>
 
           <div className="p-8 pt-0 flex gap-4">
-            <Button variant="outline" onClick={() => setPendingQuiz(null)} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
+            <Button variant="outline" onClick={() => setPendingQuiz(null)} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest">
               {t('quiz.assign_modal.back')}
             </Button>
             <Button
@@ -2896,7 +2930,7 @@ function AssignQuizModal({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-lg animate-in fade-in slide-in-from-bottom-4 duration-200 max-h-[80vh] flex flex-col">
-        <div className="p-8 border-b border-border flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-foreground">{t('quiz.assign_modal.select_quiz_title')}</h2>
             <p className="text-sm text-muted-foreground font-medium mt-1">{t('quiz.assign_modal.select_quiz_hint')}</p>
@@ -2926,10 +2960,10 @@ function AssignQuizModal({
                   type="button"
                   disabled={assigned}
                   onClick={() => { setPendingQuiz(quiz); setTimeLimitMin(0); setMaxAttempts(0); }}
-                  className={`w-full text-left rounded-2xl border-2 p-5 transition-all flex items-center gap-5 ${
+                  className={`w-full text-left rounded-2xl p-5 transition-all flex items-center gap-5 ${
                     assigned
-                      ? 'border-emerald-100 bg-emerald-50 cursor-default opacity-60'
-                      : 'border-slate-50 bg-card hover:border-primary-brand hover:bg-primary-brand-light/30 cursor-pointer group shadow-sm'
+                      ? 'bg-emerald-50 cursor-default opacity-60'
+                      : 'bg-card hover:bg-primary-brand-light/30 cursor-pointer group shadow-sm'
                   }`}
                 >
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-all ${assigned ? 'bg-emerald-100 text-emerald-600' : 'bg-muted text-muted-foreground group-hover:bg-primary-brand group-hover:text-white group-hover:shadow-lg'}`}>
@@ -2938,13 +2972,13 @@ function AssignQuizModal({
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-foreground group-hover:text-primary-brand transition-colors">{quiz.title}</div>
                     <div className="flex items-center gap-3 mt-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                      <span className="bg-muted px-2 py-0.5 rounded border border-border">{t('quiz.assign_modal.questions_count', undefined, { count: quiz.questions_count })}</span>
+                      <span className="bg-muted px-2 py-0.5 rounded">{t('quiz.assign_modal.questions_count', undefined, { count: quiz.questions_count })}</span>
                     </div>
                   </div>
                   {assigned ? (
-                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-card border border-emerald-100 px-3 py-1 rounded-full shrink-0 tracking-widest">{t('quiz.assign_modal.assigned_badge')}</span>
+                    <span className="text-[10px] font-black text-emerald-600 uppercase bg-card px-3 py-1 rounded-full shrink-0 tracking-widest">{t('quiz.assign_modal.assigned_badge')}</span>
                   ) : (
-                    <span className="text-[10px] font-black text-primary-brand uppercase bg-primary-brand-light border border-primary-brand-light px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">{t('quiz.assign_modal.select_badge')}</span>
+                    <span className="text-[10px] font-black text-primary-brand uppercase bg-primary-brand-light px-3 py-1 rounded-full shrink-0 tracking-widest opacity-0 group-hover:opacity-100 transition-all">{t('quiz.assign_modal.select_badge')}</span>
                   )}
                 </Button>
               );
@@ -2952,8 +2986,8 @@ function AssignQuizModal({
           )}
         </div>
 
-        <div className="p-8 border-t border-border">
-          <Button onClick={onClose} variant="outline" className="w-full rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
+        <div className="p-8">
+          <Button onClick={onClose} variant="outline" className="w-full rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest">
             {t('quiz.assign_modal.close_window')}
           </Button>
         </div>
@@ -3042,8 +3076,8 @@ function OpenOnlineExamModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-4xl h-[90vh] bg-card rounded-[40px] shadow-2xl border border-border flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="flex items-center justify-between p-8 border-b border-border bg-muted/30">
+      <div className="w-full max-w-4xl h-[90vh] bg-card rounded-[40px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="flex items-center justify-between p-8 bg-muted/30">
           <div>
             <h2 className="text-2xl font-black text-foreground uppercase tracking-tight">{t('classroom.ui.final_exams_open')}</h2>
             <p className="text-sm font-medium text-muted-foreground">{t('classroom.ui.final_exams_subtitle')}</p>
@@ -3060,11 +3094,11 @@ function OpenOnlineExamModal({
               {t('classroom.ui.final_exams_open')}
             </div>
             {loading ? (
-              <div className="flex h-32 items-center justify-center rounded-2xl border border-border bg-muted/40">
+              <div className="flex h-32 items-center justify-center rounded-2xl bg-muted/40">
                 <Loader2 size={28} className="animate-spin text-primary-brand" />
               </div>
             ) : exams.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border bg-muted/40 p-8 text-center">
+              <div className="rounded-2xl bg-muted/40 p-8 text-center">
                 <ClipboardList size={36} className="mx-auto mb-3 text-muted-foreground/40" />
                 <p className="text-sm font-bold text-foreground">{t('classroom.ui.final_exams_empty')}</p>
                 <p className="mt-1 text-xs font-medium text-muted-foreground">{t('classroom.ui.final_exams_empty_hint')}</p>
@@ -3079,14 +3113,14 @@ function OpenOnlineExamModal({
                       type="button"
                       onClick={() => handleSelectExam(exam)}
                       disabled={opening}
-                      className={`rounded-2xl border-2 p-4 text-left transition-all ${
+                      className={`rounded-2xl p-4 text-left transition-all${
                         active
-                          ? 'border-primary-brand bg-primary-brand-light'
-                          : 'border-border bg-card hover:border-primary-brand-muted hover:bg-primary-brand-light/40'
+                          ? 'bg-primary-brand-light'
+                          : 'bg-card hover:bg-primary-brand-light/40'
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${active ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
+                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl${active ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                           {active ? <Check size={18} /> : <FileText size={18} />}
                         </div>
                         <div className="min-w-0">
@@ -3112,7 +3146,7 @@ function OpenOnlineExamModal({
                     value={durationMin}
                     onChange={event => setDurationMin(Math.max(1, Number(event.target.value)))}
                     disabled={opening}
-                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
+                    className="h-12 w-full rounded-2xl bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
                   />
                 </Label>
 
@@ -3124,16 +3158,16 @@ function OpenOnlineExamModal({
                     value={lateThresholdMin}
                     onChange={event => setLateThresholdMin(Number(event.target.value))}
                     disabled={opening}
-                    className="h-12 w-full rounded-2xl border border-border bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
+                    className="h-12 w-full rounded-2xl bg-muted px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-primary-brand-light disabled:opacity-60"
                     placeholder={t('classroom.ui.no_time_limit_hint')}
                   />
                 </Label>
               </div>
 
               {/* Camera toggle */}
-              <div className={`flex items-center justify-between rounded-2xl border-2 px-5 py-4 transition-colors ${cameraRequired ? 'border-primary-brand bg-primary-brand-light' : 'border-border bg-muted/40'}`}>
+              <div className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-colors${cameraRequired ? 'bg-primary-brand-light' : 'bg-muted/40'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl${cameraRequired ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                     <Camera size={20} />
                   </div>
                   <div>
@@ -3147,15 +3181,15 @@ function OpenOnlineExamModal({
                   type="button"
                   disabled={opening}
                   onClick={() => setCameraRequired(v => !v)}
-                  className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${cameraRequired ? 'bg-primary-brand' : 'bg-slate-300'}`}
+                  className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60${cameraRequired ? 'bg-primary-brand' : 'bg-slate-300'}`}
                   style={{ width: 52 }}
                 >
-                  <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
+                  <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
                 </Button>
               </div>
 
               {/* Proctoring rules */}
-              <div className="rounded-2xl border-2 border-border bg-rose-50/40 p-4">
+              <div className="rounded-2xl bg-rose-50/40 p-4">
                 <div className="mb-3 flex items-center gap-2">
                   <ShieldAlert size={16} className="text-rose-600" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-rose-700">Giám sát & chống gian lận</span>
@@ -3174,7 +3208,7 @@ function OpenOnlineExamModal({
                         value={maxTabLeaves}
                         onChange={e => setMaxTabLeaves(Math.max(0, Number(e.target.value)))}
                         disabled={opening}
-                        className="h-12 w-24 rounded-2xl border border-border bg-card px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-60"
+                        className="h-12 w-24 rounded-2xl bg-card px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-60"
                       />
                       <span className="text-xs font-bold text-muted-foreground">lần (0 = không giới hạn)</span>
                     </div>
@@ -3194,7 +3228,7 @@ function OpenOnlineExamModal({
                         value={maxFaceWarnings}
                         onChange={e => setMaxFaceWarnings(Math.max(0, Number(e.target.value)))}
                         disabled={opening}
-                        className="h-12 w-24 rounded-2xl border border-border bg-card px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-amber-300 disabled:opacity-60"
+                        className="h-12 w-24 rounded-2xl bg-card px-4 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-amber-300 disabled:opacity-60"
                       />
                       <span className="text-xs font-bold text-muted-foreground">lần (0 = chỉ log)</span>
                     </div>
@@ -3206,8 +3240,8 @@ function OpenOnlineExamModal({
           )}
         </div>
 
-        <div className="p-8 border-t border-border flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button variant="outline" onClick={onClose} disabled={opening} className="rounded-[20px] font-bold text-xs h-12 px-6 uppercase tracking-widest border-border">
+        <div className="p-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button variant="outline" onClick={onClose} disabled={opening} className="rounded-[20px] font-bold text-xs h-12 px-6 uppercase tracking-widest">
             {t('classroom.labels.cancel')}
           </Button>
           <Button
@@ -3269,7 +3303,7 @@ function EditSettingsModal({
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
-        <div className="p-8 border-b border-border flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-foreground">{t('quiz.settings_modal.title')}</h2>
             <p className="text-sm text-muted-foreground font-medium mt-1 truncate max-w-[240px]">{quiz.title}</p>
@@ -3284,12 +3318,12 @@ function EditSettingsModal({
             <div className="space-y-2.5">
               <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><Clock size={14} /> {t('quiz.settings_modal.time_label')}</Label>
               <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
+                className="w-full h-12 rounded-2xl bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
             <div className="space-y-2.5">
               <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2"><RotateCcw size={14} /> {t('quiz.settings_modal.max_attempts_label')}</Label>
               <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                className="w-full h-12 rounded-2xl border border-border bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
+                className="w-full h-12 rounded-2xl bg-muted px-4 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light transition-all" />
             </div>
           </div>
 
@@ -3307,19 +3341,19 @@ function EditSettingsModal({
               { label: t('quiz.settings_modal.shuffle_options'), icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
               { label: t('quiz.settings_modal.show_explanation'), icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
-              <Label key={item.label} className="flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:bg-muted cursor-pointer group transition-all">
+              <Label key={item.label} className="flex items-center justify-between p-4 rounded-2xl hover:bg-muted cursor-pointer group transition-all">
                 <div className="flex items-center gap-3 text-sm font-bold text-foreground">
                   <item.icon size={16} className="text-muted-foreground group-hover:text-primary-brand" /> {item.label}
                 </div>
                 <Input type="checkbox" checked={item.val} onChange={e => item.set(e.target.checked)}
-                  className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand border-border transition-all" />
+                  className="w-5 h-5 rounded-lg text-primary-brand focus:ring-primary-brand transition-all" />
               </Label>
             ))}
           </div>
         </div>
 
         <div className="p-8 pt-0 flex gap-4">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest border-border">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-[20px] font-bold text-xs h-14 uppercase tracking-widest">
             {t('quiz.settings_modal.cancel')}
           </Button>
           <Button
@@ -3368,7 +3402,7 @@ function StudentDetailsModal({
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="p-8 border-b border-border flex items-center justify-between shrink-0">
+        <div className="p-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             {member.member_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -3389,14 +3423,14 @@ function StudentDetailsModal({
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 px-8 py-5 border-b border-border shrink-0">
+        <div className="grid grid-cols-3 gap-4 px-8 py-5 shrink-0">
           {[
             { label: t('classroom.ui.score_total_exams'), value: records.length, color: 'text-foreground' },
             { label: t('classroom.ui.score_submitted'), value: submitted, color: 'text-primary-brand' },
             { label: t('classroom.ui.score_avg'), value: avgGrade != null ? avgGrade.toFixed(1) : '--', color: 'text-emerald-600' },
           ].map(s => (
             <div key={s.label} className="bg-muted rounded-2xl p-4 text-center">
-              <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
+              <div className={`text-2xl font-black${s.color}`}>{s.value}</div>
               <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{s.label}</div>
             </div>
           ))}
@@ -3416,7 +3450,7 @@ function StudentDetailsModal({
           ) : (
             <table className="w-full text-left">
               <thead>
-                <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
+                <tr className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                   <th className="pb-3">{t('classroom.ui.score_grade_th_exam')}</th>
                   <th className="pb-3">{t('classroom.ui.score_grade_th_status')}</th>
                   <th className="pb-3">{t('classroom.ui.score_grade_th_submitted_at')}</th>
@@ -3425,11 +3459,11 @@ function StudentDetailsModal({
               </thead>
               <tbody>
                 {records.map(r => (
-                  <tr key={r.exam.uid} className="border-b border-slate-50 last:border-0 hover:bg-muted/50">
+                  <tr key={r.exam.uid} className="hover:bg-muted/50">
                     <td className="py-3 pr-4 text-sm font-bold text-foreground">{r.exam.title}</td>
                     <td className="py-3 pr-4">
                       {r.submission ? (
-                        <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${getSubmissionStatusClass(r.submission.status)}`}>
+                        <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full${getSubmissionStatusClass(r.submission.status)}`}>
                           {getSubmissionStatusLabel(r.submission.status, t)}
                         </span>
                       ) : (
@@ -3441,7 +3475,7 @@ function StudentDetailsModal({
                     </td>
                     <td className="py-3 text-right">
                       {r.submission?.grade != null ? (
-                        <span className={`text-sm font-black ${r.submission.grade >= 5 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <span className={`text-sm font-black${r.submission.grade >= 5 ? 'text-emerald-600' : 'text-rose-600'}`}>
                           {r.submission.grade.toFixed(1)}
                         </span>
                       ) : (
@@ -3503,7 +3537,7 @@ function StudentAnalyzeModal({
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-card rounded-[32px] shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="p-8 border-b border-border flex items-center justify-between shrink-0">
+        <div className="p-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             {member.member_avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -3546,7 +3580,7 @@ function StudentAnalyzeModal({
                     : trend < 0
                     ? <TrendingDown size={22} className="text-rose-500" />
                     : <Minus size={22} className="text-muted-foreground" />}
-                  <div className={`text-2xl font-black ${trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-rose-600' : 'text-muted-foreground'}`}>
+                  <div className={`text-2xl font-black${trend > 0 ? 'text-emerald-600' : trend < 0 ? 'text-rose-600' : 'text-muted-foreground'}`}>
                     {trend > 0 ? `+${trend.toFixed(1)}` : trend.toFixed(1)}
                   </div>
                   <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('classroom.ui.analyze_trend')}</div>
@@ -3567,7 +3601,7 @@ function StudentAnalyzeModal({
               )}
 
               {/* Assessment */}
-              <div className="rounded-2xl border border-border p-5 space-y-3">
+              <div className="rounded-2xl p-5 space-y-3">
                 <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">{t('classroom.ui.analyze_auto_assessment')}</p>
                 <p className="text-sm font-medium text-foreground leading-relaxed">
                   {submissionRate === 0 && t('classroom.ui.analyze_no_submission_msg')}
@@ -3598,7 +3632,7 @@ function GradeLineChart({ data }: { data: { name: string; grade: number; index: 
         <XAxis dataKey="name" tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} />
         <YAxis domain={[0, 10]} tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }} />
         <Tooltip
-          contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 12, fontWeight: 700 }}
+          contentStyle={{ fontSize: 12, fontWeight: 700 }}
           formatter={value => [typeof value === 'number' ? value.toFixed(1) : String(value ?? '--'), t('classroom.ui.score_avg')]}
         />
         <ReferenceLine y={5} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: t('classroom.ui.analyze_trend'), fontSize: 10, fill: '#f59e0b' }} />
@@ -3630,15 +3664,15 @@ function getSubmissionStatusLabel(status: string, t: (key: string) => string) {
 function getExamStatusClass(status: string) {
   const normalized = status.toLowerCase();
   if (normalized === 'active' || normalized === 'published' || normalized === 'open') {
-    return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
+    return 'bg-emerald-50 text-emerald-600';
   }
   if (normalized === 'draft') {
-    return 'bg-amber-50 text-amber-600 border border-amber-100';
+    return 'bg-amber-50 text-amber-600';
   }
   if (normalized === 'closed' || normalized === 'expired') {
-    return 'bg-rose-50 text-rose-600 border border-rose-100';
+    return 'bg-rose-50 text-rose-600';
   }
-  return 'bg-muted text-muted-foreground border border-border';
+  return 'bg-muted text-muted-foreground';
 }
 
 function getExamStatusLabel(status: string, t: (key: string) => string) {

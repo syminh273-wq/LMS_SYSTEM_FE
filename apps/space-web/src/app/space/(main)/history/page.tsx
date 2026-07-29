@@ -133,7 +133,7 @@ function SpaceHistoryPageContent() {
   }, [summary]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-4 sm:p-8">
+    <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-7xl mx-auto space-y-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
@@ -141,19 +141,19 @@ function SpaceHistoryPageContent() {
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="text-slate-600 hover:text-slate-900 -ml-2"
+              className="text-muted-foreground hover:text-foreground -ml-2"
               aria-label="Quay lại"
             >
               <ArrowLeft size={18} />
             </Button>
             <div>
               <div className="flex items-center gap-2">
-                <Wallet size={20} className="text-indigo-600" strokeWidth={2.4} />
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                <Wallet size={20} className="text-primary-brand" strokeWidth={2.4} />
+                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground">
                   Lịch sử thanh toán
                 </h1>
               </div>
-              <p className="text-[12px] text-slate-500 mt-0.5">
+              <p className="text-[12px] text-muted-foreground mt-0.5">
                 Các giao dịch MoMo nhận được từ học viên trong các lớp của bạn.
               </p>
             </div>
@@ -188,11 +188,11 @@ function SpaceHistoryPageContent() {
           />
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap rounded-2xl border border-slate-200 bg-white p-3">
+        <div className="flex items-center gap-3 flex-wrap rounded-2xl border border-border bg-card p-3">
           <DateRangeFilter value={dateRange} onChange={handleDateChange} />
-          <div className="h-5 w-px bg-slate-200" />
+          <div className="h-5 w-px bg-border" />
           <ClassroomFilter value={classroomUid} onChange={handleClassroomChange} />
-          <div className="h-5 w-px bg-slate-200" />
+          <div className="h-5 w-px bg-border" />
           <PaymentStatusFilter value={statusFilter} onChange={handleStatusChange} />
         </div>
 
@@ -204,20 +204,20 @@ function SpaceHistoryPageContent() {
         )}
 
         {summaryError && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {summaryError}
           </div>
         )}
 
         {summary && summary.by_classroom?.length > 0 && classroomUid === 'all' && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <h3 className="text-[12px] font-extrabold uppercase tracking-wide text-slate-500 mb-3">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <h3 className="text-[12px] font-extrabold uppercase tracking-wide text-muted-foreground mb-3">
               Tổng hợp theo lớp
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-[11px] uppercase tracking-wide text-slate-500">
+                  <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground">
                     <th className="py-2 font-bold">Lớp</th>
                     <th className="py-2 font-bold text-right">Giao dịch</th>
                     <th className="py-2 font-bold text-right">Thành công</th>
@@ -229,18 +229,18 @@ function SpaceHistoryPageContent() {
                   {summary.by_classroom.map((row) => (
                     <tr
                       key={row.classroom_uid}
-                      className="border-t border-slate-100 hover:bg-slate-50 cursor-pointer"
+                      className="border-t border-border hover:bg-muted cursor-pointer"
                       onClick={() => handleClassroomChange(row.classroom_uid)}
                     >
-                      <td className="py-2 font-semibold text-slate-800">{row.classroom_name}</td>
-                      <td className="py-2 text-right text-slate-700">{row.total_count}</td>
+                      <td className="py-2 font-semibold text-foreground">{row.classroom_name}</td>
+                      <td className="py-2 text-right text-foreground">{row.total_count}</td>
                       <td className="py-2 text-right text-emerald-700 font-bold">
                         {row.completed_count}
                       </td>
                       <td className="py-2 text-right text-amber-700 font-bold">
                         {row.pending_count}
                       </td>
-                      <td className="py-2 text-right text-indigo-700 font-extrabold">
+                      <td className="py-2 text-right text-primary-brand font-extrabold">
                         {formatRevenue(row.total_revenue)}
                       </td>
                     </tr>
@@ -252,7 +252,7 @@ function SpaceHistoryPageContent() {
         )}
 
         {error && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {error}
           </div>
         )}

@@ -119,7 +119,7 @@ export default function ConsumerSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
 
         <header className="flex items-center justify-between gap-3 flex-wrap">
@@ -128,44 +128,44 @@ export default function ConsumerSettingsPage() {
               variant="ghost"
               size="icon"
               onClick={() => router.push('/consumer/dashboard')}
-              className="shrink-0 h-9 w-9 rounded-lg hover:bg-white"
+              className="shrink-0 h-9 w-9"
             >
               <ArrowLeft size={17} />
             </Button>
             <div className="min-w-0">
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10.5px] font-semibold uppercase tracking-wider mb-1">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10.5px] font-semibold uppercase tracking-wider mb-1">
                 Consumer
               </div>
-              <h1 className="truncate text-2xl sm:text-[26px] font-bold tracking-tight text-slate-900">
+              <h1 className="truncate text-2xl sm:text-[26px] font-bold tracking-tight text-foreground">
                 Cài đặt
               </h1>
-              <p className="text-[13px] text-slate-500 mt-0.5">Quản lý bảo mật tài khoản của bạn</p>
+              <p className="text-[13px] text-muted-foreground mt-0.5">Quản lý bảo mật tài khoản của bạn</p>
             </div>
           </div>
           <ConsumerProfileDropdown />
         </header>
 
-        <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white card-elevated">
+        <section className="overflow-hidden rounded-2xl border border-border bg-card card-elevated">
           <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr]">
-            <div className="border-b border-slate-200 p-6 lg:border-b-0 lg:border-r bg-slate-50">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-md">
+            <div className="border-b border-border p-6 lg:border-b-0 lg:border-r bg-muted">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
                 <ShieldCheck size={22} strokeWidth={2.2} />
               </div>
-              <h2 className="mt-4 text-[17px] font-bold text-slate-900">Đổi mật khẩu</h2>
-              <p className="mt-2 text-[12.5px] text-slate-500 leading-relaxed">
+              <h2 className="mt-4 text-[17px] font-bold text-foreground">Đổi mật khẩu</h2>
+              <p className="mt-2 text-[12.5px] text-muted-foreground leading-relaxed">
                 Cập nhật mật khẩu định kỳ để bảo vệ tài khoản LMS. Tài khoản đăng nhập bằng Google/Gmail cần quản lý qua Google.
               </p>
-              <div className="mt-5 space-y-2.5 rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-[10.5px] font-bold uppercase tracking-wider text-slate-500 mb-1">Yêu cầu mật khẩu</p>
+              <div className="mt-5 space-y-2.5 rounded-xl border border-border bg-card p-4">
+                <p className="text-[10.5px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Yêu cầu mật khẩu</p>
                 {passwordChecks.map(item => (
                   <div key={item.label} className="flex items-center gap-2 text-[12.5px] font-medium">
                     <span className={cn(
                       "flex h-4 w-4 items-center justify-center rounded-full transition-colors",
-                      item.done ? "bg-emerald-500 text-white" : "bg-slate-200 text-slate-400"
+                      item.done ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"
                     )}>
                       <CheckCircle2 size={11} strokeWidth={3} />
                     </span>
-                    <span className={cn("transition-colors", item.done ? "text-slate-900" : "text-slate-500")}>
+                    <span className={cn("transition-colors", item.done ? "text-foreground" : "text-muted-foreground")}>
                       {item.label}
                     </span>
                   </div>
@@ -175,14 +175,14 @@ export default function ConsumerSettingsPage() {
 
             <form onSubmit={handleSubmit} className="space-y-4 p-6 sm:p-8">
               {success && (
-                <div className="flex items-start gap-2.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] font-medium text-emerald-700 animate-fade-down">
-                  <CheckCircle2 size={15} className="text-emerald-600 mt-0.5 shrink-0" />
+                <div className="flex items-start gap-2.5 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-[13px] font-medium text-success animate-fade-down">
+                  <CheckCircle2 size={15} className="text-success mt-0.5 shrink-0" />
                   {success}
                 </div>
               )}
               {error && (
-                <div className="whitespace-pre-line flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] font-medium text-rose-700 animate-fade-down">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                <div className="whitespace-pre-line flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-[13px] font-medium text-destructive animate-fade-down">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 shrink-0" />
                   {error}
                 </div>
               )}
@@ -216,7 +216,7 @@ export default function ConsumerSettingsPage() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="h-10 rounded-lg bg-indigo-600 px-5 font-semibold text-white hover:bg-indigo-700"
+                  className="h-10"
                 >
                   {loading ? <Loader2 size={15} className="animate-spin mr-2" /> : <KeyRound size={15} className="mr-2" />}
                   {loading ? 'Đang đổi mật khẩu...' : 'Đổi mật khẩu'}
@@ -247,7 +247,7 @@ function PasswordField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-[12px] font-semibold text-slate-700">
+      <Label htmlFor={id}>
         {label}
       </Label>
       <div className="relative">
@@ -256,13 +256,15 @@ function PasswordField({
           type={visible ? 'text' : 'password'}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full rounded-lg border border-slate-300 bg-white px-4 pr-11 text-[13.5px] font-medium text-slate-900 outline-none transition-colors placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+          className="h-11 w-full rounded-lg border border-border bg-background px-4 pr-11 text-[13.5px] font-medium text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
           autoComplete="off"
         />
         <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={onToggle}
-          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+          className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center"
           aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
         >
           {visible ? <EyeOff size={15} /> : <Eye size={15} />}

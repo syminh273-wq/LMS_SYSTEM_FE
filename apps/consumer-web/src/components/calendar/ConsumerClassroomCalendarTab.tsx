@@ -136,12 +136,12 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
             <CalendarDays size={18} />
           </div>
           <div>
-            <h3 className="text-[15px] font-bold text-slate-900">{t('calendar.labels.title', 'Academic Calendar')}</h3>
-            <p className="text-[12px] text-slate-500">
+            <h3 className="text-[15px] font-bold text-foreground">{t('calendar.labels.title', 'Academic Calendar')}</h3>
+            <p className="text-[12px] text-muted-foreground">
               {classroomName ?? t('calendar.labels.subtitle', 'Classroom events')}
             </p>
           </div>
@@ -152,7 +152,7 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
             value={typeFilter}
             onValueChange={(v) => setTypeFilter(v as CalendarEventType | 'all')}
           >
-            <SelectTrigger className="h-9 rounded-lg border border-slate-200 bg-white px-2.5 text-[12.5px] font-semibold text-slate-700">
+            <SelectTrigger className="h-9">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -168,20 +168,22 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
+        <div className="flex items-center bg-card border border-border rounded-lg overflow-hidden">
           <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={goPrev}
-            className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
             aria-label="Previous"
           >
             <ChevronLeft size={14} />
           </Button>
-          <div className="h-4 w-px bg-slate-200" />
+          <div className="h-4 w-px bg-border" />
           <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={goNext}
-            className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
             aria-label="Next"
           >
             <ChevronRight size={14} />
@@ -189,16 +191,17 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
         </div>
         <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={goToday}
-          className="h-9 px-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12px] font-semibold hover:bg-slate-50"
         >
           {locale === 'vi' ? 'Hôm nay' : 'Today'}
         </Button>
-        <span className="text-[14px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
+        <span className="text-[14px] font-bold text-foreground capitalize ml-2">{headerLabel}</span>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700">
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">
           {error}
         </div>
       )}
@@ -206,7 +209,7 @@ export function ConsumerClassroomCalendarTab({ classroomUid, classroomName }: Pr
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 relative">
           {loading && (
-            <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 text-[11px] text-slate-500">
+            <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-background/90 px-2 py-1 rounded-md border border-border text-[11px] text-muted-foreground">
               <Clock size={11} className="animate-spin" />
               {t('calendar.labels.loading', 'Loading...')}
             </div>

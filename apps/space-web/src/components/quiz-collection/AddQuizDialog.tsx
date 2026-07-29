@@ -86,6 +86,7 @@ export function AddQuizDialog({ open, onOpenChange, quizzes, existingQuizIds, on
                 return (
                   <Button
                     key={q.uid}
+                    variant="ghost"
                     onClick={() => toggle(q.uid)}
                     className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                       isSelected ? 'bg-primary-brand/10 border border-primary-brand/30' : 'hover:bg-muted/50 border border-transparent'

@@ -27,7 +27,7 @@ export default function MyCoursesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="animate-spin text-indigo-600" size={32} />
+        <Loader2 className="animate-spin text-primary" size={32} />
       </div>
     );
   }
@@ -35,11 +35,11 @@ export default function MyCoursesPage() {
   if (!data || data.results.length === 0) {
     return (
       <div className="max-w-2xl mx-auto py-12">
-        <Card className="border-border">
-          <CardContent className="p-12 text-center space-y-4">
-            <GraduationCap size={64} className="mx-auto text-slate-300" />
+        <Card>
+          <CardContent className="text-center space-y-4">
+            <GraduationCap size={64} className="mx-auto text-muted-foreground" />
             <h2 className="text-xl font-bold">{t('course.mine.empty', 'No courses yet.')}</h2>
-            <p className="text-slate-500">{t('course.mine.empty_desc', 'Use a preview link from your teacher to enroll.')}</p>
+            <p className="text-muted-foreground">{t('course.mine.empty_desc', 'Use a preview link from your teacher to enroll.')}</p>
           </CardContent>
         </Card>
       </div>
@@ -49,7 +49,7 @@ export default function MyCoursesPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-black text-foreground flex items-center gap-2">
-        <GraduationCap className="text-indigo-600" size={32} />
+        <GraduationCap className="text-primary" size={32} />
         {t('course.mine.title', 'My Courses')}
       </h1>
 
@@ -57,10 +57,10 @@ export default function MyCoursesPage() {
         {data.results.map((c) => (
           <Card
             key={c.uid}
-            className="border-border hover:shadow-md transition-all cursor-pointer overflow-hidden group"
+            className="cursor-pointer overflow-hidden group"
             onClick={() => router.push(`/consumer/course/${c.uid}`)}
           >
-            <div className="aspect-video bg-gradient-to-br from-indigo-500 to-purple-600 relative">
+            <div className="aspect-video bg-gradient-to-br from-primary to-purple-600 relative">
               {c.cover_url ? (
                 <img src={c.cover_url} alt={c.name} className="w-full h-full object-cover" />
               ) : (
@@ -71,15 +71,15 @@ export default function MyCoursesPage() {
               <span
                 className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold ${
                   c.pricing_type === 'free'
-                    ? 'bg-emerald-400/90 text-emerald-900'
-                    : 'bg-amber-400/90 text-amber-900'
+                    ? 'bg-success text-success-foreground'
+                    : 'bg-warning text-warning-foreground'
                 }`}
               >
                 {c.pricing_type === 'free' ? t('course.mine.free', 'Free') : formatVnd(c.price_vnd)}
               </span>
             </div>
-            <CardContent className="p-4 space-y-3">
-              <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-indigo-600">{c.name}</h3>
+            <CardContent className="space-y-3">
+              <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-primary">{c.name}</h3>
               {c.description && (
                 <p className="text-sm text-muted-foreground line-clamp-2">{c.description}</p>
               )}
@@ -92,7 +92,7 @@ export default function MyCoursesPage() {
                   e.stopPropagation();
                   router.push(`/consumer/course/${c.uid}`);
                 }}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold gap-2"
+                className="w-full gap-2"
               >
                 {t('course.mine.go_to_classroom', 'Enter classroom')}
                 <ArrowRight size={16} />

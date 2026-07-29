@@ -70,7 +70,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
   if (loading || !course) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="animate-spin text-indigo-600" size={32} />
+        <Loader2 className="animate-spin text-primary-brand" size={32} />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
                 course.status === 'published'
                   ? 'bg-emerald-50 text-emerald-700'
                   : course.status === 'archived'
-                    ? 'bg-slate-100 text-slate-600'
+                    ? 'bg-muted text-muted-foreground'
                     : 'bg-amber-50 text-amber-700'
               }`}
             >
@@ -154,7 +154,7 @@ export default function CourseDetailPage({ params }: { params: Promise<{ uid: st
               key={k}
               onClick={() => setTab(k)}
               className={`px-4 py-3 font-bold text-sm border-b-2 transition-colors ${
-                tab === k ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-muted-foreground hover:text-foreground'
+                tab === k ? 'border-primary-brand text-primary-brand' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {t(`course.detail.tabs.${k}`, k)}
@@ -240,7 +240,7 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500"
+              className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand"
             />
           </div>
           <div className="space-y-2">
@@ -249,14 +249,14 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
               {coverUrl ? (
                 <div className="relative">
                   <img src={coverUrl} alt="cover" className="w-full h-24 object-cover rounded-lg" />
-                  <Button type="button" size="sm" variant="ghost" onClick={() => setCoverUrl('')} className="absolute top-1 right-1 bg-white/80">
+                  <Button type="button" size="sm" variant="ghost" onClick={() => setCoverUrl('')} className="absolute top-1 right-1 bg-card/80">
                     <Trash2 size={12} />
                   </Button>
                 </div>
               ) : (
                 <Label className="cursor-pointer block py-4 text-center">
                   <Input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
-                  <Upload size={20} className="mx-auto text-slate-300" />
+                  <Upload size={20} className="mx-auto text-muted-foreground/40" />
                   <p className="text-xs text-muted-foreground mt-1">{uploading ? 'Uploading...' : 'Click to upload'}</p>
                 </Label>
               )}
@@ -270,7 +270,7 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
-            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500 resize-none"
+            className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand resize-none"
           />
         </div>
 
@@ -284,7 +284,7 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
                   type="button"
                   onClick={() => setPricingType(p)}
                   className={`px-3 py-2 rounded-xl border-2 font-bold capitalize ${
-                    pricingType === p ? 'border-indigo-500 bg-indigo-50' : 'border-border'
+                    pricingType === p ? 'border-primary-brand bg-primary-brand-light' : 'border-border'
                   }`}
                 >
                   {p}
@@ -300,14 +300,14 @@ function InfoTab({ course, onUpdated }: { course: Course; onUpdated: (c: Course)
                 min={1000}
                 value={priceVnd}
                 onChange={(e) => setPriceVnd(e.target.value)}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500 font-bold"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand font-bold"
               />
             </div>
           )}
         </div>
 
         <div className="pt-2 flex justify-end">
-          <Button onClick={handleSave} disabled={saving} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold gap-2">
+          <Button onClick={handleSave} disabled={saving} className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl font-bold gap-2">
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
             {t('course.edit.submit', 'Save changes')}
           </Button>
@@ -381,7 +381,7 @@ function LessonsTab({
         </p>
         <Button
           onClick={() => setEditing({ title: '', description: '', is_preview: false, is_published: true })}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold gap-2"
+          className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl font-bold gap-2"
         >
           <Plus size={16} />
           {t('course.detail.add_lesson', 'Add lesson')}
@@ -391,8 +391,8 @@ function LessonsTab({
       {lessons.length === 0 ? (
         <Card className="border-border">
           <CardContent className="p-12 text-center space-y-3">
-            <BookOpen size={48} className="mx-auto text-slate-300" />
-            <p className="text-slate-500">{t('course.detail.lesson_empty', 'No lessons yet.')}</p>
+            <BookOpen size={48} className="mx-auto text-muted-foreground/40" />
+            <p className="text-muted-foreground">{t('course.detail.lesson_empty', 'No lessons yet.')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -400,7 +400,7 @@ function LessonsTab({
           {lessons.map((l, idx) => (
             <div
               key={l.uid}
-              className="bg-white rounded-2xl border border-border p-4 flex items-center gap-3"
+              className="bg-card rounded-2xl border border-border p-4 flex items-center gap-3"
             >
               <div className="flex flex-col gap-0.5">
                 <Button
@@ -418,7 +418,7 @@ function LessonsTab({
                   ▼
                 </Button>
               </div>
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary-brand-light text-primary-brand flex items-center justify-center font-bold">
                 {idx + 1}
               </div>
               <div className="flex-1 min-w-0">
@@ -430,7 +430,7 @@ function LessonsTab({
                     </span>
                   )}
                   {!l.is_published && (
-                    <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
                       {t('course.detail.draft_lesson_badge', 'Draft')}
                     </span>
                   )}
@@ -469,7 +469,7 @@ function LessonsTab({
                   size="icon"
                   variant="ghost"
                   onClick={() => handleDelete(l.uid)}
-                  className="h-8 w-8 text-rose-500 hover:text-rose-600"
+                  className="h-8 w-8 text-destructive hover:text-destructive/90"
                 >
                   <Trash2 size={14} />
                 </Button>
@@ -480,8 +480,8 @@ function LessonsTab({
       )}
 
       {editing && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-foreground/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-card rounded-2xl max-w-md w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-bold">
               {editing.uid ? t('course.detail.edit_lesson', 'Edit lesson') : t('course.detail.add_lesson', 'Add lesson')}
             </h3>
@@ -490,7 +490,7 @@ function LessonsTab({
               <Input
                 value={editing.title || ''}
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand"
               />
             </div>
             <div className="space-y-2">
@@ -499,7 +499,7 @@ function LessonsTab({
                 value={editing.description || ''}
                 onChange={(e) => setEditing({ ...editing, description: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500 resize-none"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand resize-none"
               />
             </div>
             <div className="space-y-2">
@@ -509,7 +509,7 @@ function LessonsTab({
                 min={0}
                 value={editing.duration_seconds || 0}
                 onChange={(e) => setEditing({ ...editing, duration_seconds: Number(e.target.value) })}
-                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500"
+                className="w-full px-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand"
               />
             </div>
             <div className="flex items-center justify-between rounded-xl border border-border p-3">
@@ -519,9 +519,9 @@ function LessonsTab({
               </div>
               <Button
                 onClick={() => setEditing({ ...editing, is_preview: !editing.is_preview })}
-                className={`w-11 h-6 rounded-full transition-colors ${editing.is_preview ? 'bg-amber-500' : 'bg-slate-300'}`}
+                className={`w-11 h-6 rounded-full transition-colors ${editing.is_preview ? 'bg-amber-500' : 'bg-muted'}`}
               >
-                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${editing.is_preview ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                <div className={`w-5 h-5 rounded-full bg-background transition-transform ${editing.is_preview ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </Button>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-border p-3">
@@ -531,16 +531,16 @@ function LessonsTab({
               </div>
               <Button
                 onClick={() => setEditing({ ...editing, is_published: !editing.is_published })}
-                className={`w-11 h-6 rounded-full transition-colors ${editing.is_published ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                className={`w-11 h-6 rounded-full transition-colors ${editing.is_published ? 'bg-emerald-500' : 'bg-muted'}`}
               >
-                <div className={`w-5 h-5 rounded-full bg-white transition-transform ${editing.is_published ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                <div className={`w-5 h-5 rounded-full bg-background transition-transform ${editing.is_published ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </Button>
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="ghost" onClick={() => setEditing(null)}>
                 {t('course.create.cancel', 'Cancel')}
               </Button>
-              <Button onClick={handleSave} disabled={saving || !editing.title} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold">
+              <Button onClick={handleSave} disabled={saving || !editing.title} className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl font-bold">
                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
                 {t('course.detail.lesson_save', 'Save')}
               </Button>
@@ -579,7 +579,7 @@ function StudentsTab({ enrollments, stats }: { enrollments: CourseEnrollment[]; 
           <Card className="border-border">
             <CardContent className="p-4">
               <div className="text-xs text-muted-foreground font-bold uppercase">{t('course.stats.total_revenue', 'Revenue')}</div>
-              <div className="text-2xl font-black mt-1 text-indigo-600">{formatVnd(stats.total_revenue_vnd)}</div>
+              <div className="text-2xl font-black mt-1 text-primary-brand">{formatVnd(stats.total_revenue_vnd)}</div>
             </CardContent>
           </Card>
         </div>
@@ -588,8 +588,8 @@ function StudentsTab({ enrollments, stats }: { enrollments: CourseEnrollment[]; 
       {enrollments.length === 0 ? (
         <Card className="border-border">
           <CardContent className="p-12 text-center space-y-3">
-            <Users size={48} className="mx-auto text-slate-300" />
-            <p className="text-slate-500">{t('course.students.empty', 'No students enrolled yet.')}</p>
+            <Users size={48} className="mx-auto text-muted-foreground/40" />
+            <p className="text-muted-foreground">{t('course.students.empty', 'No students enrolled yet.')}</p>
           </CardContent>
         </Card>
       ) : (
@@ -648,14 +648,14 @@ function SharingTab({ course, sharingLink, setSharingLink }: { course: Course; s
     <div className="grid md:grid-cols-2 gap-4">
       <Card className="border-border">
         <CardContent className="p-6 space-y-4 text-center">
-          <div className="inline-block p-4 bg-white rounded-2xl border border-border">
+          <div className="inline-block p-4 bg-card rounded-2xl border border-border">
             <QRCodeSVG value={previewUrl} size={180} />
           </div>
           <p className="text-sm text-muted-foreground">
             {t('course.sharing.preview_link_hint', 'Anyone with this link can view the course preview for free.')}
           </p>
           {sharingLink && (
-            <a href={sharingLink} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 underline inline-flex items-center gap-1">
+            <a href={sharingLink} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-brand underline inline-flex items-center gap-1">
               <Download size={12} /> Download high-res QR
             </a>
           )}

@@ -109,7 +109,7 @@ export default function StaffPage() {
               >
                 <Avatar className="h-12 w-12 border-2 border-muted flex-shrink-0">
                   <AvatarImage src={s.consumer_avatar} alt={s.consumer_name} />
-                  <AvatarFallback className="bg-primary-brand-light text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-sm">
+                  <AvatarFallback className="bg-accent text-primary font-bold text-sm">
                     {initials(s.consumer_name)}
                   </AvatarFallback>
                 </Avatar>
@@ -151,7 +151,7 @@ export default function StaffPage() {
               >
                 <Avatar className="h-12 w-12 border-2 border-muted flex-shrink-0">
                   <AvatarImage src={contact.consumer_avatar} alt={contact.consumer_name} />
-                  <AvatarFallback className="bg-primary-brand-light text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 font-bold text-sm">
+                  <AvatarFallback className="bg-accent text-primary font-bold text-sm">
                     {initials(contact.consumer_name)}
                   </AvatarFallback>
                 </Avatar>

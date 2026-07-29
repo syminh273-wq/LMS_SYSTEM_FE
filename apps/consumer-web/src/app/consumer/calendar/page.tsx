@@ -74,14 +74,14 @@ export default function ConsumerCalendarPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold mb-2">
             <CalendarDays size={11} />
             {t('calendar.labels.title', 'Academic Calendar')}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
             {t('calendar.labels.title', 'Academic Calendar')}
           </h1>
-          <p className="text-slate-600 text-[14px] mt-1">
+          <p className="text-muted-foreground text-[14px] mt-1">
             {t('calendar.labels.subtitle', 'Manage your study schedule and upcoming deadlines.')}
           </p>
         </div>
@@ -91,20 +91,24 @@ export default function ConsumerCalendarPage() {
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden h-10">
+          <div className="flex items-center bg-card border border-border rounded-lg overflow-hidden h-10">
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={goPrev}
-              className="h-full px-2.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+              className="h-full"
               aria-label="Previous"
             >
               <ChevronLeft size={15} />
             </Button>
-            <div className="h-5 w-px bg-slate-200" />
+            <div className="h-5 w-px bg-border" />
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={goNext}
-              className="h-full px-2.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+              className="h-full"
               aria-label="Next"
             >
               <ChevronRight size={15} />
@@ -112,26 +116,27 @@ export default function ConsumerCalendarPage() {
           </div>
           <Button
             type="button"
+            variant="outline"
             onClick={goToday}
-            className="h-10 px-3 rounded-lg bg-white border border-slate-200 text-slate-700 text-[12.5px] font-semibold hover:bg-slate-50"
+            className="h-10"
           >
             {locale === 'vi' ? 'Hôm nay' : 'Today'}
           </Button>
-          <span className="text-[15px] font-bold text-slate-900 capitalize ml-2">{headerLabel}</span>
+          <span className="text-[15px] font-bold text-foreground capitalize ml-2">{headerLabel}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="lg:col-span-2 space-y-3">
           {error && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] text-rose-700">
+            <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">
               {error}
             </div>
           )}
 
           <div className={cn('relative')}>
             {loading && (
-              <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-white/90 px-2 py-1 rounded-md border border-slate-200 text-[11px] text-slate-500">
+              <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5 bg-background/90 px-2 py-1 rounded-md border border-border text-[11px] text-muted-foreground">
                 <Clock size={11} className="animate-spin" />
                 {t('calendar.labels.loading', 'Loading...')}
               </div>

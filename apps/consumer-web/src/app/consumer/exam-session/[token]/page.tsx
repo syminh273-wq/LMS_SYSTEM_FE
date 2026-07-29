@@ -459,10 +459,10 @@ export default function ExamSessionPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-muted">
         <div className="text-center">
-          <Loader2 size={40} className="mx-auto mb-4 animate-spin text-indigo-600" />
-          <p className="text-sm font-bold text-slate-500">Đang xác thực phiên thi...</p>
+          <Loader2 size={40} className="mx-auto mb-4 animate-spin text-primary" />
+          <p className="text-sm font-bold text-muted-foreground">Đang xác thực phiên thi...</p>
         </div>
       </div>
     );
@@ -470,14 +470,14 @@ export default function ExamSessionPage({ params }: Props) {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-        <div className="w-full max-w-md rounded-2xl border border-rose-100 bg-white p-8 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
-            <AlertCircle size={28} className="text-rose-500" />
+      <div className="flex min-h-screen items-center justify-center bg-muted p-6">
+        <div className="w-full max-w-md rounded-2xl border border-destructive/20 bg-card p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+            <AlertCircle size={28} className="text-destructive" />
           </div>
-          <h1 className="text-xl font-black text-slate-900">Không thể vào phòng thi</h1>
-          <p className="mt-2 text-sm font-bold text-rose-600">{error}</p>
-          <p className="mt-1 text-xs text-slate-400">Link đã hết hạn hoặc không hợp lệ. Liên hệ giáo viên để được hỗ trợ.</p>
+          <h1 className="text-xl font-black text-foreground">Không thể vào phòng thi</h1>
+          <p className="mt-2 text-sm font-bold text-destructive">{error}</p>
+          <p className="mt-1 text-xs text-muted-foreground">Link đã hết hạn hoặc không hợp lệ. Liên hệ giáo viên để được hỗ trợ.</p>
         </div>
       </div>
     );
@@ -509,33 +509,33 @@ export default function ExamSessionPage({ params }: Props) {
     const isForceSub = sub?.force_submitted === true || forced;
 
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-muted">
         <div className="mx-auto max-w-3xl space-y-4 p-6">
           {/* Header card */}
           <div className={`rounded-2xl border p-6 shadow-sm ${
-            isForceSub ? 'border-rose-200 bg-white' : 'border-emerald-200 bg-white'
+            isForceSub ? 'border-destructive/20 bg-card' : 'border-success/20 bg-card'
           }`}>
             <div className="flex items-start gap-4">
               <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${
-                isForceSub ? 'bg-rose-50' : 'bg-emerald-50'
+                isForceSub ? 'bg-destructive/10' : 'bg-success/10'
               }`}>
                 {isForceSub ? (
-                  <AlertCircle size={24} className="text-rose-500" />
+                  <AlertCircle size={24} className="text-destructive" />
                 ) : (
-                  <CheckCircle2 size={24} className="text-emerald-500" />
+                  <CheckCircle2 size={24} className="text-success" />
                 )}
               </div>
               <div className="flex-1">
-                <h1 className="text-xl font-black text-slate-900">
+                <h1 className="text-xl font-black text-foreground">
                   {isForceSub ? 'Bài đã bị nộp bắt buộc' : 'Nộp bài thành công!'}
                 </h1>
-                <p className="mt-1 text-sm font-bold text-slate-500">
+                <p className="mt-1 text-sm font-bold text-muted-foreground">
                   {isForceSub
                     ? 'Bạn đã vi phạm quy chế thi quá số lần cho phép. Bài làm đã được hệ thống ghi nhận và chờ giáo viên xét duyệt.'
                     : 'Bài làm của bạn đã được ghi nhận. Chờ giáo viên chấm điểm.'}
                 </p>
                 {isForceSub && sub?.force_submit_reason && (
-                  <p className="mt-2 text-xs font-bold text-rose-600">
+                  <p className="mt-2 text-xs font-bold text-destructive">
                     Lý do: {humanizeAuditEvent(sub.force_submit_reason)}
                   </p>
                 )}
@@ -544,36 +544,36 @@ export default function ExamSessionPage({ params }: Props) {
 
             {resultLoading ? (
               <div className="mt-6 flex items-center justify-center py-8">
-                <Loader2 size={24} className="animate-spin text-indigo-500" />
+                <Loader2 size={24} className="animate-spin text-primary" />
               </div>
             ) : sub ? (
               <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Điểm</p>
-                  <p className="mt-1 text-2xl font-black text-slate-900 tabular-nums">
+                <div className="rounded-xl bg-muted p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Điểm</p>
+                  <p className="mt-1 text-2xl font-black text-foreground tabular-nums">
                     {sub.grade != null ? sub.grade : '—'}
-                    <span className="text-sm font-bold text-slate-500">/{sub.max_grade ?? exam.max_grade}</span>
+                    <span className="text-sm font-bold text-muted-foreground">/{sub.max_grade ?? exam.max_grade}</span>
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Trạng thái</p>
+                <div className="rounded-xl bg-muted p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Trạng thái</p>
                   <p className={`mt-1 text-sm font-black ${
-                    sub.status === 'graded' ? 'text-emerald-600'
-                    : sub.status === 'late' ? 'text-amber-600'
-                    : 'text-slate-600'
+                    sub.status === 'graded' ? 'text-success'
+                    : sub.status === 'late' ? 'text-warning'
+                    : 'text-muted-foreground'
                   }`}>
                     {sub.status === 'graded' ? 'Đã chấm' : sub.status === 'late' ? 'Trễ hạn' : 'Đã nộp'}
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Hiệu lực</p>
-                  <p className={`mt-1 text-sm font-black ${isEffective ? 'text-emerald-600' : 'text-rose-600'}`}>
+                <div className="rounded-xl bg-muted p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Hiệu lực</p>
+                  <p className={`mt-1 text-sm font-black ${isEffective ? 'text-success' : 'text-destructive'}`}>
                     {isEffective ? 'Có hiệu lực' : 'Chờ duyệt'}
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 text-center">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Loại</p>
-                  <p className="mt-1 text-sm font-black text-slate-700">
+                <div className="rounded-xl bg-muted p-3 text-center">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Loại</p>
+                  <p className="mt-1 text-sm font-black text-foreground">
                     {stType === 'online_quiz' || stType === 'multiple_choice' ? 'Trắc nghiệm'
                       : stType === 'essay' ? 'Tự luận'
                       : 'File'}
@@ -583,26 +583,26 @@ export default function ExamSessionPage({ params }: Props) {
             ) : null}
 
             {sub?.feedback && (
-              <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Nhận xét từ giáo viên</p>
-                <p className="mt-1 text-sm font-bold text-slate-800">{sub.feedback}</p>
+              <div className="mt-4 rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Nhận xét từ giáo viên</p>
+                <p className="mt-1 text-sm font-bold text-foreground">{sub.feedback}</p>
               </div>
             )}
           </div>
 
           {/* Counters card */}
           {resultCounters && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-sm font-black text-slate-900">Tổng quan vi phạm</h2>
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <h2 className="text-sm font-black text-foreground">Tổng quan vi phạm</h2>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Rời màn hình</p>
+                <div className="rounded-xl border border-warning/20 bg-warning/10 px-4 py-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-warning">Rời màn hình</p>
                   <p className="mt-1 text-2xl font-black text-amber-900 tabular-nums">
                     {resultCounters.visibility_breaks.count}/{resultCounters.visibility_breaks.max}
                   </p>
                 </div>
-                <div className="rounded-xl border border-violet-100 bg-violet-50 px-4 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-violet-700">Cảnh báo khuôn mặt</p>
+                <div className="rounded-xl border border-violet-100 bg-primary/10 px-4 py-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary">Cảnh báo khuôn mặt</p>
                   <p className="mt-1 text-2xl font-black text-violet-900 tabular-nums">
                     {resultCounters.face_warnings.count}/{resultCounters.face_warnings.max}
                   </p>
@@ -612,15 +612,15 @@ export default function ExamSessionPage({ params }: Props) {
           )}
 
           {/* Tabs */}
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div className="flex border-b border-slate-200">
+          <div className="rounded-2xl border border-border bg-card shadow-sm">
+            <div className="flex border-b border-border">
               <Button
                 type="button"
                 onClick={() => setResultView('overview')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
                   resultView === 'overview'
-                    ? 'border-b-2 border-indigo-500 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Tổng quan
@@ -630,8 +630,8 @@ export default function ExamSessionPage({ params }: Props) {
                 onClick={() => setResultView('answers')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
                   resultView === 'answers'
-                    ? 'border-b-2 border-indigo-500 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Bài làm của tôi
@@ -641,8 +641,8 @@ export default function ExamSessionPage({ params }: Props) {
                 onClick={() => setResultView('audit')}
                 className={`flex-1 px-4 py-3 text-sm font-black transition-colors ${
                   resultView === 'audit'
-                    ? 'border-b-2 border-indigo-500 text-indigo-600'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'border-b-2 border-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Lịch sử ({resultAuditEvents.length})
@@ -652,34 +652,34 @@ export default function ExamSessionPage({ params }: Props) {
             <div className="p-5">
               {resultView === 'overview' && (
                 <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                    <span className="font-bold text-slate-600">Thời gian nộp</span>
-                    <span className="font-black text-slate-900">{sub?.submitted_at ? parseVnDate(sub.submitted_at)?.toLocaleString('vi-VN') : '—'}</span>
+                  <div className="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
+                    <span className="font-bold text-muted-foreground">Thời gian nộp</span>
+                    <span className="font-black text-foreground">{sub?.submitted_at ? parseVnDate(sub.submitted_at)?.toLocaleString('vi-VN') : '—'}</span>
                   </div>
                   {sub?.force_submitted_at && (
-                    <div className="flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
-                      <span className="font-bold text-rose-600">Bị nộp bắt buộc lúc</span>
-                      <span className="font-black text-rose-700">{parseVnDate(sub.force_submitted_at)?.toLocaleString('vi-VN')}</span>
+                    <div className="flex items-center justify-between rounded-xl bg-destructive/10 px-4 py-3">
+                      <span className="font-bold text-destructive">Bị nộp bắt buộc lúc</span>
+                      <span className="font-black text-destructive">{parseVnDate(sub.force_submitted_at)?.toLocaleString('vi-VN')}</span>
                     </div>
                   )}
                   {sub?.quiz_result && (
-                    <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-indigo-700">Kết quả trắc nghiệm</p>
-                      <p className="mt-1 text-lg font-black text-indigo-900 tabular-nums">
+                    <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-primary">Kết quả trắc nghiệm</p>
+                      <p className="mt-1 text-lg font-black text-primary tabular-nums">
                         {sub.quiz_result.correct_count}/{sub.quiz_result.total} đúng ({sub.quiz_result.score_pct}%)
                       </p>
                     </div>
                   )}
                   {resultAuditEvents.length > 0 && (
-                    <div className="rounded-xl border border-slate-200 bg-white px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Sự kiện ghi nhận</p>
-                      <p className="mt-1 text-sm font-bold text-slate-800">
-                        Tổng cộng <span className="font-black text-slate-900">{resultAuditEvents.length}</span> sự kiện đã được ghi lại trong phiên thi này.
+                    <div className="rounded-xl border border-border bg-card px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sự kiện ghi nhận</p>
+                      <p className="mt-1 text-sm font-bold text-foreground">
+                        Tổng cộng <span className="font-black text-foreground">{resultAuditEvents.length}</span> sự kiện đã được ghi lại trong phiên thi này.
                       </p>
                       <Button
                         type="button"
                         onClick={() => setResultView('audit')}
-                        className="mt-2 text-xs font-black text-indigo-600 hover:text-indigo-700"
+                        className="mt-2 text-xs font-black text-primary hover:text-primary"
                       >
                         Xem chi tiết →
                       </Button>
@@ -692,26 +692,26 @@ export default function ExamSessionPage({ params }: Props) {
                 <div className="space-y-3">
                   {stType === 'online_quiz' || stType === 'multiple_choice' ? (
                     <div className="space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Đáp án đã chọn</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Đáp án đã chọn</p>
                       {sub?.quiz_result?.results && sub.quiz_result.results.length > 0 ? (
                         <ol className="space-y-2">
                           {sub.quiz_result.results.map((r, i) => (
-                            <li key={String(r.question_uid ?? i)} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                            <li key={String(r.question_uid ?? i)} className="rounded-xl border border-border bg-muted px-4 py-3">
                               <div className="flex items-start gap-3">
                                 <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black ${
-                                  r.is_correct ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                                  r.is_correct ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
                                 }`}>
                                   {r.is_correct ? '✓' : '✗'}
                                 </span>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-black text-slate-900">{String(r.question_text ?? `Câu ${i + 1}`)}</p>
-                                  <p className="mt-1 text-xs text-slate-600">
-                                    Bạn chọn: <span className="font-black text-slate-800">{String(r.chosen ?? '(bỏ trống)').toUpperCase()}</span>
+                                  <p className="text-sm font-black text-foreground">{String(r.question_text ?? `Câu ${i + 1}`)}</p>
+                                  <p className="mt-1 text-xs text-muted-foreground">
+                                    Bạn chọn: <span className="font-black text-foreground">{String(r.chosen ?? '(bỏ trống)').toUpperCase()}</span>
                                     {' · '}
-                                    Đáp án đúng: <span className="font-black text-emerald-700">{String(r.correct_answer ?? '').toUpperCase()}</span>
+                                    Đáp án đúng: <span className="font-black text-success">{String(r.correct_answer ?? '').toUpperCase()}</span>
                                   </p>
                                   {r.explanation ? (
-                                    <p className="mt-1 text-xs italic text-slate-500">{String(r.explanation)}</p>
+                                    <p className="mt-1 text-xs italic text-muted-foreground">{String(r.explanation)}</p>
                                   ) : null}
                                 </div>
                               </div>
@@ -719,30 +719,30 @@ export default function ExamSessionPage({ params }: Props) {
                           ))}
                         </ol>
                       ) : (
-                        <p className="text-sm text-slate-400">Không có dữ liệu đáp án.</p>
+                        <p className="text-sm text-muted-foreground">Không có dữ liệu đáp án.</p>
                       )}
                     </div>
                   ) : stType === 'file' ? (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">File đã nộp</p>
+                    <div className="rounded-xl border border-border bg-muted px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">File đã nộp</p>
                       {sub?.resource_url ? (
                         <a
                           href={String(sub.resource_url)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="mt-1 inline-flex items-center gap-2 text-sm font-black text-indigo-600 hover:text-indigo-700"
+                          className="mt-1 inline-flex items-center gap-2 text-sm font-black text-primary hover:text-primary"
                         >
                           <File size={14} />
                           {String(sub.resource_name ?? 'Mở file đã nộp')}
                         </a>
                       ) : (
-                        <p className="mt-1 text-sm text-slate-400">Không có file.</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Không có file.</p>
                       )}
                     </div>
                   ) : (
-                    <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Bài làm tự luận</p>
-                      <p className="mt-2 whitespace-pre-wrap text-sm font-bold text-slate-800">{sub?.content || '(trống)'}</p>
+                    <div className="rounded-xl border border-border bg-muted px-4 py-3">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Bài làm tự luận</p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm font-bold text-foreground">{sub?.content || '(trống)'}</p>
                     </div>
                   )}
                 </div>
@@ -751,35 +751,35 @@ export default function ExamSessionPage({ params }: Props) {
               {resultView === 'audit' && (
                 <div>
                   {resultAuditEvents.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-slate-400">Chưa có sự kiện nào được ghi nhận.</p>
+                    <p className="py-6 text-center text-sm text-muted-foreground">Chưa có sự kiện nào được ghi nhận.</p>
                   ) : (
-                    <ol className="relative space-y-2 border-l-2 border-slate-200 pl-5">
+                    <ol className="relative space-y-2 border-l-2 border-border pl-5">
                       {resultAuditEvents.map((ev) => {
                         const violation = isAuditViolation(ev.event_type);
                         const limit = isAuditLimit(ev.event_type);
                         const force = isAuditForce(ev.event_type);
                         const dotColor = force || limit
-                          ? 'bg-rose-500 ring-rose-200'
+                          ? 'bg-destructive ring-destructive/20'
                           : violation
-                            ? 'bg-amber-500 ring-amber-200'
-                            : 'bg-indigo-400 ring-indigo-200';
+                            ? 'bg-warning ring-warning/20'
+                            : 'bg-primary/40 ring-primary/20';
                         return (
                           <li key={ev.uid} className="relative">
                             <span className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dotColor}`} />
-                            <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                            <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-muted/60 px-4 py-2.5">
                               <div className="min-w-0 flex-1">
                                 <p className={`text-sm font-black ${
-                                  force || limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800'
+                                  force || limit ? 'text-destructive' : violation ? 'text-warning' : 'text-foreground'
                                 }`}>
                                   {humanizeAuditEvent(ev.event_type)}
                                 </p>
                                 {ev.event_data && Object.keys(ev.event_data).length > 0 && (
-                                  <p className="mt-0.5 text-[11px] font-bold text-slate-500">
+                                  <p className="mt-0.5 text-[11px] font-bold text-muted-foreground">
                                     {formatAuditEventData(ev.event_type, ev.event_data)}
                                   </p>
                                 )}
                               </div>
-                              <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
+                              <time className="shrink-0 text-[11px] font-bold tabular-nums text-muted-foreground">
                                 {formatAuditClockTime(ev.created_at)}
                               </time>
                             </div>
@@ -806,7 +806,7 @@ export default function ExamSessionPage({ params }: Props) {
   const canSubmit = !submitting && !timeExpired && session.token_status === 'active' && cameraValid;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted">
       {/* Camera monitor for online + camera_required exams */}
       {isOnline && exam.camera_required && (
         <FaceMonitorWidget
@@ -820,12 +820,12 @@ export default function ExamSessionPage({ params }: Props) {
       {warning && (
         <div
           key={`${warning.severity}-${warning.count}-${warning.rule ?? 'none'}-${warning.message}`}
-          className={`fixed right-4 top-4 z-[200] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border bg-white shadow-2xl animate-in slide-in-from-top-2 fade-in duration-300 ${
+          className={`fixed right-4 top-4 z-[200] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border bg-card shadow-2xl animate-in slide-in-from-top-2 fade-in duration-300 ${
             warning.severity === 'danger'
               ? 'border-rose-300'
               : warning.severity === 'warning'
                 ? 'border-amber-300'
-                : 'border-indigo-300'
+                : 'border-primary/30'
           }`}
           role="alert"
           aria-live="assertive"
@@ -833,29 +833,29 @@ export default function ExamSessionPage({ params }: Props) {
           <div
             className={`flex items-start gap-3 border-b px-4 py-3 ${
               warning.severity === 'danger'
-                ? 'border-rose-200 bg-rose-50'
+                ? 'border-destructive/20 bg-destructive/10'
                 : warning.severity === 'warning'
-                  ? 'border-amber-200 bg-amber-50'
-                  : 'border-indigo-200 bg-indigo-50'
+                  ? 'border-warning/20 bg-warning/10'
+                  : 'border-primary/20 bg-primary/10'
             }`}
           >
             <div
               className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
                 warning.severity === 'danger'
-                  ? 'bg-rose-100'
+                  ? 'bg-destructive/10'
                   : warning.severity === 'warning'
-                    ? 'bg-amber-100'
-                    : 'bg-indigo-100'
+                    ? 'bg-warning/10'
+                    : 'bg-primary/10'
               }`}
             >
               <AlertTriangle
                 size={18}
                 className={
                   warning.severity === 'danger'
-                    ? 'text-rose-600'
+                    ? 'text-destructive'
                     : warning.severity === 'warning'
-                      ? 'text-amber-600'
-                      : 'text-indigo-600'
+                      ? 'text-warning'
+                      : 'text-primary'
                 }
               />
             </div>
@@ -863,10 +863,10 @@ export default function ExamSessionPage({ params }: Props) {
               <p
                 className={`text-sm font-black ${
                   warning.severity === 'danger'
-                    ? 'text-rose-700'
+                    ? 'text-destructive'
                     : warning.severity === 'warning'
-                      ? 'text-amber-700'
-                      : 'text-indigo-700'
+                      ? 'text-warning'
+                      : 'text-primary'
                 }`}
               >
                 {warning.severity === 'danger'
@@ -875,12 +875,12 @@ export default function ExamSessionPage({ params }: Props) {
                     ? 'Cảnh báo'
                     : 'Thông báo'}
               </p>
-              <p className="mt-0.5 text-sm font-bold text-slate-800">{warning.message}</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{warning.message}</p>
             </div>
             <Button
               type="button"
               onClick={() => setWarning(null)}
-              className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+              className="text-muted-foreground hover:text-muted-foreground text-lg leading-none"
               aria-label="Đóng"
             >
               ×
@@ -889,7 +889,7 @@ export default function ExamSessionPage({ params }: Props) {
           {warning.rule && warning.max > 0 && (
             <div className="flex items-center justify-between gap-3 px-4 py-2.5">
               <div className="flex-1">
-                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                   <span>
                     {warning.rule === 'visibility_breaks'
                       ? 'Rời tab/cửa sổ'
@@ -899,14 +899,14 @@ export default function ExamSessionPage({ params }: Props) {
                     {warning.count}/{warning.max}
                   </span>
                 </div>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       warning.remaining !== null && warning.remaining <= 0
-                        ? 'bg-rose-500'
+                        ? 'bg-destructive'
                         : warning.remaining !== null && warning.remaining === 1
-                          ? 'bg-amber-500'
-                          : 'bg-indigo-500'
+                          ? 'bg-warning'
+                          : 'bg-primary'
                     }`}
                     style={{
                       width: `${Math.min(100, (warning.count / warning.max) * 100)}%`,
@@ -917,10 +917,10 @@ export default function ExamSessionPage({ params }: Props) {
                   <p
                     className={`mt-1 text-[11px] font-bold ${
                       warning.remaining <= 0
-                        ? 'text-rose-600'
+                        ? 'text-destructive'
                         : warning.remaining === 1
-                          ? 'text-amber-600'
-                          : 'text-slate-500'
+                          ? 'text-warning'
+                          : 'text-muted-foreground'
                     }`}
                   >
                     {warning.remaining <= 0
@@ -933,7 +933,7 @@ export default function ExamSessionPage({ params }: Props) {
           )}
           <div
             className={`h-1 origin-left animate-toast-progress ${
-              warning.severity === 'danger' ? 'bg-rose-500' : warning.severity === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
+              warning.severity === 'danger' ? 'bg-destructive' : warning.severity === 'warning' ? 'bg-warning' : 'bg-primary'
             }`}
             style={{ ['--toast-duration' as string]: `${warning.severity === 'danger' ? 8 : 5}s` }}
           />
@@ -941,27 +941,27 @@ export default function ExamSessionPage({ params }: Props) {
       )}
 
       {/* Sticky header with timer */}
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white shadow-sm">
+      <header className="sticky top-0 z-20 border-b border-border bg-card shadow-sm">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
               <FileText size={12} />
               {isOnline ? 'Thi Trực Tuyến' : 'Bài Kiểm Tra'}
             </div>
-            <h1 className="truncate text-lg font-black text-slate-900">{exam.title}</h1>
+            <h1 className="truncate text-lg font-black text-foreground">{exam.title}</h1>
           </div>
 
           {timeLeft !== null && (
-            <div className={`flex items-center gap-2 rounded-xl px-4 py-2 ${timeLeft <= 300 ? 'bg-rose-50' : 'bg-slate-100'}`}>
-              <Timer size={16} className={timeLeft <= 300 ? 'text-rose-500' : 'text-slate-500'} />
-              <span className={`text-lg font-black tabular-nums ${timeLeft <= 300 ? 'text-rose-600' : 'text-slate-800'}`}>
+            <div className={`flex items-center gap-2 rounded-xl px-4 py-2 ${timeLeft <= 300 ? 'bg-destructive/10' : 'bg-muted'}`}>
+              <Timer size={16} className={timeLeft <= 300 ? 'text-destructive' : 'text-muted-foreground'} />
+              <span className={`text-lg font-black tabular-nums ${timeLeft <= 300 ? 'text-destructive' : 'text-foreground'}`}>
                 {formatTime(timeLeft)}
               </span>
             </div>
           )}
 
           {exam.due_date && (
-            <div className="hidden md:flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-700">
+            <div className="hidden md:flex items-center gap-1.5 rounded-xl bg-warning/10 px-3 py-2 text-xs font-black text-warning">
               <Clock size={13} />
               Hạn: {parseVnDate(exam.due_date)?.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
             </div>
@@ -969,16 +969,16 @@ export default function ExamSessionPage({ params }: Props) {
 
           {isOnline && (
             exam.camera_required ? (
-              <div className={`flex items-center gap-1.5 rounded-xl px-3 py-2 ${cameraStatus?.recognized ? 'bg-emerald-50' : cameraStatus?.camera_open ? 'bg-amber-50' : 'bg-rose-50'}`}>
-                <Camera size={14} className={cameraStatus?.recognized ? 'text-emerald-500' : cameraStatus?.camera_open ? 'text-amber-500' : 'text-rose-500'} />
-                <span className={`text-xs font-black ${cameraStatus?.recognized ? 'text-emerald-600' : cameraStatus?.camera_open ? 'text-amber-600' : 'text-rose-600'}`}>
+              <div className={`flex items-center gap-1.5 rounded-xl px-3 py-2 ${cameraStatus?.recognized ? 'bg-success/10' : cameraStatus?.camera_open ? 'bg-warning/10' : 'bg-destructive/10'}`}>
+                <Camera size={14} className={cameraStatus?.recognized ? 'text-success' : cameraStatus?.camera_open ? 'text-warning' : 'text-destructive'} />
+                <span className={`text-xs font-black ${cameraStatus?.recognized ? 'text-success' : cameraStatus?.camera_open ? 'text-warning' : 'text-destructive'}`}>
                   {cameraStatus?.recognized ? 'Đã nhận diện' : cameraStatus?.camera_open ? 'Đang xác thực...' : 'Chưa bật camera'}
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 px-3 py-2">
-                <Camera size={14} className="text-slate-400" />
-                <span className="text-xs font-black text-slate-400">Camera không bắt buộc</span>
+              <div className="flex items-center gap-1.5 rounded-xl bg-muted px-3 py-2">
+                <Camera size={14} className="text-muted-foreground" />
+                <span className="text-xs font-black text-muted-foreground">Camera không bắt buộc</span>
               </div>
             )
           )}
@@ -990,10 +990,10 @@ export default function ExamSessionPage({ params }: Props) {
                 setAuditOpen(true);
                 void fetchAuditLog();
               }}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black text-slate-700 transition-all hover:bg-slate-100"
+              className="flex items-center gap-1.5 rounded-xl border border-border bg-muted px-3 py-2 text-xs font-black text-foreground transition-all hover:bg-muted"
               title="Xem lịch sử giám sát"
             >
-              <Activity size={14} className="text-slate-500" />
+              <Activity size={14} className="text-muted-foreground" />
               <span className="hidden sm:inline">Lịch sử</span>
             </Button>
           )}
@@ -1002,39 +1002,39 @@ export default function ExamSessionPage({ params }: Props) {
 
       {/* Camera Enforcement Overlay */}
       {cameraEnforced && !cameraValid && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-md animate-in fade-in duration-500">
-          <div className="w-full max-w-md p-8 text-center bg-white rounded-[32px] shadow-2xl border border-indigo-100">
-            <div className="mx-auto w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
-              <Camera size={40} className="text-indigo-600 animate-pulse" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-card/80 backdrop-blur-md animate-in fade-in duration-500">
+          <div className="w-full max-w-md p-8 text-center bg-card rounded-[32px] shadow-2xl border border-primary/20">
+            <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <Camera size={40} className="text-primary animate-pulse" />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 mb-2">Bắt buộc mở Camera</h2>
-            <p className="text-slate-500 font-medium mb-8">
+            <h2 className="text-2xl font-black text-foreground mb-2">Bắt buộc mở Camera</h2>
+            <p className="text-muted-foreground font-medium mb-8">
               Để đảm bảo tính công bằng, bài thi này yêu cầu bạn phải bật camera và giữ khuôn mặt trong khung hình suốt thời gian thi.
             </p>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-left">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${cameraStatus?.camera_open ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+              <div className="flex items-center gap-3 p-4 rounded-2xl bg-muted border border-border text-left">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${cameraStatus?.camera_open ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
                   {cameraStatus?.camera_open ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-slate-800">Trạng thái Camera</p>
-                  <p className="text-xs text-slate-500">{cameraStatus?.camera_open ? 'Đã bật' : 'Chưa bật hoặc bị chặn'}</p>
+                  <p className="text-sm font-bold text-foreground">Trạng thái Camera</p>
+                  <p className="text-xs text-muted-foreground">{cameraStatus?.camera_open ? 'Đã bật' : 'Chưa bật hoặc bị chặn'}</p>
                 </div>
               </div>
 
               {!cameraStatus?.recognized && cameraStatus?.camera_open && (
-                <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-100 text-left">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                <div className="flex items-center gap-3 p-4 rounded-2xl bg-warning/10 border border-warning/20 text-left">
+                  <div className="w-8 h-8 rounded-full bg-warning/10 text-warning flex items-center justify-center">
                     <Monitor size={16} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-slate-800">Xác thực khuôn mặt</p>
-                    <p className="text-xs text-slate-500">Vui lòng hướng mặt về phía camera</p>
+                    <p className="text-sm font-bold text-foreground">Xác thực khuôn mặt</p>
+                    <p className="text-xs text-muted-foreground">Vui lòng hướng mặt về phía camera</p>
                   </div>
                 </div>
               )}
             </div>
-            <div className="mt-8 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-widest">
+            <div className="mt-8 flex items-center justify-center gap-2 text-xs font-bold text-primary uppercase tracking-widest">
               <Loader2 size={14} className="animate-spin" />
               Đang chờ xác thực...
             </div>
@@ -1043,49 +1043,49 @@ export default function ExamSessionPage({ params }: Props) {
       )}
 
       {timeExpired && (
-        <div className="sticky top-16 z-10 border-b border-rose-200 bg-rose-50 px-6 py-3 text-center">
-          <p className="text-sm font-black text-rose-600">⏰ Đã hết thời gian làm bài! Không thể nộp thêm.</p>
+        <div className="sticky top-16 z-10 border-b border-destructive/20 bg-destructive/10 px-6 py-3 text-center">
+          <p className="text-sm font-black text-destructive">⏰ Đã hết thời gian làm bài! Không thể nộp thêm.</p>
         </div>
       )}
 
       <main className={`mx-auto max-w-4xl space-y-6 p-6 transition-all duration-500 ${(!cameraValid && cameraEnforced) ? 'blur-sm pointer-events-none' : ''}`}>
         {/* Exam info */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap gap-3 text-xs font-bold text-slate-500">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex flex-wrap gap-3 text-xs font-bold text-muted-foreground">
             {exam.due_date && (
               <span className="flex items-center gap-1.5">
-                <Clock size={13} className="text-indigo-500" />
+                <Clock size={13} className="text-primary" />
                 Hạn nộp: {parseVnDate(exam.due_date)?.toLocaleString('vi-VN')}
               </span>
             )}
             {exam.duration_seconds && exam.duration_seconds > 0 && (
               <span className="flex items-center gap-1.5">
-                <Timer size={13} className="text-violet-500" />
+                <Timer size={13} className="text-primary" />
                 Thời gian: {Math.floor(exam.duration_seconds / 60)} phút
               </span>
             )}
           </div>
 
           {exam.description && (
-            <p className="mt-3 text-sm font-medium leading-relaxed text-slate-600">{exam.description}</p>
+            <p className="mt-3 text-sm font-medium leading-relaxed text-muted-foreground">{exam.description}</p>
           )}
         </div>
 
         {exam.content_type === 'quiz' && (
-          <div className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-primary/20 bg-card p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Bài thi trắc nghiệm</div>
-                <h2 className="mt-1 text-lg font-black text-slate-900">{quizQuestions.length} câu hỏi</h2>
+                <div className="text-[10px] font-black uppercase tracking-widest text-primary">Bài thi trắc nghiệm</div>
+                <h2 className="mt-1 text-lg font-black text-foreground">{quizQuestions.length} câu hỏi</h2>
               </div>
-              <div className="rounded-xl bg-indigo-50 px-3 py-2 text-xs font-black text-indigo-600">
+              <div className="rounded-xl bg-primary/10 px-3 py-2 text-xs font-black text-primary">
                 {Object.keys(quizAnswers).length}/{quizQuestions.length}
               </div>
             </div>
             <div className="space-y-5">
               {quizQuestions.map((question, index) => (
-                <div key={question.uid} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-                  <div className="mb-3 text-sm font-black leading-relaxed text-slate-900">
+                <div key={question.uid} className="rounded-2xl border border-border bg-muted p-4">
+                  <div className="mb-3 text-sm font-black leading-relaxed text-foreground">
                     Câu {index + 1}. {question.question_text}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -1100,8 +1100,8 @@ export default function ExamSessionPage({ params }: Props) {
                           onClick={() => setQuizAnswers(prev => ({ ...prev, [question.uid]: letter }))}
                           className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition-all disabled:opacity-60 ${
                             selected
-                              ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-200 hover:bg-indigo-50'
+                              ? 'border-primary bg-primary text-white shadow-sm'
+                              : 'border-border bg-card text-foreground hover:border-primary/20 hover:bg-primary/10'
                           }`}
                         >
                           <span className="mr-2 text-xs font-black uppercase">{letter}.</span>
@@ -1118,18 +1118,18 @@ export default function ExamSessionPage({ params }: Props) {
 
         {/* Exam content */}
         {exam.content_type === 'markdown' && exam.body && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
               <FileText size={12} />
               Đề bài
             </div>
-            <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-wrap">{exam.body}</div>
+            <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">{exam.body}</div>
           </div>
         )}
 
         {(exam.content_type === 'pdf' || exam.content_type === 'image' || exam.content_type === 'file') && exam.meta?.url && (
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
               <File size={12} />
               Tài liệu đề thi
             </div>
@@ -1140,7 +1140,7 @@ export default function ExamSessionPage({ params }: Props) {
                 href={exam.meta.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-2.5 text-sm font-bold text-indigo-600 hover:bg-indigo-100"
+                className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/10 px-4 py-2.5 text-sm font-bold text-primary hover:bg-primary/10"
               >
                 <File size={16} />
                 {exam.meta.name || 'Xem đề thi'}
@@ -1150,8 +1150,8 @@ export default function ExamSessionPage({ params }: Props) {
         )}
 
         {/* Answer form */}
-        <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 text-[10px] font-black uppercase tracking-widest text-indigo-500">Bài làm của bạn</div>
+        <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="mb-4 text-[10px] font-black uppercase tracking-widest text-primary">Bài làm của bạn</div>
 
           {exam.content_type === 'markdown' && (
             <Textarea
@@ -1159,18 +1159,18 @@ export default function ExamSessionPage({ params }: Props) {
               onChange={e => setAnswerContent(e.target.value)}
               rows={10}
               disabled={timeExpired || submitted}
-              className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-50"
+              className="w-full resize-none rounded-xl border border-border bg-muted px-4 py-3 text-sm font-medium text-foreground outline-none transition-all focus:border-primary focus:bg-card focus:ring-4 focus:ring-primary/10 disabled:opacity-50"
               placeholder="Nhập bài làm của bạn tại đây..."
             />
           )}
 
           {needsFile && (
-            <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-border bg-muted p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
-                <div className="truncate text-sm font-bold text-slate-800">
+                <div className="truncate text-sm font-bold text-foreground">
                   {answerFile?.name || 'Chưa chọn file bài làm'}
                 </div>
-                <div className="text-[11px] font-bold uppercase text-slate-400">
+                <div className="text-[11px] font-bold uppercase text-muted-foreground">
                   {answerFile ? 'Sẵn sàng nộp' : 'Chọn file để đính kèm bài làm'}
                 </div>
               </div>
@@ -1195,13 +1195,13 @@ export default function ExamSessionPage({ params }: Props) {
           )}
 
           {exam.content_type === 'quiz' && (
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-700">
+            <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-bold text-primary">
               Kiểm tra lại đáp án đã chọn phía trên trước khi nộp bài.
             </div>
           )}
 
           {submitError && (
-            <div className="mt-3 flex items-center gap-2 rounded-xl border border-rose-100 bg-rose-50 px-4 py-2.5 text-sm font-bold text-rose-600">
+            <div className="mt-3 flex items-center gap-2 rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-sm font-bold text-destructive">
               <AlertCircle size={15} />
               {submitError}
             </div>
@@ -1211,7 +1211,7 @@ export default function ExamSessionPage({ params }: Props) {
             <Button
               type="submit"
               disabled={!canSubmit}
-              className="h-12 min-w-[160px] rounded-xl bg-indigo-600 px-6 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 disabled:opacity-50"
+              className="h-12 min-w-[160px] rounded-xl bg-primary px-6 text-xs font-bold text-white shadow-lg shadow-indigo-100 hover:bg-primary disabled:opacity-50"
             >
               {submitting ? (
                 <><Loader2 size={16} className="mr-2 animate-spin" /> Đang nộp...</>
@@ -1234,31 +1234,33 @@ export default function ExamSessionPage({ params }: Props) {
           onClick={() => setAuditOpen(false)}
         >
           <div
-            className="flex h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:h-[80vh] sm:rounded-3xl"
+            className="flex h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-card shadow-2xl sm:h-[80vh] sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between border-b border-slate-200 bg-gradient-to-br from-indigo-50 to-white px-6 py-4">
+            <div className="flex items-start justify-between border-b border-border bg-gradient-to-br from-primary/10 to-white px-6 py-4">
               <div>
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-500">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary">
                   <Activity size={12} />
                   Lịch sử giám sát
                 </div>
-                <h2 className="mt-1 text-lg font-black text-slate-900">
+                <h2 className="mt-1 text-lg font-black text-foreground">
                   {auditCounters && (
                     <>
                       {auditCounters.visibility_breaks.count}/{auditCounters.visibility_breaks.max}
-                      <span className="ml-1 text-xs font-bold text-slate-500">rời màn hình</span>
+                      <span className="ml-1 text-xs font-bold text-muted-foreground">rời màn hình</span>
                       <span className="mx-2 text-slate-300">·</span>
                       {auditCounters.face_warnings.count}/{auditCounters.face_warnings.max}
-                      <span className="ml-1 text-xs font-bold text-slate-500">cảnh báo khuôn mặt</span>
+                      <span className="ml-1 text-xs font-bold text-muted-foreground">cảnh báo khuôn mặt</span>
                     </>
                   )}
                 </h2>
               </div>
               <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setAuditOpen(false)}
-                className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-muted-foreground"
                 aria-label="Đóng"
               >
                 <X size={18} />
@@ -1268,44 +1270,44 @@ export default function ExamSessionPage({ params }: Props) {
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {auditLoading ? (
                 <div className="flex items-center justify-center py-16">
-                  <Loader2 size={28} className="animate-spin text-indigo-500" />
+                  <Loader2 size={28} className="animate-spin text-primary" />
                 </div>
               ) : auditEvents.length === 0 ? (
                 <div className="py-16 text-center">
-                  <p className="text-sm font-bold text-slate-400">Chưa có sự kiện nào.</p>
+                  <p className="text-sm font-bold text-muted-foreground">Chưa có sự kiện nào.</p>
                 </div>
               ) : (
-                <ol className="relative space-y-3 border-l-2 border-slate-200 pl-5">
+                <ol className="relative space-y-3 border-l-2 border-border pl-5">
                   {auditEvents.map((ev) => {
                     const violation = isAuditViolation(ev.event_type);
                     const limit = isAuditLimit(ev.event_type);
                     const force = isAuditForce(ev.event_type);
                     const dotColor = force
-                      ? 'bg-rose-500 ring-rose-200'
+                      ? 'bg-destructive ring-destructive/20'
                       : limit
-                        ? 'bg-rose-500 ring-rose-200'
+                        ? 'bg-destructive ring-destructive/20'
                         : violation
-                          ? 'bg-amber-500 ring-amber-200'
-                          : 'bg-indigo-400 ring-indigo-200';
+                          ? 'bg-warning ring-warning/20'
+                          : 'bg-primary/40 ring-primary/20';
                     return (
                       <li key={ev.uid} className="relative">
                         <span
                           className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dotColor}`}
                         />
-                        <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-2.5">
+                        <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-muted/60 px-4 py-2.5">
                           <div className="min-w-0 flex-1">
                             <p className={`text-sm font-black ${
-                              force ? 'text-rose-700' : limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800'
+                              force ? 'text-destructive' : limit ? 'text-destructive' : violation ? 'text-warning' : 'text-foreground'
                             }`}>
                               {humanizeAuditEvent(ev.event_type)}
                             </p>
                             {ev.event_data && Object.keys(ev.event_data).length > 0 && (
-                              <p className="mt-0.5 text-[11px] font-bold text-slate-500">
+                              <p className="mt-0.5 text-[11px] font-bold text-muted-foreground">
                                 {formatAuditEventData(ev.event_type, ev.event_data)}
                               </p>
                             )}
                           </div>
-                          <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
+                          <time className="shrink-0 text-[11px] font-bold tabular-nums text-muted-foreground">
                             {formatAuditClockTime(ev.created_at)}
                           </time>
                         </div>

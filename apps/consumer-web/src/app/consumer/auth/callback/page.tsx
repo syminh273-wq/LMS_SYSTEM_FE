@@ -41,10 +41,10 @@ function AuthCallbackContent() {
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-muted">
       <div className="text-center">
-        <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent mx-auto" />
-        <p className="text-gray-600 text-sm">Đang xử lý đăng nhập...</p>
+        <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
+        <p className="text-muted-foreground text-sm">Đang xử lý đăng nhập...</p>
       </div>
     </div>
   );
@@ -54,8 +54,8 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+        <div className="flex min-h-screen items-center justify-center bg-muted">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
       }
     >

@@ -11,7 +11,6 @@ import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
 import { accountService, type UserProfile } from '@/lib/api/account';
 import { socialApi } from '@/lib/api/social';
-import { cn } from '@shared/lib/utils';
 
 type FollowedUser = {
   consumer_uid: string;
@@ -125,6 +124,7 @@ export default function FollowingPage() {
               {query && (
                 <Button
                   onClick={() => setQuery('')}
+                  variant="ghost"
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center"
                   aria-label="Xóa"
                 >
@@ -201,6 +201,7 @@ export default function FollowingPage() {
                     <div className="flex items-center gap-2 shrink-0">
                       <Button
                         onClick={() => handleMessage(u.consumer_uid)}
+                        variant="ghost"
                         className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-slate-200 text-[12.5px] font-semibold text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors"
                         title="Nhắn tin"
                       >
@@ -210,10 +211,7 @@ export default function FollowingPage() {
                       <Button
                         onClick={() => handleUnfollow(u.consumer_uid)}
                         disabled={isPending}
-                        className={cn(
-                          'inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[12.5px] font-semibold transition-colors disabled:opacity-60',
-                          'bg-indigo-50 text-indigo-700 hover:bg-rose-50 hover:text-rose-600',
-                        )}
+                        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[12.5px] font-semibold disabled:opacity-60 bg-accent text-primary hover:bg-destructive/10 hover:text-destructive"
                         title="Bỏ theo dõi"
                       >
                         {isPending ? (

@@ -26,20 +26,14 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({ onClick, isActive = false
     <Button
       onClick={onClick}
       disabled={disabled}
-      className={`
-        relative group p-2 rounded-lg transition-all duration-200 ease-in-out border
-        ${
-          isActive
-            ? 'bg-primary text-primary-foreground shadow-md border-primary'
-            : 'text-muted-foreground border-transparent hover:bg-accent hover:text-accent-foreground hover:shadow-md hover:border-border'
-        }
-        ${disabled ? 'opacity-40 cursor-not-allowed' : 'active:scale-95'}
-      `}
+      variant={isActive ? 'default' : 'ghost'}
+      size="icon"
+      className="relative group"
     >
       <div className="w-5 h-5">{children}</div>
       <span
         className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs
-        font-medium text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100
+        font-medium text-background bg-foreground rounded opacity-0 group-hover:opacity-100
         transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
       >
         {tooltip}

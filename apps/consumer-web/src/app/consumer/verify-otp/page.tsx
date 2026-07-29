@@ -60,33 +60,33 @@ export default function VerifyOTPPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
+    <div className="min-h-screen bg-muted flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-[440px] animate-fade-up">
         <Link
           href="/consumer/forgot-password"
-          className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 hover:text-slate-900 font-semibold mb-8 transition-colors group"
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground hover:text-foreground font-semibold mb-8 transition-colors group"
         >
           <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
           Quay lại
         </Link>
 
         <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-md mb-5">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground shadow-md mb-5">
             <KeyRound size={22} strokeWidth={2.2} />
           </div>
-          <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 mb-1.5 tracking-tight text-balance">
+          <h1 className="text-2xl sm:text-[28px] font-bold text-foreground mb-1.5 tracking-tight text-balance">
             Nhập mã OTP
           </h1>
-          <p className="text-slate-500 text-[14px]">
+          <p className="text-muted-foreground text-[14px]">
             Mã 6 chữ số đã được gửi đến{' '}
-            <span className="text-indigo-700 font-semibold">{email}</span>.
+            <span className="text-primary font-semibold">{email}</span>.
             Mã có hiệu lực trong 5 phút.
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-slate-700">
+            <Label>
               Mã OTP
             </Label>
             <Input
@@ -96,17 +96,17 @@ export default function VerifyOTPPage() {
               })}
               placeholder="000000"
               maxLength={6}
-              className="h-14 text-center text-2xl font-bold tracking-[0.4em] bg-white border-slate-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors"
+              className="h-14 text-center"
             />
             {errors.otp_code && (
-              <p className="text-rose-600 text-[12px] font-medium mt-1">{errors.otp_code.message}</p>
+              <p className="text-destructive text-[12px] font-medium mt-1">{errors.otp_code.message}</p>
             )}
           </div>
 
           <Button
             type="submit"
             disabled={loading}
-            className="mt-2 w-full h-11 rounded-lg font-semibold text-[14px] text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="mt-2 w-full h-11 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -125,9 +125,10 @@ export default function VerifyOTPPage() {
         <div className="mt-6 text-center">
           <Button
             type="button"
+            variant="link"
             onClick={handleResend}
             disabled={resending || countdown > 0}
-            className="inline-flex items-center gap-1.5 text-[12.5px] text-slate-500 hover:text-indigo-700 font-semibold transition-colors disabled:opacity-40 disabled:hover:text-slate-500"
+            className="inline-flex items-center gap-1.5"
           >
             <RefreshCw size={13} className={resending ? 'animate-spin' : ''} />
             {countdown > 0 ? `Gửi lại sau ${countdown}s` : 'Gửi lại mã OTP'}

@@ -187,8 +187,10 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
         >
           <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
-            className="absolute right-3 top-3 rounded-full p-1.5 text-slate-500 hover:bg-slate-100"
+            className="absolute right-3 top-3 text-muted-foreground"
             aria-label="Close"
           >
             <X size={16} />
@@ -211,10 +213,10 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
             </div>
 
             <div className="space-y-1">
-              <h2 className="text-xl font-black text-slate-900">
+              <h2 className="text-xl font-black text-foreground">
                 {t('quizCollection.celebration_title')}
               </h2>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-muted-foreground">
                 {t('quizCollection.celebration_subtitle')}
               </p>
               {(current.title || current.collection_title) && (
@@ -223,12 +225,12 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
                 </p>
               )}
               {current.classroom_name && (
-                <p className="text-[11px] font-bold text-slate-500">
+                <p className="text-[11px] font-bold text-muted-foreground">
                   {t('quizCollection.celebration_classroom_label')}: {current.classroom_name}
                 </p>
               )}
               {current.student_name && (
-                <p className="text-[11px] font-bold text-slate-500">
+                <p className="text-[11px] font-bold text-muted-foreground">
                   {t('quizCollection.celebration_student_label')}: {current.student_name}
                 </p>
               )}
@@ -241,10 +243,10 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
                   {t('quizCollection.celebration_verification_label')}
                 </span>
               </div>
-              <div className="font-mono text-base font-black text-slate-900 tracking-widest break-all">
+              <div className="font-mono text-base font-black text-foreground tracking-widest break-all">
                 {current.verification_code}
               </div>
-              <div className="text-[10px] text-slate-500">
+              <div className="text-[10px] text-muted-foreground">
                 {current.issued_at_display ||
                   (current.issued_at
                     ? new Date(current.issued_at).toLocaleString('vi-VN')
@@ -253,7 +255,7 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
             </div>
 
             {certificates.length > 1 && (
-              <div className="text-[10px] font-bold text-slate-500">
+              <div className="text-[10px] font-bold text-muted-foreground">
                 {currentIdx + 1} / {certificates.length}
               </div>
             )}
@@ -262,7 +264,7 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
               <Button
                 onClick={handleShare}
                 variant="outline"
-                className="flex-1 h-11 rounded-xl font-bold gap-1.5"
+                className="flex-1 h-11 gap-1.5"
               >
                 {copied ? <Check size={14} /> : <Share2 size={14} />}
                 {t('quizCollection.celebration_share_btn')}
@@ -279,8 +281,9 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
             {certificates.length > 1 ? (
               <Button
                 type="button"
+                variant="ghost"
                 onClick={handleNext}
-                className="text-[11px] font-bold text-slate-500 hover:text-slate-700"
+                className="text-muted-foreground"
               >
                 {currentIdx < certificates.length - 1
                   ? `→ ${certificates[currentIdx + 1].verification_code.slice(0, 6)}…`
@@ -289,8 +292,9 @@ export function CertificateCelebration({ certificates, onClose }: CertificateCel
             ) : (
               <Button
                 type="button"
+                variant="ghost"
                 onClick={handleClose}
-                className="text-[11px] font-bold text-slate-500 hover:text-slate-700"
+                className="text-muted-foreground"
               >
                 {t('quizCollection.celebration_stay_btn')}
               </Button>

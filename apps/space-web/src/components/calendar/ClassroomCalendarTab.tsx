@@ -238,7 +238,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-accent text-primary flex items-center justify-center">
             <CalendarDays size={18} />
           </div>
           <div>
@@ -279,6 +279,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
                 <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-40 overflow-hidden">
                   <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       setCreateMenuOpen(false);
                       handleCreate();
@@ -290,6 +291,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
                   </Button>
                   <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       setCreateMenuOpen(false);
                       setRecurringOpen(true);
@@ -311,8 +313,10 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
           <div className="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden">
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={goPrev}
-              className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+              className="hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Previous"
             >
               <ChevronLeft size={14} />
@@ -320,8 +324,10 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
             <div className="h-4 w-px bg-slate-200" />
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={goNext}
-              className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
+              className="hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors"
               aria-label="Next"
             >
               <ChevronRight size={14} />

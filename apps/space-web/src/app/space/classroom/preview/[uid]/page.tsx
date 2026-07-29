@@ -82,7 +82,7 @@ function fileIcon(name: string, fileType?: string) {
     return <FileText size={16} className="text-blue-500" />;
   if (['xls', 'xlsx', 'csv'].includes(ext))
     return <FileText size={16} className="text-emerald-600" />;
-  return <FileText size={16} className="text-slate-400" />;
+  return <FileText size={16} className="text-muted-foreground" />;
 }
 
 function fileKind(name: string, fileType?: string): 'image' | 'video' | 'audio' | 'pdf' | 'other' {
@@ -212,7 +212,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex items-center justify-center py-32">
-          <Loader2 size={32} className="animate-spin text-slate-400" />
+          <Loader2 size={32} className="animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -232,7 +232,6 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             Vui lòng sử dụng trang quản lý lớp học dành cho giáo viên.
           </div>
           <Button
-            className="rounded-xl"
             onClick={() => {
               router.push(`/space/classrooms/${uid}`);
             }}
@@ -250,7 +249,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
         <div className="max-w-md mx-auto py-20 text-center space-y-4">
           <div className="text-2xl">😢</div>
           <div className="text-base font-bold text-foreground">{error || 'Không tìm thấy lớp học'}</div>
-          <Button variant="outline" onClick={() => router.back()} className="rounded-xl">
+          <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft size={14} className="mr-1" /> Quay lại
           </Button>
         </div>
@@ -273,7 +272,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             variant="ghost"
             size="sm"
             onClick={() => router.back()}
-            className="rounded-lg text-slate-600 -ml-2"
+            className="-ml-2"
           >
             <ArrowLeft size={14} className="mr-1" /> Quay lại
           </Button>
@@ -287,10 +286,10 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <Card className="border-slate-200 overflow-hidden">
+            <Card className="overflow-hidden">
               <CardContent className="p-6 sm:p-8 space-y-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-md">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary-brand bg-primary-brand-light border border-primary-brand-light px-2.5 py-1 rounded-md">
                     <span>{cat.emoji}</span> {cat.label}
                   </span>
                   {isPaid ? (
@@ -302,7 +301,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                       Miễn phí
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-muted-foreground bg-muted border border-border px-2.5 py-1 rounded-md">
                     <Hash size={11} /> {classroom.pid}
                   </span>
                 </div>
@@ -323,7 +322,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2 px-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-primary-brand-light text-primary-brand flex items-center justify-center">
                     <Eye size={15} />
                   </div>
                   <div>
@@ -338,9 +337,9 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
               </div>
 
               {preview.items.length === 0 ? (
-                <div className="bg-white border border-dashed border-slate-200 rounded-2xl p-10 text-center">
-                  <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3">
-                    <BookOpen size={20} className="text-slate-400" />
+                <div className="bg-card border border-dashed border-border rounded-2xl p-10 text-center">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                    <BookOpen size={20} className="text-muted-foreground" />
                   </div>
                   <div className="text-sm font-bold text-foreground">Chưa có bài giảng miễn phí</div>
                   <div className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
@@ -350,8 +349,8 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                   </div>
                 </div>
               ) : (
-                <Card className="border-slate-200 overflow-hidden">
-                  <div className="divide-y divide-slate-100">
+                <Card className="overflow-hidden">
+                  <div className="divide-y divide-border">
                     {preview.items.map((item) => {
                       if (item.type === 'folder') {
                         const isOpen = expanded[item.uid] ?? true;
@@ -359,22 +358,23 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                         return (
                           <Button
                             type="button"
+                            variant="ghost"
                             key={`f-${item.uid}`}
                             onClick={() =>
                               setExpanded((prev) => ({ ...prev, [item.uid]: !(prev[item.uid] ?? true) }))
                             }
                             className={cn(
-                              "w-full flex items-center gap-2.5 px-4 py-2.5 text-left transition-colors",
+                              "w-full justify-start gap-2.5 px-4 py-2.5 text-left",
                               isRootPreview
                                 ? 'bg-emerald-50/40 hover:bg-emerald-50/70 text-emerald-900'
-                                : 'hover:bg-slate-50 text-slate-700'
+                                : 'text-foreground'
                             )}
                             style={{ paddingLeft: 16 + item.depth * 20 }}
                           >
                             {isOpen ? (
-                              <ChevronDown size={14} className="text-slate-400 shrink-0" />
+                              <ChevronDown size={14} className="text-muted-foreground shrink-0" />
                             ) : (
-                              <ChevronRight size={14} className="text-slate-400 shrink-0" />
+                              <ChevronRight size={14} className="text-muted-foreground shrink-0" />
                             )}
                             {isOpen ? (
                               <FolderOpen
@@ -389,7 +389,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                             )}
                             <span className="truncate text-sm font-bold flex-1">{item.name}</span>
                             {isRootPreview && (
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-white border border-emerald-200 rounded px-1.5 py-0.5">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-card border border-emerald-200 rounded px-1.5 py-0.5">
                                 Preview
                               </span>
                             )}
@@ -401,6 +401,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                       return (
                         <Button
                           type="button"
+                          variant="ghost"
                           key={`d-${item.uid}`}
                           onClick={() =>
                             setPreviewDoc({
@@ -410,14 +411,14 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                               kind: fileKind(item.name, item.file_type),
                             })
                           }
-                          className="w-full group flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left"
+                          className="w-full group justify-start gap-3 px-4 py-2.5 text-left"
                           style={{ paddingLeft: 36 + item.depth * 20 }}
                         >
-                          <div className="h-9 w-9 rounded-lg bg-slate-50 group-hover:bg-white flex items-center justify-center shrink-0 border border-slate-100 transition-colors">
+                          <div className="h-9 w-9 rounded-lg bg-muted group-hover:bg-card flex items-center justify-center shrink-0 border border-border transition-colors">
                             {fileIcon(item.name, item.file_type)}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="text-sm font-semibold text-foreground truncate group-hover:text-indigo-700 transition-colors">
+                            <div className="text-sm font-semibold text-foreground truncate group-hover:text-primary-brand transition-colors">
                               {item.name}
                             </div>
                             <div className="text-[11px] text-muted-foreground font-medium">
@@ -427,9 +428,9 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                           </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
                             {fileKind(item.name, item.file_type) === 'video' && (
-                              <Play size={12} className="text-slate-400" />
+                              <Play size={12} className="text-muted-foreground" />
                             )}
-                            <ExternalLink size={13} className="text-slate-400" />
+                            <ExternalLink size={13} className="text-muted-foreground" />
                           </div>
                         </Button>
                       );
@@ -447,7 +448,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
           </div>
 
           <div className="space-y-4">
-            <Card className="border-slate-200">
+            <Card>
               <CardContent className="p-5">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
                   {isPaid ? 'Thanh toán 1 lần' : 'Giá lớp học'}
@@ -478,9 +479,9 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 className="block group"
                 aria-label={`Xem trang cá nhân của giáo viên ${teacherName}`}
               >
-                <Card className="border-slate-200 transition group-hover:border-slate-300">
+                <Card>
                   <CardContent className="p-5 flex items-center gap-3.5">
-                    <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-base font-bold overflow-hidden shrink-0">
+                    <div className="h-12 w-12 rounded-xl bg-primary-brand-light flex items-center justify-center text-primary-brand text-base font-bold overflow-hidden shrink-0">
                       {teacherAvatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={teacherAvatar} alt={teacherName} className="h-full w-full object-cover" />
@@ -492,7 +493,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                       <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                         Giáo viên
                       </div>
-                      <div className="text-sm font-bold text-foreground truncate group-hover:text-indigo-700 transition-colors">
+                      <div className="text-sm font-bold text-foreground truncate group-hover:text-primary-brand transition-colors">
                         {teacherName}
                       </div>
                       <div className="text-[11px] text-muted-foreground mt-0.5 font-medium">
@@ -503,9 +504,9 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 </Card>
               </Link>
             ) : (
-              <Card className="border-slate-200">
+              <Card>
                 <CardContent className="p-5 flex items-center gap-3.5">
-                  <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                  <div className="h-12 w-12 rounded-xl bg-primary-brand-light flex items-center justify-center text-primary-brand shrink-0">
                     <GraduationCap size={22} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -537,7 +538,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
 
       <div className="fixed bottom-0 left-0 right-0 z-30 px-4 pb-4 pt-3 bg-gradient-to-t from-white via-white/95 to-transparent dark:from-slate-950 dark:via-slate-950/95">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-lg shadow-slate-200/50 p-2.5 flex items-center gap-3">
+          <div className="bg-card border border-border rounded-2xl shadow-lg p-2.5 flex items-center gap-3">
             <div className="flex-1 min-w-0 pl-2">
               <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                 {isPaid ? 'Tổng thanh toán' : 'Quyền truy cập'}
@@ -549,14 +550,15 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
             {actions.membership_status === 'pending' ? (
               <Button
                 disabled
-                className="h-11 rounded-xl bg-slate-100 text-slate-500 font-bold px-5 gap-1.5 cursor-not-allowed"
+                variant="secondary"
+                className="h-11 px-5 gap-1.5"
               >
                 <Hourglass size={15} /> Đợi phê duyệt
               </Button>
             ) : actions.type === 'none' ? (
               <Button
                 onClick={handleOpenClass}
-                className="h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 gap-1.5"
+                className="h-11 px-5 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
               >
                 <CheckCircle2 size={15} /> Mở lớp
               </Button>
@@ -564,7 +566,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
               <Button
                 onClick={handleCheckout}
                 disabled={joining}
-                className="h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 gap-1.5"
+                className="h-11 px-5 gap-1.5 bg-amber-500 hover:bg-amber-600 text-white"
               >
                 <Crown size={15} /> Thanh toán MoMo
               </Button>
@@ -572,7 +574,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
               <Button
                 onClick={handleJoin}
                 disabled={joining}
-                className="h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 gap-1.5"
+                className="h-11 px-5 gap-1.5"
               >
                 {joining ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
                 Tham gia
@@ -588,11 +590,11 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
           onClick={() => setPreviewDoc(null)}
         >
           <div
-            className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden"
+            className="bg-card rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate flex-1 min-w-0" title={previewDoc.name}>
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
+              <p className="text-sm font-bold text-foreground truncate flex-1 min-w-0" title={previewDoc.name}>
                 {previewDoc.name}
               </p>
               <a
@@ -600,21 +602,23 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 target="_blank"
                 rel="noopener noreferrer"
                 download
-                className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+                className="p-2 rounded-md hover:bg-muted text-muted-foreground"
                 title="Tải xuống"
               >
                 <Download size={14} />
               </a>
               <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setPreviewDoc(null)}
-                className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
+                className="hover:bg-muted text-muted-foreground"
                 title="Đóng (Esc)"
               >
                 <X size={16} />
               </Button>
             </div>
-            <div className="flex-1 min-h-0 flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4 overflow-auto">
+            <div className="flex-1 min-h-0 flex items-center justify-center bg-muted p-4 overflow-auto">
               {previewDoc.kind === 'image' ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -630,8 +634,8 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                   className="max-w-full max-h-full rounded-lg shadow bg-black"
                 />
               ) : previewDoc.kind === 'audio' ? (
-                <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl p-6 shadow border border-slate-200 dark:border-slate-800">
-                  <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 truncate" title={previewDoc.name}>
+                <div className="w-full max-w-md bg-card rounded-2xl p-6 shadow border border-border">
+                  <p className="text-sm font-bold text-foreground mb-4 truncate" title={previewDoc.name}>
                     {previewDoc.name}
                   </p>
                   <audio src={previewDoc.url} controls autoPlay className="w-full" />
@@ -643,7 +647,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                   className="w-full h-full rounded-lg shadow bg-white"
                 />
               ) : (
-                <div className="text-center text-slate-500">
+                <div className="text-center text-muted-foreground">
                   <p className="text-sm font-medium mb-3">
                     Không hỗ trợ xem trước cho định dạng này.
                   </p>
@@ -653,7 +657,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                     rel="noopener noreferrer"
                     className="inline-block"
                   >
-                    <Button size="sm" className="rounded-xl">
+                    <Button size="sm">
                       <Download size={13} className="mr-1" /> Tải xuống
                     </Button>
                   </a>

@@ -29,13 +29,15 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
   const isLong = text.length > 220;
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-card rounded-lg border border-border p-6">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xl font-bold text-slate-900">{t('workspace.profile.section_bio')}</h2>
+        <h2 className="text-xl font-bold text-foreground">{t('workspace.profile.section_bio')}</h2>
         {isOwner && (
           <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setOpen(true)}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+            className="w-8 h-8 flex items-center justify-center"
             aria-label={t('workspace.common.edit')}
           >
             <Pencil className="size-4" />
@@ -45,7 +47,7 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
       {bioHtml ? (
         <>
           <div
-            className="text-sm text-slate-800 leading-relaxed prose prose-sm max-w-none dark:prose-invert transition-[max-height] duration-300 ease-out"
+            className="text-sm text-foreground leading-relaxed prose prose-sm max-w-none dark:prose-invert transition-[max-height] duration-300 ease-out"
             style={
               isLong && !expanded
                 ? {
@@ -61,8 +63,9 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
           {isLong && (
             <Button
               type="button"
+              variant="link"
               onClick={() => setExpanded((v) => !v)}
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline mt-2 inline-flex items-center gap-1"
+              className="mt-2 inline-flex items-center gap-1 h-auto p-0"
             >
               {expanded ? t('portfolio.me.show_less') : t('portfolio.me.show_all')}
               <ChevronDown
@@ -72,19 +75,19 @@ export function BioCard({ profile, isOwner, onSaved }: BioCardProps) {
           )}
         </>
       ) : (
-        <p className="text-sm text-slate-400 italic">{t('workspace.profile.no_bio')}</p>
+        <p className="text-sm text-muted-foreground italic">{t('workspace.profile.no_bio')}</p>
       )}
 
       {profile.skills && profile.skills.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-slate-100">
-          <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-2">
+        <div className="mt-4 pt-4 border-t border-border">
+          <h3 className="text-xs font-black text-muted-foreground uppercase tracking-wider mb-2">
             {t('workspace.profile.section_skills')}
           </h3>
           <div className="flex flex-wrap gap-2">
             {profile.skills.map((s, i) => (
               <span
                 key={`${s}-${i}`}
-                className="px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold"
+                className="px-3 py-1.5 rounded-full bg-primary-brand-light text-primary-brand text-xs font-semibold"
               >
                 {s}
               </span>

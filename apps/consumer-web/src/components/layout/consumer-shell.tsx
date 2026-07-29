@@ -164,12 +164,14 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          className="relative z-[100] inline-flex items-center justify-center w-9 h-9 text-slate-900 bg-white hover:bg-slate-100 rounded-lg transition-colors dark:text-white dark:bg-slate-800 dark:hover:bg-slate-700 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700"
+          variant="outline"
+          size="icon"
+          className="relative z-[100]"
           aria-label="Notifications"
         >
           {unreadCount > 0 ? <BellRing size={18} strokeWidth={2.2} /> : <Bell size={18} strokeWidth={2.2} />}
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
@@ -178,12 +180,12 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="z-[100] w-[360px] p-0 overflow-hidden bg-white border border-slate-200 shadow-xl opacity-100 dark:bg-slate-900 dark:border-slate-700"
+        className="z-[100] w-[360px] p-0 overflow-hidden"
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div>
-            <h3 className="text-[13px] font-bold text-slate-900 dark:text-slate-100">Thông báo</h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <h3 className="text-[13px] font-bold text-foreground">Thông báo</h3>
+            <p className="text-[11px] text-muted-foreground">
               {unreadCount > 0 ? `${unreadCount} chưa đọc` : 'Đã đọc tất cả'}
             </p>
           </div>
@@ -192,7 +194,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
               variant="ghost"
               size="sm"
               onClick={() => void markAllRead()}
-              className="h-7 px-2 text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+              className="h-7 text-primary"
             >
               <Check size={12} className="mr-1" />
               Đọc tất cả
@@ -202,34 +204,33 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
 
         <div className="max-h-[420px] overflow-y-auto">
           {list.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-10 text-slate-400">
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
               <Inbox size={32} className="opacity-50" />
               <p className="text-[12px] font-medium">Chưa có thông báo nào</p>
             </div>
           ) : (
-            <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+            <ul className="divide-y divide-border">
               {list.map((item, idx) => {
                 const meta = parseNotificationMetadata(item.metadata);
                 const hasLink = !!meta.classroom_uid;
                 return (
                   <li key={item.uid ?? `notification-${idx}`}>
                     <Button
+                      variant="ghost"
                       onClick={() => handleClickItem(item)}
                       className={cn(
-                        "w-full text-left px-4 py-3 transition-colors flex items-start gap-3",
-                        item.is_read
-                          ? "hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                          : "bg-indigo-50/60 hover:bg-indigo-50 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/15",
+                        "w-full text-left px-4 py-3 flex items-start gap-3",
+                        !item.is_read && "bg-primary/10",
                       )}
                     >
                       <div
                         className={cn(
                           "shrink-0 w-9 h-9 rounded-full flex items-center justify-center mt-0.5",
                           item.notify_type === 'classroom_approved'
-                            ? "bg-emerald-500 text-white"
+                            ? "bg-success text-success-foreground"
                             : item.notify_type === 'classroom_rejected'
-                              ? "bg-rose-500 text-white"
-                              : "bg-indigo-500 text-white",
+                              ? "bg-destructive text-destructive-foreground"
+                              : "bg-primary text-primary-foreground",
                         )}
                       >
                         <Bell size={15} />
@@ -240,30 +241,30 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
                             className={cn(
                               "text-[13px] truncate",
                               item.is_read
-                                ? "font-semibold text-slate-700 dark:text-slate-300"
-                                : "font-bold text-slate-900 dark:text-white",
+                                ? "font-semibold text-muted-foreground"
+                                : "font-bold text-foreground",
                             )}
                           >
                             {item.title}
                           </p>
                           {!item.is_read && (
-                            <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                           )}
                         </div>
                         <p
                           className={cn(
                             "text-[12px] line-clamp-2 mt-0.5",
                             item.is_read
-                              ? "text-slate-600 dark:text-slate-400"
-                              : "text-slate-800 dark:text-slate-200",
+                              ? "text-muted-foreground"
+                              : "text-foreground",
                           )}
                         >
                           {item.content}
                         </p>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-500 mt-1 font-medium">
+                        <p className="text-[11px] text-muted-foreground mt-1 font-medium">
                           {relativeTime(item.created_at)}
                           {hasLink && (
-                            <span className="ml-2 text-indigo-600 dark:text-indigo-400 font-semibold">· Xem lớp →</span>
+                            <span className="ml-2 text-primary font-semibold">· Xem lớp →</span>
                           )}
                         </p>
                       </div>
@@ -356,7 +357,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
               />
             </Link>
 
-            <div className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-700" />
+            <div className="hidden lg:block h-6 w-px bg-border" />
 
             <nav className="hidden lg:flex items-center gap-1" aria-label="Main">
               {primaryNavItems.map((item) => {
@@ -367,11 +368,10 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     key={item.href}
                     href={item.href}
                     aria-current={active ? 'page' : undefined}
+                    data-active={active || undefined}
                     className={cn(
-                      "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                      active
-                        ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
+                      "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground border-l-2 border-transparent",
+                      "data-[active=true]:border-primary data-[active=true]:text-foreground data-[active=true]:font-semibold",
                     )}
                   >
                     <Icon size={15} strokeWidth={2.2} />
@@ -385,10 +385,10 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
+                        variant="ghost"
                         className={cn(
-                          "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors outline-none",
-                          "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800",
-                          "data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-slate-100"
+                          "relative flex items-center gap-2 outline-none text-muted-foreground",
+                          "data-[state=open]:bg-muted data-[state=open]:text-foreground"
                         )}
                       >
                         <Sparkles size={15} strokeWidth={2.2} />
@@ -396,7 +396,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                         <ChevronDown size={13} className="opacity-70" />
                         {unseenCertCount > 0 && (
                           <span
-                            className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900"
+                            className="absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-background"
                             aria-label={`${unseenCertCount} new certificate(s)`}
                           >
                             {unseenCertCount > 9 ? '9+' : unseenCertCount}
@@ -407,7 +407,7 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                     <DropdownMenuContent
                       align="end"
                       sideOffset={8}
-                      className="w-[220px] rounded-xl shadow-xl border border-slate-200 bg-white p-1.5 animate-fade-down dark:bg-slate-900 dark:border-slate-700"
+                      className="w-[220px]"
                     >
                       {utilityNavItems.map((item) => {
                         const active = isActive(item.href);
@@ -417,20 +417,19 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                           <Link
                             key={item.href}
                             href={item.href}
+                            data-active={active || undefined}
                             className={cn(
-                              "w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left transition-colors",
-                              active
-                                ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"
-                                : "text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                              "w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left text-foreground border-l-2 border-transparent",
+                              "data-[active=true]:border-primary data-[active=true]:text-foreground data-[active=true]:font-semibold",
                             )}
                           >
-                            <span className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center dark:bg-slate-800">
-                              <Icon size={14} className="text-slate-500 dark:text-slate-400" />
+                            <span className="w-7 h-7 rounded-md bg-muted flex items-center justify-center">
+                              <Icon size={14} className="text-muted-foreground" />
                             </span>
                             <span className="text-sm font-medium flex-1">{item.name}</span>
                             {showCertDot && (
                               <span
-                                className="min-w-[18px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center"
+                                className="min-w-[18px] h-4 px-1 rounded-full bg-destructive text-white text-[9px] font-bold flex items-center justify-center"
                                 aria-label={`${unseenCertCount} new certificate(s)`}
                               >
                                 {unseenCertCount > 9 ? '9+' : unseenCertCount}
@@ -448,7 +447,8 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
 
           <div className="flex items-center gap-1 sm:gap-2">
             <Button
-              className="hidden md:flex items-center gap-2 h-9 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-colors text-sm font-medium dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400 dark:hover:text-slate-100"
+              variant="secondary"
+              className="hidden md:flex items-center gap-2"
               aria-label="Search"
             >
               <Search size={15} strokeWidth={2.2} />
@@ -456,7 +456,9 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
             </Button>
 
             <Button
-              className="md:hidden p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-muted-foreground"
               aria-label="Search"
             >
               <Search size={18} strokeWidth={2} />
@@ -466,56 +468,59 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
               <ThemeToggle />
               <NotificationBell userId={mounted ? userProfile?.uid : null} />
               <Button
-                className="p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800"
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground"
                 aria-label="Help"
               >
                 <HelpCircle size={17} strokeWidth={2} />
               </Button>
             </div>
 
-            <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
+            <div className="hidden sm:block h-6 w-px bg-border mx-1" />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 transition-colors outline-none dark:hover:bg-slate-800"
+                  variant="ghost"
+                  className="flex items-center gap-2 outline-none"
                   aria-label="Open user menu"
                 >
                   <div className="relative">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={mounted ? (userProfile?.avatar_url || '') : ''} alt={displayName} />
-                      <AvatarFallback className="bg-indigo-600 text-white text-xs font-semibold">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-success rounded-full border-2 border-background" />
                   </div>
                   <div className="hidden xl:flex flex-col items-start leading-none">
-                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-100 max-w-[120px] truncate">
+                    <span className="text-sm font-semibold text-foreground max-w-[120px] truncate">
                       {displayName}
                     </span>
                   </div>
-                  <ChevronDown size={13} className="text-slate-400 hidden xl:block" />
+                  <ChevronDown size={13} className="text-muted-foreground hidden xl:block" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
                 sideOffset={10}
-                className="w-[280px] rounded-xl shadow-xl border border-slate-200 bg-white p-1.5 animate-fade-down dark:bg-slate-900 dark:border-slate-700"
+                className="w-[280px]"
               >
-                <div className="px-3 py-3 mb-1 rounded-lg bg-slate-50 dark:bg-slate-800">
+                <div className="px-3 py-3 mb-1 rounded-lg bg-muted">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-11 w-11">
                       <AvatarImage src={mounted ? (userProfile?.avatar_url || '') : ''} alt={displayName} />
-                      <AvatarFallback className="bg-indigo-600 text-white text-sm font-semibold">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">
+                      <p className="text-sm font-semibold text-foreground truncate">
                         {displayName}
                       </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                      <p className="text-xs text-muted-foreground truncate mt-0.5">
                         {mounted ? (userProfile?.email || 'student@edusphere.vn') : ''}
                       </p>
                     </div>
@@ -531,29 +536,31 @@ export function ConsumerShell({ children }: ConsumerShellProps) {
                   ].map(({ label, Icon, path }) => (
                     <Button
                       key={path}
+                      variant="ghost"
                       onClick={() => router.push(path)}
-                      className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left hover:bg-slate-100 transition-colors group dark:hover:bg-slate-800"
+                      className="w-full flex items-center gap-3 text-left group"
                     >
-                      <span className="w-7 h-7 rounded-md bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center transition-colors dark:bg-slate-800 dark:group-hover:bg-indigo-500/20">
-                        <Icon size={14} className="text-slate-500 group-hover:text-indigo-600 transition-colors dark:text-slate-400 dark:group-hover:text-indigo-300" />
+                      <span className="w-7 h-7 rounded-md bg-muted group-hover:bg-primary/15 flex items-center justify-center transition-colors">
+                        <Icon size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
                       </span>
-                      <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900 dark:text-slate-300 dark:group-hover:text-slate-100">
+                      <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground">
                         {label}
                       </span>
                     </Button>
                   ))}
                 </div>
 
-                <div className="h-px bg-slate-200 dark:bg-slate-700 my-1.5 mx-1" />
+                <div className="h-px bg-border my-1.5 mx-1" />
 
                 <Button
+                  variant="ghost"
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-left hover:bg-rose-50 transition-colors group dark:hover:bg-rose-500/10"
+                  className="w-full flex items-center gap-3 text-left group"
                 >
-                  <span className="w-7 h-7 rounded-md bg-rose-50 group-hover:bg-rose-100 flex items-center justify-center transition-colors dark:bg-rose-500/10 dark:group-hover:bg-rose-500/20">
-                    <LogOut size={14} className="text-rose-600" />
+                  <span className="w-7 h-7 rounded-md bg-destructive/10 group-hover:bg-destructive/20 flex items-center justify-center transition-colors">
+                    <LogOut size={14} className="text-destructive" />
                   </span>
-                  <span className="text-sm font-medium text-rose-600 group-hover:text-rose-700 dark:text-rose-400">
+                  <span className="text-sm font-medium text-destructive">
                     Đăng xuất
                   </span>
                 </Button>

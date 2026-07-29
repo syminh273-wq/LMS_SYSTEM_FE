@@ -64,7 +64,7 @@ export function CreateCertificateDialog({ open, onOpenChange, onCreated }: Props
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) reset(); onOpenChange(o); }}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('certificate.create_modal.title')}</DialogTitle>
         </DialogHeader>

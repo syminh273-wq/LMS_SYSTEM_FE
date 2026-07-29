@@ -58,22 +58,22 @@ export function ConnectSuggestions() {
 
   return (
     <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-      <div className="bg-white border border-slate-200 rounded-xl p-4 card-elevated">
+      <div className="bg-card border border-border rounded-xl p-4 card-elevated">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[13.5px] font-bold text-slate-900">Gợi ý kết nối</h3>
-          <UserPlus size={14} className="text-indigo-600" />
+          <h3 className="text-[13.5px] font-bold text-foreground">Gợi ý kết nối</h3>
+          <UserPlus size={14} className="text-primary" />
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-6">
-            <Loader2 size={18} className="animate-spin text-indigo-600" />
+            <Loader2 size={18} className="animate-spin text-primary" />
           </div>
         ) : users.length === 0 ? (
           <div className="py-6 text-center">
-            <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-slate-100 flex items-center justify-center">
-              <UserIcon size={18} className="text-slate-400" />
+            <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-muted flex items-center justify-center">
+              <UserIcon size={18} className="text-muted-foreground" />
             </div>
-            <p className="text-[12.5px] text-slate-500">Chưa có gợi ý mới</p>
+            <p className="text-[12.5px] text-muted-foreground">Chưa có gợi ý mới</p>
           </div>
         ) : (
           <ul className="space-y-3">
@@ -89,7 +89,7 @@ export function ConnectSuggestions() {
                     className="shrink-0"
                     aria-label={`Xem trang của ${u.name || u.username}`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white text-[12px] font-bold overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary flex items-center justify-center text-white text-[12px] font-bold overflow-hidden">
                       {u.avatar ? (
                         <img src={u.avatar} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -103,16 +103,16 @@ export function ConnectSuggestions() {
                       prefetch={false}
                       className="block min-w-0"
                     >
-                      <p className="text-[13px] font-semibold text-slate-900 truncate hover:underline flex items-center gap-1.5">
+                      <p className="text-[13px] font-semibold text-foreground truncate hover:underline flex items-center gap-1.5">
                         <span className="truncate">{u.name || u.username || 'Người dùng'}</span>
                         {u.kind === 'space' && (
-                          <span className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[9.5px] font-bold uppercase tracking-wider border border-indigo-100">
+                          <span className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9.5px] font-bold uppercase tracking-wider border border-primary/20">
                             Giáo viên
                           </span>
                         )}
                       </p>
                       {subtitle && (
-                        <p className="text-[11.5px] text-slate-500 truncate">{subtitle}</p>
+                        <p className="text-[11.5px] text-muted-foreground truncate">{subtitle}</p>
                       )}
                     </Link>
                   </div>
@@ -122,8 +122,8 @@ export function ConnectSuggestions() {
                     className={cn(
                       'shrink-0 inline-flex items-center gap-1 px-2.5 h-8 rounded-full text-[11.5px] font-bold transition-colors disabled:opacity-50',
                       isFollowing
-                        ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        ? 'bg-muted text-muted-foreground hover:bg-muted'
+                        : 'bg-primary text-white hover:bg-primary'
                     )}
                     aria-label={isFollowing ? 'Đang theo dõi' : 'Theo dõi'}
                   >

@@ -42,13 +42,13 @@ function PaymentResultContent() {
   }, [orderId, resultCode, message, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         <Card className="border-border">
           <CardContent className="p-8 text-center space-y-5">
             {(status === 'loading' || status === 'redirecting') && (
               <>
-                <Loader2 size={48} className="mx-auto text-indigo-600 animate-spin" />
+                <Loader2 size={48} className="mx-auto text-primary animate-spin" />
                 <h2 className="text-xl font-bold">
                   {status === 'loading' ? 'Đang xử lý kết quả thanh toán...' : 'Đang chuyển hướng...'}
                 </h2>
@@ -57,9 +57,9 @@ function PaymentResultContent() {
 
             {status === 'success' && (
               <>
-                <CheckCircle2 size={64} className="mx-auto text-emerald-500" />
+                <CheckCircle2 size={64} className="mx-auto text-success" />
                 <h2 className="text-xl font-bold">Thanh toán thành công</h2>
-                <Button onClick={() => router.push('/consumer/classroom')} className="rounded-xl font-bold">
+                <Button onClick={() => router.push('/consumer/classroom')}>
                   Về danh sách lớp
                 </Button>
               </>
@@ -67,13 +67,12 @@ function PaymentResultContent() {
 
             {status === 'failed' && (
               <>
-                <XCircle size={64} className="mx-auto text-rose-500" />
+                <XCircle size={64} className="mx-auto text-destructive" />
                 <h2 className="text-xl font-bold">Không thể xử lý kết quả</h2>
-                <p className="text-slate-500 text-sm">{errorMsg}</p>
+                <p className="text-muted-foreground text-sm">{errorMsg}</p>
                 <Button
                   onClick={() => router.push('/consumer/classroom')}
                   variant="outline"
-                  className="rounded-xl"
                 >
                   Về danh sách lớp
                 </Button>
@@ -91,7 +90,7 @@ export default function PaymentResultPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          <Loader2 size={32} className="animate-spin text-slate-400" />
+          <Loader2 size={32} className="animate-spin text-muted-foreground" />
         </div>
       }
     >

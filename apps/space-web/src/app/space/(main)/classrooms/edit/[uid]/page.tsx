@@ -380,7 +380,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
                   >
                     <SelectTrigger
                       id="category"
-                      className="h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 aria-invalid:border-red-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-100"
+                      className="h-10 w-full aria-invalid:border-destructive"
                       aria-invalid={!!errors.category}
                     >
                       <SelectValue />

@@ -43,7 +43,7 @@ export function AssignToClassroomDialog({ open, onOpenChange, classrooms, existi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('quizCollection.assign_modal.title')}</DialogTitle>
         </DialogHeader>
@@ -55,6 +55,7 @@ export function AssignToClassroomDialog({ open, onOpenChange, classrooms, existi
               <Button
                 key={c.uid}
                 onClick={() => setSelected(c.uid === selected ? null : c.uid)}
+                variant="ghost"
                 className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                   c.uid === selected ? 'bg-primary-brand/10 border border-primary-brand/30' : 'hover:bg-muted/50 border border-transparent'
                 }`}

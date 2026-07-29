@@ -27,7 +27,7 @@ export function ResourceManagementSection<TItem>({
   return (
     <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between border-b pb-4">
-        <CardTitle className="text-xl font-bold">{title}</CardTitle>
+        <CardTitle>{title}</CardTitle>
         <span className="text-sm font-medium text-muted-foreground">
           {recordsLabel ?? `${items.length} records`}
         </span>

@@ -19,26 +19,26 @@ type Props = {
 
 export function HistoryTabs({ value, onChange, counts }: Props) {
   return (
-    <div className="inline-flex p-1 rounded-xl bg-slate-100/80 border border-slate-200">
+    <div className="inline-flex p-1 rounded-xl bg-muted border border-border">
       {TABS.map((t) => {
         const active = value === t.key;
         return (
           <Button
             key={t.key}
+            variant="ghost"
             onClick={() => onChange(t.key)}
+            data-active={active || undefined}
             className={cn(
-              'relative px-4 py-2 rounded-lg text-sm font-semibold transition-all',
-              active
-                ? 'bg-white text-indigo-700 shadow-sm ring-1 ring-slate-200'
-                : 'text-slate-600 hover:text-slate-900',
+              'relative text-muted-foreground data-[active=true]:text-foreground data-[active=true]:font-semibold data-[active=true]:border-b-2 data-[active=true]:border-primary',
             )}
           >
             {t.label}
             {typeof counts?.[t.key] === 'number' && (
               <span
+                data-active={active || undefined}
                 className={cn(
-                  'ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold',
-                  active ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-600',
+                  'ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold bg-muted text-muted-foreground',
+                  'data-[active=true]:text-foreground data-[active=true]:font-semibold',
                 )}
               >
                 {counts[t.key]}

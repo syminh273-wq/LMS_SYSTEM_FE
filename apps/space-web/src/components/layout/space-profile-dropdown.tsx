@@ -1,7 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '@shared/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@shared/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@shared/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
@@ -9,21 +17,9 @@ import type { RootState } from '@/lib/redux/store';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { accountService, type UserProfile } from '@/lib/api/account';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@shared/components/ui/dropdown-menu';
-import {
-  BookOpen,
-  ChevronDown,
-  LayoutDashboard,
   LogOut,
-  Settings,
   Sparkles,
   UserCircle,
-  Users,
-  Award,
-  Calendar,
 } from 'lucide-react';
 
 type ProfileData = {
@@ -98,132 +94,57 @@ export function SpaceProfileDropdown() {
   const initials = displayName.slice(0, 2).toUpperCase();
   const email = profile?.email || 'Space Admin';
 
-  const menuItems: Array<{
-    label: string;
-    Icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
-    path: string;
-  }> = [
-    { label: 'Trang cá nhân', Icon: UserCircle,     path: '/space/me' },
-    { label: 'Dashboard',     Icon: LayoutDashboard, path: '/space' },
-    { label: 'Classrooms',    Icon: BookOpen,       path: '/space/classrooms' },
-    { label: 'Calendar',      Icon: Calendar,       path: '/space/calendar' },
-    { label: 'Certificates',  Icon: Award,          path: '/space/quiz-collections' },
-    { label: 'Students',      Icon: Users,          path: '/space/student' },
-    { label: 'Settings',      Icon: Settings,       path: '/space/settings' },
-  ];
-
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          aria-label="Mở menu tài khoản"
-          onClick={(e) => e.stopPropagation()}
-          className="flex max-w-[220px] items-center gap-2.5 rounded-full border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group"
-        >
+      <DropdownMenuTrigger
+        aria-label="Mở menu tài khoản"
+        onClick={(e) => e.stopPropagation()}
+        className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <Avatar>
           {profile?.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt={displayName}
-              className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-background"
-            />
-          ) : (
-            <div className="h-9 w-9 shrink-0 rounded-full bg-gradient-to-br from-primary-brand to-accent text-xs font-black text-white flex items-center justify-center ring-2 ring-background">
-              {initials}
-            </div>
-          )}
-          <div className="hidden min-w-0 text-left sm:block">
-            <p className="truncate text-sm font-bold leading-none text-foreground">{displayName}</p>
-            <p className="mt-0.5 max-w-[120px] truncate text-[11px] leading-none text-muted-foreground">
-              {email}
-            </p>
-          </div>
-          <ChevronDown size={14} className="shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
-        </Button>
+            <AvatarImage src={profile.avatar_url} alt={displayName} />
+          ) : null}
+          <AvatarFallback className="bg-primary text-primary-foreground text-xs font-black">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        sideOffset={10}
-        style={{ width: '240px', minWidth: '240px' }}
-        className="rounded-2xl border border-border bg-card p-1.5 shadow-xl"
-      >
-        <Button
-          onClick={goToProfile}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted"
-        >
-          {profile?.avatar_url ? (
-            <img
-              src={profile.avatar_url}
-              alt={displayName}
-              className="h-10 w-10 shrink-0 rounded-full object-cover"
-            />
-          ) : (
-            <div className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-primary-brand to-accent text-sm font-black text-white flex items-center justify-center">
+      <DropdownMenuContent align="end" sideOffset={10} className="w-60">
+        <DropdownMenuLabel className="flex items-center gap-3 p-2">
+          <Avatar className="h-10 w-10 shrink-0">
+            {profile?.avatar_url ? (
+              <AvatarImage src={profile.avatar_url} alt={displayName} />
+            ) : null}
+            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-black">
               {initials}
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold leading-tight text-foreground">{displayName}</p>
-            <p className="mt-0.5 truncate text-xs text-muted-foreground">{email}</p>
-          </div>
-        </Button>
-
-        <div className="mx-1 my-1 h-px bg-border" />
-
-        <div className="space-y-0.5">
-          {menuItems.map(({ label, Icon, path }) => (
-            <Button
-              key={path}
-              onClick={() => router.push(path)}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted group"
-            >
-              <Icon
-                size={16}
-                strokeWidth={2}
-                className="shrink-0 text-muted-foreground group-hover:text-primary-brand transition-colors"
-              />
-              <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
-                {label}
-              </span>
-            </Button>
-          ))}
-        </div>
-
-        <div className="mx-1 my-1 h-px bg-border" />
-
-        <Button
-          onClick={() => router.push('/space/feed')}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-muted group"
-        >
-          <Sparkles
-            size={16}
-            strokeWidth={2}
-            className="shrink-0 text-muted-foreground group-hover:text-primary-brand transition-colors"
-          />
-          <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
-            Social Feed
+            </AvatarFallback>
+          </Avatar>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-bold text-foreground">{displayName}</span>
+            <span className="block truncate text-xs text-muted-foreground">{email}</span>
           </span>
-          <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
-            MỚI
-          </span>
-        </Button>
+        </DropdownMenuLabel>
 
-        <div className="mx-1 my-1 h-px bg-border" />
+        <DropdownMenuSeparator />
 
-        <Button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-destructive/5 group"
-        >
-          <LogOut
-            size={16}
-            strokeWidth={2}
-            className="shrink-0 text-muted-foreground group-hover:text-destructive transition-colors"
-          />
-          <span className="text-sm font-medium text-foreground/80 group-hover:text-destructive">
-            Đăng xuất
-          </span>
-        </Button>
+        <DropdownMenuItem onClick={goToProfile}>
+          <UserCircle />
+          Trang cá nhân
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={() => router.push('/space/feed')}>
+          <Sparkles />
+          Social Feed
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+          <LogOut />
+          Đăng xuất
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

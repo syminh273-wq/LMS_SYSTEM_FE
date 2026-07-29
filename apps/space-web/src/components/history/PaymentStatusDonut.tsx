@@ -32,23 +32,23 @@ export function PaymentStatusDonut({ data, loading }: Props) {
   const hasData = visible.length > 0;
 
   return (
-    <Card className="border-slate-200 h-full">
+    <Card className="h-full">
       <CardContent className="p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-3">
-          <PieIcon size={16} className="text-indigo-600" />
-          <h3 className="text-[12px] font-extrabold uppercase tracking-wide text-slate-600">
+          <PieIcon size={16} className="text-primary-brand" />
+          <h3 className="text-[12px] font-extrabold uppercase tracking-wide text-muted-foreground">
             Phân bố trạng thái
           </h3>
         </div>
 
         <div className="h-[220px] sm:h-[260px] relative">
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white/60 z-10">
-              <Loader2 size={24} className="animate-spin text-slate-400" />
+            <div className="absolute inset-0 flex items-center justify-center bg-background/60 z-10">
+              <Loader2 size={24} className="animate-spin text-muted-foreground" />
             </div>
           )}
           {!hasData && !loading ? (
-            <div className="h-full flex items-center justify-center text-[12px] text-slate-400">
+            <div className="h-full flex items-center justify-center text-[12px] text-muted-foreground">
               Chưa có giao dịch nào.
             </div>
           ) : (

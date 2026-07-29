@@ -204,7 +204,7 @@ export default function SpaceRegisterPage() {
 
               <Link
                 href="/space/login"
-                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
+                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-primary bg-card border border-primary/30 hover:bg-accent flex items-center justify-center gap-2"
               >
                 Đã có Space? Đăng nhập
               </Link>

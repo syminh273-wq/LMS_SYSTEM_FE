@@ -61,8 +61,8 @@ export function UserPostsSection({ profile, currentUserId, onCountChange }: Prop
     return (
       <section className="space-y-3">
         <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <Loader2 size={24} className="animate-spin text-indigo-600" />
-          <p className="text-[12.5px] text-slate-500">Đang tải bài đăng...</p>
+          <Loader2 size={24} className="animate-spin text-primary" />
+          <p className="text-[12.5px] text-muted-foreground">Đang tải bài đăng...</p>
         </div>
       </section>
     );
@@ -71,12 +71,12 @@ export function UserPostsSection({ profile, currentUserId, onCountChange }: Prop
   if (posts.length === 0) {
     return (
       <section className="space-y-3">
-        <div className="text-center py-12 bg-slate-50 border border-dashed border-slate-200 rounded-xl">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-white flex items-center justify-center">
-            <Sparkles size={24} className="text-slate-400" />
+        <div className="text-center py-12 bg-muted border border-dashed border-border rounded-xl">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-background flex items-center justify-center">
+            <Sparkles size={24} className="text-muted-foreground" />
           </div>
-          <p className="font-semibold text-slate-900 text-[14px]">Chưa có bài đăng nào</p>
-          <p className="text-[12.5px] text-slate-500 mt-1">Người dùng này chưa đăng bài viết nào.</p>
+          <p className="font-semibold text-foreground text-[14px]">Chưa có bài đăng nào</p>
+          <p className="text-[12.5px] text-muted-foreground mt-1">Người dùng này chưa đăng bài viết nào.</p>
         </div>
       </section>
     );

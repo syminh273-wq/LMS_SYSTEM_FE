@@ -107,19 +107,20 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
   };
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-card rounded-lg border border-border p-6">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Award size={18} className="text-amber-500" />
-          <h2 className="text-xl font-bold text-slate-900">Chứng chỉ & Giải thưởng</h2>
-          <span className="text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded-full">
+          <Award size={18} className="text-warning" />
+          <h2 className="text-xl font-bold text-foreground">Chứng chỉ & Giải thưởng</h2>
+          <span className="text-xs text-muted-foreground font-semibold bg-muted px-2 py-0.5 rounded-full">
             {items.length}
           </span>
         </div>
         {isOwner && (
           <Button
             onClick={startCreate}
-            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-amber-500 text-white text-xs font-bold hover:bg-amber-600 transition-colors"
+            size="sm"
+            className="gap-1 bg-warning text-warning-foreground"
           >
             <Plus size={13} /> Thêm
           </Button>
@@ -127,7 +128,7 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <p className="text-sm text-slate-400 italic">
+        <p className="text-sm text-muted-foreground italic">
           {isOwner ? 'Thêm chứng chỉ để học viên thấy năng lực của bạn.' : 'Chưa có chứng chỉ nào.'}
         </p>
       ) : (
@@ -137,28 +138,28 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
             return (
               <div
                 key={it.uid}
-                className="relative border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="relative border border-warning/30 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-warning/10 text-warning flex items-center justify-center shrink-0">
                     <Award size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <CollapsibleItem
                       summary={
                         <>
-                          <p className="text-sm font-bold text-slate-900 line-clamp-2">{v.title}</p>
+                          <p className="text-sm font-bold text-foreground line-clamp-2">{v.title}</p>
                           {v.issuer && (
-                            <p className="text-[11px] text-slate-600 mt-0.5">{v.issuer}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{v.issuer}</p>
                           )}
                           {v.year && (
-                            <p className="text-[10px] text-slate-400 mt-0.5">{v.year}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{v.year}</p>
                           )}
                         </>
                       }
                       details={
                         v.description ? (
-                          <p className="text-[11px] text-slate-600 whitespace-pre-line">{v.description}</p>
+                          <p className="text-[11px] text-muted-foreground whitespace-pre-line">{v.description}</p>
                         ) : null
                       }
                     />
@@ -169,7 +170,7 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                     href={v.file_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="mt-2 inline-flex items-center gap-1 text-[11px] text-amber-700 hover:text-amber-900 font-semibold"
+                    className="mt-2 inline-flex items-center gap-1 text-[11px] text-warning hover:text-warning/80 font-semibold"
                   >
                     Mở file <ExternalLink size={11} />
                   </a>
@@ -178,13 +179,17 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
                   <div className="absolute top-2 right-2 flex gap-1">
                     <Button
                       onClick={() => startEdit(it)}
-                      className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50"
+                      variant="outline"
+                      size="icon"
+                      className="w-6 h-6"
                     >
                       <Pencil size={11} />
                     </Button>
                     <Button
                       onClick={() => handleDelete(it)}
-                      className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-rose-600 hover:bg-rose-50"
+                      variant="outline"
+                      size="icon"
+                      className="w-6 h-6 text-destructive"
                     >
                       <Trash2 size={11} />
                     </Button>
@@ -199,52 +204,52 @@ export function CertificatesCard({ data, isOwner, onChanged }: Props) {
       {open && (
         <Dialog open onOpenChange={(o) => !o && setOpen(false)}>
           <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-            <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
+            <DialogHeader className="px-6 pt-5 pb-3 border-b border-border">
               <DialogTitle>{editing ? 'Sửa chứng chỉ' : 'Thêm chứng chỉ'}</DialogTitle>
             </DialogHeader>
             <div className="px-6 py-5 space-y-3">
               <Label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">Tên chứng chỉ *</span>
+                <span className="block text-xs font-bold text-foreground mb-1">Tên chứng chỉ *</span>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="VD: AWS Solutions Architect"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-warning"
                 />
               </Label>
               <Label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">Nơi cấp</span>
+                <span className="block text-xs font-bold text-foreground mb-1">Nơi cấp</span>
                 <input
                   value={issuer}
                   onChange={(e) => setIssuer(e.target.value)}
                   placeholder="VD: Amazon Web Services"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-warning"
                 />
               </Label>
               <Label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">Năm</span>
+                <span className="block text-xs font-bold text-foreground mb-1">Năm</span>
                 <input
                   value={year}
                   onChange={(e) => setYear(e.target.value)}
                   placeholder="VD: 2024"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-warning"
                 />
               </Label>
               <Label className="block">
-                <span className="block text-xs font-bold text-slate-700 mb-1">URL file đính kèm (tùy chọn)</span>
+                <span className="block text-xs font-bold text-foreground mb-1">URL file đính kèm (tùy chọn)</span>
                 <input
                   value={fileUrl}
                   onChange={(e) => setFileUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm outline-none focus:border-amber-500"
+                  className="w-full px-3 py-2 border border-border rounded-md text-sm outline-none focus:border-warning"
                 />
               </Label>
             </div>
-            <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+            <div className="sticky bottom-0 bg-background border-t border-border px-6 py-3 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
                 Huỷ
               </Button>
-              <Button onClick={handleSave} disabled={saving} className="bg-amber-500 hover:bg-amber-600 text-white">
+              <Button onClick={handleSave} disabled={saving} className="bg-warning text-warning-foreground">
                 {saving ? 'Đang lưu...' : 'Lưu'}
               </Button>
             </div>

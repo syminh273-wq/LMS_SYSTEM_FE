@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 
 const ConsumerShell = dynamic(() => import("@/components/layout/consumer-shell").then(mod => mod.ConsumerShell), {
   ssr: true,
-  loading: () => <div className="min-h-screen bg-[#F8FAFF]" />
+  loading: () => <div className="min-h-screen bg-background" />
 });
 
 const WORKSPACE_ROUTES = ['/consumer/feed', '/consumer/profile', '/consumer/messages'];

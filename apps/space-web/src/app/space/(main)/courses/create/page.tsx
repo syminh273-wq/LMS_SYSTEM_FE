@@ -110,30 +110,30 @@ export default function CreateCoursePage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <Card className="border-border shadow-sm rounded-2xl overflow-hidden">
-          <div className="h-2 bg-gradient-to-r from-indigo-500 to-purple-600" />
+          <div className="h-2 bg-primary-brand" />
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-2 text-foreground">
-              <BookOpen size={20} className="text-indigo-600" />
+              <BookOpen size={20} className="text-primary-brand" />
               {t('course.detail.tabs.info', 'Info')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             {globalError && (
-              <div className="bg-rose-50 border border-rose-100 p-4 text-rose-600 text-sm rounded-xl font-medium">
+              <div className="bg-destructive/10 border border-destructive/20 p-4 text-destructive text-sm rounded-xl font-medium">
                 {globalError}
               </div>
             )}
 
             <div className="space-y-2">
               <Label className="text-sm font-bold text-foreground flex items-center gap-2 px-1">
-                {t('course.create.name_label', 'Course name')} <span className="text-rose-500">*</span>
+                {t('course.create.name_label', 'Course name')} <span className="text-destructive">*</span>
               </Label>
               <Input
                 {...register('name', { required: t('course.create.name_required', 'Required') })}
-                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground ${errors.name ? 'border-rose-500' : 'border-border'}`}
+                className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-medium text-foreground ${errors.name ? 'border-destructive' : 'border-border'}`}
                 placeholder={t('course.create.name_placeholder', 'Example: Python Basics')}
               />
-              {errors.name && <p className="text-rose-500 text-xs font-bold px-1">{errors.name.message}</p>}
+              {errors.name && <p className="text-destructive text-xs font-bold px-1">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -143,7 +143,7 @@ export default function CreateCoursePage() {
               <Textarea
                 {...register('description')}
                 rows={4}
-                className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-medium text-foreground resize-none"
+                className="w-full px-4 py-3 bg-muted/50 border border-border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-medium text-foreground resize-none"
                 placeholder={t('course.create.description_placeholder', 'What will students learn?')}
               />
             </div>
@@ -173,7 +173,7 @@ export default function CreateCoursePage() {
                   <Label className="cursor-pointer block">
                     <Input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" />
                     <div className="py-4 space-y-1">
-                      <ImageIcon size={32} className="mx-auto text-slate-300" />
+                      <ImageIcon size={32} className="mx-auto text-muted-foreground/40" />
                       <p className="text-xs text-muted-foreground">
                         {uploading ? 'Uploading...' : t('course.create.cover_hint', 'Recommended 16:9, max 2MB')}
                       </p>
@@ -205,8 +205,8 @@ export default function CreateCoursePage() {
                   onClick={() => setValue('pricing_type', type)}
                   className={`p-4 rounded-xl border-2 transition-all text-left ${
                     pricingType === type
-                      ? 'border-indigo-500 bg-indigo-50'
-                      : 'border-border hover:border-indigo-200'
+                      ? 'border-primary-brand bg-primary-brand-light'
+                      : 'border-border hover:border-primary-brand-muted'
                   }`}
                 >
                   <div className="font-bold capitalize">
@@ -222,7 +222,7 @@ export default function CreateCoursePage() {
             {pricingType === 'paid' && (
               <div className="space-y-2">
                 <Label className="text-sm font-bold text-foreground px-1">
-                  {t('course.create.price_label', 'Price (VND)')} <span className="text-rose-500">*</span>
+                  {t('course.create.price_label', 'Price (VND)')} <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   type="number"
@@ -231,10 +231,10 @@ export default function CreateCoursePage() {
                     required: t('course.create.price_required', 'Required'),
                     min: { value: 1000, message: t('course.create.price_min', 'Min 1,000đ') },
                   })}
-                  className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:bg-card focus:border-indigo-500 transition-all font-bold text-foreground ${errors.price_vnd_str ? 'border-rose-500' : 'border-border'}`}
+                  className={`w-full px-4 py-3 bg-muted/50 border rounded-xl outline-none focus:ring-4 focus:ring-primary-brand/10 focus:bg-card focus:border-primary-brand transition-all font-bold text-foreground ${errors.price_vnd_str ? 'border-destructive' : 'border-border'}`}
                   placeholder={t('course.create.price_placeholder', '299000')}
                 />
-                {errors.price_vnd_str && <p className="text-rose-500 text-xs font-bold px-1">{errors.price_vnd_str.message}</p>}
+                {errors.price_vnd_str && <p className="text-destructive text-xs font-bold px-1">{errors.price_vnd_str.message}</p>}
               </div>
             )}
           </CardContent>
@@ -253,7 +253,7 @@ export default function CreateCoursePage() {
           <Button
             type="submit"
             disabled={loading}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold min-w-[180px] h-12 rounded-xl shadow-lg shadow-indigo-500/20"
+            className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold min-w-[180px] h-12 rounded-xl shadow-lg shadow-primary-brand/20"
           >
             {loading ? (
               <>

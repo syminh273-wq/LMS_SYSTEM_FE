@@ -110,7 +110,7 @@ export default function SpaceExamAnalyticsPage({
           </p>
           <Button
             onClick={() => router.push(`/space/classrooms/${uid}/exams/${examUid}`)}
-            className="mt-5 w-full rounded-xl bg-primary-brand"
+            className="mt-5 w-full"
           >
             Quay lại chi tiết bài kiểm tra
           </Button>
@@ -315,7 +315,7 @@ export default function SpaceExamAnalyticsPage({
             </p>
             <div className="mt-5 space-y-3">
               <PassFailBar label="Đạt" count={passedCount} total={graded} color="bg-emerald-500" />
-              <PassFailBar label="Không đạt" count={failedCount} total={graded} color="bg-rose-500" />
+              <PassFailBar label="Không đạt" count={failedCount} total={graded} color="bg-destructive" />
             </div>
           </div>
 
@@ -326,7 +326,7 @@ export default function SpaceExamAnalyticsPage({
             </p>
             <div className="mt-5 grid grid-cols-2 gap-3">
               <MiniStat label="Đã nộp" value={String(submitted)} accent="text-primary-brand" />
-              <MiniStat label="Chưa nộp" value={String(missing)} accent="text-rose-500" />
+              <MiniStat label="Chưa nộp" value={String(missing)} accent="text-destructive" />
               <MiniStat label="Đã chấm" value={String(graded)} accent="text-emerald-600" />
               <MiniStat label="Chờ chấm" value={String(Math.max(0, submitted - graded))} accent="text-amber-500" />
             </div>

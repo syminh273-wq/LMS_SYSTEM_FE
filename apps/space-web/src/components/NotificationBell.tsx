@@ -110,13 +110,15 @@ export default function NotificationBell() {
   return (
     <div className="relative" ref={panelRef}>
       <Button
+        variant="ghost"
+        size="icon"
         onClick={() => setOpen(prev => !prev)}
-        className="relative p-2 rounded-full hover:bg-muted transition-colors"
+        className="relative rounded-full hover:bg-muted transition-colors"
         aria-label={t('layout.notifications.aria_label')}
       >
         <Bell size={20} className="text-muted-foreground" />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -149,13 +151,10 @@ export default function NotificationBell() {
                   <li
                     key={n.uid}
                     onClick={() => !isRead && handleMarkRead(n.uid)}
-                    className={`flex items-start gap-3 px-4 py-3 transition-colors cursor-pointer ${
-                      isRead ? 'hover:bg-muted/50' : 'bg-primary-brand-light/60 hover:bg-primary-brand-light'
-                    }`}
+                    data-read={isRead}
+                    className="flex items-start gap-3 px-4 py-3 cursor-pointer data-[read=true]:hover:bg-muted/50 data-[read=false]:bg-primary-brand-light/60 data-[read=false]:hover:bg-primary-brand-light"
                   >
-                    <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      isRead ? 'bg-muted text-muted-foreground' : 'bg-primary-brand-light text-primary-brand'
-                    }`}>
+                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold data-[read=true]:bg-muted data-[read=true]:text-muted-foreground data-[read=false]:bg-primary-brand-light data-[read=false]:text-primary-brand" data-read={isRead}>
                       {n.title?.[0]?.toUpperCase() ?? '🔔'}
                     </div>
 

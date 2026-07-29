@@ -65,7 +65,7 @@ export default function QuizCollectionsPage() {
         </div>
         <Button
           onClick={() => setShowCreate(true)}
-          className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-xl h-10 px-5 gap-2 shadow-lg shadow-primary-brand/20"
+          className="h-10 gap-2"
         >
           <Plus size={16} />
           {t('quizCollection.create_btn')}
@@ -81,7 +81,7 @@ export default function QuizCollectionsPage() {
           <Layers size={48} className="mb-4 opacity-30" />
           <p className="text-sm font-medium">{t('quizCollection.empty')}</p>
           <p className="text-xs mt-1 mb-6">{t('quizCollection.empty_hint')}</p>
-          <Button onClick={() => setShowCreate(true)} variant="outline" className="rounded-xl gap-2 font-bold text-xs">
+          <Button onClick={() => setShowCreate(true)} variant="outline" className="gap-2">
             <Plus size={16} /> {t('quizCollection.create_first_btn')}
           </Button>
         </div>
@@ -128,7 +128,9 @@ export default function QuizCollectionsPage() {
                 <div className="flex items-center gap-2">
                   <Button
                     onClick={(e) => { e.stopPropagation(); void handleDelete(c); }}
-                    className="text-muted-foreground hover:text-red-500 transition-colors p-1"
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-destructive"
                     title="Delete"
                   >
                     <Trash2 size={14} />

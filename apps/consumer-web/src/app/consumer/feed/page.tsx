@@ -105,16 +105,16 @@ export default function FeedPage() {
 
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <Loader2 size={28} className="animate-spin text-indigo-600" />
-              <p className="text-[12.5px] text-slate-500">Đang tải bảng tin...</p>
+              <Loader2 size={28} className="animate-spin text-primary" />
+              <p className="text-[12.5px] text-muted-foreground">Đang tải bảng tin...</p>
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-20 bg-white border-2 border-dashed border-slate-200 rounded-xl">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
-                <Sparkles size={28} className="text-slate-400" />
+            <div className="text-center py-20 bg-card border-2 border-dashed border-border rounded-xl">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted flex items-center justify-center">
+                <Sparkles size={28} className="text-muted-foreground" />
               </div>
-              <p className="font-semibold text-slate-900 text-[15px]">Chưa có bài đăng nào</p>
-              <p className="text-[13px] text-slate-500 mt-1">Hãy là người đầu tiên chia sẻ!</p>
+              <p className="font-semibold text-foreground text-[15px]">Chưa có bài đăng nào</p>
+              <p className="text-[13px] text-muted-foreground mt-1">Hãy là người đầu tiên chia sẻ!</p>
             </div>
           ) : (
             <div className="space-y-3 sm:space-y-4">
@@ -137,7 +137,7 @@ export default function FeedPage() {
                   <Button
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="inline-flex items-center gap-1.5 px-5 h-10 bg-white border border-slate-200 rounded-full text-[13px] font-semibold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 px-5 h-10 bg-card border border-border rounded-full text-[13px] font-semibold text-muted-foreground hover:bg-muted transition-colors disabled:opacity-60"
                   >
                     {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <ChevronDown size={14} />}
                     Xem thêm

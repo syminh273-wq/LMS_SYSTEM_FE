@@ -2,7 +2,6 @@
 
 import { Calendar, X } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { cn } from '@shared/lib/utils';
 
 export type DateRangeValue = {
   from: string | null;
@@ -53,20 +52,20 @@ export function DateRangeFilter({ value, onChange }: Props) {
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <Calendar size={14} className="text-slate-500" />
+      <Calendar size={14} className="text-muted-foreground" />
       <input
         type="date"
         value={value.from ?? ''}
         onChange={(e) => onChange({ ...value, from: e.target.value || null })}
-        className="px-2 py-1.5 rounded-lg text-[12px] font-medium border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        className="px-2 py-1.5 rounded-lg text-[12px] font-medium border border-border bg-background text-foreground hover:border-primary-brand/40 focus:outline-none focus:ring-2 focus:ring-primary-brand/20"
         aria-label="Từ ngày"
       />
-      <span className="text-slate-400 text-[11px]">→</span>
+      <span className="text-muted-foreground text-[11px]">→</span>
       <input
         type="date"
         value={value.to ?? ''}
         onChange={(e) => onChange({ ...value, to: e.target.value || null })}
-        className="px-2 py-1.5 rounded-lg text-[12px] font-medium border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        className="px-2 py-1.5 rounded-lg text-[12px] font-medium border border-border bg-background text-foreground hover:border-primary-brand/40 focus:outline-none focus:ring-2 focus:ring-primary-brand/20"
         aria-label="Đến ngày"
       />
       <div className="flex items-center gap-1 ml-1">
@@ -75,13 +74,9 @@ export function DateRangeFilter({ value, onChange }: Props) {
           return (
             <Button
               key={p.label}
+              variant={active ? 'default' : 'outline'}
+              size="sm"
               onClick={() => applyPreset(p.days)}
-              className={cn(
-                'px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors ring-1',
-                active
-                  ? 'bg-indigo-600 text-white ring-indigo-600'
-                  : 'bg-white text-slate-600 ring-slate-200 hover:ring-indigo-300 hover:text-indigo-700'
-              )}
             >
               {p.label}
             </Button>
@@ -90,7 +85,9 @@ export function DateRangeFilter({ value, onChange }: Props) {
         {(value.from || value.to) && (
           <Button
             onClick={() => onChange({ from: null, to: null })}
-            className="ml-1 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100"
+            variant="ghost"
+            size="sm"
+            className="ml-1 gap-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
             aria-label="Xoá bộ lọc ngày"
           >
             <X size={10} />

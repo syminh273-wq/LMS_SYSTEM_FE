@@ -63,7 +63,7 @@ export default function ConsumerHistoryPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background p-4 sm:p-8">
       <div className="max-w-4xl mx-auto space-y-5">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
@@ -71,17 +71,17 @@ export default function ConsumerHistoryPage() {
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="text-slate-600 hover:text-slate-900 -ml-2"
+              className="-ml-2"
               aria-label="Quay lại"
             >
               <ArrowLeft size={18} />
             </Button>
             <div>
               <div className="flex items-center gap-2">
-                <HistoryIcon size={20} className="text-indigo-600" strokeWidth={2.4} />
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Lịch sử</h1>
+                <HistoryIcon size={20} className="text-primary" strokeWidth={2.4} />
+                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground">Lịch sử</h1>
               </div>
-              <p className="text-[12px] text-slate-500 mt-0.5">
+              <p className="text-[12px] text-muted-foreground mt-0.5">
                 Giao dịch thanh toán và các lớp bạn đã tham gia.
               </p>
             </div>
@@ -92,12 +92,11 @@ export default function ConsumerHistoryPage() {
               size="sm"
               onClick={() => void load(true)}
               disabled={refreshing}
-              className="rounded-lg"
             >
               <RefreshCw size={14} className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
               Làm mới
             </Button>
-            <Button asChild variant="ghost" size="sm" className="rounded-lg">
+            <Button asChild variant="ghost" size="sm">
               <Link href="/consumer/dashboard">Về Dashboard</Link>
             </Button>
           </div>
@@ -113,12 +112,9 @@ export default function ConsumerHistoryPage() {
                 return (
                   <Button
                     key={s.value}
+                    variant={active ? 'default' : 'outline'}
+                    size="sm"
                     onClick={() => setStatusFilter(s.value)}
-                    className={`px-3 py-1.5 rounded-full text-[12px] font-bold transition-colors ring-1 ${
-                      active
-                        ? 'bg-indigo-600 text-white ring-indigo-600'
-                        : 'bg-white text-slate-600 ring-slate-200 hover:ring-indigo-300 hover:text-indigo-700'
-                    }`}
                   >
                     {s.label}
                   </Button>

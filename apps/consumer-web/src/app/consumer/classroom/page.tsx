@@ -141,24 +141,26 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 animate-fade-in">
       <div
-        className="w-full max-w-md rounded-xl bg-white shadow-2xl overflow-hidden animate-scale-in"
+        className="w-full max-w-md rounded-xl bg-card shadow-2xl overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Tham gia lớp học</h2>
-            <p className="text-[12px] text-slate-500 mt-0.5">Nhập mã hoặc quét QR từ giáo viên</p>
+            <h2 className="text-base font-bold text-foreground">Tham gia lớp học</h2>
+            <p className="text-[12px] text-muted-foreground mt-0.5">Nhập mã hoặc quét QR từ giáo viên</p>
           </div>
           <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+            className="rounded-lg hover:bg-muted text-muted-foreground transition-colors"
             aria-label="Đóng"
           >
             <X size={18} />
           </Button>
         </div>
 
-        <div className="flex border-b border-slate-200 bg-slate-50">
+        <div className="flex border-b border-border bg-muted">
           {[
             { key: 'code' as const, label: 'Nhập mã', icon: KeyRound },
             { key: 'qr' as const, label: 'Quét QR', icon: QrCode },
@@ -169,8 +171,8 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
               className={cn(
                 "flex-1 flex items-center justify-center gap-1.5 py-3 text-[13px] font-semibold transition-colors",
                 tab === key
-                  ? "text-indigo-700 bg-white border-b-2 border-indigo-600 -mb-px"
-                  : "text-slate-500 hover:text-slate-900"
+                  ? "text-primary bg-card border-b-2 border-indigo-600 -mb-px"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Icon size={14} />
@@ -183,7 +185,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
           {tab === 'code' && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label className="block text-[12px] font-semibold text-slate-700 mb-2">
+                <Label className="block text-[12px] font-semibold text-foreground mb-2">
                   Mã lớp (PID)
                 </Label>
                 <input
@@ -192,22 +194,22 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
                   onChange={e => setCode(e.target.value.toUpperCase())}
                   placeholder="AB1C2D"
                   maxLength={10}
-                  className="w-full h-14 rounded-lg border-2 border-slate-200 bg-white px-4 text-2xl font-mono font-bold tracking-[0.4em] text-center outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-colors uppercase"
+                  className="w-full h-14 rounded-lg border-2 border-border bg-card px-4 text-2xl font-mono font-bold tracking-[0.4em] text-center outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors uppercase"
                 />
-                <p className="text-[11px] text-slate-500 mt-2 text-center">
+                <p className="text-[11px] text-muted-foreground mt-2 text-center">
                   Mã gồm 4-10 ký tự chữ và số
                 </p>
               </div>
               {error && (
-                <div className="flex items-center gap-2 text-[12.5px] text-rose-600 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                <div className="flex items-center gap-2 text-[12.5px] text-destructive font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
                   {error}
                 </div>
               )}
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700"
+                className="w-full h-11 rounded-lg bg-primary text-white font-semibold hover:bg-primary"
               >
                 {loading ? (
                   <Loader2 size={16} className="animate-spin mr-2" />
@@ -222,11 +224,11 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
           {tab === 'qr' && (
             <div className="space-y-4">
               {cameraError ? (
-                <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-[13px] text-rose-700 text-center font-medium">
+                <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-[13px] text-destructive text-center font-medium">
                   {cameraError}
                 </div>
               ) : (
-                <div className="relative rounded-lg overflow-hidden bg-black aspect-square border border-slate-200">
+                <div className="relative rounded-lg overflow-hidden bg-black aspect-square border border-border">
                   <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
                   {!scanning && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 text-white">
@@ -237,16 +239,16 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
                   {scanning && (
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                       <div className="w-48 h-48 relative">
-                        <span className="absolute top-0 left-0 w-6 h-6 border-t-[3px] border-l-[3px] border-indigo-400 rounded-tl-lg" />
-                        <span className="absolute top-0 right-0 w-6 h-6 border-t-[3px] border-r-[3px] border-indigo-400 rounded-tr-lg" />
-                        <span className="absolute bottom-0 left-0 w-6 h-6 border-b-[3px] border-l-[3px] border-indigo-400 rounded-bl-lg" />
-                        <span className="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-indigo-400 rounded-br-lg" />
+                        <span className="absolute top-0 left-0 w-6 h-6 border-t-[3px] border-l-[3px] border-primary/40 rounded-tl-lg" />
+                        <span className="absolute top-0 right-0 w-6 h-6 border-t-[3px] border-r-[3px] border-primary/40 rounded-tr-lg" />
+                        <span className="absolute bottom-0 left-0 w-6 h-6 border-b-[3px] border-l-[3px] border-primary/40 rounded-bl-lg" />
+                        <span className="absolute bottom-0 right-0 w-6 h-6 border-b-[3px] border-r-[3px] border-primary/40 rounded-br-lg" />
                       </div>
                     </div>
                   )}
                 </div>
               )}
-              <p className="text-[12px] text-center text-slate-500">
+              <p className="text-[12px] text-center text-muted-foreground">
                 Hướng camera vào mã QR của giáo viên
               </p>
             </div>
@@ -305,25 +307,25 @@ export default function ClassroomPage() {
   const activeCount = classrooms.filter(c => c.status === 'active').length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {showJoin && <JoinDialog onClose={() => setShowJoin(false)} onJoined={handleJoined} />}
 
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-semibold mb-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-semibold mb-2">
               <School size={11} />
               Lớp học
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Lớp học của tôi</h1>
-            <p className="text-slate-600 text-[14px] mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">Lớp học của tôi</h1>
+            <p className="text-muted-foreground text-[14px] mt-1">
               {loading ? 'Đang tải...' : `${classrooms.length} lớp · ${activeCount} đang hoạt động`}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             {classrooms.length > 0 && (
-              <div className="hidden sm:flex bg-white border border-slate-200 rounded-lg p-0.5">
+              <div className="hidden sm:flex bg-card border border-border rounded-lg p-0.5">
                 {[
                   { key: 'all' as const, label: 'Tất cả' },
                   { key: 'active' as const, label: 'Đang học' },
@@ -335,7 +337,7 @@ export default function ClassroomPage() {
                       "px-3 py-1.5 text-[12.5px] font-semibold rounded-md transition-colors",
                       filter === key
                         ? "bg-slate-900 text-white"
-                        : "text-slate-600 hover:text-slate-900"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     {label}
@@ -345,7 +347,7 @@ export default function ClassroomPage() {
             )}
             <Button
               onClick={() => setShowJoin(true)}
-              className="h-10 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 gap-1.5"
+              className="h-10 rounded-lg bg-primary text-white font-semibold hover:bg-primary gap-1.5"
             >
               <Plus size={16} strokeWidth={2.5} />
               <span className="hidden sm:inline">Tham gia lớp</span>
@@ -355,29 +357,29 @@ export default function ClassroomPage() {
         </div>
 
         {error && (
-          <div className="flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] font-medium text-rose-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+          <div className="flex items-start gap-2.5 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-[13px] font-medium text-destructive">
+            <span className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 shrink-0" />
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-20 text-slate-500">
+          <div className="flex items-center justify-center gap-2 py-20 text-muted-foreground">
             <Loader2 size={20} className="animate-spin" />
             <span className="text-[13px]">Đang tải lớp học...</span>
           </div>
         ) : classrooms.length === 0 ? (
-          <div className="text-center py-20 px-6 bg-white border-2 border-dashed border-slate-200 rounded-2xl">
-            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-indigo-50 flex items-center justify-center">
-              <School size={36} className="text-indigo-600" />
+          <div className="text-center py-20 px-6 bg-card border-2 border-dashed border-border rounded-2xl">
+            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <School size={36} className="text-primary" />
             </div>
-            <h3 className="text-[17px] font-bold text-slate-900 mb-1">Chưa tham gia lớp học nào</h3>
-            <p className="text-[13.5px] text-slate-500 max-w-sm mx-auto mb-6">
+            <h3 className="text-[17px] font-bold text-foreground mb-1">Chưa tham gia lớp học nào</h3>
+            <p className="text-[13.5px] text-muted-foreground max-w-sm mx-auto mb-6">
               Nhấn &ldquo;Tham gia lớp&rdquo; và nhập mã từ giáo viên hoặc quét QR code để bắt đầu.
             </p>
             <Button
               onClick={() => setShowJoin(true)}
-              className="h-11 px-6 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 gap-2"
+              className="h-11 px-6 rounded-lg bg-primary text-white font-semibold hover:bg-primary gap-2"
             >
               <Sparkles size={15} />
               Tham gia lớp đầu tiên
@@ -393,7 +395,7 @@ export default function ClassroomPage() {
                   key={classroom.uid}
                   style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
                   onClick={() => router.push(`/consumer/classroom/${classroom.uid}`)}
-                  className="group bg-white border border-slate-200 rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-slate-300 animate-fade-up"
+                  className="group bg-card border border-border rounded-2xl flex flex-col cursor-pointer transition-colors hover:border-border animate-fade-up"
                 >
                   <div className="flex items-center justify-end gap-2 px-4 pt-3.5 pb-2">
                     <ClassroomFavoriteButton
@@ -413,7 +415,7 @@ export default function ClassroomPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-border">
                     <div className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
                       <Users size={11} />
                       {classroom.member_count ?? '—'} thành viên
@@ -422,8 +424,8 @@ export default function ClassroomPage() {
                       className={cn(
                         "text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded",
                         isActive
-                          ? "text-emerald-700 bg-emerald-50 border border-emerald-200"
-                          : "text-slate-500 bg-slate-50 border border-slate-200"
+                          ? "text-success bg-success/10 border border-success/20"
+                          : "text-muted-foreground bg-muted border border-border"
                       )}
                     >
                       {isActive ? 'Đang học' : 'Đã đóng'}

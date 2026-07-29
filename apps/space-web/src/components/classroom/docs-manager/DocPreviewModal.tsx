@@ -53,8 +53,10 @@ export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDe
           {canManage && onDelete && (
             <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => onDelete(doc)}
-              className="p-2 rounded-md hover:bg-rose-50 text-slate-500 hover:text-rose-600"
+              className="rounded-md hover:bg-rose-50 text-slate-500 hover:text-rose-600"
               title={t('classroom.docs.delete', 'Xóa')}
             >
               <Trash2 size={14} />
@@ -72,8 +74,10 @@ export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDe
           </a>
           <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-2 rounded-md hover:bg-slate-200 text-slate-600"
+            className="rounded-md hover:bg-slate-200 text-slate-600"
             title={t('classroom.docs.close', 'Đóng')}
           >
             <X size={16} />

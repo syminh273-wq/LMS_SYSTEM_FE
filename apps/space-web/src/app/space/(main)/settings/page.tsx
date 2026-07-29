@@ -171,12 +171,9 @@ export default function SettingsPage() {
           {menuItems.map((item) => (
             <Button
               key={item.id}
+              variant={activeSection === item.id ? 'default' : 'ghost'}
               onClick={() => setActiveSection(item.id as SettingSection)}
-              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all font-bold text-sm uppercase tracking-wider ${
-                activeSection === item.id
-                  ? 'bg-primary-brand text-white shadow-lg shadow-primary-brand/20'
-                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-              }`}
+              className="w-full justify-start gap-3"
             >
               <item.icon size={20} />
               {item.label}
@@ -211,32 +208,31 @@ export default function SettingsPage() {
 
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                       <div className="space-y-2.5">
-                        <Label htmlFor="spaceName" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.name_label')}</Label>
+                        <Label htmlFor="spaceName">{t('settings.space.profile.name_label')}</Label>
                         <Input
                           id="spaceName"
                           value={settings.space_profile?.name || ''}
                           onChange={(e) => updateSetting('space_profile', 'name', e.target.value)}
-                          className="h-12 rounded-xl bg-muted/30 border-border focus:bg-card"
+                          className="h-12"
                         />
                       </div>
                       <div className="space-y-2.5">
-                        <Label htmlFor="slug" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.slug_label')}</Label>
+                        <Label htmlFor="slug">{t('settings.space.profile.slug_label')}</Label>
                         <div className="relative">
                           <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                           <Input
                             id="slug"
                             value={settings.space_profile?.slug || ''}
                             onChange={(e) => updateSetting('space_profile', 'slug', e.target.value)}
-                            className="h-12 pl-12 rounded-xl bg-muted/30 border-border focus:bg-card"
+                            className="h-12 pl-12"
                           />
                         </div>
                       </div>
                       <div className="md:col-span-2 space-y-2.5">
-                        <Label htmlFor="desc" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.desc_label')}</Label>
+                        <Label htmlFor="desc">{t('settings.space.profile.desc_label')}</Label>
                         <Textarea
                           id="desc"
                           rows={3}
-                          className="w-full p-4 rounded-xl bg-muted/30 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary-brand/10 focus:bg-card transition-all font-medium"
                           value={settings.space_profile?.description || ''}
                           onChange={(e) => updateSetting('space_profile', 'description', e.target.value)}
                         />
@@ -246,15 +242,16 @@ export default function SettingsPage() {
 
                   <div className="pt-6 border-t border-border/50">
                     <div className="flex items-center justify-between mb-4">
-                      <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.theme_color_label')}</Label>
+                      <Label>{t('settings.space.profile.theme_color_label')}</Label>
                       <span className="text-xs font-mono font-bold text-primary-brand bg-primary-brand-light px-2 py-1 rounded-md border border-primary-brand-muted uppercase">{themeColor}</span>
                     </div>
                     <div className="flex flex-wrap gap-4 items-center">
                       {['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899'].map((color) => (
                         <Button
                           key={color}
+                          variant="ghost"
                           onClick={() => setThemeColor(color)}
-                          className={`w-12 h-12 rounded-2xl border-2 shadow-sm transition-all hover:scale-110 active:scale-95 ${themeColor === color ? 'border-primary-brand ring-2 ring-primary-brand/20' : 'border-white ring-1 ring-border'}`}
+                          className={`w-12 h-12 border-2 ${themeColor === color ? 'border-primary-brand ring-2 ring-primary-brand/20' : 'border-white ring-1 ring-border'}`}
                           style={{ backgroundColor: color }}
                         >
                           {themeColor === color && <Check size={18} className="text-white mx-auto" />}
@@ -268,7 +265,7 @@ export default function SettingsPage() {
                           onChange={(e) => setThemeColor(e.target.value)}
                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                         />
-                        <Button className="w-12 h-12 rounded-2xl border-2 border-dashed border-border flex items-center justify-center text-muted-foreground group-hover:bg-muted/50 group-hover:border-primary-brand group-hover:text-primary-brand transition-all">
+                        <Button variant="ghost" className="w-12 h-12 border-2 border-dashed border-border text-muted-foreground group-hover:bg-muted/50 group-hover:border-primary-brand group-hover:text-primary-brand">
                           <Palette size={20} />
                         </Button>
                       </div>
@@ -280,7 +277,7 @@ export default function SettingsPage() {
                   <div className="pt-6 border-t border-border/50">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                       <div className="space-y-1">
-                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('settings.space.profile.language_label')}</Label>
+                        <Label>{t('settings.space.profile.language_label')}</Label>
                         <p className="text-xs text-muted-foreground font-medium">{t('settings.space.profile.language_hint')}</p>
                       </div>
                       <LanguageSwitcher />
@@ -291,7 +288,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
+                    className="h-11 gap-2"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
                     {t('settings.space.profile.save')}
@@ -318,7 +315,7 @@ export default function SettingsPage() {
                 <CardContent className="p-8 space-y-8">
                   <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary-brand border border-border shadow-sm">
+                      <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-primary-brand border border-border shadow-sm">
                         <Camera size={20} />
                       </div>
                       <div>
@@ -336,7 +333,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary-brand border border-border shadow-sm">
+                      <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-primary-brand border border-border shadow-sm">
                         <Lock size={20} />
                       </div>
                       <div>
@@ -354,7 +351,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between gap-4 p-4 bg-muted/30 rounded-2xl border border-border">
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-rose-500 border border-border shadow-sm">
+                      <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center text-destructive border border-border shadow-sm">
                         <ShieldAlert size={20} />
                       </div>
                       <div className="min-w-0">
@@ -371,24 +368,24 @@ export default function SettingsPage() {
                         max={20}
                         value={typeof settings.security_config?.max_face_warnings === 'number' ? settings.security_config.max_face_warnings : 3}
                         onChange={(e) => updateSetting('security_config', 'max_face_warnings', Math.max(0, Number(e.target.value)))}
-                        className="h-10 w-20 rounded-xl border border-border bg-card px-2 text-sm font-black text-foreground outline-none focus:border-primary-brand focus:ring-2 focus:ring-primary-brand/10"
+                        className="h-10 w-20"
                       />
                       <span className="text-xs font-bold text-muted-foreground">lần</span>
                     </div>
                   </div>
 
                   <div className="space-y-4 pt-4">
-                    <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground block">{t('settings.space.security.join_code_label')}</Label>
+                    <Label>{t('settings.space.security.join_code_label')}</Label>
                     <div className="flex gap-4">
                       <Input
                         value={settings.security_config?.join_code || ''}
                         onChange={(e) => updateSetting('security_config', 'join_code', e.target.value)}
-                        className="h-12 rounded-xl bg-muted/30 font-mono font-bold tracking-widest text-center"
+                        className="h-12 text-center"
                       />
                       <Button
                         variant="outline"
                         onClick={() => updateSetting('security_config', 'join_code', 'SPACE-' + Math.floor(100 + Math.random() * 900))}
-                        className="h-12 px-6 rounded-xl font-bold uppercase text-xs tracking-widest border-border"
+                        className="h-12"
                       >
                         {t('settings.space.security.generate')}
                       </Button>
@@ -399,7 +396,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
+                    className="h-11 gap-2"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
                     {t('settings.space.security.save')}
@@ -429,7 +426,7 @@ export default function SettingsPage() {
                       };
                       return (
                         <div key={field} className="space-y-2">
-                          <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                          <Label>
                             {labels[field]}
                           </Label>
                           <div className="relative">
@@ -442,12 +439,14 @@ export default function SettingsPage() {
                                 setPwSuccess('');
                               }}
                               required
-                              className="w-full h-12 rounded-xl bg-muted/30 border border-border px-4 pr-12 text-sm font-medium outline-none focus:ring-2 focus:ring-primary-brand/20 focus:bg-card transition-all"
+                              className="w-full h-12 pr-12"
                             />
                             <Button
                               type="button"
+                              variant="ghost"
+                              size="icon"
                               onClick={() => setPwVisible(prev => ({ ...prev, [field]: !prev[field] }))}
-                              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                              className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                             >
                               {pwVisible[field] ? <EyeOff size={16} /> : <Eye size={16} />}
                             </Button>
@@ -472,7 +471,7 @@ export default function SettingsPage() {
                       <Button
                         type="submit"
                         disabled={pwLoading}
-                        className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
+                        className="h-11 gap-2"
                       >
                         {pwLoading ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={16} />}
                         {t('settings.space.security.change_password_submit')}
@@ -501,7 +500,7 @@ export default function SettingsPage() {
                 <CardContent className="p-8 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2.5">
-                      <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Users size={14} />
                         {t('settings.space.classrooms.max_students_label')}
                       </Label>
@@ -509,25 +508,27 @@ export default function SettingsPage() {
                         type="number"
                         value={settings.classroom_defaults?.max_students || 40}
                         onChange={(e) => updateSetting('classroom_defaults', 'max_students', parseInt(e.target.value))}
-                        className="h-12 rounded-xl bg-muted/30 border-border"
+                        className="h-12"
                       />
                     </div>
 
                     <div className="space-y-2.5">
-                      <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <Label className="flex items-center gap-2">
                         <Palette size={14} />
                         {t('settings.space.classrooms.view_mode_label')}
                       </Label>
                       <div className="flex h-12 bg-muted/30 rounded-xl border border-border p-1">
                         <Button
+                          variant={settings.classroom_defaults?.view_mode === 'grid' ? 'secondary' : 'ghost'}
                           onClick={() => updateSetting('classroom_defaults', 'view_mode', 'grid')}
-                          className={`flex-1 rounded-lg transition-all text-xs font-bold ${settings.classroom_defaults?.view_mode === 'grid' ? 'bg-card shadow-sm text-primary-brand border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+                          className="flex-1"
                         >
                           {t('settings.space.classrooms.view_grid')}
                         </Button>
                         <Button
+                          variant={settings.classroom_defaults?.view_mode === 'list' ? 'secondary' : 'ghost'}
                           onClick={() => updateSetting('classroom_defaults', 'view_mode', 'list')}
-                          className={`flex-1 rounded-lg transition-all text-xs font-bold ${settings.classroom_defaults?.view_mode === 'list' ? 'bg-card shadow-sm text-primary-brand border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+                          className="flex-1"
                         >
                           {t('settings.space.classrooms.view_list')}
                         </Button>
@@ -573,7 +574,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
+                    className="h-11 gap-2"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
                     {t('settings.space.classrooms.save')}
@@ -657,7 +658,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="bg-primary-brand hover:bg-primary-brand-dark text-white rounded-xl px-6 h-11 gap-2 shadow-lg shadow-primary-brand/10 font-bold uppercase text-xs tracking-widest transition-all"
+                    className="h-11 gap-2"
                   >
                     {isSaving ? <Check size={16} className="animate-pulse" /> : <Save size={16} />}
                     {t('settings.space.notifications.save')}

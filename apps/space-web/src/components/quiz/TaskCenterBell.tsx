@@ -25,7 +25,9 @@ export default function TaskCenterBell() {
     <div className="relative" ref={wrapperRef}>
       <Button
         onClick={() => dispatch(setPanelOpen(!open))}
-        className="relative p-2 rounded-full hover:bg-muted transition-colors"
+        variant="ghost"
+        size="icon"
+        className="relative rounded-full hover:bg-muted transition-colors"
         aria-label={t('quizTasks.badge.aria_label')}
       >
         {loading ? (

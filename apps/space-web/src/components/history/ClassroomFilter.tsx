@@ -55,13 +55,13 @@ export function ClassroomFilter({ value, onChange, className }: Props) {
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <Filter size={14} className="text-slate-500" />
+      <Filter size={14} className="text-muted-foreground" />
       <Select
         value={value}
         onValueChange={(v) => onChange(v as string | 'all')}
         disabled={loading}
       >
-        <SelectTrigger className="px-3 py-1.5 rounded-lg text-[12px] font-bold border border-slate-200 bg-white text-slate-700 hover:border-indigo-300 h-auto">
+        <SelectTrigger className="h-auto">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -73,8 +73,8 @@ export function ClassroomFilter({ value, onChange, className }: Props) {
           ))}
         </SelectContent>
       </Select>
-      {loading && <Loader2 size={12} className="animate-spin text-slate-400" />}
-      {error && <span className="text-[11px] text-rose-500">{error}</span>}
+      {loading && <Loader2 size={12} className="animate-spin text-muted-foreground" />}
+      {error && <span className="text-[11px] text-destructive">{error}</span>}
     </div>
   );
 }

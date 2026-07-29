@@ -75,7 +75,7 @@ export function CreateCollectionDialog({ open, onOpenChange, certificates, onCre
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) reset(); onOpenChange(o); }}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t('quizCollection.create_modal.title')}</DialogTitle>
         </DialogHeader>

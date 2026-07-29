@@ -110,7 +110,7 @@ const MOCK = {
 const STATUS_MAP = {
   Improving: { label: 'Đang tiến bộ', color: 'text-emerald-600 bg-emerald-50 border-emerald-200', icon: TrendingUp },
   Stable:    { label: 'Ổn định',      color: 'text-blue-600 bg-blue-50 border-blue-200',          icon: Minus },
-  Declining: { label: 'Đang giảm sút', color: 'text-rose-600 bg-rose-50 border-rose-200',        icon: TrendingDown },
+  Declining: { label: 'Đang giảm sút', color: 'text-destructive bg-destructive/10 border-destructive/20',        icon: TrendingDown },
   'At Risk': { label: 'Có nguy cơ',   color: 'text-amber-600 bg-amber-50 border-amber-200',      icon: AlertTriangle },
   Excellent: { label: 'Xuất sắc',     color: 'text-primary-brand bg-primary-brand-light border-primary-brand-muted',   icon: Award },
 };
@@ -214,7 +214,7 @@ export default function StudentAnalyzePage({
               { label: 'Assignment Behavior',  value: MOCK.composite.assignment, weight: '25%', color: 'bg-primary-brand-light0' },
               { label: 'Attendance',           value: MOCK.composite.attendance, weight: '15%', color: 'bg-emerald-500' },
               { label: 'Learning Engagement',  value: MOCK.composite.engagement, weight: '15%', color: 'bg-amber-500' },
-              { label: 'Discipline',           value: MOCK.composite.discipline, weight: '10%', color: 'bg-rose-400' },
+              { label: 'Discipline',           value: MOCK.composite.discipline, weight: '10%', color: 'bg-destructive' },
             ].map(c => (
               <div key={c.label} className="flex items-center gap-3">
                 <div className="w-40 shrink-0 flex items-center gap-2">
@@ -291,7 +291,7 @@ export default function StudentAnalyzePage({
             { label: 'Tổng bài',   value: MOCK.assignment.total,        color: 'text-foreground' },
             { label: 'Đã nộp',     value: MOCK.assignment.submitted,    color: 'text-primary-brand' },
             { label: 'Đúng hạn',   value: MOCK.assignment.onTime,       color: 'text-emerald-600' },
-            { label: 'Không nộp',  value: MOCK.assignment.missed,       color: 'text-rose-500' },
+            { label: 'Không nộp',  value: MOCK.assignment.missed,       color: 'text-destructive' },
           ].map(s => (
             <div key={s.label} className="rounded-xl border border-border bg-muted/30 p-4 text-center">
               <div className={`text-2xl font-black ${s.color}`}>{s.value}</div>
@@ -305,7 +305,7 @@ export default function StudentAnalyzePage({
           {[
             { label: 'Tỉ lệ nộp bài',     value: MOCK.assignment.submitRate,  color: 'bg-primary-brand' },
             { label: 'Nộp đúng hạn',       value: MOCK.assignment.onTimeRate,  color: 'bg-emerald-500' },
-            { label: 'Không nộp',          value: MOCK.assignment.missRate,    color: 'bg-rose-400' },
+            { label: 'Không nộp',          value: MOCK.assignment.missRate,    color: 'bg-destructive' },
           ].map(r => (
             <div key={r.label} className="flex items-center gap-3">
               <span className="w-32 text-xs font-bold text-muted-foreground shrink-0">{r.label}</span>
@@ -330,8 +330,8 @@ export default function StudentAnalyzePage({
           title="Attendance" sub="Chuyên cần & đi học">
           <div className="grid grid-cols-2 gap-3 mb-4">
             {[
-              { label: 'Tỉ lệ đi học', value: `${MOCK.attendance.rate}%`, color: MOCK.attendance.rate >= 80 ? 'text-emerald-600' : 'text-rose-500' },
-              { label: 'Buổi nghỉ',    value: MOCK.attendance.absent,      color: 'text-rose-500' },
+              { label: 'Tỉ lệ đi học', value: `${MOCK.attendance.rate}%`, color: MOCK.attendance.rate >= 80 ? 'text-emerald-600' : 'text-destructive' },
+              { label: 'Buổi nghỉ',    value: MOCK.attendance.absent,      color: 'text-destructive' },
               { label: 'Đi trễ',       value: MOCK.attendance.lateIn,     color: 'text-amber-500' },
               { label: 'Nghỉ liên tiếp', value: MOCK.attendance.consecutiveAbsent, color: 'text-foreground' },
             ].map(s => (
@@ -390,7 +390,7 @@ export default function StudentAnalyzePage({
       {/* ── Discipline & Risk ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Discipline */}
-        <SectionCard icon={<Target size={17} className="text-rose-500" />}
+        <SectionCard icon={<Target size={17} className="text-destructive" />}
           title="Discipline & Consistency" sub="Tính đều đặn và kỷ luật">
           <div className="space-y-4">
             {[
@@ -401,13 +401,13 @@ export default function StudentAnalyzePage({
               <div key={d.label}>
                 <div className="flex justify-between mb-1">
                   <span className="text-xs font-bold text-muted-foreground">{d.label}</span>
-                  <span className={`text-xs font-black ${d.value >= 70 ? 'text-emerald-600' : d.value >= 50 ? 'text-amber-600' : 'text-rose-500'}`}>
+                  <span className={`text-xs font-black ${d.value >= 70 ? 'text-emerald-600' : d.value >= 50 ? 'text-amber-600' : 'text-destructive'}`}>
                     {d.value}/100
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-muted">
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${d.value >= 70 ? 'bg-emerald-500' : d.value >= 50 ? 'bg-amber-400' : 'bg-rose-400'}`}
+                    className={`h-full rounded-full transition-all duration-700 ${d.value >= 70 ? 'bg-emerald-500' : d.value >= 50 ? 'bg-amber-400' : 'bg-destructive'}`}
                     style={{ width: `${d.value}%` }}
                   />
                 </div>
@@ -418,12 +418,12 @@ export default function StudentAnalyzePage({
         </SectionCard>
 
         {/* Risk */}
-        <SectionCard icon={<ShieldAlert size={17} className="text-rose-500" />}
+        <SectionCard icon={<ShieldAlert size={17} className="text-destructive" />}
           title="Risk Indicators" sub="Chỉ số cảnh báo sớm">
           <div className="space-y-4">
             {[
-              { label: 'Dropout Risk',  value: MOCK.risk.dropoutRisk,  color: MOCK.risk.dropoutRisk >= 50 ? 'bg-rose-500' : MOCK.risk.dropoutRisk >= 25 ? 'bg-amber-400' : 'bg-emerald-500', textColor: MOCK.risk.dropoutRisk >= 50 ? 'text-rose-600' : 'text-amber-600' },
-              { label: 'Burnout Risk',  value: MOCK.risk.burnoutRisk,  color: MOCK.risk.burnoutRisk >= 50 ? 'bg-rose-500' : MOCK.risk.burnoutRisk >= 25 ? 'bg-amber-400' : 'bg-emerald-500',  textColor: MOCK.risk.burnoutRisk >= 50 ? 'text-rose-600' : 'text-emerald-600' },
+              { label: 'Dropout Risk',  value: MOCK.risk.dropoutRisk,  color: MOCK.risk.dropoutRisk >= 50 ? 'bg-destructive' : MOCK.risk.dropoutRisk >= 25 ? 'bg-amber-400' : 'bg-emerald-500', textColor: MOCK.risk.dropoutRisk >= 50 ? 'text-destructive' : 'text-amber-600' },
+              { label: 'Burnout Risk',  value: MOCK.risk.burnoutRisk,  color: MOCK.risk.burnoutRisk >= 50 ? 'bg-destructive' : MOCK.risk.burnoutRisk >= 25 ? 'bg-amber-400' : 'bg-emerald-500',  textColor: MOCK.risk.burnoutRisk >= 50 ? 'text-destructive' : 'text-emerald-600' },
             ].map(r => (
               <div key={r.label}>
                 <div className="flex justify-between mb-1">
@@ -438,7 +438,7 @@ export default function StudentAnalyzePage({
             <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Risk Level</p>
               <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-black border ${
-                MOCK.risk.level === 'high'   ? 'bg-rose-50 text-rose-600 border-rose-200' :
+                MOCK.risk.level === 'high'   ? 'bg-destructive/10 text-destructive border-destructive/20' :
                 MOCK.risk.level === 'medium' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                                               'bg-emerald-50 text-emerald-600 border-emerald-200'
               }`}>

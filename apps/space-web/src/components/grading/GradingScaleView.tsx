@@ -33,19 +33,19 @@ interface FactProps {
 
 function Fact({ icon: Icon, iconClassName, label, value }: FactProps) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3.5 dark:border-slate-700 dark:bg-slate-900">
+    <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-3.5">
       <span
         className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
-          iconClassName ?? 'bg-indigo-500/10 text-indigo-600'
+          iconClassName ?? 'bg-primary-brand/10 text-primary-brand'
         }`}
       >
         <Icon size={17} />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
           {label}
         </p>
-        <div className="text-sm font-bold text-slate-900 dark:text-white mt-0.5 break-words leading-relaxed">
+        <div className="text-sm font-bold text-foreground mt-0.5 break-words leading-relaxed">
           {value}
         </div>
       </div>
@@ -60,11 +60,11 @@ interface ExampleBoxProps {
 
 function ExampleBox({ label, children }: ExampleBoxProps) {
   return (
-    <div className="rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 p-3.5 dark:border-indigo-500/30 dark:bg-indigo-500/10">
-      <p className="text-[10px] font-black uppercase tracking-wider text-indigo-500 mb-1.5">
+    <div className="rounded-xl border border-dashed border-primary-brand/30 bg-primary-brand/5 p-3.5">
+      <p className="text-[10px] font-black uppercase tracking-wider text-primary-brand mb-1.5">
         {label}
       </p>
-      <div className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+      <div className="text-sm text-foreground leading-relaxed">
         {children}
       </div>
     </div>
@@ -81,21 +81,21 @@ interface SectionCardProps {
 
 function SectionCard({ title, subtitle, icon: Icon, iconClassName, children }: SectionCardProps) {
   return (
-    <section className="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 dark:bg-slate-900 dark:border-slate-800">
+    <section className="bg-card border border-border rounded-2xl p-5 space-y-4">
       <div className="flex items-start gap-3">
         <span
           className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
-            iconClassName ?? 'bg-indigo-500/10 text-indigo-600'
+            iconClassName ?? 'bg-primary-brand/10 text-primary-brand'
           }`}
         >
           <Icon size={18} />
         </span>
         <div className="flex-1 min-w-0">
-          <h2 className="text-base font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-base font-black text-foreground tracking-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">
+            <p className="text-xs text-muted-foreground font-medium mt-1 leading-relaxed">
               {subtitle}
             </p>
           )}

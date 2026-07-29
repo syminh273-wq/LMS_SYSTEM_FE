@@ -184,20 +184,20 @@ export function CreatePost({ profile, onCreated }: {
 
   if (!open) {
     return (
-      <div className="bg-white border border-slate-200 rounded-xl p-4 card-elevated">
+      <div className="bg-card border border-border rounded-xl p-4 card-elevated">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-[12px] shrink-0 overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-primary-brand flex items-center justify-center text-white font-semibold text-[12px] shrink-0 overflow-hidden">
             {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : initials}
           </div>
           <Button
             onClick={() => setOpen(true)}
-            className="flex-1 text-left px-4 py-2.5 bg-slate-100 hover:bg-slate-200 rounded-full text-[13.5px] text-slate-500 transition-colors"
+            className="flex-1 text-left px-4 py-2.5 bg-muted hover:bg-muted rounded-full text-[13.5px] text-muted-foreground"
           >
             {profile?.full_name ? `${profile.full_name} ơi, bạn đang nghĩ gì?` : 'Bạn đang nghĩ gì?'}
           </Button>
           <Button
             onClick={() => setOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-[12.5px] font-semibold text-slate-700 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-full bg-muted hover:bg-muted text-[12.5px] font-semibold text-foreground"
           >
             <ImageIcon size={14} />
             Ảnh
@@ -208,25 +208,25 @@ export function CreatePost({ profile, onCreated }: {
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl card-elevated overflow-hidden animate-scale-in">
+    <div className="bg-card border border-border rounded-xl card-elevated overflow-hidden animate-scale-in">
       <Form {...form}>
         <div className="p-4 sm:p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold text-[12px] shrink-0 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-primary-brand flex items-center justify-center text-white font-semibold text-[12px] shrink-0 overflow-hidden">
                 {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> : initials}
               </div>
               <div className="min-w-0">
-                <p className="text-[13.5px] font-semibold text-slate-900 truncate">{profile?.full_name || 'Bạn'}</p>
+                <p className="text-[13.5px] font-semibold text-foreground truncate">{profile?.full_name || 'Bạn'}</p>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full hover:bg-indigo-100 transition-colors">
+                    <Button className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-primary-brand bg-primary-brand-light px-2 py-0.5 rounded-full hover:bg-primary-brand-light">
                       <selectedVis.icon size={10} strokeWidth={2.5} />
                       {selectedVis.label}
                       <ChevronDown size={9} />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-white border-slate-200">
+                  <DropdownMenuContent align="start" className="bg-card border-border">
                     {VISIBILITY_OPTIONS.map((opt) => (
                       <DropdownMenuItem
                         key={opt.key}
@@ -243,7 +243,9 @@ export function CreatePost({ profile, onCreated }: {
             </div>
             <Button
               onClick={() => setOpen(false)}
-              className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors"
+              variant="ghost"
+              size="icon"
+              className="hover:bg-muted rounded-lg text-muted-foreground"
               aria-label="Đóng"
             >
               <X size={16} />
@@ -251,15 +253,15 @@ export function CreatePost({ profile, onCreated }: {
           </div>
 
           {selectedEmotion && (
-            <div className="flex items-center gap-1.5 text-[13px] text-slate-600 animate-fade-down">
+            <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground animate-fade-down">
               <Sparkles size={12} className="text-amber-500" />
               <span>đang cảm thấy</span>
-              <span className="font-semibold text-indigo-700">
+              <span className="font-semibold text-primary-brand">
                 {selectedEmotion.emoji} {selectedEmotion.label}
               </span>
               <Button
                 onClick={() => setEmotion('')}
-                className="text-slate-400 hover:text-slate-600 ml-1"
+                className="text-muted-foreground hover:text-muted-foreground ml-1"
                 aria-label="Bỏ cảm xúc"
               >
                 <X size={12} />
@@ -269,7 +271,7 @@ export function CreatePost({ profile, onCreated }: {
 
           {selectedClassrooms.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5 animate-fade-down">
-              <span className="text-[12px] text-slate-500 font-medium">đang chia sẻ với</span>
+              <span className="text-[12px] text-muted-foreground font-medium">đang chia sẻ với</span>
               {selectedClassrooms.map((c) => (
                 <span
                   key={c.uid}
@@ -297,14 +299,14 @@ export function CreatePost({ profile, onCreated }: {
           />
 
           {imagePreviews.length > 0 && (
-            <div className="grid grid-cols-3 gap-1.5 rounded-lg overflow-hidden border border-slate-200 animate-fade-down p-1.5 bg-slate-50">
+            <div className="grid grid-cols-3 gap-1.5 rounded-lg overflow-hidden border border-border animate-fade-down p-1.5 bg-muted">
               {imagePreviews.map((src, i) => (
                 <div key={i} className="relative group aspect-square">
                   <img src={src} alt="" className="w-full h-full object-cover rounded" />
                   <Button
                     type="button"
                     onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 w-6 h-6 bg-slate-900/70 rounded-full flex items-center justify-center text-white hover:bg-slate-900 transition-colors"
+                    className="absolute top-1 right-1 w-6 h-6 bg-foreground/70 rounded-full flex items-center justify-center text-white hover:bg-foreground/90"
                     aria-label={`Xóa ảnh ${i + 1}`}
                   >
                     <X size={12} />
@@ -315,30 +317,31 @@ export function CreatePost({ profile, onCreated }: {
           )}
 
           {showEmotions && (
-            <div className="grid grid-cols-5 sm:grid-cols-10 gap-1 p-2.5 bg-slate-50 rounded-lg border border-slate-200 animate-fade-down">
+            <div className="grid grid-cols-5 sm:grid-cols-10 gap-1 p-2.5 bg-muted rounded-lg border border-border animate-fade-down">
               {EMOTIONS.map(e => (
                 <Button
                   key={e.key}
                   onClick={() => { setEmotion(e.key); setShowEmotions(false); }}
                   className={cn(
-                    "flex flex-col items-center p-2 rounded-md transition-colors",
+                    "flex flex-col items-center p-2 rounded-md",
                     emotion === e.key
-                      ? "bg-indigo-100 ring-1 ring-indigo-300"
-                      : "hover:bg-white"
+                      ? "bg-primary-brand-light ring-1 ring-primary-brand/30"
+                      : "hover:bg-card"
                   )}
                 >
                   <span className="text-xl">{e.emoji}</span>
-                  <span className="text-[9.5px] text-slate-500 mt-1 truncate w-full text-center">{e.label}</span>
+                  <span className="text-[9.5px] text-muted-foreground mt-1 truncate w-full text-center">{e.label}</span>
                 </Button>
               ))}
             </div>
           )}
 
-          <div className="flex items-center justify-between border-t border-slate-200 pt-3 mt-1">
+          <div className="flex items-center justify-between border-t border-border pt-3 mt-1">
             <div className="flex items-center gap-1">
               <Button
                 onClick={() => fileRef.current?.click()}
                 disabled={imageFiles.length >= MAX_IMAGES}
+                variant="ghost"
                 className="p-2 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors flex items-center gap-1.5 text-[12.5px] font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <ImageIcon size={15} />
@@ -356,6 +359,7 @@ export function CreatePost({ profile, onCreated }: {
               />
               <Button
                 onClick={() => setShowEmotions(!showEmotions)}
+                variant="ghost"
                 className="p-2 rounded-lg text-amber-700 hover:bg-amber-50 transition-colors flex items-center gap-1.5 text-[12.5px] font-semibold"
               >
                 <Smile size={15} />
@@ -366,7 +370,7 @@ export function CreatePost({ profile, onCreated }: {
                   type="button"
                   onClick={() => setShowClassroomPicker((v) => !v)}
                   className={cn(
-                    'p-2 rounded-lg transition-colors flex items-center gap-1.5 text-[12.5px] font-semibold',
+                    'p-2 rounded-lg flex items-center gap-1.5 text-[12.5px] font-semibold',
                     selectedClassroomUids.length > 0
                       ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
                       : 'text-emerald-700 hover:bg-emerald-50'
@@ -382,7 +386,7 @@ export function CreatePost({ profile, onCreated }: {
             <Button
               onClick={handleFormSubmit(onSubmit)}
               disabled={(!content.trim() && imageFiles.length === 0) || submitting}
-              className="px-5 h-9 rounded-lg text-[13px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1.5"
+              className="h-9 gap-1.5"
             >
               {submitting && <Loader2 size={13} className="animate-spin" />}
               Đăng bài
@@ -392,29 +396,29 @@ export function CreatePost({ profile, onCreated }: {
           </Form>
       {showClassroomPicker && pickerPos && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed z-50 bg-white border border-slate-200 rounded-xl shadow-xl"
+          className="fixed z-50 bg-card border border-border rounded-xl shadow-xl"
           style={{ top: pickerPos.top, left: pickerPos.left, width: pickerPos.width }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-2 border-b border-slate-100">
+          <div className="p-2 border-b border-border">
             <div className="relative">
-              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 autoFocus
                 value={classroomSearch}
                 onChange={(e) => setClassroomSearch(e.target.value)}
                 placeholder="Tìm lớp học..."
-                className="w-full h-8 pl-8 pr-2 text-[13px] bg-slate-50 border border-transparent rounded-lg focus:bg-white focus:border-indigo-300 outline-none"
+                className="w-full h-8 pl-8 pr-2 text-[13px] bg-muted border border-transparent rounded-lg focus:bg-card focus:border-primary-brand/40 outline-none"
               />
             </div>
           </div>
           <div className="max-h-64 overflow-y-auto p-1">
             {classroomsLoading ? (
-              <div className="flex items-center justify-center py-6 text-[12px] text-slate-500">
+              <div className="flex items-center justify-center py-6 text-[12px] text-muted-foreground">
                 <Loader2 size={13} className="animate-spin mr-1.5" /> Đang tải...
               </div>
             ) : filteredClassrooms.length === 0 ? (
-              <div className="py-6 text-center text-[12px] text-slate-500">
+              <div className="py-6 text-center text-[12px] text-muted-foreground">
                 {classroomSearch ? 'Không tìm thấy lớp phù hợp' : 'Chưa có lớp học nào'}
               </div>
             ) : (
@@ -425,22 +429,22 @@ export function CreatePost({ profile, onCreated }: {
                     key={c.uid}
                     onClick={() => toggleClassroom(c.uid)}
                     className={cn(
-                      'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors',
-                      isSel ? 'bg-emerald-50' : 'hover:bg-slate-50'
+                      'w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left',
+                      isSel ? 'bg-emerald-50' : 'hover:bg-muted'
                     )}
                   >
                     <div className={cn(
                       'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
-                      isSel ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'
+                      isSel ? 'bg-emerald-600 text-white' : 'bg-muted text-muted-foreground'
                     )}>
                       {isSel ? <Check size={13} /> : <BookOpen size={13} />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-semibold text-slate-900 truncate">
+                      <p className="text-[13px] font-semibold text-foreground truncate">
                         {c.name || c.title || 'Lớp học'}
                       </p>
                       {c.description && (
-                        <p className="text-[11px] text-slate-500 truncate">{c.description}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{c.description}</p>
                       )}
                     </div>
                   </Button>
@@ -449,13 +453,13 @@ export function CreatePost({ profile, onCreated }: {
             )}
           </div>
           {selectedClassroomUids.length > 0 && (
-            <div className="border-t border-slate-100 p-2 flex items-center justify-between">
-              <span className="text-[11.5px] text-slate-500 font-medium">
+            <div className="border-t border-border p-2 flex items-center justify-between">
+              <span className="text-[11.5px] text-muted-foreground font-medium">
                 Đã chọn {selectedClassroomUids.length} lớp
               </span>
               <Button
                 onClick={() => setSelectedClassroomUids([])}
-                className="text-[11.5px] font-semibold text-slate-500 hover:text-rose-600"
+                className="text-[11.5px] font-semibold text-muted-foreground hover:text-destructive"
               >
                 Bỏ chọn tất cả
               </Button>

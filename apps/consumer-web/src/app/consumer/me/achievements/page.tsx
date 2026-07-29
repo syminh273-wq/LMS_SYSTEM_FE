@@ -37,18 +37,18 @@ export default function MeAchievementsPage() {
   }, [router, t]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-muted">
       <div className="mx-auto max-w-5xl space-y-5 px-4 py-6 sm:px-6 sm:py-8">
         <div className="flex items-center gap-3">
           <Link
             href="/consumer/me"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h1 className="flex items-center gap-2 text-xl font-black text-slate-900 sm:text-2xl dark:text-white">
-              <Trophy className="h-5 w-5 text-amber-500" />
+            <h1 className="flex items-center gap-2 text-xl font-black text-foreground sm:text-2xl">
+              <Trophy className="h-5 w-5 text-warning" />
               {t('ranking.achievements_title', 'Achievements')}
             </h1>
           </div>

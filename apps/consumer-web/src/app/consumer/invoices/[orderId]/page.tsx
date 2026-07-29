@@ -78,8 +78,8 @@ function InvoiceContent() {
   if (state.kind === 'loading') {
     return (
       <Center>
-        <Loader2 size={40} className="animate-spin text-indigo-600" />
-        <p className="mt-4 text-sm text-slate-500">Đang tải hóa đơn...</p>
+        <Loader2 size={40} className="animate-spin text-primary" />
+        <p className="mt-4 text-sm text-muted-foreground">Đang tải hóa đơn...</p>
       </Center>
     );
   }
@@ -87,16 +87,16 @@ function InvoiceContent() {
   if (state.kind === 'not-found') {
     return (
       <Center>
-        <AlertTriangle size={48} className="text-amber-500" />
-        <h2 className="mt-4 text-lg font-bold text-slate-900">Không tìm thấy hóa đơn</h2>
-        <p className="mt-2 text-sm text-slate-500 max-w-md">
+        <AlertTriangle size={48} className="text-warning" />
+        <h2 className="mt-4 text-lg font-bold text-foreground">Không tìm thấy hóa đơn</h2>
+        <p className="mt-2 text-sm text-muted-foreground max-w-md">
           Hóa đơn này không tồn tại hoặc bạn không có quyền truy cập. Vui lòng kiểm tra lại mã đơn hàng.
         </p>
         <div className="flex gap-2 mt-6">
-          <Button asChild variant="outline" className="rounded-xl">
+          <Button asChild variant="outline">
             <Link href="/consumer/history">Xem lịch sử</Link>
           </Button>
-          <Button asChild className="rounded-xl">
+          <Button asChild>
             <Link href="/consumer/dashboard">Về Dashboard</Link>
           </Button>
         </div>
@@ -113,20 +113,20 @@ function InvoiceContent() {
     payment.resource_id;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background p-4 sm:p-8">
       <div className="max-w-2xl mx-auto space-y-4">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.back()}
-          className="text-slate-600 hover:text-slate-900 -ml-2"
+          className="-ml-2"
         >
           <ArrowLeft size={15} className="mr-1" />
           Quay lại
         </Button>
 
         {isFreeAutoRedirect && autoRedirectTimer > 0 && (
-          <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-700 font-medium flex items-center gap-2">
+          <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary font-medium flex items-center gap-2">
             <Loader2 size={14} className="animate-spin" />
             Tự động chuyển đến lớp trong {autoRedirectTimer}s...
           </div>
@@ -138,9 +138,9 @@ function InvoiceContent() {
           teacherName={teacherName}
         />
 
-        <p className="text-center text-[12px] text-slate-500">
+        <p className="text-center text-[12px] text-muted-foreground">
           Mọi thắc mắc vui lòng liên hệ hỗ trợ qua trang{' '}
-          <Link href="/consumer/settings" className="text-indigo-600 hover:underline font-semibold">
+          <Link href="/consumer/settings" className="text-primary hover:underline font-semibold">
             Cài đặt
           </Link>
           .
@@ -152,7 +152,7 @@ function InvoiceContent() {
 
 function Center({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-muted to-background flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">{children}</div>
     </div>
   );
@@ -163,7 +163,7 @@ export default function InvoicePage() {
     <Suspense
       fallback={
         <Center>
-          <Loader2 size={32} className="animate-spin text-slate-400" />
+          <Loader2 size={32} className="animate-spin text-muted-foreground" />
         </Center>
       }
     >

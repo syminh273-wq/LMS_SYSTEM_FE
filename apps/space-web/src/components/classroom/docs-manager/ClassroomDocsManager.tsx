@@ -264,29 +264,25 @@ export function ClassroomDocsManager({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
           <Button
             type="button"
+            variant="ghost"
             onClick={() => setSelectedFolderId(null)}
-            className={`px-2 py-1 rounded-md font-bold ${
-              selectedFolderId === null
-                ? 'bg-indigo-50 text-indigo-700'
-                : 'hover:bg-slate-100'
-            }`}
+            data-active={selectedFolderId === null}
+            className="px-2 py-1 rounded-md font-bold text-muted-foreground data-[active=true]:text-foreground data-[active=true]:font-semibold"
           >
             {t('classroom.docs.root_label', 'Tất cả tài liệu')}
           </Button>
           {currentBreadcrumb.map((f) => (
             <React.Fragment key={f.uid}>
-              <span className="text-slate-300">/</span>
+              <span className="text-muted-foreground/50">/</span>
               <Button
                 type="button"
+                variant="ghost"
                 onClick={() => setSelectedFolderId(f.uid)}
-                className={`px-2 py-1 rounded-md font-bold ${
-                  f.uid === selectedFolderId
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'hover:bg-slate-100'
-                }`}
+                data-active={f.uid === selectedFolderId}
+                className="px-2 py-1 rounded-md font-bold text-muted-foreground data-[active=true]:text-foreground data-[active=true]:font-semibold"
               >
                 <FolderIcon size={12} className="inline-block mr-1" />
                 {f.name}
@@ -336,9 +332,9 @@ export function ClassroomDocsManager({
         />
         <div className="flex-1 min-w-0">
           {loading && currentDocs.length === 0 ? (
-            <div className="flex items-center justify-center py-16 bg-white rounded-2xl border border-slate-200">
-              <Loader2 className="w-6 h-6 animate-spin text-indigo-600 mr-2" />
-              <span className="text-sm font-medium text-slate-500">
+            <div className="flex items-center justify-center py-16 bg-card rounded-2xl border border-border">
+              <Loader2 className="w-6 h-6 animate-spin text-primary mr-2" />
+              <span className="text-sm font-medium text-muted-foreground">
                 {t('classroom.docs.loading', 'Đang tải...')}
               </span>
             </div>

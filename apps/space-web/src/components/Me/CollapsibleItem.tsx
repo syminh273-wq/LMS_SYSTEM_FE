@@ -38,7 +38,7 @@ export function CollapsibleItem({
   return (
     <Collapsible open={expanded} onOpenChange={setOpen}>
       {showSummary && <div>{summary}</div>}
-      <CollapsibleTrigger className="text-xs font-semibold text-[#0a66c2] hover:text-[#004182] hover:underline mt-1 inline-flex items-center gap-1 group/trigger">
+      <CollapsibleTrigger className="text-xs font-semibold text-primary-brand hover:text-primary-brand-dark hover:underline mt-1 inline-flex items-center gap-1 group/trigger">
         {expanded ? t('portfolio.me.show_less') : t('portfolio.me.show_all')}
         <ChevronDown
           className={`size-3 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}

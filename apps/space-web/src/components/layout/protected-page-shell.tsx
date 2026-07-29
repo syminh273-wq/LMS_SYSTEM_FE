@@ -24,12 +24,12 @@ export function ProtectedPageShell({
   maxWidthClassName = "max-w-7xl",
 }: ProtectedPageShellProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-card px-8 py-4">
+    <div className="min-h-screen bg-muted">
+      <header className="border-b border-border bg-card px-8 py-4">
         <div className={`mx-auto flex ${maxWidthClassName} items-center justify-between gap-4`}>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-            {description && <p className="text-sm text-gray-500">{description}</p>}
+            <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
           </div>
           {actions && <div className="flex gap-2">{actions}</div>}
         </div>
@@ -54,7 +54,7 @@ function StatusBanner({
   const className =
     tone === "success"
       ? "border-green-200 bg-green-50 text-green-700"
-      : "border-red-200 bg-red-50 text-red-700"
+      : "border-destructive/30 bg-destructive/10 text-destructive"
 
   return <div className={`rounded-md border p-3 text-sm ${className}`}>{children}</div>
 }

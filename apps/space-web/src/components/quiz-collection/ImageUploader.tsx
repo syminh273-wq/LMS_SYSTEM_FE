@@ -76,7 +76,7 @@ export function ImageUploader({ value, file, onChange, onClear, maxSizeMB = 4, c
       {displayedUrl ? (
         <div className="relative group rounded-xl overflow-hidden border border-border bg-muted/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={displayedUrl} alt="template" className="w-full h-40 object-contain bg-white" />
+          <img src={displayedUrl} alt="template" className="w-full h-40 object-contain bg-background" />
           {file && (
             <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase">
               {t('imageUploader.new_file')}
@@ -85,7 +85,7 @@ export function ImageUploader({ value, file, onChange, onClear, maxSizeMB = 4, c
           <Button
             type="button"
             onClick={clear}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-red-500 transition-colors"
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-destructive"
             title={t('imageUploader.remove')}
           >
             <X size={14} />

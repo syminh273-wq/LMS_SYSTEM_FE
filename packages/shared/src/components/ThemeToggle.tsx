@@ -15,8 +15,9 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   return (
     <Button
       onClick={(e) => toggleTheme(e)}
+      variant="ghost"
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-      className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors hover:bg-accent text-muted-foreground hover:text-foreground ${className}`}
+      className={`flex items-center justify-center w-9 h-9 rounded-lg bg-transparent! hover:bg-transparent! active:bg-transparent! focus-visible:bg-transparent! focus-visible:ring-0! shadow-none text-muted-foreground ${className}`}
     >
       {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
     </Button>

@@ -33,13 +33,8 @@ function ToolbarButton({
       onClick={onClick}
       disabled={disabled}
       title={tooltip}
-      className={[
-        'relative p-1.5 rounded transition border',
-        isActive
-          ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-          : 'text-slate-500 border-transparent hover:bg-slate-100 hover:text-slate-900',
-        disabled ? 'opacity-40 cursor-not-allowed' : 'active:scale-95',
-      ].join(' ')}
+      variant={isActive ? 'default' : 'ghost'}
+      className="p-1.5"
     >
       <div className="w-4 h-4 [&_svg]:w-4 [&_svg]:h-4">{children}</div>
     </Button>
@@ -47,7 +42,7 @@ function ToolbarButton({
 }
 
 function Divider() {
-  return <div className="w-px h-5 bg-slate-200 mx-0.5" />;
+  return <div className="w-px h-5 bg-border mx-0.5" />;
 }
 
 function CMenuBar({ editor }: Props) {
@@ -71,7 +66,7 @@ function CMenuBar({ editor }: Props) {
   };
 
   return (
-    <div className="px-2 py-1.5 rounded-t-lg flex items-center gap-0.5 w-full border border-b-0 border-slate-200 bg-slate-50 flex-wrap">
+    <div className="px-2 py-1.5 rounded-t-lg flex items-center gap-0.5 w-full border border-b-0 border-border bg-muted flex-wrap">
       <input
         ref={fileInputRef}
         type="file"

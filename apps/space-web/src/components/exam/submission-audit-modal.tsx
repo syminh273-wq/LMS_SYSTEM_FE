@@ -111,7 +111,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!max-w-[1100px] w-[calc(100vw-2rem)] h-[820px] max-h-[820px] overflow-hidden p-0 rounded-2xl border-border bg-card flex flex-col">
+      <DialogContent className="sm:max-w-[1100px] w-[calc(100vw-2rem)] h-[820px] max-h-[820px] overflow-hidden p-0 border-border bg-card flex flex-col">
         <DialogHeader className="border-b border-border bg-muted/30 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-brand-light text-primary-brand">
@@ -121,7 +121,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                 {exam.title}
               </p>
-              <DialogTitle className="truncate text-base font-black text-foreground">
+              <DialogTitle className="truncate text-foreground">
                 Chi tiết bài làm · {submission.student_id.slice(0, 8)}…
               </DialogTitle>
             </div>
@@ -137,7 +137,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
                 key={key}
                 type="button"
                 onClick={() => setActiveTab(key)}
-                className={`flex items-center gap-2 border-b-2 px-3 py-3 text-xs font-black uppercase transition-colors ${
+                className={`flex items-center gap-2 border-b-2 px-3 py-3 text-xs font-black uppercase ${
                   active
                     ? 'border-primary-brand text-primary-brand'
                     : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -152,7 +152,7 @@ export function SubmissionAuditModal({ open, onOpenChange, submission, exam }: P
 
         <div className="flex-1 min-h-0 overflow-y-auto bg-muted/30 px-6 py-5">
           {error && (
-            <div className="mb-4 flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+            <div className="mb-4 flex items-center gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-bold text-destructive">
               <AlertTriangle size={16} />
               {error}
             </div>
@@ -213,11 +213,11 @@ function OverviewTab({ data }: { data: AuditOverviewResponse }) {
       </div>
 
       {data.force_submitted && (
-        <div className="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 p-4">
-          <ShieldAlert size={20} className="mt-0.5 shrink-0 text-rose-600" />
+        <div className="flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4">
+          <ShieldAlert size={20} className="mt-0.5 shrink-0 text-destructive" />
           <div className="min-w-0">
-            <p className="text-sm font-black text-rose-700">Bài thi đã được nộp bắt buộc</p>
-            <p className="mt-1 text-xs font-medium text-rose-600">
+            <p className="text-sm font-black text-destructive">Bài thi đã được nộp bắt buộc</p>
+            <p className="mt-1 text-xs font-medium text-destructive">
               Lý do: {data.force_submit_reason || 'vi phạm quy chế'}
               {data.force_submitted_at ? ` · ${formatAuditClockTime(data.force_submitted_at)}` : ''}
             </p>
@@ -286,8 +286,8 @@ function CounterRow({
   const exceeded = !unlimited && count > max;
   const danger = exceeded;
   const pct = unlimited ? 0 : Math.min(100, (count / Math.max(max, 1)) * 100);
-  const barColor = danger ? 'bg-rose-500' : tone === 'rose' ? 'bg-rose-400' : 'bg-amber-400';
-  const textColor = danger ? 'text-rose-700' : 'text-amber-700';
+  const barColor = danger ? 'bg-destructive' : tone === 'rose' ? 'bg-destructive/70' : 'bg-amber-400';
+  const textColor = danger ? 'text-destructive' : 'text-amber-700';
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between">
@@ -309,7 +309,7 @@ function CounterRow({
 
 function Metric({ label, value, tone = 'neutral' }: { label: string; value: string; tone?: 'good' | 'bad' | 'neutral' }) {
   const color =
-    tone === 'good' ? 'text-emerald-600' : tone === 'bad' ? 'text-rose-600' : 'text-foreground';
+    tone === 'good' ? 'text-emerald-600' : tone === 'bad' ? 'text-destructive' : 'text-foreground';
   return (
     <div className="rounded-xl border border-border bg-card p-3">
       <div className="text-[10px] font-black uppercase text-muted-foreground">{label}</div>
@@ -340,27 +340,27 @@ function HistoryTab({ events }: { events: AuditLogEntry[] }) {
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
   );
   return (
-    <ol className="relative space-y-2 border-l-2 border-slate-200 pl-5">
+    <ol className="relative space-y-2 border-l-2 border-border pl-5">
       {sorted.map((ev) => {
         const force = isAuditForce(ev.event_type);
         const limit = isAuditLimit(ev.event_type);
         const violation = isAuditViolation(ev.event_type);
         const dot = force || limit
-          ? 'bg-rose-500 ring-rose-200'
+          ? 'bg-destructive ring-destructive/20'
           : violation
             ? 'bg-amber-500 ring-amber-200'
-            : 'bg-indigo-400 ring-indigo-200';
-        const text = force || limit ? 'text-rose-700' : violation ? 'text-amber-700' : 'text-slate-800';
+            : 'bg-primary-brand ring-primary-brand/20';
+        const text = force || limit ? 'text-destructive' : violation ? 'text-amber-700' : 'text-foreground';
         const data = formatAuditEventData(ev.event_type, ev.event_data);
         return (
           <li key={ev.uid} className="relative">
             <span className={`absolute -left-[27px] top-1.5 h-3 w-3 rounded-full ring-4 ${dot}`} />
-            <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-card px-4 py-2.5">
+            <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-card px-4 py-2.5">
               <div className="min-w-0 flex-1">
                 <p className={`text-sm font-black ${text}`}>{humanizeAuditEvent(ev.event_type)}</p>
-                {data && <p className="mt-0.5 text-[11px] font-bold text-slate-500">{data}</p>}
+                {data && <p className="mt-0.5 text-[11px] font-bold text-muted-foreground">{data}</p>}
               </div>
-              <time className="shrink-0 text-[11px] font-bold tabular-nums text-slate-400">
+              <time className="shrink-0 text-[11px] font-bold tabular-nums text-muted-foreground">
                 {formatAuditClockTime(ev.created_at)}
               </time>
             </div>
@@ -403,7 +403,7 @@ function WorkTab({ data }: { data: AuditAnswersResponse }) {
                   <div className="flex items-start gap-2">
                     <span
                       className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                        a.is_correct ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                        a.is_correct ? 'bg-emerald-100 text-emerald-700' : 'bg-destructive/10 text-destructive'
                       }`}
                     >
                       {a.is_correct ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
@@ -420,7 +420,7 @@ function WorkTab({ data }: { data: AuditAnswersResponse }) {
                         </span>
                       </p>
                       {a.explanation && (
-                        <p className="mt-1 text-xs italic text-slate-500">{a.explanation}</p>
+                        <p className="mt-1 text-xs italic text-muted-foreground">{a.explanation}</p>
                       )}
                     </div>
                   </div>
@@ -531,7 +531,7 @@ function FaceTab({ logs }: { logs: FaceLogEntry[] }) {
                       <CheckCircle2 size={12} /> Bật
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-black uppercase text-rose-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-[10px] font-black uppercase text-destructive">
                       <XCircle size={12} /> Tắt
                     </span>
                   )}
@@ -542,7 +542,7 @@ function FaceTab({ logs }: { logs: FaceLogEntry[] }) {
                       <CheckCircle2 size={12} /> Khớp
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-black uppercase text-rose-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-[10px] font-black uppercase text-destructive">
                       <XCircle size={12} /> Lỗi
                     </span>
                   )}
@@ -552,7 +552,7 @@ function FaceTab({ logs }: { logs: FaceLogEntry[] }) {
                 </td>
                 <td className="px-4 py-3 text-sm font-black text-foreground">
                   {l.multiple_faces ? (
-                    <span className="text-rose-600">{l.face_count} (nhiều)</span>
+                    <span className="text-destructive">{l.face_count} (nhiều)</span>
                   ) : (
                     l.face_count
                   )}

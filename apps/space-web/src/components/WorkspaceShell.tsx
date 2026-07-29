@@ -103,11 +103,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/80 border-b border-border">
         <div className="max-w-[90vw] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
           <Link href={authed ? '/space/feed' : '/space/login'} className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-brand to-violet-600 flex items-center justify-center text-white shadow-md">
               <Users size={16} strokeWidth={2.5} />
             </div>
             <span className="hidden sm:inline text-sm font-black text-foreground tracking-tight">
@@ -118,13 +118,11 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
           {authed && (
             <nav className="hidden md:flex items-center gap-1 ml-2">
               <Button
+                variant="ghost"
                 onClick={() => router.push('/space/feed')}
-                className={
-                  'inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[13px] font-bold transition-colors ' +
-                  (isHome
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900')
-                }
+                data-active={isHome}
+                aria-current={isHome ? 'page' : undefined}
+                className="inline-flex items-center gap-1.5 h-9 px-3 text-foreground data-[active=true]:text-foreground data-[active=true]:font-semibold"
                 aria-label="Trang chủ"
               >
                 <Home size={14} />
@@ -134,7 +132,6 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 variant="ghost"
                 size="icon"
                 onClick={() => router.push('/space/messages')}
-                className="h-9 w-9 rounded-full"
                 title={t('workspace.nav.messages')}
               >
                 <MessageCircle size={16} />
@@ -148,7 +145,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
             <Input
               placeholder="Tìm kiếm tài liệu, bạn bè..."
-              className="h-9 pl-9 rounded-full bg-slate-100 dark:bg-slate-800 border-transparent text-sm"
+              className="h-9 pl-9 rounded-full bg-slate-100 dark:bg-slate-800 border-transparent shadow-none text-sm"
             />
           </div>
 
@@ -181,6 +178,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     </div>
                     <div className="h-px bg-border my-1" />
                     <Button
+                      variant="ghost"
                       onClick={() => router.push('/space')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -188,6 +186,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">Quay về trang chính</span>
                     </Button>
                     <Button
+                      variant="ghost"
                       onClick={() => router.push('/space/me')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -195,6 +194,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
                     </Button>
                     <Button
+                      variant="ghost"
                       onClick={() => router.push('/space/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -203,6 +203,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     </Button>
                     <div className="h-px bg-border my-1" />
                     <Button
+                      variant="ghost"
                       onClick={handleLogout}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-destructive/5"
                     >

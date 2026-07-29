@@ -107,12 +107,12 @@ export function ConsumerProfileDropdown() {
     color: string;
     path: string;
   }> = [
-    { label: 'Dashboard',       Icon: LayoutDashboard, bg: 'bg-blue-100',     color: 'text-blue-600',     path: '/consumer/dashboard' },
-    { label: 'Lớp học của tôi', Icon: BookOpen,        bg: 'bg-emerald-100',  color: 'text-emerald-600',  path: '/consumer/classroom' },
-    { label: 'Lịch học',        Icon: Calendar,        bg: 'bg-rose-100',     color: 'text-rose-600',     path: '/consumer/calendar' },
-    { label: 'Chứng chỉ',       Icon: Award,           bg: 'bg-amber-100',    color: 'text-amber-600',    path: '/consumer/certificates' },
-    { label: 'Hồ sơ cá nhân',   Icon: User,            bg: 'bg-indigo-100',   color: 'text-indigo-600',   path: '/consumer/profile' },
-    { label: 'Settings',        Icon: Settings,        bg: 'bg-violet-100',   color: 'text-violet-600',   path: '/consumer/settings' },
+    { label: 'Dashboard',       Icon: LayoutDashboard, bg: 'bg-primary/15',   color: 'text-primary',      path: '/consumer/dashboard' },
+    { label: 'Lớp học của tôi', Icon: BookOpen,        bg: 'bg-success/10',   color: 'text-success',      path: '/consumer/classroom' },
+    { label: 'Lịch học',        Icon: Calendar,        bg: 'bg-destructive/10', color: 'text-destructive', path: '/consumer/calendar' },
+    { label: 'Chứng chỉ',       Icon: Award,           bg: 'bg-warning/10',   color: 'text-warning',      path: '/consumer/certificates' },
+    { label: 'Hồ sơ cá nhân',   Icon: User,            bg: 'bg-primary/15',   color: 'text-primary',      path: '/consumer/profile' },
+    { label: 'Settings',        Icon: Settings,        bg: 'bg-primary/15',   color: 'text-primary',      path: '/consumer/settings' },
   ];
 
   const quickItems: Array<{
@@ -121,10 +121,10 @@ export function ConsumerProfileDropdown() {
     bg: string;
     color: string;
   }> = [
-    { label: 'Thông báo',  Icon: Bell,        bg: 'bg-sky-100',     color: 'text-sky-600' },
+    { label: 'Thông báo',  Icon: Bell,        bg: 'bg-info/10',     color: 'text-info' },
     { label: 'Ngôn ngữ',   Icon: Globe,       bg: 'bg-teal-100',    color: 'text-teal-600' },
-    { label: 'Dark mode',  Icon: Moon,        bg: 'bg-slate-100',   color: 'text-slate-600' },
-    { label: 'Trợ giúp',   Icon: HelpCircle,  bg: 'bg-orange-100',  color: 'text-orange-600' },
+    { label: 'Dark mode',  Icon: Moon,        bg: 'bg-muted',       color: 'text-muted-foreground' },
+    { label: 'Trợ giúp',   Icon: HelpCircle,  bg: 'bg-warning/10',  color: 'text-warning' },
   ];
 
   return (
@@ -133,11 +133,11 @@ export function ConsumerProfileDropdown() {
         <Button
           type="button"
           aria-label="Mở menu tài khoản"
-          className="flex max-w-[220px] items-center gap-2.5 rounded-2xl border border-border bg-card py-1 pl-1 pr-3 outline-none transition-all hover:bg-muted group"
+          className="flex max-w-[220px] items-center gap-2.5 rounded-2xl border border-border bg-card py-1 pl-1 pr-3 outline-none hover:bg-muted group"
         >
           <Avatar className="h-8 w-8 shrink-0">
             <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-            <AvatarFallback className="bg-indigo-100 text-xs font-black text-indigo-700">
+            <AvatarFallback className="bg-primary/15 text-xs font-black text-primary">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -155,65 +155,68 @@ export function ConsumerProfileDropdown() {
         align="end"
         sideOffset={8}
         style={{ width: '280px', minWidth: '280px' }}
-        className="rounded-2xl border border-gray-100 bg-white p-1.5 shadow-xl"
       >
         <Button
+          variant="ghost"
           onClick={goToProfile}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-gray-50"
+          className="flex w-full items-center gap-3 text-left"
         >
           <Avatar className="h-10 w-10 shrink-0">
             <AvatarImage src={profile?.avatar_url || ''} alt={displayName} />
-            <AvatarFallback className="bg-indigo-100 text-sm font-black text-indigo-700">
+            <AvatarFallback className="bg-primary/15 text-sm font-black text-primary">
               {initials}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold leading-tight text-gray-900">{displayName}</p>
-            <p className="mt-0.5 truncate text-xs text-gray-400">{email}</p>
-            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-indigo-600">
+            <p className="truncate text-sm font-bold leading-tight text-foreground">{displayName}</p>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground">{email}</p>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-primary">
               Xem trang cá nhân →
             </p>
           </div>
         </Button>
 
-        <div className="mx-1 my-1 h-px bg-gray-100" />
+        <div className="mx-1 my-1 h-px bg-border" />
 
         <Button
+          variant="ghost"
           onClick={() => router.push('/consumer/feed')}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
+          className="flex w-full items-center gap-2.5 text-left group"
         >
           <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-pink-100 text-pink-600">
             <Sparkles size={13} strokeWidth={2.5} />
           </div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Social Feed</span>
+          <span className="text-sm font-medium text-foreground">Social Feed</span>
           <span className="ml-auto rounded-full bg-pink-500/10 px-2 py-0.5 text-[10px] font-bold text-pink-600">
             MỚI
           </span>
         </Button>
 
-        <div className="mx-1 my-1 h-px bg-gray-100" />
+        <div className="mx-1 my-1 h-px bg-border" />
 
         <div className="space-y-0.5">
           {menuItems.map(({ label, Icon, bg, color, path }) => (
             <Button
               key={path}
+              variant="ghost"
               onClick={() => router.push(path)}
-              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
+              className="flex w-full items-center gap-2.5 text-left group"
             >
               <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${bg} ${color}`}>
                 <Icon size={13} strokeWidth={2.5} />
               </div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
+              <span className="text-sm font-medium text-foreground">{label}</span>
             </Button>
           ))}
         </div>
 
-        <div className="mx-1 my-1 h-px bg-gray-100" />
+        <div className="mx-1 my-1 h-px bg-border" />
 
         <div className="grid grid-cols-4 gap-1 px-1 py-1">
           {quickItems.map(({ label, Icon, bg, color }) => (
             <Button
               key={label}
+              variant="ghost"
               onClick={() => {
                 if (label === 'Thông báo') router.push('/consumer/notifications');
                 else if (label === 'Trợ giúp') router.push('/consumer/help');
@@ -224,39 +227,41 @@ export function ConsumerProfileDropdown() {
                   }
                 }
               }}
-              className="flex flex-col items-center gap-1 rounded-xl py-2 transition-colors hover:bg-gray-50 group"
+              className="flex flex-col items-center gap-1 group"
               title={label}
             >
               <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${bg} ${color}`}>
                 <Icon size={15} strokeWidth={2.5} />
               </div>
-              <span className="text-[10px] font-medium text-gray-500 group-hover:text-gray-900">
+              <span className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground">
                 {label}
               </span>
             </Button>
           ))}
         </div>
 
-        <div className="mx-1 my-1 h-px bg-gray-100" />
+        <div className="mx-1 my-1 h-px bg-border" />
 
         <Button
+          variant="ghost"
           onClick={() => router.push('/consumer/profile/edit')}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gray-50 group"
+          className="flex w-full items-center gap-2.5 text-left group"
         >
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-cyan-100 text-cyan-600">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-info/10 text-info">
             <FileText size={13} strokeWidth={2.5} />
           </div>
-          <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Chỉnh sửa hồ sơ</span>
+          <span className="text-sm font-medium text-foreground">Chỉnh sửa hồ sơ</span>
         </Button>
 
         <Button
+          variant="ghost"
           onClick={handleLogout}
-          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-red-50 group"
+          className="flex w-full items-center gap-2.5 text-left group"
         >
-          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-red-100 text-red-500">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-destructive/10 text-destructive">
             <LogOut size={13} strokeWidth={2.5} />
           </div>
-          <span className="text-sm font-medium text-red-500 group-hover:text-red-600">Đăng xuất</span>
+          <span className="text-sm font-medium text-destructive">Đăng xuất</span>
         </Button>
       </DropdownMenuContent>
     </DropdownMenu>

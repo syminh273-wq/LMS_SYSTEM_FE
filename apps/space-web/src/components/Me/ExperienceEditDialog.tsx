@@ -44,8 +44,7 @@ type FormState = {
 
 const YEAR_OPTIONS = getYearOptions();
 
-const inputCls =
-  'w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none disabled:bg-slate-50 disabled:text-slate-400';
+const inputCls = 'w-full';
 
 export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
   const { t } = useTranslation();
@@ -88,7 +87,7 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="w-full max-w-[calc(100%-2rem)] sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <DialogHeader className="px-6 pt-5 pb-3 border-b border-slate-100">
+        <DialogHeader className="px-6 pt-5 pb-3 border-b border-border">
           <DialogTitle>
             {initial ? t('portfolio.me.edit') : t('portfolio.me.add')}{' '}
             {t('portfolio.me.experience')}
@@ -99,7 +98,7 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
             <Input
               value={form.position}
               onChange={(e) => setForm({ ...form, position: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-[#0a66c2]/20 focus:border-[#0a66c2] outline-none"
+              className="w-full"
               placeholder={t('portfolio.placeholders.position')}
             />
           </Field>
@@ -113,7 +112,7 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
           </Field>
 
           <div>
-            <p className="text-xs font-bold text-slate-700 mb-1">{t('portfolio.labels.start_year_month')}</p>
+            <p className="text-xs font-bold text-foreground mb-1">{t('portfolio.labels.start_year_month')}</p>
             <div className="grid grid-cols-2 gap-2">
               <Select
                 value={form.start_month || 'placeholder-start-month'}
@@ -148,16 +147,16 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-bold text-slate-700">
+              <p className="text-xs font-bold text-foreground">
                 {t('portfolio.labels.end_year_month')}{' '}
-                <span className="font-normal text-slate-500">({t('portfolio.labels.end_expected')})</span>
+                <span className="font-normal text-muted-foreground">({t('portfolio.labels.end_expected')})</span>
               </p>
-              <Label className="flex items-center gap-1.5 text-xs text-slate-600">
+              <Label className="flex items-center gap-1.5 text-muted-foreground">
                 <Input
                   type="checkbox"
                   checked={form.is_current}
                   onChange={(e) => setForm({ ...form, is_current: e.target.checked })}
-                  className="size-3.5 accent-[#0a66c2]"
+                  className="size-3.5 accent-primary-brand"
                 />
                 {t('portfolio.labels.end_year_present')}
               </Label>
@@ -211,14 +210,13 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
             />
           </Field>
         </div>
-        <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-3 flex justify-end gap-2">
+        <div className="sticky bottom-0 bg-card border-t border-border px-6 py-3 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             {t('portfolio.me.cancel')}
           </Button>
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-[#0a66c2] hover:bg-[#004182] text-white"
           >
             {saving && <Loader2 className="size-4 animate-spin" />}
             {t('portfolio.me.save')}
@@ -232,7 +230,7 @@ export function ExperienceEditDialog({ initial, onClose, onSaved }: Props) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Label className="block">
-      <span className="block text-xs font-bold text-slate-700 mb-1">{label}</span>
+      <span className="block text-xs font-bold text-foreground mb-1">{label}</span>
       {children}
     </Label>
   );

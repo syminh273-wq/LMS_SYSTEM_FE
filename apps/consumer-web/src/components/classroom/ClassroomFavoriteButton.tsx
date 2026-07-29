@@ -58,18 +58,19 @@ export function ClassroomFavoriteButton({
     'inline-flex items-center justify-center gap-1.5 transition active:scale-95 disabled:opacity-60';
   const variants: Record<Variant, string> = {
     overlay:
-      'h-9 w-9 rounded-full bg-white/90 backdrop-blur shadow-sm hover:bg-white text-slate-700',
+      'h-9 w-9 rounded-full bg-background/90 backdrop-blur shadow-sm hover:bg-background text-foreground',
     inline:
       'h-8 px-3 rounded-full border text-xs font-bold',
   };
   const activeCls = isFavorited
-    ? 'border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100'
-    : 'border-slate-200 bg-white text-slate-500 hover:border-rose-200 hover:text-rose-500';
+    ? 'border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20'
+    : 'border-border bg-background text-muted-foreground hover:border-destructive/30 hover:text-destructive';
 
   if (variant === 'overlay') {
     return (
       <Button
         type="button"
+        variant="ghost"
         onClick={handleClick}
         disabled={busy}
         aria-label={isFavorited ? 'Bỏ yêu thích' : 'Yêu thích'}
@@ -77,7 +78,7 @@ export function ClassroomFavoriteButton({
       >
         <Heart
           size={16}
-          className={cn(isFavorited && 'fill-rose-500 text-rose-500')}
+          className={cn(isFavorited && 'fill-destructive text-destructive')}
         />
       </Button>
     );
@@ -86,16 +87,17 @@ export function ClassroomFavoriteButton({
   return (
     <Button
       type="button"
+      variant="ghost"
       onClick={handleClick}
       disabled={busy}
       className={cn(base, variants.inline, activeCls, className)}
     >
       <Heart
         size={13}
-        className={cn(isFavorited && 'fill-rose-500 text-rose-500')}
+        className={cn(isFavorited && 'fill-destructive text-destructive')}
       />
       <span>{isFavorited ? 'Đã thích' : 'Yêu thích'}</span>
-      {count > 0 && <span className="text-slate-400 font-medium">· {count}</span>}
+      {count > 0 && <span className="text-muted-foreground font-medium">· {count}</span>}
     </Button>
   );
 }

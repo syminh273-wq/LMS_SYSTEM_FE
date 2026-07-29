@@ -113,21 +113,21 @@ export function StudentProgressModal({
       <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Users size={18} className="text-indigo-600" />
+            <Users size={18} className="text-primary" />
             <span className="truncate">Tiến độ đọc: {resourceName}</span>
           </DialogTitle>
         </DialogHeader>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : (
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 min-h-0">
             {/* Student list */}
-            <div className="border border-slate-200 rounded-xl overflow-hidden flex flex-col min-h-0">
-              <div className="px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <div className="border border-border rounded-xl overflow-hidden flex flex-col min-h-0">
+              <div className="px-3 py-2 bg-muted border-b border-border flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                   Học sinh ({totalCount})
                 </span>
                 <span className="text-[10px] font-bold text-emerald-600">
@@ -136,7 +136,7 @@ export function StudentProgressModal({
               </div>
               <div className="flex-1 overflow-y-auto">
                 {progress.length === 0 ? (
-                  <p className="text-center py-8 text-xs text-slate-400">
+                  <p className="text-center py-8 text-xs text-muted-foreground">
                     Chưa có học sinh nào mở tài liệu này.
                   </p>
                 ) : (
@@ -150,35 +150,34 @@ export function StudentProgressModal({
                           type="button"
                           key={p.student_id}
                           onClick={() => setSelectedStudent(p.student_id)}
-                          className={`w-full text-left px-3 py-2 border-b border-slate-100 hover:bg-indigo-50/40 transition flex items-center gap-2 ${
-                            isSelected ? 'bg-indigo-50' : ''
-                          }`}
+                          data-selected={isSelected}
+                          className="w-full text-left px-3 py-2 border-b border-border hover:bg-accent flex items-center gap-2 data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
                         >
                           {p.is_completed ? (
                             <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
                           ) : (
-                            <Circle size={14} className="text-slate-300 shrink-0" />
+                            <Circle size={14} className="text-muted-foreground/40 shrink-0" />
                           )}
                           <div className="min-w-0 flex-1">
-                            <p className="text-xs font-bold text-slate-800 truncate">
+                            <p className="text-xs font-bold text-foreground truncate">
                               {p.student_id.slice(0, 8)}…
                             </p>
                             <div className="flex items-center gap-2 mt-1">
-                              <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
+                              <div className="flex-1 h-1 bg-muted rounded-full overflow-hidden">
                                 <div
                                   className={`h-full ${p.is_completed ? 'bg-emerald-500' : 'bg-indigo-500'}`}
                                   style={{ width: `${p.read_progress ?? 0}%` }}
                                 />
                               </div>
-                              <span className="text-[10px] font-bold text-slate-500 w-10 text-right">
+                              <span className="text-[10px] font-bold text-muted-foreground w-10 text-right">
                                 {p.read_progress ?? 0}%
                               </span>
-                              <span className="text-[10px] text-slate-400 w-12 text-right">
+                              <span className="text-[10px] text-muted-foreground/70 w-12 text-right">
                                 {p.note_count} note
                               </span>
                             </div>
                           </div>
-                          <ChevronRight size={12} className="text-slate-400 shrink-0" />
+                          <ChevronRight size={12} className="text-muted-foreground shrink-0" />
                         </Button>
                       );
                     })
@@ -187,16 +186,18 @@ export function StudentProgressModal({
             </div>
 
             {/* Notes for selected student */}
-            <div className="border border-slate-200 rounded-xl overflow-hidden flex flex-col min-h-0">
-              <div className="px-3 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+            <div className="border border-border rounded-xl overflow-hidden flex flex-col min-h-0">
+              <div className="px-3 py-2 bg-muted border-b border-border flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                   {selectedStudent ? `Note của học sinh` : 'Chọn học sinh để xem note'}
                 </span>
                 {selectedStudent && (
                   <Button
                     type="button"
                     onClick={() => setSelectedStudent(null)}
-                    className="p-1 rounded hover:bg-slate-200"
+                    variant="ghost"
+                    size="icon"
+                    className="rounded"
                   >
                     <X size={12} />
                   </Button>
@@ -204,15 +205,15 @@ export function StudentProgressModal({
               </div>
               <div className="flex-1 overflow-y-auto p-2">
                 {!selectedStudent ? (
-                  <p className="text-center py-8 text-xs text-slate-400">
+                  <p className="text-center py-8 text-xs text-muted-foreground">
                     Bấm vào học sinh bên trái để xem ghi chú.
                   </p>
                 ) : notesLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-5 h-5 animate-spin text-indigo-600" />
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
                   </div>
                 ) : notes.length === 0 ? (
-                  <p className="text-center py-8 text-xs text-slate-400">
+                  <p className="text-center py-8 text-xs text-muted-foreground">
                     Học sinh chưa tạo note nào.
                   </p>
                 ) : (
@@ -220,23 +221,23 @@ export function StudentProgressModal({
                     {notes.map((n) => (
                       <div
                         key={n.uid}
-                        className="p-2 rounded-lg border border-slate-200 bg-white"
+                        className="p-2 rounded-lg border border-border bg-card"
                       >
                         <div className="flex items-center gap-2 mb-1">
-                          <MessageSquare size={12} className="text-indigo-600" />
-                          <span className="text-[10px] font-black text-slate-500">
+                          <MessageSquare size={12} className="text-primary" />
+                          <span className="text-[10px] font-black text-muted-foreground">
                             {Math.round((n.progress_at ?? 0) * 100)}%
                           </span>
                           {n.page != null && (
-                            <span className="text-[10px] text-slate-400">Trang {n.page}</span>
+                            <span className="text-[10px] text-muted-foreground/70">Trang {n.page}</span>
                           )}
                           {n.created_at && (
-                            <span className="ml-auto text-[10px] text-slate-400">
+                            <span className="ml-auto text-[10px] text-muted-foreground/70">
                               {new Date(n.created_at).toLocaleDateString('vi-VN')}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-slate-700 whitespace-pre-wrap">{n.content}</p>
+                        <p className="text-xs text-foreground/80 whitespace-pre-wrap">{n.content}</p>
                       </div>
                     ))}
                   </div>
@@ -246,7 +247,7 @@ export function StudentProgressModal({
           </div>
         )}
 
-        <div className="flex justify-end pt-3 border-t border-slate-200">
+        <div className="flex justify-end pt-3 border-t border-border">
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Đóng
           </Button>

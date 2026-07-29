@@ -192,9 +192,9 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
     <>
       {hasWarning && (
         <div className="fixed left-1/2 top-4 z-[100] -translate-x-1/2 animate-in fade-in slide-in-from-top-2">
-          <div className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 shadow-lg shadow-rose-100">
-            <ShieldAlert size={15} className="shrink-0 text-rose-600 animate-pulse" />
-            <p className="text-sm font-bold text-rose-800">
+          <div className="flex items-center gap-2 rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2.5 shadow-lg shadow-destructive/10">
+            <ShieldAlert size={15} className="shrink-0 text-destructive animate-pulse" />
+            <p className="text-sm font-bold text-destructive">
               {multiplefaces ? 'Phát hiện nhiều khuôn mặt!' : 'Không nhận diện được khuôn mặt!'}
             </p>
           </div>
@@ -202,7 +202,7 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
       )}
 
       <div className="fixed bottom-24 right-4 z-40 sm:bottom-8">
-        <div className="w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <div className="w-44 overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
           <div className="relative">
             <video
               ref={videoRef}
@@ -214,10 +214,10 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
             <div
               className={`absolute bottom-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full ${
                 recognized === null
-                  ? 'bg-slate-400'
+                  ? 'bg-muted-foreground'
                   : recognized
-                    ? 'bg-emerald-500'
-                    : 'bg-rose-500'
+                    ? 'bg-success'
+                    : 'bg-destructive'
               }`}
             >
               {recognized ? (
@@ -228,8 +228,8 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
             </div>
           </div>
 
-          <div className="flex h-9 w-full items-center justify-center gap-1.5 bg-slate-50 text-xs font-bold text-slate-600">
-            <ShieldCheck size={14} className="text-slate-400" />
+          <div className="flex h-9 w-full items-center justify-center gap-1.5 bg-muted text-xs font-bold text-muted-foreground">
+            <ShieldCheck size={14} className="text-muted-foreground" />
             <span>Camera</span>
           </div>
         </div>

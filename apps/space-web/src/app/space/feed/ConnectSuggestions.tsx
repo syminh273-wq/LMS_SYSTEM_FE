@@ -114,7 +114,7 @@ export function ConnectSuggestions() {
                       <p className="text-[13px] font-semibold text-slate-900 truncate hover:underline flex items-center gap-1.5">
                         <span className="truncate">{u.name || u.username || 'Người dùng'}</span>
                         {u.kind === 'space' && (
-                          <span className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[9.5px] font-bold uppercase tracking-wider border border-indigo-100">
+                          <span className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded bg-accent text-primary text-[9.5px] font-bold uppercase tracking-wider border border-primary/20">
                             Giáo viên
                           </span>
                         )}

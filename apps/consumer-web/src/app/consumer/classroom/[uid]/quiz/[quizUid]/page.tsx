@@ -37,10 +37,10 @@ function TimerBadge({
   tone: TimerTone;
 }) {
   const toneClasses: Record<TimerTone, string> = {
-    indigo: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-    amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    urgent: 'bg-gradient-to-r from-rose-500 to-pink-500 text-white border-rose-400 shadow-lg shadow-rose-200 timer-shake',
-    expired: 'bg-slate-100 text-slate-500 border-slate-200',
+    indigo: 'bg-primary/10 text-primary border-primary/20',
+    amber: 'bg-warning/10 text-warning border-warning/20',
+    urgent: 'bg-gradient-to-r from-destructive to-pink-500 text-white border-rose-400 shadow-lg shadow-rose-200 timer-shake',
+    expired: 'bg-muted text-muted-foreground border-border',
   };
 
   return (
@@ -316,18 +316,18 @@ export default function QuizGamePage({ params }: Props) {
 
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-100 flex items-center justify-center">
-        <Loader2 size={40} className="animate-spin text-indigo-500" />
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 to-muted flex items-center justify-center">
+        <Loader2 size={40} className="animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-slate-100 flex flex-col items-center justify-center p-4 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 to-muted flex flex-col items-center justify-center p-4 text-center">
         <XCircle size={48} className="text-rose-400 mb-4" />
-        <p className="font-bold text-slate-700">{error}</p>
-        <Button onClick={() => router.push(`/consumer/classroom/${classroomUid}`)} className="mt-6 rounded-xl bg-indigo-600 text-white">
+        <p className="font-bold text-foreground">{error}</p>
+        <Button onClick={() => router.push(`/consumer/classroom/${classroomUid}`)} className="mt-6 rounded-xl bg-primary text-white">
           Quay lại lớp học
         </Button>
       </div>
@@ -349,21 +349,21 @@ export default function QuizGamePage({ params }: Props) {
       : null;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-violet-700 flex flex-col items-center justify-center p-6 text-white">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-primary flex flex-col items-center justify-center p-6 text-white">
         <div className="max-w-md w-full space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <div className="text-center space-y-3">
-            <div className="w-20 h-20 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto border border-white/30">
+            <div className="w-20 h-20 rounded-3xl bg-card/20 backdrop-blur-sm flex items-center justify-center mx-auto border border-white/30">
               <Trophy size={40} className="text-yellow-300" />
             </div>
             <h1 className="text-3xl font-black tracking-tight">{quiz.title}</h1>
             {quiz.description && (
-              <p className="text-indigo-200 text-sm font-medium">{quiz.description}</p>
+              <p className="text-primary-foreground/80 text-sm font-medium">{quiz.description}</p>
             )}
           </div>
 
           {/* Not yet open banner */}
           {isNotYetOpen && (
-            <div className="bg-amber-500/20 backdrop-blur-sm border-2 border-amber-300/50 rounded-2xl p-4 flex items-center gap-3">
+            <div className="bg-warning/20 backdrop-blur-sm border-2 border-amber-300/50 rounded-2xl p-4 flex items-center gap-3">
               <Lock size={24} className="text-amber-200 shrink-0" />
               <div>
                 <p className="font-black text-sm">Bài quiz chưa mở</p>
@@ -378,7 +378,7 @@ export default function QuizGamePage({ params }: Props) {
 
           {/* Closed banner */}
           {isClosed && (
-            <div className="bg-rose-500/20 backdrop-blur-sm border-2 border-rose-300/50 rounded-2xl p-4 flex items-center gap-3">
+            <div className="bg-destructive/20 backdrop-blur-sm border-2 border-rose-300/50 rounded-2xl p-4 flex items-center gap-3">
               <Lock size={24} className="text-rose-200 shrink-0" />
               <div>
                 <p className="font-black text-sm">Bài quiz đã đóng</p>
@@ -393,31 +393,31 @@ export default function QuizGamePage({ params }: Props) {
           )}
 
           {/* Quiz info */}
-          <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 space-y-3">
+          <div className="bg-card/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 space-y-3">
             <div className="flex justify-between text-sm font-bold">
-              <span className="text-indigo-200">Tổng câu hỏi</span>
+              <span className="text-primary-foreground/80">Tổng câu hỏi</span>
               <span>{quiz.questions_count} câu</span>
             </div>
             {quiz.time_limit_seconds > 0 && (
               <div className="flex justify-between text-sm font-bold">
-                <span className="text-indigo-200 flex items-center gap-1.5"><Clock size={14} /> Thời gian</span>
+                <span className="text-primary-foreground/80 flex items-center gap-1.5"><Clock size={14} /> Thời gian</span>
                 <span>{Math.round(quiz.time_limit_seconds / 60)} phút</span>
               </div>
             )}
             {fmtOpensLocal && (
               <div className="flex justify-between text-sm font-bold">
-                <span className="text-indigo-200">Mở lúc</span>
+                <span className="text-primary-foreground/80">Mở lúc</span>
                 <span className="text-emerald-300">{fmtOpensLocal}</span>
               </div>
             )}
             {fmtClosesLocal && (
               <div className="flex justify-between text-sm font-bold">
-                <span className="text-indigo-200">Đóng lúc</span>
+                <span className="text-primary-foreground/80">Đóng lúc</span>
                 <span className="text-rose-300">{fmtClosesLocal}</span>
               </div>
             )}
             <div className="flex justify-between text-sm font-bold">
-              <span className="text-indigo-200 flex items-center gap-1.5"><RotateCcw size={14} /> Số lần làm</span>
+              <span className="text-primary-foreground/80 flex items-center gap-1.5"><RotateCcw size={14} /> Số lần làm</span>
               <span>
                 {maxAttempts > 0
                   ? `${attemptCount}/${maxAttempts} lần`
@@ -426,7 +426,7 @@ export default function QuizGamePage({ params }: Props) {
             </div>
             {bestScore !== null && (
               <div className="flex justify-between text-sm font-bold">
-                <span className="text-indigo-200">Điểm cao nhất</span>
+                <span className="text-primary-foreground/80">Điểm cao nhất</span>
                 <span className="text-yellow-300">{bestScore}%</span>
               </div>
             )}
@@ -434,14 +434,14 @@ export default function QuizGamePage({ params }: Props) {
 
           {/* Past attempts history */}
           {pastAttempts.length > 0 && (
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15 space-y-2">
-              <div className="text-[10px] font-black uppercase text-indigo-300 tracking-wider mb-2">Lịch sử làm bài</div>
+            <div className="bg-card/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15 space-y-2">
+              <div className="text-[10px] font-black uppercase text-primary tracking-wider mb-2">Lịch sử làm bài</div>
               {pastAttempts.slice(0, 3).map(a => (
                 <div key={a.uid} className="flex items-center justify-between text-xs font-bold">
-                  <span className="text-indigo-200">Lần #{a.attempt_number}</span>
+                  <span className="text-primary-foreground/80">Lần #{a.attempt_number}</span>
                   <div className="flex items-center gap-3">
                     {a.time_taken_seconds > 0 && (
-                      <span className="text-indigo-300">{fmtSeconds(a.time_taken_seconds)}</span>
+                      <span className="text-primary">{fmtSeconds(a.time_taken_seconds)}</span>
                     )}
                     <span className={
                       a.score_pct >= 80 ? 'text-emerald-300' :
@@ -459,26 +459,26 @@ export default function QuizGamePage({ params }: Props) {
           <Button
             type="button"
             onClick={() => setShowLeaderboard(true)}
-            className="w-full h-12 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-black text-sm rounded-2xl gap-2 shadow-lg shadow-amber-900/30"
+            className="w-full h-12 bg-gradient-to-r from-warning to-yellow-500 hover:from-warning hover:to-yellow-600 text-white font-black text-sm rounded-2xl gap-2 shadow-lg shadow-amber-900/30"
           >
             <Trophy size={18} /> XEM BẢNG VÀNG
           </Button>
 
           {/* Start / blocked / closed / not yet open */}
           {isClosed ? (
-            <div className="bg-white/10 border border-white/20 rounded-2xl p-4 text-center">
-              <p className="text-xs text-indigo-200 font-medium">Không thể làm bài khi quiz đã đóng.</p>
+            <div className="bg-card/10 border border-white/20 rounded-2xl p-4 text-center">
+              <p className="text-xs text-primary-foreground/80 font-medium">Không thể làm bài khi quiz đã đóng.</p>
             </div>
           ) : isBlocked ? (
-            <div className="bg-white/10 border border-white/20 rounded-2xl p-5 text-center space-y-2">
-              <Lock size={28} className="mx-auto text-indigo-300" />
+            <div className="bg-card/10 border border-white/20 rounded-2xl p-5 text-center space-y-2">
+              <Lock size={28} className="mx-auto text-primary" />
               <p className="font-black text-sm">Bạn đã dùng hết {maxAttempts} lần làm bài</p>
-              <p className="text-xs text-indigo-300 font-medium">Liên hệ giáo viên để được mở thêm lượt</p>
+              <p className="text-xs text-primary font-medium">Liên hệ giáo viên để được mở thêm lượt</p>
             </div>
           ) : isNotYetOpen ? (
             <Button
               disabled
-              className="w-full h-14 bg-white/30 text-white/60 font-black text-base rounded-2xl gap-3 cursor-not-allowed"
+              className="w-full h-14 bg-card/30 text-white/60 font-black text-base rounded-2xl gap-3 cursor-not-allowed"
             >
               CHƯA MỞ
               <Lock size={18} />
@@ -486,7 +486,7 @@ export default function QuizGamePage({ params }: Props) {
           ) : (
             <Button
               onClick={handleStartPlaying}
-              className="w-full h-14 bg-white text-indigo-700 hover:bg-indigo-50 font-black text-base rounded-2xl shadow-xl shadow-indigo-900/30 gap-3"
+              className="w-full h-14 bg-card text-primary hover:bg-primary/10 font-black text-base rounded-2xl shadow-xl shadow-indigo-900/30 gap-3"
             >
               {attemptCount > 0 ? 'LÀM LẠI' : 'BẮT ĐẦU CHƠI'}
               <ChevronRight size={20} />
@@ -494,7 +494,7 @@ export default function QuizGamePage({ params }: Props) {
           )}
 
           {attemptsRemaining !== null && !isBlocked && !isClosed && !isNotYetOpen && (
-            <p className="text-center text-xs text-indigo-300 font-bold">
+            <p className="text-center text-xs text-primary font-bold">
               Còn {attemptsRemaining} lần làm
             </p>
           )}
@@ -502,7 +502,7 @@ export default function QuizGamePage({ params }: Props) {
           <Button
             type="button"
             onClick={() => router.push(`/consumer/classroom/${classroomUid}`)}
-            className="w-full text-center text-indigo-200 text-sm font-bold hover:text-white transition flex items-center justify-center gap-2"
+            className="w-full text-center text-primary-foreground/80 text-sm font-bold hover:text-white transition flex items-center justify-center gap-2"
           >
             <ArrowLeft size={16} />
             Quay lại lớp học
@@ -537,14 +537,14 @@ export default function QuizGamePage({ params }: Props) {
     const closesExpired = hasClosesTimer && (closesAtCountdown ?? 0) === 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-violet-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/10 flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div className="sticky top-0 z-20 bg-card/80 backdrop-blur-xl border-b border-border/60 shadow-sm">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4">
             <Button
               type="button"
               onClick={handleRestart}
-              className="shrink-0 w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition active:scale-95"
+              className="shrink-0 w-10 h-10 rounded-xl bg-muted hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition active:scale-95"
               aria-label="Quay lại"
             >
               <ArrowLeft size={18} />
@@ -552,7 +552,7 @@ export default function QuizGamePage({ params }: Props) {
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-3 mb-1.5">
-                <span className="text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-wider">
+                <span className="text-[11px] sm:text-xs font-black text-muted-foreground uppercase tracking-wider">
                   Câu {currentIdx + 1} / {totalQuestions}
                 </span>
                 {hasAttemptTimer || hasClosesTimer ? (
@@ -580,15 +580,15 @@ export default function QuizGamePage({ params }: Props) {
                     )}
                   </div>
                 ) : (
-                  <span className="text-xs font-black text-slate-400">{Math.round(progress)}%</span>
+                  <span className="text-xs font-black text-muted-foreground">{Math.round(progress)}%</span>
                 )}
               </div>
-              <div className="relative h-2.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className="relative h-2.5 bg-muted rounded-full overflow-hidden">
                 <div
                   className={`absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out ${
                     timerUrgent
-                      ? 'bg-gradient-to-r from-rose-500 via-pink-500 to-rose-500'
-                      : 'bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500'
+                      ? 'bg-gradient-to-r from-destructive via-pink-500 to-destructive'
+                      : 'bg-gradient-to-r from-primary via-violet-500 to-primary'
                   }`}
                   style={{ width: `${hasAttemptTimer || hasClosesTimer ? timePct : progress}%` }}
                 />
@@ -606,20 +606,20 @@ export default function QuizGamePage({ params }: Props) {
         {/* Question */}
         <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 max-w-2xl mx-auto w-full">
           <div className="w-full space-y-5 sm:space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300" key={currentQuestion.uid}>
-            <div className="relative bg-white rounded-3xl border border-slate-200/80 shadow-lg shadow-indigo-100/40 p-6 sm:p-7 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500" />
+            <div className="relative bg-card rounded-3xl border border-border/80 shadow-lg shadow-indigo-100/40 p-6 sm:p-7 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-violet-500 to-fuchsia-500" />
               <div className="flex items-center justify-between mb-3">
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase text-indigo-600 tracking-widest bg-indigo-50 px-2.5 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase text-primary tracking-widest bg-primary/10 px-2.5 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   Câu hỏi {currentIdx + 1}
                 </span>
                 {Object.keys(answers).length > 0 && (
-                  <span className="text-[10px] font-bold text-slate-400">
+                  <span className="text-[10px] font-bold text-muted-foreground">
                     Đã trả lời {Object.keys(answers).length}/{totalQuestions}
                   </span>
                 )}
               </div>
-              <p className="text-base sm:text-lg font-bold text-slate-900 leading-relaxed">{currentQuestion.question_text}</p>
+              <p className="text-base sm:text-lg font-bold text-foreground leading-relaxed">{currentQuestion.question_text}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
@@ -634,18 +634,18 @@ export default function QuizGamePage({ params }: Props) {
                     style={{ animationDelay: `${idx * 60}ms` }}
                     className={`group w-full flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all duration-200 focus:outline-none animate-in fade-in slide-in-from-left-2
                       ${selected === null
-                        ? 'border-slate-200 bg-white hover:border-indigo-400 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
+                        ? 'border-border bg-card hover:border-primary/40 hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/10 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
                         : isSelected
-                          ? 'border-indigo-500 bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-xl shadow-indigo-200 scale-[1.01]'
-                          : 'border-slate-100 bg-slate-50 text-slate-400 opacity-60'
+                          ? 'border-primary bg-gradient-to-r from-primary to-primary text-white shadow-xl shadow-indigo-200 scale-[1.01]'
+                          : 'border-border bg-muted text-muted-foreground opacity-60'
                       }`}
                   >
                     <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black shrink-0 transition-all ${
                       isSelected
-                        ? 'bg-white text-indigo-600 shadow-md'
+                        ? 'bg-card text-primary shadow-md'
                         : selected === null
-                          ? 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 group-hover:from-indigo-100 group-hover:to-violet-100 group-hover:text-indigo-600'
-                          : 'bg-slate-100 text-slate-400'
+                          ? 'bg-gradient-to-br from-muted to-muted text-muted-foreground group-hover:from-primary/10 group-hover:to-primary/10 group-hover:text-primary'
+                          : 'bg-muted text-muted-foreground'
                     }`}>
                       {OPTION_LABELS[opt]}
                     </span>
@@ -659,7 +659,7 @@ export default function QuizGamePage({ params }: Props) {
             <Button
               onClick={() => void handleNext()}
               disabled={selected === null || submitting}
-              className="w-full h-14 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-200/60 gap-2 text-base disabled:opacity-40 disabled:shadow-none transition-all hover:-translate-y-0.5 active:translate-y-0"
+              className="w-full h-14 bg-gradient-to-r from-primary to-primary hover:from-primary hover:to-primary text-white font-black rounded-2xl shadow-xl shadow-indigo-200/60 gap-2 text-base disabled:opacity-40 disabled:shadow-none transition-all hover:-translate-y-0.5 active:translate-y-0"
             >
               {submitting ? (
                 <><Loader2 size={18} className="animate-spin" /> Đang gửi...</>
@@ -677,15 +677,15 @@ export default function QuizGamePage({ params }: Props) {
 
   /* ── RESULT ── */
   if (phase === 'result' && result) {
-    const scoreColor = result.score >= 80 ? 'text-emerald-600' : result.score >= 50 ? 'text-amber-600' : 'text-rose-600';
-    const scoreBg = result.score >= 80 ? 'from-emerald-500 to-teal-600' : result.score >= 50 ? 'from-amber-500 to-orange-600' : 'from-rose-500 to-pink-600';
+    const scoreColor = result.score >= 80 ? 'text-success' : result.score >= 50 ? 'text-warning' : 'text-destructive';
+    const scoreBg = result.score >= 80 ? 'from-success to-teal-600' : result.score >= 50 ? 'from-warning to-orange-600' : 'from-destructive to-pink-600';
     void scoreColor;
     const timeTaken = startedAtRef.current
       ? Math.floor((Date.now() - startedAtRef.current.getTime()) / 1000)
       : 0;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 flex flex-col items-center py-10 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-muted to-primary/10 flex flex-col items-center py-10 px-4">
         {celebrateCerts && celebrateCerts.length > 0 && (
           <CertificateCelebration
             certificates={celebrateCerts}
@@ -694,7 +694,7 @@ export default function QuizGamePage({ params }: Props) {
         )}
         <div className="max-w-2xl w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
           {forceSubmitted && (
-            <div className="rounded-2xl border-2 border-rose-300 bg-rose-50 px-4 py-3 flex items-center gap-3 text-rose-800">
+            <div className="rounded-2xl border-2 border-rose-300 bg-destructive/10 px-4 py-3 flex items-center gap-3 text-rose-800">
               <Lock size={18} className="shrink-0" />
               <div>
                 <p className="text-sm font-black">Bài đã được hệ thống nộp tự động</p>
@@ -706,7 +706,7 @@ export default function QuizGamePage({ params }: Props) {
           <div className={`bg-gradient-to-br ${scoreBg} rounded-3xl p-8 text-white text-center shadow-2xl`}>
             <div className="flex items-center justify-center gap-2 mb-2">
               <Trophy size={40} className="text-yellow-200" />
-              <span className="text-xs font-black bg-white/20 rounded-full px-3 py-1">
+              <span className="text-xs font-black bg-card/20 rounded-full px-3 py-1">
                 Lần thứ #{result.attempt_number}
               </span>
             </div>
@@ -723,7 +723,7 @@ export default function QuizGamePage({ params }: Props) {
                'Cần cố gắng hơn! Hãy ôn tập và thử lại.'}
             </div>
             {result.attempts_remaining !== null && (
-              <div className="mt-3 text-xs font-bold bg-white/20 rounded-full px-3 py-1 inline-block">
+              <div className="mt-3 text-xs font-bold bg-card/20 rounded-full px-3 py-1 inline-block">
                 Còn {result.attempts_remaining} lần làm
               </div>
             )}
@@ -731,27 +731,27 @@ export default function QuizGamePage({ params }: Props) {
 
           {/* Exam linkage notice */}
           {examUid && (
-            <div className="flex items-center gap-2 rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-700">
-              <CheckCircle2 size={16} className="shrink-0 text-indigo-500" />
+            <div className="flex items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-bold text-primary">
+              <CheckCircle2 size={16} className="shrink-0 text-primary" />
               Kết quả đã được ghi nhận vào bài kiểm tra
             </div>
           )}
 
           {/* Certificate celebration card (persists after modal closes) */}
           {celebrateCerts && celebrateCerts.length > 0 && (
-            <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-center gap-3 shadow-md">
+            <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-warning/10 to-warning/10 p-4 flex items-center gap-3 shadow-md">
               <div className="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center shrink-0">
                 <Trophy size={22} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-black text-amber-900">Bạn vừa nhận chứng chỉ mới!</p>
-                <p className="text-[11px] text-amber-700 font-mono font-bold truncate">
+                <p className="text-[11px] text-warning font-mono font-bold truncate">
                   {celebrateCerts[0].verification_code}
                 </p>
               </div>
               <Button
                 onClick={() => router.push(`/consumer/certificate/${celebrateCerts[0].uid}`)}
-                className="bg-amber-500 hover:bg-amber-600 text-white font-bold h-9 px-3 text-[11px] rounded-xl shrink-0"
+                className="bg-warning hover:bg-warning text-white font-bold h-9 px-3 text-[11px] rounded-xl shrink-0"
               >
                 Xem
               </Button>
@@ -763,7 +763,7 @@ export default function QuizGamePage({ params }: Props) {
             <Button
               type="button"
               onClick={() => setShowLeaderboard(true)}
-              className="h-12 px-5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white rounded-2xl font-bold gap-2"
+              className="h-12 px-5 bg-gradient-to-r from-warning to-yellow-500 hover:from-warning hover:to-yellow-600 text-white rounded-2xl font-bold gap-2"
             >
               <Trophy size={16} />
               Bảng vàng
@@ -780,7 +780,7 @@ export default function QuizGamePage({ params }: Props) {
             )}
             <Button
               onClick={() => router.push(`/consumer/classroom/${classroomUid}`)}
-              className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold gap-2 min-w-[120px]"
+              className="flex-1 h-12 bg-primary hover:bg-primary text-white rounded-2xl font-bold gap-2 min-w-[120px]"
             >
               <ArrowLeft size={16} />
               Về lớp học
@@ -789,21 +789,21 @@ export default function QuizGamePage({ params }: Props) {
 
           {/* Detailed results */}
           <div className="space-y-3">
-            <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Chi tiết kết quả</div>
+            <div className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Chi tiết kết quả</div>
             {result.results.map((item, idx) => (
               <div
                 key={item.question_uid}
-                className={`bg-white rounded-2xl border shadow-sm p-5 space-y-3 ${
-                  item.is_correct ? 'border-emerald-100' : 'border-rose-100'
+                className={`bg-card rounded-2xl border shadow-sm p-5 space-y-3 ${
+                  item.is_correct ? 'border-success/20' : 'border-destructive/20'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   {item.is_correct
-                    ? <CheckCircle2 size={20} className="text-emerald-500 shrink-0 mt-0.5" />
-                    : <XCircle size={20} className="text-rose-500 shrink-0 mt-0.5" />
+                    ? <CheckCircle2 size={20} className="text-success shrink-0 mt-0.5" />
+                    : <XCircle size={20} className="text-destructive shrink-0 mt-0.5" />
                   }
-                  <p className="text-sm font-bold text-slate-900 leading-relaxed">
-                    <span className="text-slate-400 font-black mr-1">{idx + 1}.</span>
+                  <p className="text-sm font-bold text-foreground leading-relaxed">
+                    <span className="text-muted-foreground font-black mr-1">{idx + 1}.</span>
                     {item.question_text}
                   </p>
                 </div>
@@ -811,21 +811,21 @@ export default function QuizGamePage({ params }: Props) {
                 <div className="grid grid-cols-2 gap-2 pl-8">
                   {item.chosen && (
                     <div className={`rounded-xl px-3 py-2 text-xs font-bold ${
-                      item.is_correct ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'
+                      item.is_correct ? 'bg-success/10 text-success border border-success/20' : 'bg-destructive/10 text-destructive border border-destructive/20'
                     }`}>
                       Bạn chọn: {item.chosen.toUpperCase()}
                     </div>
                   )}
                   {!item.is_correct && (
-                    <div className="rounded-xl px-3 py-2 text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <div className="rounded-xl px-3 py-2 text-xs font-bold bg-success/10 text-success border border-success/20">
                       Đáp án: {item.correct_answer.toUpperCase()}
                     </div>
                   )}
                 </div>
 
                 {item.explanation && (
-                  <div className="pl-8 text-xs text-slate-500 font-medium bg-amber-50 rounded-xl px-4 py-2 border border-amber-100">
-                    <span className="font-black text-amber-600">Giải thích: </span>{item.explanation}
+                  <div className="pl-8 text-xs text-muted-foreground font-medium bg-warning/10 rounded-xl px-4 py-2 border border-warning/20">
+                    <span className="font-black text-warning">Giải thích: </span>{item.explanation}
                   </div>
                 )}
               </div>

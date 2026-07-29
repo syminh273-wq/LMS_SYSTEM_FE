@@ -47,13 +47,15 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
   };
 
   return (
-    <section className="bg-white rounded-lg border border-slate-200 p-6">
+    <section className="bg-card rounded-lg border border-border p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-slate-900">{t('portfolio.me.education')}</h2>
+        <h2 className="text-xl font-bold text-foreground">{t('portfolio.me.education')}</h2>
         {isOwner && (
           <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setAdding(true)}
-            className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500"
+            className="w-8 h-8 flex items-center justify-center text-muted-foreground"
             aria-label={t('portfolio.me.add')}
           >
             <Plus className="size-4" />
@@ -62,7 +64,7 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <p className="text-sm text-slate-400 italic">{t('portfolio.me.no_education')}</p>
+        <p className="text-sm text-muted-foreground italic">{t('portfolio.me.no_education')}</p>
       ) : (
         <div className="space-y-5">
           {items.map((item, idx) => {
@@ -80,9 +82,9 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                   <CollapsibleItem
                     summary={
                       <>
-                        <p className="text-base font-semibold text-slate-900">{v.school}</p>
+                        <p className="text-base font-semibold text-foreground">{v.school}</p>
                         {(v.degree || v.field_of_study) && (
-                          <p className="text-sm text-slate-700">
+                          <p className="text-sm text-foreground">
                             {[v.degree, v.field_of_study].filter(Boolean).join(', ')}
                           </p>
                         )}
@@ -92,25 +94,25 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                     details={
                       <>
                         {v.grade && (
-                          <p className="text-xs text-slate-600">
-                            <span className="text-slate-500">{t('portfolio.labels.grade')}:</span> {v.grade}
+                          <p className="text-xs text-muted-foreground">
+                            <span className="text-muted-foreground">{t('portfolio.labels.grade')}:</span> {v.grade}
                           </p>
                         )}
                         {v.activities_and_societies && (
-                          <p className="text-xs text-slate-600 mt-1">
-                            <span className="text-slate-500">{t('portfolio.labels.activities_and_societies')}:</span>{' '}
+                          <p className="text-xs text-muted-foreground mt-1">
+                            <span className="text-muted-foreground">{t('portfolio.labels.activities_and_societies')}:</span>{' '}
                             {v.activities_and_societies}
                           </p>
                         )}
                         {v.description && (
-                          <p className="text-sm text-slate-700 mt-2 whitespace-pre-line">{v.description}</p>
+                          <p className="text-sm text-foreground mt-2 whitespace-pre-line">{v.description}</p>
                         )}
                         {v.skills.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {v.skills.map((s) => (
                               <span
                                 key={s}
-                                className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-[11px] text-slate-700"
+                                className="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-[11px] text-foreground"
                               >
                                 {s}
                               </span>
@@ -123,7 +125,7 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                 </div>
                 {isOwner && (
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100">
+                    <DropdownMenuTrigger className="w-8 h-8 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground opacity-0 group-hover:opacity-100">
                       <MoreHorizontal className="size-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -132,7 +134,7 @@ export function EducationSection({ items, isOwner = true, onChanged }: Props) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDelete(item.uid)}
-                        className="text-red-600"
+                        variant="destructive"
                       >
                         <Trash2 className="size-3.5" />
                         {t('portfolio.me.delete')}
@@ -183,5 +185,5 @@ function PeriodLine({ v, monthLabel }: { v: EducationValue; monthLabel: (m: stri
   }
   if (!start && !end) return null;
   const text = start && end ? `${start} – ${end}` : start || end;
-  return <p className="text-xs text-slate-500 mt-0.5">{text}</p>;
+  return <p className="text-xs text-muted-foreground mt-0.5">{text}</p>;
 }

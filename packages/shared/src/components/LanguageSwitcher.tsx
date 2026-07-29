@@ -33,7 +33,7 @@ export function LanguageSwitcher({
       )}
       <div
         className={cn(
-          'inline-flex items-center rounded-xl border border-border bg-muted/30 p-1',
+          'inline-flex items-center rounded-xl bg-muted p-1',
           variant === 'compact' && 'p-0.5'
         )}
       >
@@ -46,14 +46,13 @@ export function LanguageSwitcher({
               onClick={() => setLocale(loc)}
               aria-pressed={isActive}
               lang={loc}
+              variant="ghost"
+              data-active={isActive}
               className={cn(
-                'inline-flex items-center justify-center rounded-lg font-bold uppercase tracking-widest transition-all',
+                'inline-flex items-center justify-center rounded-lg font-bold uppercase tracking-widest text-muted-foreground! hover:text-foreground! aria-pressed:!text-foreground aria-pressed:font-semibold bg-transparent! hover:bg-transparent! active:bg-transparent! focus-visible:bg-transparent! focus-visible:ring-0! shadow-none aria-pressed:bg-background! aria-pressed:shadow-sm',
                 variant === 'segmented'
                   ? 'min-w-[56px] h-9 px-3 text-xs gap-1.5'
                   : 'min-w-[40px] h-8 px-2 text-[10px]',
-                isActive
-                  ? 'bg-card text-primary-brand shadow-sm border border-border/50'
-                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {variant === 'segmented' && <Languages size={12} className="opacity-60" />}

@@ -61,8 +61,8 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/80 border-b border-border">
         <div className="max-w-[90vw] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
           <Link href={authed ? '/consumer/feed' : '/auth/login'} className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md">
@@ -77,7 +77,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
             <Input
               placeholder="Tìm kiếm tài liệu, bạn bè..."
-              className="h-9 pl-9 rounded-full bg-slate-100 dark:bg-slate-800 border-transparent text-sm"
+              className="h-9 pl-9 rounded-full bg-muted border-transparent shadow-none text-sm"
             />
           </div>
 
@@ -85,12 +85,13 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
             {authed ? (
               <>
                 <Button
+                  variant="ghost"
                   onClick={() => router.push('/consumer/feed')}
                   className={
-                    'hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors ' +
+                    'hidden md:inline-flex items-center gap-1.5 h-9 px-3.5 rounded-full text-[13px] font-bold ' +
                     (isHome
-                      ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100'
-                      : 'text-slate-700 hover:bg-slate-100')
+                      ? 'bg-primary/10 text-primary ring-1 ring-primary/20'
+                      : 'text-foreground')
                   }
                   aria-label="Trang chủ"
                 >
@@ -119,7 +120,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="ml-1 flex items-center gap-1 rounded-full p-0.5 outline-none hover:ring-2 hover:ring-indigo-300 transition-all">
+                    <Button variant="ghost" className="ml-1 gap-1 rounded-full p-0.5 outline-none">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={profile?.avatar_url || ''}  />
                         <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-violet-600 text-xs font-black text-white">
@@ -136,6 +137,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     </div>
                     <div className="h-px bg-border my-1" />
                     <Button
+                      variant="ghost"
                       onClick={() => router.push('/consumer/profile')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -143,6 +145,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">{t('workspace.profile.title')}</span>
                     </Button>
                     <Button
+                      variant="ghost"
                       onClick={() => router.push('/consumer/following')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -150,6 +153,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                       <span className="text-sm font-medium">Đang theo dõi</span>
                     </Button>
                     <Button
+                      variant="ghost"
                       onClick={() => router.push('/consumer/classroom')}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
@@ -158,6 +162,7 @@ export function WorkspaceShell({ children }: { children: React.ReactNode }) {
                     </Button>
                     <div className="h-px bg-border my-1" />
                     <Button
+                      variant="ghost"
                       onClick={handleLogout}
                       className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left hover:bg-destructive/5"
                     >

@@ -172,7 +172,7 @@ export function PostCard({
                 <p className="text-[13.5px] font-semibold text-slate-900 leading-none truncate hover:underline">{post.author_name || 'Ẩn danh'}</p>
               </AuthorLink>
               {post.author_type === 'space' && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent text-primary border border-primary/20">
                   Giáo viên
                 </span>
               )}
@@ -193,8 +193,10 @@ export function PostCard({
         {isMe && (
           <div className="relative shrink-0">
             <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setMenuOpen(p => !p)}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+              className="rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
               aria-label="Tùy chọn"
             >
               <MoreHorizontal size={16} />
@@ -204,6 +206,7 @@ export function PostCard({
                 <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                 <div className="absolute right-0 top-9 bg-white border border-slate-200 rounded-lg shadow-xl p-1 z-20 w-36 animate-fade-down">
                   <Button
+                    variant="ghost"
                     onClick={() => { setMenuOpen(false); handleDelete(); }}
                     className="w-full flex items-center gap-2 px-3 py-2 text-[13px] font-medium text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
                   >
@@ -281,6 +284,7 @@ export function PostCard({
         ].map(({ key, icon: Icon, label, onClick, active, activeColor }) => (
           <Button
             key={key}
+            variant="ghost"
             onClick={onClick}
             className={cn(
               "flex items-center justify-center gap-1.5 py-2.5 text-[13px] font-medium transition-colors",

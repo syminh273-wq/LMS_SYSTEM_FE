@@ -50,11 +50,11 @@ export default function SpaceForgotPasswordPage() {
                   <input
                     type="email"
                     {...register('email', { required: 'Vui lòng nhập email' })}
-                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-red-500' : 'border-border'}`}
+                    className={`block w-full pl-10 pr-3 py-2.5 border rounded-lg bg-muted/50 text-foreground placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-card transition-all ${errors.email ? 'border-destructive' : 'border-border'}`}
                     placeholder="admin@your-space.com"
                   />
                 </div>
-                {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email.message}</p>}
+                {errors.email && <p className="text-destructive text-xs mt-1 font-medium">{errors.email.message}</p>}
               </div>
 
               <Button

@@ -71,23 +71,23 @@ function DialogBody({
       </DialogHeader>
       <div className="space-y-3 py-2">
         <div>
-          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             {t('classroom.docs.file_label', 'File')}
           </Label>
           <input
             ref={inputRef}
             type="file"
-            className="block w-full mt-1 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-bold hover:file:bg-indigo-100"
+            className="block w-full mt-1 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-accent file:text-accent-foreground file:font-bold"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
           {file && (
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               {file.name} — {(file.size / 1024).toFixed(1)} KB
             </p>
           )}
         </div>
         <div>
-          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             {t('classroom.docs.section_label', 'Mục (tuỳ chọn)')}
           </Label>
           <Input
@@ -98,14 +98,14 @@ function DialogBody({
           />
         </div>
         <div>
-          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
             {t('classroom.docs.folder_label', 'Thư mục đích')}
           </Label>
           <Select
             value={folderId ?? 'root'}
             onValueChange={(v) => setFolderId(v === 'root' ? null : v)}
           >
-            <SelectTrigger className="mt-1 w-full h-9 text-xs rounded-md border border-slate-200 bg-white px-2">
+            <SelectTrigger className="mt-1 w-full h-9 text-xs rounded-md border border-border bg-card px-2">
               <SelectValue placeholder={t('classroom.docs.root_option', 'Gốc (không thư mục)')} />
             </SelectTrigger>
             <SelectContent>

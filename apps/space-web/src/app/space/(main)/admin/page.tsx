@@ -290,8 +290,8 @@ export default function AdminPage() {
             </form>
             }
             renderItemAction={(consumer) => (
-              <Card key={consumer.uid} className="relative overflow-hidden transition-all hover:shadow-md border-border/60">
-                <CardHeader className="p-4 flex-row items-start gap-4 space-y-0">
+              <Card key={consumer.uid} className="relative overflow-hidden border-border/60">
+                <CardHeader className="flex-row items-start gap-4 space-y-0">
                   <Avatar size="lg" className="border">
                     <AvatarImage src={consumer.avatar_url} alt={consumer.username} />
                     <AvatarFallback className="bg-primary/5 text-primary">
@@ -300,7 +300,7 @@ export default function AdminPage() {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-gray-900 truncate">{consumer.full_name || consumer.username || 'No Name'}</p>
+                      <p className="font-semibold text-foreground truncate">{consumer.full_name || consumer.username || 'No Name'}</p>
                       <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${consumer.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         {consumer.is_active ? <CheckCircle2 className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
                         {consumer.is_active ? 'Active' : 'Inactive'}
@@ -325,15 +325,15 @@ export default function AdminPage() {
                   </div>
                 </CardHeader>
                 <div className="px-4 pb-4 flex flex-wrap gap-2">
-                  <Button size="sm" variant="secondary" className="h-8 text-xs" onClick={() => void handleRetrieveConsumer(consumer.uid)} disabled={saving}>
+                  <Button size="sm" variant="secondary" className="h-8" onClick={() => void handleRetrieveConsumer(consumer.uid)} disabled={saving}>
                     <Eye className="mr-1.5 h-3.5 w-3.5" />
                     Chi tiết
                   </Button>
-                  <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => void handleDeactivateConsumer(consumer.uid)} disabled={saving || !consumer.is_active}>
+                  <Button size="sm" variant="outline" className="h-8" onClick={() => void handleDeactivateConsumer(consumer.uid)} disabled={saving || !consumer.is_active}>
                     <ShieldOff className="mr-1.5 h-3.5 w-3.5" />
                     Vô hiệu hóa
                   </Button>
-                  <Button size="sm" variant="destructive" className="h-8 text-xs" onClick={() => void handleDeleteConsumer(consumer.uid)} disabled={saving}>
+                  <Button size="sm" variant="destructive" className="h-8" onClick={() => void handleDeleteConsumer(consumer.uid)} disabled={saving}>
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                     Xóa
                   </Button>
@@ -390,8 +390,8 @@ export default function AdminPage() {
             </form>
             }
             renderItemAction={(space) => (
-              <Card key={space.uid} className="relative overflow-hidden transition-all hover:shadow-md border-border/60">
-                <CardHeader className="p-4 flex-row items-start gap-4 space-y-0">
+              <Card key={space.uid} className="relative overflow-hidden border-border/60">
+                <CardHeader className="flex-row items-start gap-4 space-y-0">
                   <div className="h-12 w-12 rounded-lg border bg-muted flex items-center justify-center shrink-0 overflow-hidden">
                     {space.logo_url ? (
                       <img src={space.logo_url} alt={space.name} className="h-full w-full object-cover" />
@@ -401,7 +401,7 @@ export default function AdminPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-gray-900 truncate">{space.name}</p>
+                      <p className="font-semibold text-foreground truncate">{space.name}</p>
                       <div className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${space.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         {space.is_active ? <CheckCircle2 className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
                         {space.is_active ? 'Active' : 'Inactive'}
@@ -419,15 +419,15 @@ export default function AdminPage() {
                   </div>
                 </CardHeader>
                 <div className="px-4 pb-4 flex flex-wrap gap-2">
-                  <Button size="sm" variant="secondary" className="h-8 text-xs" onClick={() => void handleRetrieveSpace(space.uid)} disabled={saving}>
+                  <Button size="sm" variant="secondary" className="h-8" onClick={() => void handleRetrieveSpace(space.uid)} disabled={saving}>
                     <Eye className="mr-1.5 h-3.5 w-3.5" />
                     Chi tiết
                   </Button>
-                  <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => void handleDeactivateSpace(space.uid)} disabled={saving || !space.is_active}>
+                  <Button size="sm" variant="outline" className="h-8" onClick={() => void handleDeactivateSpace(space.uid)} disabled={saving || !space.is_active}>
                     <ShieldOff className="mr-1.5 h-3.5 w-3.5" />
                     Vô hiệu hóa
                   </Button>
-                  <Button size="sm" variant="destructive" className="h-8 text-xs" onClick={() => void handleDeleteSpace(space.uid)} disabled={saving}>
+                  <Button size="sm" variant="destructive" className="h-8" onClick={() => void handleDeleteSpace(space.uid)} disabled={saving}>
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                     Xóa
                   </Button>

@@ -619,9 +619,9 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                   <p className="mt-1 text-xl font-semibold tracking-tight text-primary">{gradeTableLoading ? '--' : Math.max(0, submitted - graded)}</p>
                   <p className="mt-1 text-[11px] text-muted-foreground">{t('classroom.ui.grade_table_pending_detail', undefined, { rate: gradingRate })}</p>
                 </Card>
-                <Card className="rounded-xl border-rose-200 bg-rose-50/40 p-3 gap-0">
+                <Card className="rounded-xl border-destructive/30 bg-destructive/10 p-3 gap-0">
                   <p className="text-[11px] font-medium text-muted-foreground">{t('classroom.ui.grade_table_missing_label')}</p>
-                  <p className="mt-1 text-xl font-semibold tracking-tight text-rose-600">{gradeTableLoading ? '--' : missing}</p>
+                  <p className="mt-1 text-xl font-semibold tracking-tight text-destructive">{gradeTableLoading ? '--' : missing}</p>
                   <p className="mt-1 text-[11px] text-muted-foreground">{t('classroom.ui.grade_table_missing_detail')}</p>
                 </Card>
               </div>
@@ -718,7 +718,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
                             </td>
                             <td className="px-4 py-3">
                               {submission?.grade != null ? (
-                                <span className={`text-sm font-semibold ${submission.grade >= 5 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                                <span className={`text-sm font-semibold ${submission.grade >= 5 ? 'text-emerald-700' : 'text-destructive'}`}>
                                   {submission.grade.toFixed(1)}
                                 </span>
                               ) : <span className="text-sm font-medium text-muted-foreground/60">--</span>}

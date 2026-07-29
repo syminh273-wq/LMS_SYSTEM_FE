@@ -50,7 +50,7 @@ const EXAM_KIND_OPTIONS = [
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Bản nháp', icon: CircleDashed, activeClassName: 'bg-amber-50 text-amber-700', iconClassName: 'text-amber-500' },
   { value: 'published', label: 'Công bố', icon: Send, activeClassName: 'bg-emerald-50 text-emerald-700', iconClassName: 'text-emerald-500' },
-  { value: 'closed', label: 'Đóng bài', icon: LockKeyhole, activeClassName: 'bg-rose-50 text-rose-700', iconClassName: 'text-rose-500' },
+  { value: 'closed', label: 'Đóng bài', icon: LockKeyhole, activeClassName: 'bg-destructive/10 text-destructive', iconClassName: 'text-destructive' },
 ] as const;
 
 const CONTENT_TYPE_OPTIONS = [
@@ -420,7 +420,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
             </div>
 
             <div className="space-y-2">
-              <Label>Tiêu đề <span className="text-rose-500">*</span></Label>
+              <Label>Tiêu đề <span className="text-destructive">*</span></Label>
               <Input
                 value={form.title}
                 onChange={event => updateForm('title', event.target.value)}
@@ -432,7 +432,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
             {form.exam_type === 'quiz' && (
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>Bộ đề trắc nghiệm <span className="text-rose-500">*</span></Label>
+                  <Label>Bộ đề trắc nghiệm <span className="text-destructive">*</span></Label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -508,7 +508,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
             <CardContent className="space-y-5">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>Hạn nộp <span className="text-rose-500">*</span></Label>
+                  <Label>Hạn nộp <span className="text-destructive">*</span></Label>
                   <Input
                     type="datetime-local"
                     value={form.due_date}
@@ -602,7 +602,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
               </div>
 
               <div className="space-y-2">
-                <Label>Hướng dẫn làm bài <span className="text-rose-500">*</span></Label>
+                <Label>Hướng dẫn làm bài <span className="text-destructive">*</span></Label>
                 <Textarea
                   value={form.body}
                   onChange={event => updateForm('body', event.target.value)}

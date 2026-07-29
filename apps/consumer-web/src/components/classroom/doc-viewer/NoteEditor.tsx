@@ -42,18 +42,20 @@ export function NoteEditor({
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 w-72 space-y-2"
+      className="bg-popover rounded-2xl shadow-2xl border border-border p-3 w-72 space-y-2"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           {mode === 'create' ? 'Take Note' : 'Edit Note'}
         </span>
         {existingNote && onDelete && (
           <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onDelete}
-            className="p-1 rounded hover:bg-rose-50 text-rose-500"
+            className="text-destructive"
             title="Xóa"
           >
             <Trash2 size={13} />
@@ -64,11 +66,11 @@ export function NoteEditor({
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Ghi chú tại đây..."
-        className="h-8 text-xs"
+        className="h-8"
         autoFocus
       />
       {positionHint && (
-        <p className="text-[10px] text-slate-500 font-medium">
+        <p className="text-[10px] text-muted-foreground font-medium">
           Vị trí: x={Math.round(positionHint.x_pct * 100)}% · y=
           {Math.round(positionHint.y_pct * 100)}%
           {positionHint.page != null ? ` · trang ${positionHint.page}` : ''}
@@ -80,20 +82,20 @@ export function NoteEditor({
             key={key}
             type="button"
             onClick={() => setColor(key)}
-            className={`w-5 h-5 rounded-full border-2 transition ${
-              color === key ? 'border-slate-900 scale-110' : 'border-transparent'
+            className={`w-5 h-5 rounded-full border-2 ${
+              color === key ? 'border-foreground scale-110' : 'border-transparent'
             } ${cls}`}
             aria-label={key}
           />
         ))}
       </div>
       <div className="flex items-center gap-2 justify-end pt-1">
-        <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={onCancel}>
+        <Button size="sm" variant="ghost" className="h-7" onClick={onCancel}>
           Huỷ
         </Button>
         <Button
           size="sm"
-          className="h-7 px-3 text-xs"
+          className="h-7"
           onClick={handleSubmit}
           disabled={!content.trim()}
         >

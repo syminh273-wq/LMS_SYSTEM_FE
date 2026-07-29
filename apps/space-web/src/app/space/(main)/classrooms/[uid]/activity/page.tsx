@@ -154,7 +154,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
             variant="outline"
             size="icon"
             onClick={() => router.push(`/space/classrooms/${uid}/details`)}
-            className="w-11 h-11 rounded-full border-border bg-card shadow-sm hover:scale-110 transition-all"
+            className="w-11 h-11"
           >
             <ArrowLeft size={18} className="text-muted-foreground" />
           </Button>
@@ -176,7 +176,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
           size="sm"
           onClick={() => fetchLogs(true)}
           disabled={loading}
-          className="h-10 rounded-xl gap-2 text-xs font-bold uppercase tracking-wider"
+          className="h-10 gap-2"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           Làm mới
@@ -190,12 +190,9 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
           {(['major', 'detail'] as const).map(lvl => (
             <Button
               key={lvl}
+              variant={level === lvl ? 'secondary' : 'ghost'}
+              size="sm"
               onClick={() => setLevel(lvl)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                level === lvl
-                  ? 'bg-card text-primary-brand shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
             >
               {lvl === 'major' ? 'Hoạt động chính' : 'Audit chi tiết'}
             </Button>
@@ -218,12 +215,9 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
           {EVENT_GROUPS.map((g, i) => (
             <Button
               key={g.label}
+              variant={activeGroup === i ? 'default' : 'secondary'}
+              size="sm"
               onClick={() => setActiveGroup(i)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                activeGroup === i
-                  ? 'bg-primary-brand text-white shadow-sm'
-                  : 'bg-muted text-muted-foreground hover:bg-primary-brand-light hover:text-primary-brand'
-              }`}
             >
               {g.label}
             </Button>
@@ -338,7 +332,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
                 variant="outline"
                 onClick={() => fetchLogs(false)}
                 disabled={loadingMore}
-                className="h-12 px-8 rounded-2xl font-bold text-xs uppercase tracking-widest gap-2"
+                className="h-12 gap-2"
               >
                 {loadingMore ? (
                   <Loader2 size={16} className="animate-spin" />

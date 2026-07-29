@@ -25,7 +25,7 @@ const formatVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'đ'
 const STATUS_BADGE: Record<string, string> = {
   draft: 'bg-amber-100 text-amber-700 border border-amber-200',
   published: 'bg-emerald-100 text-emerald-700 border border-emerald-200',
-  archived: 'bg-slate-100 text-slate-600 border border-slate-200',
+  archived: 'bg-muted text-muted-foreground border border-border',
 };
 
 export default function CoursesListPage() {
@@ -80,7 +80,7 @@ export default function CoursesListPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-foreground flex items-center gap-2">
-            <GraduationCap className="text-indigo-600" size={32} />
+            <GraduationCap className="text-primary-brand" size={32} />
             {t('course.list.title', 'My Courses')}
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -89,7 +89,7 @@ export default function CoursesListPage() {
         </div>
         <Button
           onClick={() => router.push('/space/courses/create')}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl gap-2 h-11"
+          className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold rounded-xl gap-2 h-11"
         >
           <Plus size={18} />
           {t('course.list.create_cta', 'Create new course')}
@@ -102,19 +102,19 @@ export default function CoursesListPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('course.list.search_placeholder', 'Search...')}
-          className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-indigo-500 transition-all"
+          className="w-full pl-10 pr-4 py-2.5 bg-muted/50 border border-border rounded-xl outline-none focus:bg-card focus:border-primary-brand transition-all"
         />
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin text-indigo-600" size={32} />
+          <Loader2 className="animate-spin text-primary-brand" size={32} />
         </div>
       ) : !filtered || filtered.length === 0 ? (
         <Card className="border-border">
           <CardContent className="p-12 text-center space-y-3">
-            <GraduationCap size={48} className="mx-auto text-slate-300" />
-            <p className="text-slate-500">{t('course.list.empty', 'No courses yet.')}</p>
+            <GraduationCap size={48} className="mx-auto text-muted-foreground/40" />
+            <p className="text-muted-foreground">{t('course.list.empty', 'No courses yet.')}</p>
             <Button
               onClick={() => router.push('/space/courses/create')}
               variant="outline"
@@ -132,7 +132,7 @@ export default function CoursesListPage() {
               className="border-border hover:shadow-md transition-all cursor-pointer overflow-hidden group"
               onClick={() => router.push(`/space/courses/${c.uid}`)}
             >
-              <div className="aspect-video bg-gradient-to-br from-indigo-500 to-purple-600 relative">
+              <div className="aspect-video bg-primary-brand relative">
                 {c.cover_url ? (
                   <img src={c.cover_url} alt={c.name} className="w-full h-full object-cover" />
                 ) : (
@@ -147,7 +147,7 @@ export default function CoursesListPage() {
                 </span>
               </div>
               <CardContent className="p-4 space-y-2">
-                <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-indigo-600 transition-colors">
+                <h3 className="font-bold text-foreground line-clamp-1 group-hover:text-primary-brand transition-colors">
                   {c.name}
                 </h3>
                 {c.description && (
@@ -210,7 +210,7 @@ export default function CoursesListPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(c.uid)}
-                          className="gap-2 text-rose-600"
+                          className="gap-2 text-destructive"
                         >
                           <Trash2 size={14} />
                           {t('course.list.delete_confirm', 'Delete')}

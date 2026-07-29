@@ -88,83 +88,85 @@ export default function LoginPage() {
   return (
     <MasterLayout footer={null}>
       <MasterBody className="min-h-screen">
-        <div className="flex min-h-screen flex-col lg:flex-row bg-slate-50 dark:bg-slate-950">
+        <div className="flex min-h-screen flex-col lg:flex-row bg-muted">
 
           {/* Right Side - Form */}
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-white dark:bg-slate-950 relative">
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10 lg:px-16 bg-background relative">
             <div className="w-full max-w-[420px] animate-fade-up">
               <div className="mb-8 flex justify-center">
                 <Image src="/logo-icon.svg" alt="LMS System" width={140} height={150} />
               </div>
 
               <div className="mb-8 text-center">
-                <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight dark:text-white text-balance">
+                <h2 className="text-3xl font-bold text-foreground mb-2 tracking-tight text-balance">
                   Đăng Nhập
                 </h2>
-                <p className="text-slate-600 text-[15px] dark:text-slate-400">
+                <p className="text-muted-foreground text-[15px]">
                   Đăng nhập để tiếp tục hành trình học tập của bạn.
                 </p>
               </div>
 
               {globalError && (
-                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-fade-down dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-300">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 shrink-0" />
+                <div className="mb-5 flex items-start gap-2.5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive animate-fade-down">
+                  <span className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 shrink-0" />
                   <span className="font-medium">{globalError}</span>
                 </div>
               )}
 
               <form onSubmit={handleSubmit(onLogin)} className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <Label>
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
                     <Input
                       {...register('email', { required: 'Vui lòng nhập email' })}
                       type="email"
                       autoComplete="email"
                       placeholder="name@company.com"
-                      className="h-11 pl-10 pr-4 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
+                      className="h-11 pl-10 pr-4"
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-rose-600 text-xs font-medium mt-1">{errors.email.message}</p>
+                    <p className="text-destructive text-xs font-medium mt-1">{errors.email.message}</p>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <Label>
                       Mật khẩu
                     </Label>
                     <Link
                       href="/consumer/forgot-password"
-                      className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                      className="text-xs font-medium text-primary hover:underline"
                     >
                       Quên mật khẩu?
                     </Link>
                   </div>
                   <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} strokeWidth={2} />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} strokeWidth={2} />
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="current-password"
                       {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
                       placeholder="••••••••"
-                      className="h-11 pl-10 pr-11 text-sm bg-white border-slate-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:focus:border-indigo-400"
+                      className="h-11 pl-10 pr-11"
                     />
                     <Button
                       type="button"
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-md transition-colors dark:hover:text-slate-200"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                       aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                     >
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </Button>
                   </div>
                   {errors.password && (
-                    <p className="text-rose-600 text-xs font-medium mt-1">{errors.password.message}</p>
+                    <p className="text-destructive text-xs font-medium mt-1">{errors.password.message}</p>
                   )}
                 </div>
 
@@ -172,11 +174,8 @@ export default function LoginPage() {
                   type="submit"
                   disabled={loading}
                   className={cn(
-                    "w-full h-11 rounded-lg font-semibold text-sm text-white",
-                    "bg-indigo-600 hover:bg-indigo-700",
-                    "shadow-sm transition-colors",
-                    "flex items-center justify-center gap-2",
-                    "disabled:opacity-60 disabled:cursor-not-allowed"
+                    "w-full h-11",
+                    "flex items-center justify-center gap-2"
                   )}
                 >
                   {loading ? (
@@ -195,10 +194,10 @@ export default function LoginPage() {
 
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                  <div className="w-full border-t border-border" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-white px-3 text-xs uppercase tracking-wider text-slate-500 font-semibold dark:bg-slate-950">
+                  <span className="bg-background px-3 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
                     Hoặc tiếp tục với
                   </span>
                 </div>
@@ -206,11 +205,12 @@ export default function LoginPage() {
 
               <Button
                 type="button"
+                variant="outline"
                 onClick={() => {
                   const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
                   window.location.href = `${backendUrl}/api/v1/consumer/account/auth/google/login/`;
                 }}
-                className="w-full h-11 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center justify-center gap-2.5 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="w-full h-11 flex items-center justify-center gap-2.5"
               >
                 <GoogleIcon />
                 Tiếp tục với Google
@@ -218,7 +218,7 @@ export default function LoginPage() {
 
               <Link
                 href="/consumer/register"
-                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-indigo-600 bg-white border border-indigo-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors flex items-center justify-center gap-2 dark:bg-slate-900 dark:border-indigo-500/30 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
+                className="mt-6 w-full h-11 rounded-lg font-semibold text-sm text-primary bg-background border border-primary/20 hover:bg-primary/10 hover:border-primary/40 transition-colors flex items-center justify-center gap-2"
               >
                 Chưa có tài khoản? Đăng ký
               </Link>

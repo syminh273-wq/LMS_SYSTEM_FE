@@ -131,8 +131,7 @@ export default function QuizDetailPage({ params }: Props) {
     <div className="max-w-4xl mx-auto py-8 px-4 space-y-6 animate-in fade-in duration-300">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.push('/space/quizzes')}
-          className="rounded-xl border border-border bg-card shadow-sm hover:bg-muted/50">
+        <Button variant="ghost" size="icon" onClick={() => router.push('/space/quizzes')}>
           <ArrowLeft size={18} className="text-muted-foreground" />
         </Button>
         <div className="flex-1 min-w-0">
@@ -146,7 +145,7 @@ export default function QuizDetailPage({ params }: Props) {
           <h1 className="text-xl font-black text-foreground tracking-tight truncate">{quiz.title}</h1>
         </div>
         <Button onClick={() => setShowAssignModal(true)}
-          className="bg-primary-brand hover:bg-primary-brand-dark text-white font-bold text-xs rounded-xl h-10 px-4 gap-2 shrink-0">
+          className="h-10 gap-2 shrink-0">
           <Link2 size={15} /> Phân công lớp
         </Button>
       </div>
@@ -175,22 +174,22 @@ export default function QuizDetailPage({ params }: Props) {
                     </span>
                   )}
                   {closed && (
-                    <span className="flex items-center gap-0.5 text-rose-600 bg-rose-50 rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase">
+                    <span className="flex items-center gap-0.5 text-destructive bg-destructive/10 rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase">
                       <Lock size={9} /> Đã đóng
                     </span>
                   )}
-                  <Button type="button" onClick={() => setEditingAssignment(a)}
-                    className="text-muted-foreground/60 hover:text-primary-brand transition-colors"
+                  <Button type="button" variant="ghost" size="icon" onClick={() => setEditingAssignment(a)}
+                    className="text-muted-foreground/60 hover:text-primary-brand"
                     title="Cài đặt">
                     <Settings size={12} />
                   </Button>
-                  <Button type="button" onClick={() => setCloseScheduleAssignment(a)}
-                    className={`transition-colors ${closed ? 'text-emerald-500 hover:text-emerald-700' : 'text-rose-500 hover:text-rose-700'}`}
+                  <Button type="button" variant="ghost" size="icon" onClick={() => setCloseScheduleAssignment(a)}
+                    className={closed ? 'text-emerald-500 hover:text-emerald-700' : 'text-destructive hover:text-destructive/80'}
                     title={closed ? 'Mở lại / đặt lịch' : 'Đóng / đặt thời gian'}>
                     {closed ? <RotateCcw size={12} /> : <Lock size={12} />}
                   </Button>
-                  <Button type="button" onClick={() => void handleUnassign(a.classroom_id)}
-                    className="text-muted-foreground/60 hover:text-rose-500 transition-colors"
+                  <Button type="button" variant="ghost" size="icon" onClick={() => void handleUnassign(a.classroom_id)}
+                    className="text-muted-foreground/60 hover:text-destructive"
                     title="Hủy phân công">
                     <X size={12} />
                   </Button>
@@ -204,10 +203,8 @@ export default function QuizDetailPage({ params }: Props) {
       {/* Tabs */}
       <div className="flex gap-1 bg-muted rounded-2xl p-1">
         {TABS.map(tab => (
-          <Button key={tab.key} type="button" onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-black transition-all ${
-              activeTab === tab.key ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
-            }`}>
+          <Button key={tab.key} type="button" variant={activeTab === tab.key ? 'secondary' : 'ghost'} onClick={() => setActiveTab(tab.key)}
+            className="flex-1 gap-1.5">
             {tab.icon}{tab.label}
           </Button>
         ))}
@@ -219,14 +216,16 @@ export default function QuizDetailPage({ params }: Props) {
           {quiz.questions.sort((a, b) => a.order - b.order).map((q, idx) => (
             <div key={q.uid} className="bg-card rounded-2xl border border-border shadow-sm p-5 space-y-4">
               <div className="flex items-start gap-3">
-                <span className="w-7 h-7 rounded-lg bg-primary-brand text-white text-xs font-black flex items-center justify-center shrink-0">
+                <span className="w-7 h-7 rounded-lg bg-primary text-primary-foreground text-xs font-black flex items-center justify-center shrink-0">
                   {idx + 1}
                 </span>
                 <p className="text-sm font-bold text-foreground leading-relaxed flex-1">{q.question_text}</p>
                 <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => setEditingQuestion(q)}
-                  className="shrink-0 text-[10px] font-black text-primary-brand bg-primary-brand-light hover:bg-primary-brand hover:text-white rounded-lg px-3 py-1.5 transition-colors uppercase tracking-wider"
+                  className="shrink-0"
                 >
                   Sửa đáp án
                 </Button>
@@ -265,13 +264,9 @@ export default function QuizDetailPage({ params }: Props) {
               <span className="text-xs font-black text-muted-foreground">Lớp học:</span>
               <div className="flex gap-2 flex-wrap">
                 {assignments.map(a => (
-                  <Button key={a.classroom_id} type="button"
-                    onClick={() => { setSelectedClassroomId(a.classroom_id); setAttempts([]); }}
-                    className={`text-xs font-black rounded-xl px-3 py-1.5 transition-all ${
-                      selectedClassroomId === a.classroom_id
-                        ? 'bg-primary-brand text-white'
-                        : 'bg-muted text-muted-foreground hover:bg-muted'
-                    }`}>
+                  <Button key={a.classroom_id} type="button" size="sm"
+                    variant={selectedClassroomId === a.classroom_id ? 'default' : 'secondary'}
+                    onClick={() => { setSelectedClassroomId(a.classroom_id); setAttempts([]); }}>
                     {a.classroom_id.slice(0, 8)}…
                   </Button>
                 ))}
@@ -305,14 +300,14 @@ export default function QuizDetailPage({ params }: Props) {
                 </thead>
                 <tbody>
                   {attempts.map((a, idx) => (
-                    <tr key={a.uid} className="border-b border-slate-50 hover:bg-muted/50">
+                    <tr key={a.uid} className="border-b border-border hover:bg-muted/50">
                       <td className="px-5 py-3 text-muted-foreground font-bold text-center">{idx + 1}</td>
                       <td className="px-5 py-3 font-mono text-xs text-muted-foreground text-center">{a.student_id.slice(0, 8)}…</td>
                       <td className="px-5 py-3 text-center">
                         <span className="text-xs font-black text-primary-brand bg-primary-brand-light rounded-lg px-2 py-0.5">#{a.attempt_number}</span>
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <span className={`text-sm font-black ${a.score_pct >= 80 ? 'text-emerald-600' : a.score_pct >= 50 ? 'text-amber-600' : 'text-rose-600'}`}>
+                        <span className={`text-sm font-black ${a.score_pct >= 80 ? 'text-emerald-600' : a.score_pct >= 50 ? 'text-amber-600' : 'text-destructive'}`}>
                           {a.score_pct}%
                         </span>
                       </td>
@@ -335,13 +330,9 @@ export default function QuizDetailPage({ params }: Props) {
               <span className="text-xs font-black text-muted-foreground">Lớp học:</span>
               <div className="flex gap-2 flex-wrap">
                 {assignments.map(a => (
-                  <Button key={a.classroom_id} type="button"
-                    onClick={() => setSelectedClassroomId(a.classroom_id)}
-                    className={`text-xs font-black rounded-xl px-3 py-1.5 transition-all ${
-                      selectedClassroomId === a.classroom_id
-                        ? 'bg-primary-brand text-white'
-                        : 'bg-muted text-muted-foreground hover:bg-muted'
-                    }`}>
+                  <Button key={a.classroom_id} type="button" size="sm"
+                    variant={selectedClassroomId === a.classroom_id ? 'default' : 'secondary'}
+                    onClick={() => setSelectedClassroomId(a.classroom_id)}>
                     {a.classroom_id.slice(0, 8)}…
                   </Button>
                 ))}
@@ -463,7 +454,7 @@ function AssignToClassroomModal({
       <div className="bg-card rounded-3xl shadow-2xl w-full max-w-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
         <div className="p-6 border-b border-border flex items-center justify-between">
           <h2 className="font-black text-foreground flex items-center gap-2"><Link2 size={20} className="text-primary-brand" /> Phân công cho lớp</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground"><X size={20} /></Button>
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground"><X size={20} /></Button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -473,19 +464,17 @@ function AssignToClassroomModal({
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</Label>
-                  <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
+                  <Label className="flex items-center gap-1.5"><Clock size={12} /> Thời gian (phút)</Label>
+                  <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</Label>
-                  <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
+                  <Label className="flex items-center gap-1.5"><RotateCcw size={12} /> Số lần tối đa</Label>
+                  <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))} />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt (%)</Label>
+                <Label className="flex items-center gap-1.5"><Target size={12} /> Điểm đạt (%)</Label>
                 <div className="flex items-center gap-4">
                   <Input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
                     className="flex-1 accent-primary-brand" />
@@ -494,7 +483,7 @@ function AssignToClassroomModal({
               </div>
 
               <div className="space-y-3 pt-2">
-                <Label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                <Label className="flex items-center gap-3">
                   <Input type="checkbox" checked={shuffleQuestions} onChange={e => setShuffleQuestions(e.target.checked)}
                     className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
                   <div className="flex-1">
@@ -503,7 +492,7 @@ function AssignToClassroomModal({
                   </div>
                 </Label>
 
-                <Label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                <Label className="flex items-center gap-3">
                   <Input type="checkbox" checked={shuffleOptions} onChange={e => setShuffleOptions(e.target.checked)}
                     className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
                   <div className="flex-1">
@@ -512,7 +501,7 @@ function AssignToClassroomModal({
                   </div>
                 </Label>
 
-                <Label className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                <Label className="flex items-center gap-3">
                   <Input type="checkbox" checked={showExplanation} onChange={e => setShowExplanation(e.target.checked)}
                     className="w-4 h-4 rounded text-primary-brand focus:ring-primary-brand" />
                   <div className="flex-1">
@@ -524,25 +513,23 @@ function AssignToClassroomModal({
 
               <div className="space-y-3 pt-2 border-t border-border">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                  <Label className="flex items-center gap-1.5">
                     <Clock size={12} /> Thời gian mở (tùy chọn)
                   </Label>
                   <Input
                     type="datetime-local"
                     value={opensAt}
                     onChange={e => setOpensAt(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+                  <Label className="flex items-center gap-1.5">
                     <Clock size={12} /> Thời gian đóng (tùy chọn)
                   </Label>
                   <Input
                     type="datetime-local"
                     value={closesAt}
                     onChange={e => setClosesAt(e.target.value)}
-                    className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
                   />
                   <p className="text-[10px] text-muted-foreground font-medium">
                     Để trống = mở vĩnh viễn. Khi tới giờ đóng, hệ thống tự khóa nộp bài và mở bảng vàng cho học sinh.
@@ -653,25 +640,23 @@ function EditAssignmentModal({
             <h2 className="font-black text-foreground">Cài đặt lớp học</h2>
             <p className="text-[10px] text-muted-foreground font-mono mt-0.5 truncate max-w-[200px]">{assignment.classroom_id}</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl text-muted-foreground"><X size={20} /></Button>
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground"><X size={20} /></Button>
         </div>
 
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Clock size={12} /> Thời gian</Label>
-              <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))}
-                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
+              <Label className="flex items-center gap-1.5"><Clock size={12} /> Thời gian</Label>
+              <Input type="number" min={0} value={timeLimitMin} onChange={e => setTimeLimitMin(Number(e.target.value))} />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><RotateCcw size={12} /> Lần thử</Label>
-              <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))}
-                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-black outline-none focus:ring-2 focus:ring-primary-brand-light" />
+              <Label className="flex items-center gap-1.5"><RotateCcw size={12} /> Lần thử</Label>
+              <Input type="number" min={0} value={maxAttempts} onChange={e => setMaxAttempts(Number(e.target.value))} />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5"><Target size={12} /> Điểm đạt: {passingScore}%</Label>
+            <Label className="flex items-center gap-1.5"><Target size={12} /> Điểm đạt: {passingScore}%</Label>
             <Input type="range" min={0} max={100} step={5} value={passingScore} onChange={e => setPassingScore(Number(e.target.value))}
               className="w-full accent-primary-brand" />
           </div>
@@ -682,7 +667,7 @@ function EditAssignmentModal({
               { label: 'Trộn đáp án', icon: Shuffle, val: shuffleOptions, set: setShuffleOptions },
               { label: 'Hiện giải thích', icon: HelpCircle, val: showExplanation, set: setShowExplanation },
             ].map(item => (
-              <Label key={item.label} className="flex items-center justify-between p-3 rounded-xl border border-slate-50 hover:bg-muted/50 cursor-pointer">
+              <Label key={item.label} className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground">
                   <item.icon size={14} className="text-muted-foreground" /> {item.label}
                 </div>
@@ -694,12 +679,12 @@ function EditAssignmentModal({
 
           <div className="space-y-3 pt-2 border-t border-border">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5">
                 <Settings size={12} /> Trạng thái lớp học
               </span>
               <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${
                 isClosed
-                  ? 'text-rose-600 bg-rose-50'
+                  ? 'text-destructive bg-destructive/10'
                   : 'text-emerald-600 bg-emerald-50'
               }`}>
                 {isClosed ? 'ĐÃ ĐÓNG' : 'ĐANG MỞ'}
@@ -707,25 +692,23 @@ function EditAssignmentModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+              <Label className="flex items-center gap-1.5">
                 <Clock size={12} /> Thời gian mở (tùy chọn)
               </Label>
               <Input
                 type="datetime-local"
                 value={opensAt}
                 onChange={e => setOpensAt(e.target.value)}
-                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase flex items-center gap-1.5">
+              <Label className="flex items-center gap-1.5">
                 <Clock size={12} /> Thời gian đóng (tùy chọn)
               </Label>
               <Input
                 type="datetime-local"
                 value={closesAt}
                 onChange={e => setClosesAt(e.target.value)}
-                className="w-full rounded-xl border border-border bg-muted/50 px-3 py-2 text-sm font-bold outline-none focus:ring-2 focus:ring-primary-brand-light"
               />
               <p className="text-[10px] text-muted-foreground font-medium">
                 Để trống = mở vĩnh viễn. Khi tới giờ đóng, hệ thống tự khóa nộp bài.

@@ -57,21 +57,22 @@ function NodeRow({
   return (
     <div>
       <div
-        className={`group flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium transition ${
-          selected
-            ? 'bg-indigo-50 text-indigo-700'
-            : 'text-slate-600 hover:bg-slate-100'
+        className={`group flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground ${
+          selected ? 'bg-primary-brand-light text-primary-brand font-semibold' : ''
         }`}
         style={{ paddingLeft: 8 + depth * 12 }}
+        data-active={selected}
         onClick={() => onSelect(node.uid)}
       >
         <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={(e) => {
             e.stopPropagation();
             setOpen((v) => !v);
           }}
-          className="p-0.5 text-slate-400 hover:text-slate-700"
+          className="h-6 w-6 p-0.5 text-muted-foreground"
           aria-label={open ? 'Collapse' : 'Expand'}
         >
           {hasChildren ? (
@@ -91,7 +92,9 @@ function NodeRow({
             <Button
               type="button"
               onClick={(e) => e.stopPropagation()}
-              className="p-1 rounded hover:bg-white/60 opacity-0 group-hover:opacity-100"
+              variant="ghost"
+              size="icon"
+              className="rounded opacity-0 group-hover:opacity-100"
               aria-label="Folder actions"
             >
               <MoreVertical size={14} />
@@ -148,9 +151,9 @@ export function DocsTreeSidebar({
   t,
 }: Props) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-2 flex flex-col gap-1 w-full lg:w-64 shrink-0">
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-2 flex flex-col gap-1 w-full lg:w-64 shrink-0">
       <div className="flex items-center justify-between px-2 pt-1 pb-2">
-        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           {t('classroom.docs.folders_title', 'Thư mục')}
         </span>
         <Button
@@ -163,18 +166,17 @@ export function DocsTreeSidebar({
         </Button>
       </div>
       <div
-        className={`flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium transition ${
-          selectedFolderId === null
-            ? 'bg-indigo-50 text-indigo-700'
-            : 'text-slate-600 hover:bg-slate-100'
+        className={`flex items-center gap-1 rounded-lg px-2 py-1.5 cursor-pointer text-sm font-medium transition-colors hover:bg-muted hover:text-foreground ${
+          selectedFolderId === null ? 'bg-primary-brand-light text-primary-brand font-semibold' : 'text-muted-foreground'
         }`}
+        data-active={selectedFolderId === null}
         onClick={() => onSelectFolder(null)}
       >
         <Home size={15} className="shrink-0" />
         <span className="truncate flex-1 ml-1">
           {t('classroom.docs.root_label', 'Tất cả tài liệu')}
         </span>
-        <span className="text-[10px] font-bold text-slate-400 bg-slate-100 rounded px-1.5 py-0.5">
+        <span className="text-[10px] font-bold text-muted-foreground bg-muted rounded px-1.5 py-0.5">
           {totalRootDocs}
         </span>
       </div>
