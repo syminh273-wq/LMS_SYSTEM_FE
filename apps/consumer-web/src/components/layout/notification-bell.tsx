@@ -160,13 +160,13 @@ export function NotificationBell({ userId }: NotificationBellProps) {
             </div>
           ) : (
             <div className="py-2">
-              {list.map((item) => {
+              {list.map((item, index) => {
                 const meta = parseNotificationMetadata(item.metadata);
                 const hasLink = !!meta.classroom_uid;
                 return (
                   <button
                     type="button"
-                    key={item.uid}
+                    key={`${item.uid}-${index}`}
                     onClick={() => handleClickItem(item)}
                     className={cn(
                       'relative flex items-start gap-3 mx-2 px-3 py-3 rounded-xl cursor-pointer transition-colors w-full text-left',
