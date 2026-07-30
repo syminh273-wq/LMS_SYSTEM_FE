@@ -16,7 +16,6 @@ import {
   Loader2,
   Search,
   ArrowUpDown,
-  CheckCircle2,
   Download,
   Lock,
   Eye,
@@ -32,7 +31,6 @@ import {
 import { findPathToFolder, flattenTree, collectDocsByFolder } from './tree-utils';
 import type { ClassroomDoc, ClassroomFolder, SortField, SortDir, FolderNode } from './types';
 import { DocViewerPanel } from '../doc-viewer/DocViewerPanel';
-import { isMediaFile } from '../doc-viewer/utils';
 
 const ICON_BY_TYPE: Record<string, typeof FileText> = {
   pdf: FileText, doc: FileText, docx: FileText, txt: FileText, md: FileText,
@@ -67,8 +65,6 @@ function formatDate(iso?: string) {
     return '';
   }
 }
-
-type ProgressByDoc = Record<string, { read_progress: number; is_completed: boolean; note_count: number }>;
 
 type Props = {
   classroomUid: string;
@@ -111,11 +107,13 @@ function NodeRow({
       >
         <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={(e) => {
             e.stopPropagation();
             setOpen((v) => !v);
           }}
-          className="p-0.5 text-muted-foreground"
+          className="p-0.5 h-auto w-auto text-muted-foreground hover:bg-transparent"
           aria-label={open ? 'Collapse' : 'Expand'}
         >
           {hasChildren ? open ? <ChevronDown size={14} /> : <ChevronRight size={14} /> : <span className="inline-block w-[14px]" />}
@@ -166,7 +164,6 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
   const [openDoc, setOpenDoc] = useState<ClassroomDoc | null>(null);
-  const [progressByDoc, setProgressByDoc] = useState<ProgressByDoc>({});
 
   const ctx = useMemo(() => ({ apiBase, accessToken, classroomUid }), [apiBase, accessToken, classroomUid]);
   const paidLocked = isPaidClassroom && !hasPaid;
@@ -195,53 +192,6 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
   }, [ctx, t]);
 
   const folderDocs = selectedFolderId ? (docsByFolder[selectedFolderId] ?? []) : [];
-
-  // Fetch progress for each doc (lightweight, only fields we need)
-  const allVisibleDocs = useMemo(() => {
-    const map = new Map<string, ClassroomDoc>();
-    for (const d of rootDocs) map.set(d.uid, d);
-    for (const d of folderDocs) map.set(d.uid, d);
-    return Array.from(map.values());
-  }, [rootDocs, folderDocs]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const docsToFetch = allVisibleDocs.filter((d) => !(d.uid in progressByDoc));
-    if (docsToFetch.length === 0) return;
-    Promise.all(
-      docsToFetch.map((d) =>
-        fetch(`${ctx.apiBase}/api/v1/consumer/course/classrooms/${ctx.classroomUid}/docs/${d.uid}/progress/`, {
-          headers: ctx.accessToken ? { Authorization: `Bearer ${ctx.accessToken}` } : {},
-        })
-          .then((r) => (r.ok ? r.json() : null))
-          .catch(() => null),
-      ),
-    )
-      .then((results) => {
-        if (cancelled) return;
-        setProgressByDoc((prev) => {
-          const next = { ...prev };
-          docsToFetch.forEach((d, i) => {
-            const r = results[i] as { read_progress?: number; is_completed?: boolean; note_count?: number } | null;
-            if (r) {
-              next[d.uid] = {
-                read_progress: r.read_progress ?? 0,
-                is_completed: r.is_completed ?? false,
-                note_count: r.note_count ?? 0,
-              };
-            }
-          });
-          return next;
-        });
-      })
-      .catch(() => {
-        /* ignore */
-      });
-    return () => {
-      cancelled = true;
-    };
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [allVisibleDocs, ctx]);
 
   const currentDocs = selectedFolderId === null ? rootDocs : folderDocs;
   const currentBreadcrumb = useMemo(() => {
@@ -394,17 +344,13 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 min-w-0">
               {filtered.map((d) => {
                 const Icon = pickIcon(d.file_type);
-                const prog = progressByDoc[d.uid];
-                const completed = prog?.is_completed ?? false;
-                const pct = prog?.read_progress ?? 0;
-                const media = isMediaFile(d.file_type);
                 return (
                   <Button
                     type="button"
                     variant="ghost"
                     key={d.uid}
                     onClick={() => setOpenDoc(d)}
-                    className="group relative text-left flex items-start gap-3 p-3 pr-10 border border-border min-w-0 overflow-hidden"
+                    className="group relative h-auto items-start justify-start whitespace-normal text-left flex gap-3 p-3 pr-10 border border-border min-w-0 overflow-hidden"
                   >
                     <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary/15">
                       {React.createElement(Icon, { size: 20 })}
@@ -412,25 +358,12 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 min-w-0">
                         <p className="text-sm font-bold text-foreground truncate min-w-0 flex-1" title={d.name}>{d.name}</p>
-                        {completed && !media && (
-                          <CheckCircle2 size={12} className="text-success shrink-0" />
-                        )}
                       </div>
                       <div className="flex items-center gap-2 mt-1 text-[10px] font-bold text-muted-foreground uppercase tracking-wider flex-wrap">
                         {d.file_type && <span className="px-1.5 py-0.5 bg-muted rounded">{d.file_type}</span>}
                         {d.size ? <span>{formatSize(d.size)}</span> : null}
                         {d.created_at ? <span>{formatDate(d.created_at)}</span> : null}
-                        {pct > 0 && (
-                          <span className={`px-1.5 py-0.5 rounded ${completed ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'}`}>
-                            {pct}%
-                          </span>
-                        )}
                       </div>
-                      {pct > 0 && !completed && (
-                        <div className="mt-1 h-1 w-full bg-muted rounded-full overflow-hidden">
-                          <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
-                        </div>
-                      )}
                     </div>
                     <a
                       href={d.url}
@@ -457,16 +390,6 @@ export function ClassroomDocsViewer({ classroomUid, apiBase, accessToken, t, isP
           ctx={ctx}
           open
           onClose={() => setOpenDoc(null)}
-          onProgressChange={(p) => {
-            setProgressByDoc((prev) => ({
-              ...prev,
-              [p.resource_uid]: {
-                read_progress: p.read_progress,
-                is_completed: p.is_completed,
-                note_count: p.note_count,
-              },
-            }));
-          }}
           t={t}
         />
       )}

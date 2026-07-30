@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, History as HistoryIcon, RefreshCw } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
-import { paymentApi, classroomApi } from '@/lib/api';
+import { historyApi } from '@/lib/api';
 import type { PaymentListItem, PaymentStatus } from '@/lib/api/payment';
 import type { JoinHistoryItem } from '@/lib/api/classroom';
 import { HistoryTabs, type HistoryTab } from '@/components/history/HistoryTabs';
@@ -34,10 +34,7 @@ export default function ConsumerHistoryPage() {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
-      const [pmts, jn] = await Promise.all([
-        paymentApi.getHistory({ limit: 100 }),
-        classroomApi.getJoinHistory(100).catch(() => [] as JoinHistoryItem[]),
-      ]);
+      const { payments: pmts, joins: jn } = await historyApi.getOverview(100);
       setPayments(pmts);
       setJoins(jn);
     } catch (err) {

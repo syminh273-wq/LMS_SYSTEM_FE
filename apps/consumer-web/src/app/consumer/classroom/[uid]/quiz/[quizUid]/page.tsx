@@ -634,7 +634,7 @@ export default function QuizGamePage({ params }: Props) {
                     style={{ animationDelay: `${idx * 60}ms` }}
                     className={`group w-full flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all duration-200 focus:outline-none animate-in fade-in slide-in-from-left-2
                       ${selected === null
-                        ? 'border-border bg-card hover:border-primary/40 hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/10 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
+                        ? 'border-border bg-card text-foreground hover:border-primary/40 hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/10 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
                         : isSelected
                           ? 'border-primary bg-gradient-to-r from-primary to-primary text-white shadow-xl shadow-indigo-200 scale-[1.01]'
                           : 'border-border bg-muted text-muted-foreground opacity-60'

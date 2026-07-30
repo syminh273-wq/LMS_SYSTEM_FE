@@ -18,6 +18,8 @@ export type PaymentListItem = {
   updated_at?: string;
   resource_type?: PaymentResourceType | null;
   resource_id?: string | null;
+  resource_name?: string | null;
+  teacher_name?: string | null;
 };
 
 type PaymentHistoryParams = {
@@ -34,7 +36,7 @@ function normalizeStatus(raw: unknown): PaymentStatus {
   return (VALID_STATUSES as readonly string[]).includes(upper) ? (upper as PaymentStatus) : 'PENDING';
 }
 
-function normalizePayment(item: PaymentListItem): PaymentListItem {
+export function normalizePayment(item: PaymentListItem): PaymentListItem {
   return { ...item, status: normalizeStatus(item.status) };
 }
 

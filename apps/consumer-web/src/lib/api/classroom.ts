@@ -18,13 +18,10 @@ import type {
 export type JoinHistoryItem = {
   classroom_uid: string;
   classroom_name: string;
-  teacher_name: string;
-  role: string;
-  status: 'pending' | 'approved' | string;
-  is_deleted: boolean;
-  has_paid: boolean;
-  joined_at?: string | null;
-  paid_at?: string | null;
+  teacher_id: string | null;
+  joined_at: string | null;
+  amount: number;
+  order_id: string;
 };
 
 class ClassroomApiClient extends BaseRestApiClient {
@@ -105,12 +102,6 @@ class ClassroomApiClient extends BaseRestApiClient {
     qr_code_url?: string;
   }> {
     return this.post(`/api/v1/consumer/course/classrooms/${uid}/checkout/`);
-  }
-
-  public async getJoinHistory(limit: number = 50): Promise<JoinHistoryItem[]> {
-    const sp = new URLSearchParams();
-    sp.set('limit', String(limit));
-    return this.get<JoinHistoryItem[]>(`/api/v1/consumer/course/classrooms/me/history/?${sp.toString()}`);
   }
 
   public async access(uid: string): Promise<{

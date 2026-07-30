@@ -674,6 +674,15 @@ type QuizCollectionAssignment = {
   assigned_at: string;
 };
 
+export type QuizCollectionProgress = {
+  total: number;
+  passed: number;
+  is_completed: boolean;
+  percent: number;
+  passed_quiz_ids: string[];
+  missing_quiz_ids: string[];
+};
+
 export type QuizCollection = {
   uid: string;
   created_by: string;
@@ -684,20 +693,12 @@ export type QuizCollection = {
   status: 'draft' | 'published' | 'archived';
   created_at: string;
   updated_at: string;
+  progress?: QuizCollectionProgress | null;
 };
 
 export type QuizCollectionDetail = QuizCollection & {
   items: QuizCollectionItem[];
   assignments: QuizCollectionAssignment[];
-};
-
-export type QuizCollectionProgress = {
-  total: number;
-  passed: number;
-  is_completed: boolean;
-  percent: number;
-  passed_quiz_ids: string[];
-  missing_quiz_ids: string[];
 };
 
 export type IssuedCertificate = {

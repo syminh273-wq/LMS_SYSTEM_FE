@@ -9,9 +9,6 @@ import type { PaymentListItem, PaymentStatus } from '@/lib/api/payment';
 
 type InvoiceCardProps = {
   payment: PaymentListItem;
-  classroomName?: string | null;
-  courseName?: string | null;
-  teacherName?: string | null;
 };
 
 const STATUS_META: Record<PaymentStatus, { label: string; icon: React.ElementType; cls: string }> = {
@@ -34,12 +31,13 @@ function formatDate(iso?: string | null): string {
   }
 }
 
-export function InvoiceCard({ payment, classroomName, courseName, teacherName }: InvoiceCardProps) {
+export function InvoiceCard({ payment }: InvoiceCardProps) {
   const status = (payment.status || 'PENDING') as PaymentStatus;
   const meta = STATUS_META[status] ?? STATUS_META.PENDING;
   const Icon = meta.icon;
-  const targetName = classroomName || courseName || payment.order_info || 'Đơn thanh toán';
   const isClassroom = payment.resource_type === 'classroom';
+  const resourceName = payment.resource_name;
+  const teacherName = payment.teacher_name;
 
   const copy = (text: string, label: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -71,11 +69,11 @@ export function InvoiceCard({ payment, classroomName, courseName, teacherName }:
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Mô tả">
             <p className="text-sm font-semibold text-foreground">{payment.order_info || 'Thanh toán đơn hàng'}</p>
-            {isClassroom && classroomName && (
-              <p className="text-[12px] text-muted-foreground mt-0.5">Lớp: {classroomName}</p>
+            {isClassroom && resourceName && (
+              <p className="text-[12px] text-muted-foreground mt-0.5">Lớp: {resourceName}</p>
             )}
-            {!isClassroom && courseName && (
-              <p className="text-[12px] text-muted-foreground mt-0.5">Khóa học: {courseName}</p>
+            {!isClassroom && resourceName && (
+              <p className="text-[12px] text-muted-foreground mt-0.5">Khóa học: {resourceName}</p>
             )}
             {teacherName && isClassroom && (
               <p className="text-[12px] text-muted-foreground mt-0.5">Giáo viên: {teacherName}</p>

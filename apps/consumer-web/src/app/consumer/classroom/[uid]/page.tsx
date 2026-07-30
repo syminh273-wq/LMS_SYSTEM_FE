@@ -458,11 +458,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
         setCollections(list);
         const pMap: Record<string, QuizCollectionProgress> = {};
         for (const c of list) {
-          try {
-            pMap[c.uid] = await consumerQuizCollectionApi.getProgress(c.uid, uid);
-          } catch {
-            pMap[c.uid] = { total: c.quiz_count, passed: 0, is_completed: false, percent: 0, passed_quiz_ids: [], missing_quiz_ids: [] };
-          }
+          pMap[c.uid] = c.progress ?? {
+            total: c.quiz_count, passed: 0, is_completed: false, percent: 0, passed_quiz_ids: [], missing_quiz_ids: [],
+          };
         }
         setCollectionProgress(pMap);
       } catch {
@@ -935,7 +933,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                             type="button"
                             variant="ghost"
                             onClick={() => void handleToggleCollection(c)}
-                            className="w-full text-left p-4 flex items-center gap-4 cursor-pointer hover:bg-muted/50 transition-colors"
+                            className="w-full h-auto text-left p-4 flex items-start gap-4 cursor-pointer hover:bg-muted/50 transition-colors"
                           >
                             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
                               p?.is_completed ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'
@@ -1970,7 +1968,7 @@ function MissionAccordion({
           type="button"
           onClick={handleToggle}
           disabled={isLocked}
-          className={`flex items-center gap-2.5 flex-1 min-w-0 text-left ${
+          className={`h-auto flex items-center gap-2.5 flex-1 min-w-0 text-left ${
             isLocked ? 'cursor-not-allowed' : 'cursor-pointer'
           }`}
         >

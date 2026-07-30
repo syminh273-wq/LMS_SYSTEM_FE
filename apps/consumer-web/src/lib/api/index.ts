@@ -7,6 +7,7 @@ import { examSessionApi } from './exam-session';
 import { consumerCalendarApi } from './calendar';
 import { consumerLeaveRequestApi } from './leaveRequest';
 import { paymentApi } from './payment';
+import { historyApi } from './history';
 import { ApiException } from './exceptions';
 import { SharingLink, NotificationItem, PaginatedResponse } from './types';
 import { consumerCourseApi } from './course';
@@ -22,6 +23,7 @@ export { consumerCalendarApi };
 export { consumerLeaveRequestApi };
 export { consumerCourseApi };
 export { paymentApi };
+export { historyApi };
 export { classroomApi };
 
 // Backward compatibility exports for the previous structure

@@ -6,15 +6,13 @@ import Link from 'next/link';
 import { Loader2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { paymentApi } from '@/lib/api';
-import { classroomApi } from '@/lib/api';
 import type { PaymentListItem } from '@/lib/api/payment';
-import type { Classroom } from '@/lib/api/types';
 import { InvoiceCard } from '@/components/payment/InvoiceCard';
 
 type ResolveState =
   | { kind: 'loading' }
   | { kind: 'not-found' }
-  | { kind: 'ready'; payment: PaymentListItem; classroom: Classroom | null };
+  | { kind: 'ready'; payment: PaymentListItem };
 
 function InvoiceContent() {
   const params = useParams<{ orderId: string }>();
@@ -39,16 +37,7 @@ function InvoiceContent() {
         setState({ kind: 'not-found' });
         return;
       }
-      let classroom: Classroom | null = null;
-      if (payment.resource_type === 'classroom' && payment.resource_id) {
-        try {
-          classroom = await classroomApi.retrieve(payment.resource_id);
-        } catch {
-          classroom = null;
-        }
-      }
-      if (cancelled) return;
-      setState({ kind: 'ready', payment, classroom });
+      setState({ kind: 'ready', payment });
     })();
     return () => {
       cancelled = true;
@@ -104,8 +93,7 @@ function InvoiceContent() {
     );
   }
 
-  const { payment, classroom } = state;
-  const teacherName = (classroom as unknown as { teacher_name?: string } | null)?.teacher_name || null;
+  const { payment } = state;
   const isFreeAutoRedirect =
     payment.status === 'COMPLETED' &&
     next &&
@@ -132,11 +120,7 @@ function InvoiceContent() {
           </div>
         )}
 
-        <InvoiceCard
-          payment={payment}
-          classroomName={classroom?.name ?? null}
-          teacherName={teacherName}
-        />
+        <InvoiceCard payment={payment} />
 
         <p className="text-center text-[12px] text-muted-foreground">
           Mọi thắc mắc vui lòng liên hệ hỗ trợ qua trang{' '}
