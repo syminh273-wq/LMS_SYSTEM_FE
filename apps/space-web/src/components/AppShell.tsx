@@ -39,7 +39,6 @@ import {
   Wallet,
 } from 'lucide-react';
 import { ThemeToggle } from '@shared/components/ThemeToggle';
-import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { LmsLogo } from '@shared/components/LmsLogo';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import NotificationBell from '@/components/NotificationBell';
@@ -463,7 +462,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-8">
             <ThemeToggle />
-            <LanguageSwitcher variant="compact" />
             <TaskCenterBell />
             <NotificationBell />
             <div className="pl-6 border-l border-border">
