@@ -134,22 +134,26 @@ export default function AITab({
         } else if (event.type === 'chunk') {
           setAiMessages(prev => {
             const last = prev[prev.length - 1];
+            if (!last) return prev;
             const next = (last.text + event.text).replace(/\n{3,}/g, '\n\n');
             return [...prev.slice(0, -1), { ...last, loading: false, text: next }];
           });
         } else if (event.type === 'tool_calls') {
           setAiMessages(prev => {
             const last = prev[prev.length - 1];
+            if (!last) return prev;
             return [...prev.slice(0, -1), { ...last, tool_calls: event.data }];
           });
         } else if (event.type === 'sources') {
           setAiMessages(prev => {
             const last = prev[prev.length - 1];
+            if (!last) return prev;
             return [...prev.slice(0, -1), { ...last, loading: false, sources: event.data }];
           });
         } else if (event.type === 'error') {
           setAiMessages(prev => {
             const last = prev[prev.length - 1];
+            if (!last) return prev;
             return [...prev.slice(0, -1), { ...last, loading: false, text: event.message ?? t('classroom.ui.ai_error_generic') }];
           });
         }
@@ -168,7 +172,7 @@ export default function AITab({
       <div className="w-72 bg-muted/20 flex flex-col hidden md:flex">
         <div className="p-6 flex items-center justify-between bg-card">
           <h4 className="font-bold text-sm text-foreground">{t('classroom.ui.ai_history_title')}</h4>
-          <Button variant="ghost" size="icon" onClick={createNewAiSession} className="h-8 w-8 rounded-lg hover:bg-primary-brand-light hover:text-primary-brand">
+          <Button variant="ghost" size="icon" onClick={createNewAiSession} disabled={aiLoading} className="h-8 w-8 rounded-lg hover:bg-primary-brand-light hover:text-primary-brand disabled:opacity-50">
             <Plus size={16} />
           </Button>
         </div>
@@ -183,7 +187,8 @@ export default function AITab({
                 key={s.session_id}
                 variant="ghost"
                 onClick={() => setAiSessionId(s.session_id)}
-                className={`w-full text-left p-3 rounded-xl transition-all duration-200 group justify-start ${
+                disabled={aiLoading}
+                className={`w-full text-left p-3 rounded-xl transition-all duration-200 group justify-start disabled:opacity-50 disabled:pointer-events-none ${
                   aiSessionId === s.session_id
                     ? '!bg-primary-brand !text-white shadow-md shadow-primary-brand/20 hover:!bg-primary-brand hover:!text-white'
                     : '!bg-transparent text-muted-foreground hover:!bg-primary-brand-light/50 hover:!text-primary-brand'
@@ -229,7 +234,8 @@ export default function AITab({
                 variant="ghost"
                 size="sm"
                 onClick={clearAiSession}
-                className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
+                disabled={aiLoading}
+                className="text-xs text-muted-foreground hover:text-foreground rounded-xl disabled:opacity-50"
               >
                 {t('classroom.ui.ai_clear_history')}
               </Button>

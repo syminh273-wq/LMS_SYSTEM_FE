@@ -1,11 +1,11 @@
 'use client';
 
-import { ChangeEvent, use, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, use, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Check, ChevronDown, CircleDashed, File, FileImage, FileText, Loader2, Save, Send, UploadCloud } from 'lucide-react';
+import { ArrowLeft, Calendar, Check, ChevronDown, CircleDashed, Eye, File, FileImage, FileText, Loader2, Save, Send, UploadCloud } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -25,10 +25,11 @@ import {
   FormMessage,
 } from '@shared/components/ui/form';
 import { Textarea } from '@shared/components/ui/textarea';
-import { Classroom, ExamStatus, spaceApi } from '@/lib/api';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shared/components/ui/dialog';
+import { Classroom, Exam, ExamStatus, spaceApi } from '@/lib/api';
 
-interface CreateAssignmentPageProps {
-  params: Promise<{ uid: string }>;
+interface EditAssignmentPageProps {
+  params: Promise<{ uid: string; assignmentUid: string }>;
 }
 
 const STATUS_OPTIONS = [
@@ -60,14 +61,16 @@ const assignmentSchema = z
 
 type AssignmentForm = z.infer<typeof assignmentSchema>;
 
-export default function CreateAssignmentPage({ params }: CreateAssignmentPageProps) {
-  const { uid } = use(params);
+export default function EditAssignmentPage({ params }: EditAssignmentPageProps) {
+  const { uid, assignmentUid } = use(params);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const fileRef = useRef<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [assignment, setAssignment] = useState<Exam | null>(null);
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const form = useForm<AssignmentForm>({
     resolver: zodResolver(assignmentSchema),
@@ -84,32 +87,54 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
   const contentType = form.watch('content_type');
   const needsResource = ['file', 'pdf', 'image'].includes(contentType);
 
+  const objectUrl = useMemo(() => (selectedFile ? URL.createObjectURL(selectedFile) : null), [selectedFile]);
+  useEffect(() => {
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [objectUrl]);
+
+  const previewUrl = objectUrl || assignment?.meta?.url || null;
+  const previewName = selectedFile?.name || assignment?.meta?.name || '';
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         setFetching(true);
-        const details = await spaceApi.classrooms.retrieve(uid);
-        setClassroom(details);
+        const [classroomDetails, assignmentDetails] = await Promise.all([
+          spaceApi.classrooms.retrieve(uid),
+          spaceApi.assignments.retrieve(assignmentUid),
+        ]);
+        setClassroom(classroomDetails);
+        setAssignment(assignmentDetails);
+        form.reset({
+          title: assignmentDetails.title,
+          description: assignmentDetails.description || '',
+          content_type: assignmentDetails.content_type === 'quiz' ? 'markdown' : assignmentDetails.content_type,
+          body: assignmentDetails.body || '',
+          due_date: toDatetimeLocalValue(assignmentDetails.due_date),
+          status: assignmentDetails.status === 'closed' || assignmentDetails.status === 'ongoing' ? 'published' : assignmentDetails.status,
+        });
       } catch (err: unknown) {
-        toast.error(err instanceof Error ? err.message : 'Không thể tải dữ liệu');
+        toast.error(err instanceof Error ? err.message : 'Không thể tải bài tập');
       } finally {
         setFetching(false);
       }
     };
     void fetchData();
-  }, [uid]);
+  }, [uid, assignmentUid, form]);
 
   const handleResourceSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     event.target.value = '';
-    fileRef.current = file;
+    setSelectedFile(file);
   };
 
   const onSubmit = async (data: AssignmentForm) => {
     setSaving(true);
     try {
-      if (needsResource && !fileRef.current) {
+      if (needsResource && !selectedFile && !assignment?.ref_id) {
         toast.error('Vui lòng chọn tệp đính kèm');
         setSaving(false);
         return;
@@ -123,16 +148,20 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
       formData.append('body', needsResource ? '' : data.body.trim());
       formData.append('due_date', new Date(data.due_date).toISOString());
       formData.append('status', data.status);
-      if (needsResource && fileRef.current) {
-        formData.append('file', fileRef.current);
+      if (needsResource) {
+        if (selectedFile) {
+          formData.append('file', selectedFile);
+        } else if (assignment?.ref_id) {
+          formData.append('ref_id', assignment.ref_id);
+        }
       }
 
-      await spaceApi.assignments.create(formData);
+      await spaceApi.assignments.update(assignmentUid, formData);
 
-      toast.success('Đã tạo bài tập');
+      toast.success('Đã cập nhật bài tập');
       router.push(`/space/classrooms/${uid}/details?tab=assignments`);
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Không thể tạo bài tập');
+      toast.error(err instanceof Error ? err.message : 'Không thể cập nhật bài tập');
     } finally {
       setSaving(false);
     }
@@ -142,7 +171,7 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
     return (
       <div className="flex flex-col items-center justify-center py-32 text-muted-foreground">
         <Loader2 className="mb-4 size-10 animate-spin" />
-        <p className="text-sm font-medium">Đang tải dữ liệu lớp học...</p>
+        <p className="text-sm font-medium">Đang tải dữ liệu bài tập...</p>
       </div>
     );
   }
@@ -169,8 +198,8 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
             <FileText className="size-3.5" />
             {classroom?.name || 'Lớp học'}
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Tạo bài tập mới</h1>
-          <p className="text-sm text-muted-foreground">Giao bài tập để học sinh nộp file hoặc viết bài</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Chỉnh sửa bài tập</h1>
+          <p className="text-sm text-muted-foreground">Cập nhật nội dung và thời hạn bài tập</p>
         </div>
       </div>
 
@@ -301,7 +330,7 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
                               <DropdownMenuItem
                                 key={option.value}
                                 onClick={() => {
-                                  fileRef.current = null;
+                                  setSelectedFile(null);
                                   field.onChange(option.value);
                                 }}
                                 className={`flex items-center justify-between gap-3 px-3 py-2.5 font-medium ${active ? 'bg-primary/10 text-primary focus:bg-primary/10 focus:text-primary' : ''}`}
@@ -345,30 +374,63 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
               />
 
               {needsResource && (
-                <div className="flex flex-col gap-3 rounded-xl border border-dashed bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-foreground">
-                      {fileRef.current?.name || 'Chưa chọn tệp nào'}
+                <div className="flex flex-col gap-3 rounded-xl border border-dashed bg-muted/30 p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3">
+                      {contentType === 'image' && previewUrl ? (
+                        <button
+                          type="button"
+                          onClick={() => setPreviewOpen(true)}
+                          className="group relative size-12 shrink-0 overflow-hidden rounded-lg border border-border"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={previewUrl} alt={previewName} className="size-full object-cover" />
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition group-hover:bg-black/40 group-hover:opacity-100">
+                            <Eye className="size-4" />
+                          </span>
+                        </button>
+                      ) : (
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                          {contentType === 'pdf' ? <FileText className="size-5" /> : <File className="size-5" />}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-foreground">
+                          {previewName || 'Chưa chọn tệp nào'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {selectedFile ? 'Sẽ upload khi lưu' : assignment?.ref_id ? 'Đang dùng tệp hiện tại' : 'Yêu cầu tệp đính kèm'}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {fileRef.current ? 'Sẽ upload khi lưu' : 'Yêu cầu tệp đính kèm'}
+                    <div className="flex shrink-0 items-center gap-2">
+                      {previewUrl && (
+                        <Button type="button" variant="ghost" onClick={() => setPreviewOpen(true)}>
+                          <Eye className="size-4" />
+                          Xem trước
+                        </Button>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={handleResourceSelect}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={saving}
+                      >
+                        <UploadCloud className="size-4" />
+                        Chọn tệp
+                      </Button>
                     </div>
                   </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    onChange={handleResourceSelect}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={saving}
-                  >
-                    <UploadCloud className="size-4" />
-                    Chọn tệp
-                  </Button>
+
+                  {contentType === 'pdf' && previewUrl && (
+                    <iframe src={previewUrl} title={previewName} className="h-64 w-full rounded-lg border border-border bg-background" />
+                  )}
                 </div>
               )}
             </CardContent>
@@ -390,11 +452,37 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
               className="h-12 min-w-[180px] rounded-xl px-6"
             >
               {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-              TẠO BÀI TẬP
+              LƯU THAY ĐỔI
             </Button>
           </div>
         </form>
       </Form>
+
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="w-[90vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="truncate">{previewName || 'Xem trước tệp đính kèm'}</DialogTitle>
+          </DialogHeader>
+          {previewUrl && contentType === 'image' && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={previewUrl} alt={previewName} className="max-h-[75vh] w-full rounded-lg object-contain" />
+          )}
+          {previewUrl && contentType === 'pdf' && (
+            <iframe src={previewUrl} title={previewName} className="h-[75vh] w-full rounded-lg border border-border" />
+          )}
+          {previewUrl && contentType === 'file' && (
+            <div className="flex flex-col items-center gap-4 py-10 text-center text-muted-foreground">
+              <File className="size-10" />
+              <p className="text-sm font-medium">Không thể xem trước loại tệp này trong trình duyệt</p>
+              <Button asChild variant="outline">
+                <a href={previewUrl} target="_blank" rel="noopener noreferrer">
+                  Mở tệp trong tab mới
+                </a>
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -430,4 +518,13 @@ function PickerDropdown({
       </DropdownMenuContent>
     </DropdownMenu>
   );
+}
+
+function toDatetimeLocalValue(value: string | null) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const offset = date.getTimezoneOffset();
+  const localDate = new Date(date.getTime() - offset * 60 * 1000);
+  return localDate.toISOString().slice(0, 16);
 }

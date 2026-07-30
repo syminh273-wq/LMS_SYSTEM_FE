@@ -101,7 +101,7 @@ function ResultItem({
       type="button"
       onMouseEnter={onMouseEnter}
       onClick={onClick}
-      className={`w-full flex items-start gap-3 px-4 py-3 text-left rounded-lg transition-colors ${
+      className={`h-auto w-full flex items-start gap-3 px-4 py-3 text-left rounded-lg whitespace-normal transition-colors ${
         active ? 'bg-primary-brand-light dark:bg-indigo-900/30' : 'hover:bg-muted/60'
       }`}
     >
@@ -281,7 +281,7 @@ export default function GlobalSearch() {
         role="dialog"
         aria-modal
         aria-label={t('layout.search.dialog_aria_label')}
-        className="fixed left-1/2 top-[15vh] z-50 w-full max-w-xl -translate-x-1/2 rounded-2xl bg-popover shadow-2xl ring-1 ring-border overflow-hidden"
+        className="fixed left-1/2 top-[12vh] z-50 w-full max-w-2xl -translate-x-1/2 rounded-2xl bg-popover shadow-2xl ring-1 ring-border overflow-hidden"
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border">

@@ -1,5 +1,5 @@
 import BaseRestApiClient from './client';
-import type { AIGradeBatchResponse, AIGradeRequest, CreateExamRequest, Exam, ExamSubmission, UpdateExamRequest } from './types';
+import type { AIGradeBatchResponse, AIGradeRequest, Exam, ExamSubmission } from './types';
 
 class AssignmentApiClient extends BaseRestApiClient {
   public async listByClassroom(
@@ -22,11 +22,11 @@ class AssignmentApiClient extends BaseRestApiClient {
     return this.get<Exam>(`/api/v1/space/course/assignments/${uid}/`);
   }
 
-  public async create(data: CreateExamRequest): Promise<Exam> {
+  public async create(data: FormData): Promise<Exam> {
     return this.post<Exam>('/api/v1/space/course/assignments/', data);
   }
 
-  public async update(uid: string, data: UpdateExamRequest): Promise<Exam> {
+  public async update(uid: string, data: FormData): Promise<Exam> {
     return this.patch<Exam>(`/api/v1/space/course/assignments/${uid}/`, data);
   }
 
