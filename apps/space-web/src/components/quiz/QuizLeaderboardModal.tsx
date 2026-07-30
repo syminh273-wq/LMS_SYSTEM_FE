@@ -404,7 +404,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {detail.attempts.map(a => (
+                  {(detail.attempts ?? []).map(a => (
                     <div
                       key={a.attempt_uid ?? `${a.attempt_number}-${a.submitted_at}`}
                       className="flex items-center justify-between bg-muted/40 rounded-2xl p-3.5 ring-1 ring-border"
