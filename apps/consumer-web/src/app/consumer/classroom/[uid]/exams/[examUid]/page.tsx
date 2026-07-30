@@ -59,20 +59,16 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
       try {
         setLoading(true);
         setError('');
-        const [classroomData, examsData] = await Promise.all([
+        const [classroomData, examData] = await Promise.all([
           classroomApi.retrieve(uid),
-          classroomApi.exams(uid),
+          classroomApi.retrieveExam(examUid),
         ]);
-        const publishedExam = examsData.find(item => item.uid === examUid && item.status === 'published');
-
-        if (!publishedExam) {
-          throw new Error('Không tìm thấy bài kiểm tra đã xuất bản.');
-        }
 
         setClassroom(classroomData);
-        setExam(publishedExam);
+        setExam(examData);
+        setSubmission(examData.submission ?? null);
 
-        if (publishedExam.exam_type === 'quiz') {
+        if (examData.exam_type === 'quiz') {
           try {
             const questions = await classroomApi.examQuestions(examUid);
             setQuizData(questions);
@@ -80,13 +76,6 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
           } catch (err) {
             console.error('Failed to load exam questions', err);
           }
-        }
-
-        try {
-          const currentSubmission = await classroomApi.examSubmission(examUid);
-          setSubmission(currentSubmission);
-        } catch {
-          setSubmission(null);
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Không thể tải bài kiểm tra');

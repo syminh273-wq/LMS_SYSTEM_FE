@@ -273,6 +273,31 @@ export type ExamSubmission = {
   updated_at?: string;
 };
 
+export type ExamAnalyticsStats = {
+  total_members: number;
+  submitted: number;
+  missing: number;
+  graded: number;
+  passed: number;
+  failed: number;
+  submission_rate: number;
+  completion_rate: number;
+  average_score: number | null;
+  score_buckets: Array<{ label: string; count: number; percent: number }>;
+  total_score: number;
+  average_grade: number;
+  median_grade: number;
+  mode_grade: number;
+};
+
+export type ExamAnalyticsResponse = {
+  exam: Exam;
+  classroom: Classroom;
+  students: ClassroomMember[];
+  submissions: ExamSubmission[];
+  stats: ExamAnalyticsStats;
+};
+
 export type AIGradeRequest = {
   rubric?: string;
   max_grade?: number;

@@ -76,6 +76,7 @@ export default function Sidebar({
             { id: 'chat',     label: t('classroom.ui.tab_chat'),     icon: MessageSquare },
             { id: 'meeting',  label: t('classroom.ui.tab_meeting'),  icon: Video },
             { id: 'calendar', label: t('classroom.ui.tab_calendar'), icon: Calendar },
+            { id: 'assignments', label: t('classroom.ui.tab_assignments', 'Bài tập'), icon: FileText },
             { id: 'exams',    label: t('classroom.ui.tab_exams'),    icon: ClipboardList },
             { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
             { id: 'quiz',     label: t('classroom.ui.tab_quiz'),     icon: Gamepad2 },
@@ -177,6 +178,7 @@ export default function Sidebar({
           {openGroups.learning && (
             <div className="pb-1 px-1">
               {[
+                { id: 'assignments', label: t('classroom.ui.tab_assignments', 'Bài tập'), icon: FileText },
                 { id: 'final_exams', label: t('classroom.ui.tab_final_exams'), icon: BarChart2 },
                 { id: 'exams', label: t('classroom.ui.tab_exams'), icon: ClipboardList },
                 { id: 'quiz',  label: t('classroom.ui.tab_quiz'),    icon: Gamepad2 },

@@ -3,6 +3,7 @@ export const VALID_TABS = [
   'docs',
   'chat',
   'meeting',
+  'assignments',
   'exams',
   'final_exams',
   'quiz',

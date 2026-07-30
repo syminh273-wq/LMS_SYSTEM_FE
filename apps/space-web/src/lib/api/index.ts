@@ -1,6 +1,7 @@
 import { authApi } from './auth';
 import { classroomApi } from './classroom';
 import { examApi } from './exam';
+import { assignmentApi } from './assignment';
 import { meetingRoomApi } from './meeting-room';
 import { quizApi } from './quiz';
 import { quizCollectionApi, certificateApi } from './quiz-collection';
@@ -16,7 +17,7 @@ export * from './types';
 export * from './exceptions';
 export * from './calendar';
 export * from './leaveRequest';
-export { quizApi, calendarApi, spaceLeaveRequestApi, courseApi, classroomApi, examApi };
+export { quizApi, calendarApi, spaceLeaveRequestApi, courseApi, classroomApi, examApi, assignmentApi };
 
 // Re-export specific instances
 export { userSettingsApi };
@@ -41,6 +42,7 @@ export const spaceApi = {
   },
   classrooms: classroomApi,
   exams: examApi,
+  assignments: assignmentApi,
   meetingRooms: meetingRoomApi,
   quizzes: quizApi,
   quizCollections: quizCollectionApi,

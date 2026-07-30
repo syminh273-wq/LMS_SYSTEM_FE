@@ -4,9 +4,9 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 import { spaceApi, Classroom, ClassroomJoinLink } from '@/lib/api';
 import { toast } from 'sonner';
 
-type ActiveTab = 'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking';
+type ActiveTab = 'info' | 'docs' | 'chat' | 'meeting' | 'assignments' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking';
 
-const VALID_TABS: ActiveTab[] = ['info', 'docs', 'chat', 'meeting', 'exams', 'final_exams', 'quiz', 'students', 'ai', 'blacklist', 'calendar', 'leave_request', 'ranking'];
+const VALID_TABS: ActiveTab[] = ['info', 'docs', 'chat', 'meeting', 'assignments', 'exams', 'final_exams', 'quiz', 'students', 'ai', 'blacklist', 'calendar', 'leave_request', 'ranking'];
 
 type ExamKind = 'midterm' | 'final' | 'regular';
 
@@ -58,7 +58,7 @@ export function useClassroomCore({
   const [fetching, setFetching] = useState(false);
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [linkData, setLinkData] = useState<ClassroomJoinLink | null>(null);
-  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'assignments' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking'>('info');
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');
   const [canManageExams, setCanManageExams] = useState(false);
 

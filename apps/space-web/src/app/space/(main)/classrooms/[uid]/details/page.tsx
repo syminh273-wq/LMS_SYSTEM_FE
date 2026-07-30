@@ -31,6 +31,7 @@ import MeetingTab from '@/components/classroom/details/tabs/MeetingTab';
 import CalendarTab from '@/components/classroom/details/tabs/CalendarTab';
 import LeaveRequestTabView from '@/components/classroom/details/tabs/LeaveRequestTabView';
 import ExamsTab from '@/components/classroom/details/tabs/ExamsTab';
+import AssignmentsTab from '@/components/classroom/details/tabs/AssignmentsTab';
 import FinalExamsTab from '@/components/classroom/details/tabs/FinalExamsTab';
 import QuizTab from '@/components/classroom/details/tabs/QuizTab';
 import BlacklistTab from '@/components/classroom/details/tabs/BlacklistTab';
@@ -352,6 +353,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
             <CalendarTab
               classroomUid={uid}
               classroomName={core.classroom.name}
+            />
+          )}
+
+          {/* /details?tab=assignments */}
+          {core.activeTab === 'assignments' && (
+            <AssignmentsTab
+              canManageExams={core.canManageExams}
+              formatDateTime={formatDateTime}
+              formatDate={formatDate}
+              router={router}
+              classroomUid={uid}
+              t={t}
             />
           )}
 

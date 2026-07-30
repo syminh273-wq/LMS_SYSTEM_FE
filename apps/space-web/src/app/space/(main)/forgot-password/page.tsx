@@ -29,7 +29,10 @@ type FormValues = z.infer<typeof forgotSchema>;
 export default function SpaceForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const form = useForm<FormValues>({ resolver: zodResolver(forgotSchema) });
+  const form = useForm<FormValues>({
+    resolver: zodResolver(forgotSchema),
+    defaultValues: { email: '' },
+  });
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);

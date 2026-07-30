@@ -250,6 +250,9 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [exams, setExams] = useState<Exam[]>([]);
   const [loadingExams, setLoadingExams] = useState(false);
   const [examError, setExamError] = useState("");
+  const [assignments, setAssignments] = useState<Exam[]>([]);
+  const [loadingAssignments, setLoadingAssignments] = useState(false);
+  const [assignmentError, setAssignmentError] = useState("");
   const [selectedExamGroup, setSelectedExamGroup] = useState<ExamGroupKey | null>(null);
   const [joiningExamUid, setJoiningExamUid] = useState<string | null>(null);
   const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
@@ -429,6 +432,25 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
     void fetchExams();
   }, [isAuthenticated, uid]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !uid || activeTab !== 'assignments') return;
+
+    const fetchAssignments = async () => {
+      try {
+        setLoadingAssignments(true);
+        setAssignmentError("");
+        const data = await classroomApi.assignments(uid);
+        setAssignments((data as Exam[]).filter(item => item.status !== 'draft'));
+      } catch (err: unknown) {
+        setAssignmentError(err instanceof Error ? err.message : 'Không thể tải danh sách bài tập');
+      } finally {
+        setLoadingAssignments(false);
+      }
+    };
+
+    void fetchAssignments();
+  }, [isAuthenticated, uid, activeTab]);
 
   useEffect(() => {
     if (!isAuthenticated || !uid || activeTab !== 'quiz') return;
@@ -1328,7 +1350,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
-            {activeTab !== 'discussion' && activeTab !== 'exams' && activeTab !== 'quiz' && activeTab !== 'meeting' && activeTab !== 'ai' && (
+            {activeTab !== 'discussion' && activeTab !== 'assignments' && activeTab !== 'exams' && activeTab !== 'quiz' && activeTab !== 'meeting' && activeTab !== 'ai' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                 <div className="flex h-64 flex-col items-center justify-center text-center text-muted-foreground">
                   <FileText size={38} className="mb-3 opacity-30" />
@@ -1337,6 +1359,98 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
               </div>
             )}
 
+
+            {/* Assignments */}
+            {activeTab === 'assignments' && (
+              <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText size={17} className="text-primary" />
+                    <span className="font-black text-foreground text-sm uppercase tracking-tighter">Bài tập</span>
+                  </div>
+                  <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase text-primary">
+                    {assignments.length} bài
+                  </span>
+                </div>
+
+                <div className="p-5">
+                  {loadingAssignments ? (
+                    <div className="flex items-center justify-center h-32 text-muted-foreground">
+                      <Loader2 size={26} className="animate-spin" />
+                    </div>
+                  ) : assignmentError ? (
+                    <div className="rounded-2xl border border-destructive/20 bg-destructive/10 p-4 text-sm font-medium text-destructive">
+                      {assignmentError}
+                    </div>
+                  ) : assignments.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-40 text-center text-muted-foreground">
+                      <FileText size={38} className="mb-3 opacity-30" />
+                      <p className="text-sm font-medium">Chưa có bài tập nào</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {[...assignments]
+                        .sort((left, right) => getDueTimestamp(left.due_date) - getDueTimestamp(right.due_date))
+                        .map(assignment => {
+                          const deadline = getDeadlineMeta(assignment.due_date);
+                          const ContentIcon = getContentTypeIcon(assignment.content_type);
+
+                          return (
+                            <div
+                              key={assignment.uid}
+                              className={`w-full rounded-2xl border bg-card p-4 shadow-sm ${deadline.cardClassName}`}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <h4 className="line-clamp-2 text-sm font-black leading-snug text-foreground">{assignment.title}</h4>
+                                  <p className="mt-1 line-clamp-2 text-xs font-medium leading-relaxed text-muted-foreground">
+                                    {assignment.description || 'Không có mô tả'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className={`mt-4 rounded-xl border px-3 py-2 ${deadline.badgeClassName}`}>
+                                <div className="flex items-center gap-2">
+                                  <Clock size={14} className="shrink-0" />
+                                  <div className="min-w-0">
+                                    <div className="truncate text-xs font-black">{deadline.label}</div>
+                                    <div className="truncate text-[10px] font-bold opacity-80">{formatDateTime(assignment.due_date)}</div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="mt-3 flex items-center justify-between gap-2">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[10px] font-black uppercase text-muted-foreground ring-1 ring-border">
+                                  <ContentIcon size={12} />
+                                  {getContentTypeLabel(assignment.content_type)}
+                                </span>
+                                {deadline.isExpired ? (
+                                  <Button
+                                    type="button"
+                                    disabled
+                                    variant="ghost"
+                                    className="text-[10px] font-black uppercase text-muted-foreground opacity-60 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
+                                  >
+                                    Đã hết hạn
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    type="button"
+                                    onClick={() => router.push(`/consumer/classroom/${uid}/exams/${assignment.uid}`)}
+                                    className="rounded-xl bg-primary px-3 py-1.5 text-[10px] font-black uppercase text-white hover:bg-primary/90 cursor-pointer"
+                                  >
+                                    Xem chi tiết
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Exams */}
             {activeTab === 'exams' && (
@@ -1592,11 +1706,6 @@ function getExamStatusClass(status: string) {
 
 const EXAM_GROUPS = [
   {
-    key: 'regular',
-    label: 'Bài kiểm tra thường xuyên',
-    keywords: ['kiem tra thuong xuyen', 'kiểm tra thường xuyên', 'thuong xuyen', 'thường xuyên'],
-  },
-  {
     key: 'midterm',
     label: 'Kiểm tra giữa kì',
     keywords: ['kiem tra giua ki', 'kiểm tra giữa kì', 'kiểm tra giữa kỳ', 'giua ki', 'giữa kì', 'giữa kỳ'],
@@ -1625,11 +1734,6 @@ function isExamInGroup(exam: Exam, groupKey: typeof EXAM_GROUPS[number]['key']) 
   const title = normalizeText(exam.title);
   const group = EXAM_GROUPS.find(item => item.key === groupKey);
   if (!group) return false;
-
-  if (group.key === 'regular') {
-    return group.keywords.some(keyword => title.includes(normalizeText(keyword)))
-      || !EXAM_GROUPS.some(item => item.key !== 'regular' && item.keywords.some(keyword => title.includes(normalizeText(keyword))));
-  }
 
   return group.keywords.some(keyword => title.includes(normalizeText(keyword)));
 }

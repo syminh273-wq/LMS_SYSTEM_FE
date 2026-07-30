@@ -1,13 +1,14 @@
 import BaseRestApiClient from './client';
-import type { AIGradeBatchResponse, AIGradeRequest, AuditAnswersResponse, AuditDetailsResponse, AuditOverviewResponse, CreateExamRequest, Exam, ExamSession, ExamSubmission, FaceLogEntry, OpenOnlineResponse, UpdateExamRequest } from './types';
+import type { AIGradeBatchResponse, AIGradeRequest, AuditAnswersResponse, AuditDetailsResponse, AuditOverviewResponse, CreateExamRequest, Exam, ExamAnalyticsResponse, ExamSession, ExamSubmission, FaceLogEntry, OpenOnlineResponse, UpdateExamRequest } from './types';
 
 class ExamApiClient extends BaseRestApiClient {
   public async listByClassroom(
     classroomUid: string,
-    params?: { status?: string | string[]; exam_mode?: string }
+    params?: { status?: string | string[]; exam_mode?: string; exam_type?: 'assignment' | 'quiz' }
   ): Promise<Exam[]> {
     const qs = new URLSearchParams({ classroom_id: classroomUid });
     if (params?.exam_mode) qs.set('exam_mode', params.exam_mode);
+    if (params?.exam_type) qs.set('exam_type', params.exam_type);
     if (params?.status) {
       const statuses = Array.isArray(params.status) ? params.status : [params.status];
       statuses.forEach(s => qs.append('status', s));
@@ -37,6 +38,10 @@ class ExamApiClient extends BaseRestApiClient {
 
   public async listSubmissions(examUid: string): Promise<ExamSubmission[]> {
     return this.get<ExamSubmission[]>(`/api/v1/space/course/exams/${examUid}/submissions/`);
+  }
+
+  public async getAnalytics(examUid: string): Promise<ExamAnalyticsResponse> {
+    return this.get<ExamAnalyticsResponse>(`/api/v1/space/course/exams/${examUid}/analytics/`);
   }
 
   public async gradeSubmission(

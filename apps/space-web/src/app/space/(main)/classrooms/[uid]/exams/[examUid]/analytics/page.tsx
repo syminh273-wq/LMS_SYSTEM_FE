@@ -15,7 +15,7 @@ import {
   YAxis,
 } from 'recharts';
 import { Button } from '@shared/components/ui/button';
-import { classroomApi, examApi, type Classroom, type ClassroomMember, type Exam, type ExamSubmission } from '@/lib/api';
+import { examApi, type ExamAnalyticsResponse } from '@/lib/api';
 import { useTranslation } from '@shared/components/LocaleProvider';
 
 export default function SpaceExamAnalyticsPage({
@@ -26,10 +26,7 @@ export default function SpaceExamAnalyticsPage({
   const { uid, examUid } = use(params);
   const router = useRouter();
   const { t } = useTranslation();
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
-  const [exam, setExam] = useState<Exam | null>(null);
-  const [members, setMembers] = useState<ClassroomMember[]>([]);
-  const [submissions, setSubmissions] = useState<ExamSubmission[]>([]);
+  const [data, setData] = useState<ExamAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -38,19 +35,8 @@ export default function SpaceExamAnalyticsPage({
       try {
         setLoading(true);
         setError('');
-        const [classroomData, examData, memberData, submissionData] = await Promise.all([
-          classroomApi.retrieve(uid),
-          examApi.retrieve(examUid),
-          classroomApi.members(uid),
-          examApi.listSubmissions(examUid),
-        ]);
-        setClassroom(classroomData);
-        setExam(examData);
-        const studentsOnly = memberData.filter(
-          member => member.role === 'student' && member.status === 'approved',
-        );
-        setMembers(studentsOnly);
-        setSubmissions(submissionData);
+        const analytics = await examApi.getAnalytics(examUid);
+        setData(analytics);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : t('classroom.ui.score_load_error'));
       } finally {
@@ -60,34 +46,28 @@ export default function SpaceExamAnalyticsPage({
     void load();
   }, [uid, examUid, t]);
 
-  const subMap = useMemo(() => new Map(submissions.map(s => [s.student_id, s])), [submissions]);
-  const rows = useMemo(
-    () => members.map(member => ({ member, submission: subMap.get(member.member_id) || null })),
-    [members, subMap],
-  );
-  const submitted = rows.filter(row => row.submission).length;
-  const missing = Math.max(0, members.length - submitted);
-  const gradedSubmissions = rows
-    .map(r => r.submission)
-    .filter((s): s is ExamSubmission => s?.grade != null);
-  const graded = gradedSubmissions.length;
-  const submissionRate = members.length > 0 ? Math.round((submitted / members.length) * 100) : 0;
-  const averageScore =
-    graded > 0 ? gradedSubmissions.reduce((acc, s) => acc + (s.grade ?? 0), 0) / graded : null;
-  const avg = averageScore != null ? averageScore.toFixed(1) : '--';
-  const passedCount = rows.filter(r => r.submission?.passed === true).length;
-  const failedCount = rows.filter(r => r.submission?.passed === false).length;
-
-  const scoreBuckets = useMemo(() => buildScoreBuckets(submissions), [submissions]);
+  const exam = data?.exam ?? null;
+  const stats = data?.stats ?? null;
+  const scoreBuckets = stats?.score_buckets ?? [];
   const maxBucketCount = useMemo(
     () => Math.max(1, ...scoreBuckets.map(b => b.count)),
     [scoreBuckets],
   );
-  const completionRate = members.length > 0 ? Math.round((graded / members.length) * 100) : 0;
-  const { sortedGrades, totalScore, averageGrade, medianGrade, modeGrade } = useMemo(
-    () => buildScoreStats(submissions),
-    [submissions],
-  );
+
+  const members = data?.students ?? [];
+  const submitted = stats?.submitted ?? 0;
+  const missing = stats?.missing ?? 0;
+  const graded = stats?.graded ?? 0;
+  const passedCount = stats?.passed ?? 0;
+  const failedCount = stats?.failed ?? 0;
+  const submissionRate = stats?.submission_rate ?? 0;
+  const completionRate = stats?.completion_rate ?? 0;
+  const avg = stats?.average_score != null ? stats.average_score.toFixed(1) : '--';
+  const sortedGrades = data?.submissions.filter(s => typeof s.grade === 'number') ?? [];
+  const totalScore = stats?.total_score ?? 0;
+  const averageGrade = (stats?.average_grade ?? 0).toFixed(2);
+  const medianGrade = (stats?.median_grade ?? 0).toFixed(1);
+  const modeGrade = (stats?.mode_grade ?? 0).toFixed(1);
 
   if (loading) {
     return (
@@ -405,69 +385,6 @@ function CompletionRing({ value }: { value: number }) {
       />
     </svg>
   );
-}
-
-function buildScoreBuckets(submissions: ExamSubmission[]) {
-  const grades = submissions
-    .map(s => s.grade)
-    .filter((g): g is number => typeof g === 'number' && Number.isFinite(g));
-  const buckets = [
-    { label: '<=1', min: 0, max: 1 },
-    { label: '<=2', min: 1.01, max: 2 },
-    { label: '<=3', min: 2.01, max: 3 },
-    { label: '<=4', min: 3.01, max: 4 },
-    { label: '<=5', min: 4.01, max: 5 },
-    { label: '<=6', min: 5.01, max: 6 },
-    { label: '<=7', min: 6.01, max: 7 },
-    { label: '<=8', min: 7.01, max: 8 },
-    { label: '<=9', min: 8.01, max: 9 },
-    { label: '<=10', min: 9.01, max: 10 },
-  ];
-  return buckets.map(b => {
-    const count = grades.filter(g => g >= b.min && g <= b.max + 0.0001).length;
-    return {
-      label: b.label,
-      count,
-      percent: grades.length > 0 ? Math.round((count / grades.length) * 100) : 0,
-    };
-  });
-}
-
-function buildScoreStats(submissions: ExamSubmission[]) {
-  const grades = submissions
-    .map(s => s.grade)
-    .filter((g): g is number => typeof g === 'number' && Number.isFinite(g))
-    .sort((a, b) => a - b);
-  const totalScore = grades.reduce((acc, g) => acc + g, 0);
-  const average = grades.length > 0 ? totalScore / grades.length : 0;
-  const median =
-    grades.length === 0
-      ? 0
-      : grades.length % 2 === 1
-      ? grades[(grades.length - 1) / 2]
-      : (grades[grades.length / 2 - 1] + grades[grades.length / 2]) / 2;
-
-  const counts = new Map<number, number>();
-  for (const g of grades) {
-    const key = Math.round(g * 10) / 10;
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-  let mode = 0;
-  let maxCount = 0;
-  for (const [value, count] of counts.entries()) {
-    if (count > maxCount) {
-      maxCount = count;
-      mode = value;
-    }
-  }
-
-  return {
-    sortedGrades: grades,
-    totalScore,
-    averageGrade: average.toFixed(2),
-    medianGrade: median.toFixed(1),
-    modeGrade: mode.toFixed(1),
-  };
 }
 
 function ScoreStatRow({ label, value, isLast }: { label: string; value: string; isLast?: boolean }) {

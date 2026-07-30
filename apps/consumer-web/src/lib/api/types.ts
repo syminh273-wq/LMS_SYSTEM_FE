@@ -274,6 +274,7 @@ export type Exam = {
   resource_name?: string;
   created_at?: string;
   updated_at?: string;
+  submission?: ExamSubmission | null;
 };
 
 export type ExamSessionInfo = {

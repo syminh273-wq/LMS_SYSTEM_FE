@@ -143,8 +143,15 @@ class ClassroomApiClient extends BaseRestApiClient {
     return Array.isArray(response) ? response : response.results;
   }
 
-  public async examSubmission(examUid: string): Promise<ExamSubmission> {
-    return this.get<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/me/`);
+  public async retrieveExam(examUid: string): Promise<Exam> {
+    return this.get<Exam>(`/api/v1/consumer/course/exams/${examUid}/`);
+  }
+
+  public async assignments(uid: string): Promise<Exam[]> {
+    const response = await this.get<Exam[] | { results: Exam[] }>(
+      `/api/v1/consumer/course/classrooms/${uid}/assignments/`
+    );
+    return Array.isArray(response) ? response : response.results;
   }
 
   public async examQuestions(examUid: string, options?: RequestInit): Promise<{
