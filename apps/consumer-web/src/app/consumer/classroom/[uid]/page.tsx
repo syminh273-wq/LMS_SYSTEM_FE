@@ -870,7 +870,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                           key={quiz.uid}
                           type="button"
                           onClick={() => router.push(`/consumer/classroom/${uid}/quiz/${quiz.uid}`)}
-                          className="w-full flex items-center gap-4 rounded-2xl border border-border bg-muted/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20 focus:outline-none focus:ring-4 focus:ring-primary/20 cursor-pointer"
+                          className="w-full h-auto flex items-center gap-4 rounded-2xl border border-border bg-muted/60 p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-primary/20 focus:outline-none focus:ring-4 focus:ring-primary/20 cursor-pointer"
                         >
                           <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-200">
                             <Trophy size={22} />

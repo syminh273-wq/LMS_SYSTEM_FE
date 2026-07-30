@@ -587,6 +587,16 @@ export type StudentExamRecord = {
   submission: ExamSubmission | null;
 };
 
+export type StudentStatsResponse = {
+  member: ClassroomMember | null;
+  profile: StudentPublicProfile | null;
+  submissions: StudentExamRecord[];
+  ranking: {
+    profile: import('./ranking').StudentRankingProfile;
+    achievements: import('./ranking').StudentAchievement[];
+  };
+};
+
 
 export type ActivityLogLevel = 'major' | 'detail';
 

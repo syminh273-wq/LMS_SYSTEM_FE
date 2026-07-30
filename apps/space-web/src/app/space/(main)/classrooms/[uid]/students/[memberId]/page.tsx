@@ -11,6 +11,7 @@ import {
 import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
 import type { ClassroomMember, StudentExamRecord, StudentPublicProfile } from '@/lib/api/types';
+import type { StudentRankingProfile, StudentAchievement } from '@/lib/api/ranking';
 import { toast } from 'sonner';
 import SpaceStudentRankingPanel from '@/components/ranking/SpaceStudentRankingPanel';
 import { useTranslation } from '@shared/components/LocaleProvider';
@@ -39,6 +40,8 @@ export default function StudentDetailsPage({
 
   const [member, setMember]     = useState<ClassroomMember | null>(null);
   const [records, setRecords]   = useState<StudentExamRecord[]>([]);
+  const [rankingProfile, setRankingProfile] = useState<StudentRankingProfile | null>(null);
+  const [achievements, setAchievements]     = useState<StudentAchievement[]>([]);
   const [profile, setProfile]   = useState<StudentPublicProfile | null>(null);
   const [loading, setLoading]   = useState(true);
   const [blockMenu, setBlockMenu] = useState(false);
@@ -47,20 +50,12 @@ export default function StudentDetailsPage({
   useEffect(() => {
     const load = async () => {
       try {
-        const [allMembers, subs] = await Promise.all([
-          spaceApi.classrooms.members(uid),
-          spaceApi.classrooms.studentSubmissions(uid, memberId),
-        ]);
-        const found = allMembers.find(m => m.member_id === memberId) ?? null;
-        setMember(found);
-        setRecords(subs);
-
-        // Try to load public profile (non-critical)
-        if (found) {
-          spaceApi.classrooms.getStudentPublicProfile(found.member_id)
-            .then(setProfile)
-            .catch(() => {});
-        }
+        const stats = await spaceApi.classrooms.studentStats(uid, memberId);
+        setMember(stats.member);
+        setProfile(stats.profile);
+        setRecords(stats.submissions);
+        setRankingProfile(stats.ranking.profile);
+        setAchievements(stats.ranking.achievements);
       } catch {
         toast.error('Không thể tải dữ liệu sinh viên');
       } finally {
@@ -258,7 +253,7 @@ export default function StudentDetailsPage({
             {t('ranking.title', 'Ranking')}
           </h2>
         </div>
-        <SpaceStudentRankingPanel studentUid={memberId} t={t} />
+        <SpaceStudentRankingPanel profile={rankingProfile} achievements={achievements} t={t} />
       </div>
 
       {/* ── Stats ── */}

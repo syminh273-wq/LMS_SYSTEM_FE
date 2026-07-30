@@ -170,15 +170,15 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                     <Trophy size={16} className="text-amber-500" />
                     <h3 className="text-sm font-black uppercase tracking-widest text-foreground">Top 3 xuất sắc</h3>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex flex-wrap justify-center gap-4">
                     {[...data.top_3].sort((a, b) => a.rank - b.rank).map((e) => {
                       const isFirst = e.rank === 1;
                       return (
-                        <Button
+                        <button
                           key={e.student_id}
                           type="button"
                           onClick={() => void openDetail(e)}
-                          className={`group relative text-left rounded-3xl p-5 shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl ${
+                          className={`group relative block w-full sm:w-72 text-left rounded-3xl p-5 shadow-lg transition-all hover:-translate-y-1 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                             isFirst
                               ? 'bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 border-2 border-amber-300 md:scale-105 md:z-10'
                               : e.rank === 2
@@ -225,7 +225,7 @@ export default function QuizLeaderboardModal({ quizUid, classroomId, onClose }: 
                               </div>
                             </div>
                           </div>
-                        </Button>
+                        </button>
                       );
                     })}
                   </div>

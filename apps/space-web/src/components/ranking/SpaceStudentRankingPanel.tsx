@@ -1,50 +1,19 @@
-import { useEffect, useState } from 'react';
 import { Flame, Sparkles, Star, Trophy, Zap, BookOpen, CheckCircle2, Lock } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { cn } from '@shared/lib/utils';
-import {
-  spaceRankingApi,
-  type StudentRankingProfile,
-  type StudentAchievement,
-} from '@/lib/api/ranking';
+import type { StudentRankingProfile, StudentAchievement } from '@/lib/api/ranking';
 
 export interface SpaceStudentRankingPanelProps {
-  studentUid: string;
+  profile: StudentRankingProfile | null;
+  achievements: StudentAchievement[];
   t: (key: string, fallback?: string, values?: Record<string, string | number>) => string;
 }
 
 export default function SpaceStudentRankingPanel({
-  studentUid,
+  profile,
+  achievements,
   t,
 }: SpaceStudentRankingPanelProps) {
-  const [profile, setProfile] = useState<StudentRankingProfile | null>(null);
-  const [achievements, setAchievements] = useState<StudentAchievement[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const [p, a] = await Promise.all([
-          spaceRankingApi.getStudentProfile(studentUid),
-          spaceRankingApi.getStudentAchievements(studentUid).catch(() => [] as StudentAchievement[]),
-        ]);
-        if (cancelled) return;
-        setProfile(p);
-        setAchievements(a);
-      } catch {
-        if (!cancelled) setProfile(null);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [studentUid]);
-
-  if (loading) {
-    return <div className="h-48 shimmer rounded-2xl" />;
-  }
   if (!profile) {
     return (
       <Card>

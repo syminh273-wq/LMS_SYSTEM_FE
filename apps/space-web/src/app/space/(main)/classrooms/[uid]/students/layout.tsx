@@ -65,9 +65,10 @@ export default function StudentsLayout({
                   key={id}
                   title={label}
                   onClick={() => goToTab(id)}
-                  className={`w-full flex justify-center py-3 transition-colors relative ${
+                  variant="ghost"
+                  className={`w-full flex justify-center py-3 rounded-none transition-colors relative ${
                     isActive
-                      ? 'text-primary-brand bg-primary-brand-light'
+                      ? 'text-primary-brand bg-primary-brand-light hover:bg-primary-brand-light hover:text-primary-brand'
                       : 'text-muted-foreground hover:bg-muted/50 hover:text-muted-foreground'
                   }`}
                 >

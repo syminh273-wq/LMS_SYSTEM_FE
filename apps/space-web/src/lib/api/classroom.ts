@@ -4,12 +4,12 @@ import type {
   ClassroomMember,
   ClassroomPreviewResponse,
   StudentExamRecord,
+  StudentStatsResponse,
   PaginatedResponse,
   CreateClassroomRequest,
   UpdateClassroomRequest,
   SharingLink,
   ActivityLog,
-  StudentPublicProfile,
   BlacklistEntry,
 } from './types';
 
@@ -68,8 +68,8 @@ class ClassroomApiClient extends BaseRestApiClient {
     return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/submissions/`);
   }
 
-  public async getStudentPublicProfile(consumerUid: string): Promise<StudentPublicProfile> {
-    return this.get(`/api/v1/consumer/account/profile/${consumerUid}/public/`);
+  public async studentStats(classroomUid: string, memberId: string): Promise<StudentStatsResponse> {
+    return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/stats/`);
   }
 
   // ── Classroom blacklist ────────────────────────────────────────────────────

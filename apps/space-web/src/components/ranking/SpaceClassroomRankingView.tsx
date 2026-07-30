@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { Award, Crown, Medal, Sparkles, Trophy, TrendingUp, Users } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
+import { Badge } from '@shared/components/ui/badge';
 import { cn } from '@shared/lib/utils';
 import { spaceRankingApi, type ClassroomLeaderboardResponse } from '@/lib/api/ranking';
 
@@ -132,6 +133,7 @@ export default function SpaceClassroomRankingView({
           label={t('ranking.total_students', 'Students ranked')}
           value={total}
           accent="from-sky-500 to-indigo-500"
+          shadow="shadow-sky-500/20"
         />
         <StatCard
           icon={Crown}
@@ -139,71 +141,65 @@ export default function SpaceClassroomRankingView({
           value={top.student_name}
           sub={`${top.total_xp.toLocaleString()} XP · Lv ${top.level}`}
           accent="from-amber-500 to-orange-500"
+          shadow="shadow-amber-500/20"
         />
         <StatCard
           icon={TrendingUp}
           label={t('ranking.avg_xp', 'Average XP')}
-          value={`${avgXp.toLocaleString()}`}
-          sub="XP"
+          value={`${avgXp.toLocaleString()} XP`}
           accent="from-emerald-500 to-teal-500"
+          shadow="shadow-emerald-500/20"
         />
       </div>
 
       {/* Podium for top 3 */}
       {top3.length > 0 && (
-        <Card>
+        <Card className="overflow-hidden">
+          <div className="pointer-events-none h-1.5 w-full bg-gradient-to-r from-amber-400 via-orange-400 to-amber-400" />
           <CardContent className="p-6">
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-6 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-500" />
               <h3 className="text-sm font-black uppercase tracking-wider text-foreground">
                 {t('ranking.top3', 'Top 3')}
               </h3>
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { entry: top3[1], height: 'h-28', color: 'from-slate-300 to-slate-400' },
-                { entry: top3[0], height: 'h-36', color: 'from-amber-400 to-orange-500' },
-                { entry: top3[2], height: 'h-24', color: 'from-orange-300 to-orange-400' },
-              ].map((slot, i) => {
-                if (!slot.entry) return <div key={i} />;
-                return (
-                  <PodiumCell
-                    key={slot.entry.student_id}
-                    entry={slot.entry}
-                    heightClass={slot.height}
-                    colorClass={slot.color}
-                    onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${slot.entry.student_id}`)}
-                  />
-                );
-              })}
+            <div className="flex items-end justify-center gap-4 sm:gap-10">
+              {top3.map((entry, i) => (
+                <PodiumCell
+                  key={entry.student_id}
+                  entry={entry}
+                  rank={(i + 1) as 1 | 2 | 3}
+                  onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${entry.student_id}`)}
+                />
+              ))}
             </div>
           </CardContent>
         </Card>
       )}
 
       {/* Full ranking list */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardContent className="p-0">
-          <div className="flex items-center justify-between border-b border-border px-5 py-3">
+          <div className="flex items-center justify-between border-b border-border bg-muted/40 px-5 py-3">
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4 text-primary-brand" />
               <h3 className="text-sm font-black uppercase tracking-wider text-foreground">
                 {t('ranking.full_list', 'Full ranking')}
               </h3>
             </div>
-            <span className="text-xs text-muted-foreground">
+            <Badge variant="secondary" className="rounded-full font-bold">
               {t('ranking.entries_count', '{{count}} students', { count: data.entries.length })}
-            </span>
+            </Badge>
           </div>
           <ul className="divide-y divide-border">
             {data.entries.map((entry) => (
               <li
                 key={entry.student_id}
                 onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${entry.student_id}`)}
-                className="flex cursor-pointer items-center gap-3 px-5 py-3 transition hover:bg-muted"
+                className="group flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/60"
               >
                 {rankBadge(entry.rank)}
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-black text-white">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-black text-white ring-2 ring-background">
                   {entry.student_avatar ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -217,13 +213,13 @@ export default function SpaceClassroomRankingView({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-bold text-foreground">
+                    <p className="truncate text-sm font-bold text-foreground group-hover:text-primary-brand">
                       {entry.student_name}
                     </p>
                     {entry.level_title && (
-                      <span className="shrink-0 rounded-full bg-primary-brand/10 px-2 py-0.5 text-[10px] font-bold text-primary-brand">
+                      <Badge className="shrink-0 rounded-full bg-primary-brand/10 px-2 py-0 text-[10px] font-bold text-primary-brand hover:bg-primary-brand/10">
                         {entry.level_title}
-                      </span>
+                      </Badge>
                     )}
                   </div>
                   <p className="truncate text-xs text-muted-foreground">
@@ -235,7 +231,7 @@ export default function SpaceClassroomRankingView({
                     </p>
                   )}
                 </div>
-                <div className="rounded-full bg-primary-brand/10 px-2.5 py-0.5 text-xs font-bold text-primary-brand">
+                <div className="shrink-0 rounded-full bg-primary-brand/10 px-2.5 py-0.5 text-xs font-bold text-primary-brand">
                   Lv {entry.level}
                 </div>
               </li>
@@ -269,57 +265,98 @@ function StatCard({
   value,
   sub,
   accent,
+  shadow,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string | number;
   sub?: string;
   accent: string;
+  shadow?: string;
 }) {
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm',
-              accent,
-            )}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-              {label}
-            </p>
-            <p className="truncate text-lg font-black text-foreground">{value}</p>
-            {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
-          </div>
+    <Card className="transition-shadow hover:shadow-md">
+      <CardContent className="flex items-center gap-3 p-4">
+        <div
+          className={cn(
+            'flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-lg',
+            accent,
+            shadow,
+          )}
+        >
+          <Icon className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+            {label}
+          </p>
+          <p className="truncate text-lg font-black leading-tight text-foreground">{value}</p>
+          {sub && <p className="truncate text-[10px] font-medium text-muted-foreground">{sub}</p>}
         </div>
       </CardContent>
     </Card>
   );
 }
 
+const PODIUM_STYLES: Record<
+  1 | 2 | 3,
+  { ring: string; bar: string; barHeight: string; avatarSize: string; order: string }
+> = {
+  1: {
+    ring: 'ring-amber-400',
+    bar: 'from-amber-400 via-amber-500 to-orange-500',
+    barHeight: 'h-28',
+    avatarSize: 'h-16 w-16 text-base',
+    order: 'order-2',
+  },
+  2: {
+    ring: 'ring-slate-300',
+    bar: 'from-slate-300 to-slate-400',
+    barHeight: 'h-20',
+    avatarSize: 'h-12 w-12 text-xs',
+    order: 'order-1',
+  },
+  3: {
+    ring: 'ring-orange-300',
+    bar: 'from-orange-300 to-orange-400',
+    barHeight: 'h-16',
+    avatarSize: 'h-12 w-12 text-xs',
+    order: 'order-3',
+  },
+};
+
 function PodiumCell({
   entry,
-  heightClass,
-  colorClass,
+  rank,
   onClick,
 }: {
   entry: ClassroomLeaderboardResponse['entries'][number];
-  heightClass: string;
-  colorClass: string;
+  rank: 1 | 2 | 3;
   onClick: () => void;
 }) {
+  const style = PODIUM_STYLES[rank];
+  const isFirst = rank === 1;
+
   return (
-    <Button
+    <button
       type="button"
       onClick={onClick}
-      className="group flex flex-col items-center justify-end gap-2 text-center"
+      className={cn(
+        'group flex w-24 flex-col items-center gap-1.5 rounded-2xl p-2 text-center transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-28',
+        style.order,
+      )}
     >
-      <div className="flex flex-col items-center gap-1">
-        <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-muted text-xs font-black text-muted-foreground ring-2 ring-white">
+      <div className="relative mb-0.5">
+        {isFirst && (
+          <Crown className="absolute -top-5 left-1/2 h-5 w-5 -translate-x-1/2 text-amber-500 drop-shadow" />
+        )}
+        <div
+          className={cn(
+            'flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 font-black text-white ring-4',
+            style.ring,
+            style.avatarSize,
+          )}
+        >
           {entry.student_avatar ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={entry.student_avatar} alt={entry.student_name} className="h-full w-full object-cover" />
@@ -327,27 +364,27 @@ function PodiumCell({
             initials(entry.student_name)
           )}
         </div>
-        <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-foreground group-hover:text-primary-brand">
-          {entry.student_name}
-        </p>
-        {entry.level_title && (
-          <span className="rounded-full bg-primary-brand/10 px-2 py-0.5 text-[9px] font-bold text-primary-brand">
-            {entry.level_title}
-          </span>
-        )}
-        <p className="text-[10px] text-muted-foreground">
-          {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
-        </p>
       </div>
+      <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-foreground group-hover:text-primary-brand">
+        {entry.student_name}
+      </p>
+      {entry.level_title && (
+        <Badge variant="secondary" className="rounded-full px-2 py-0 text-[9px] font-bold">
+          {entry.level_title}
+        </Badge>
+      )}
+      <p className="text-[10px] font-medium text-muted-foreground">
+        {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
+      </p>
       <div
         className={cn(
-          'flex w-full items-end justify-center rounded-t-xl bg-gradient-to-b text-xs font-black text-white shadow-sm transition group-hover:scale-[1.02]',
-          heightClass,
-          colorClass,
+          'mt-1 flex w-full items-start justify-center rounded-t-2xl bg-gradient-to-b pt-2 text-white shadow-inner transition group-hover:brightness-105',
+          style.bar,
+          style.barHeight,
         )}
       >
-        <span className="pb-2 text-base">#{entry.rank}</span>
+        <span className="text-lg font-black drop-shadow-sm">#{rank}</span>
       </div>
-    </Button>
+    </button>
   );
 }
