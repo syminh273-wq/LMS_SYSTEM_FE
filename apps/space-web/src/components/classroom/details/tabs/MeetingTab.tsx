@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Video, MonitorUp, Camera, Wifi, WifiOff, Users, X, Loader2 } from 'lucide-react';
+import { Video, MonitorUp, Camera, CameraOff, Wifi, WifiOff, Users, X, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
+import { FrameViewer } from '@/components/rtc/frame-viewer';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 
 interface MeetingTabProps {
@@ -11,12 +12,13 @@ interface MeetingTabProps {
   loadingMeetings: boolean;
   meetingAction: 'start' | 'end' | null;
   localStream: MediaStream | null;
-  remoteStream: MediaStream | null;
+  remoteFrame: string | null;
   localSource: 'screen' | 'camera' | null;
   rtcConnected: boolean;
   handleStartMeeting: (source: 'screen' | 'camera') => Promise<void> | void;
   handleEndMeeting: () => Promise<void> | void;
   stopMediaShare: () => void;
+  toggleCamera: () => void;
   formatDateTime: (v: string) => string;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;
 }
@@ -28,15 +30,17 @@ export default function MeetingTab({
   loadingMeetings,
   meetingAction,
   localStream,
-  remoteStream,
+  remoteFrame,
   localSource,
   rtcConnected,
   handleStartMeeting,
   handleEndMeeting,
   stopMediaShare,
+  toggleCamera,
   formatDateTime,
   t,
 }: MeetingTabProps) {
+  const cameraEnabled = localSource === 'camera' && (localStream?.getVideoTracks()[0]?.enabled ?? true);
   return (
     <div className="flex h-full flex-col animate-in fade-in duration-300 bg-card rounded-[32px] overflow-hidden shadow-sm">
       <div className="p-10 bg-muted/50 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
@@ -78,15 +82,30 @@ export default function MeetingTab({
                   </Button>
                 </>
               ) : (
-                <Button
-                  onClick={stopMediaShare}
-                  disabled={meetingAction !== null}
-                  variant="outline"
-                  className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 uppercase tracking-widest"
-                >
-                  <WifiOff size={18} />
-                  {t('classroom.ui.meeting_stop_streaming')}
-                </Button>
+                <>
+                  {localSource === 'camera' && (
+                    <Button
+                      onClick={toggleCamera}
+                      disabled={meetingAction !== null}
+                      variant="outline"
+                      className={`h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold uppercase tracking-widest ${
+                        cameraEnabled ? 'hover:bg-muted' : 'text-rose-600 hover:bg-rose-50'
+                      }`}
+                    >
+                      {cameraEnabled ? <Camera size={18} /> : <CameraOff size={18} />}
+                      {cameraEnabled ? t('classroom.ui.meeting_disable_camera', 'Tắt camera') : t('classroom.ui.meeting_enable_camera_back', 'Bật lại camera')}
+                    </Button>
+                  )}
+                  <Button
+                    onClick={stopMediaShare}
+                    disabled={meetingAction !== null}
+                    variant="outline"
+                    className="h-12 rounded-2xl px-6 gap-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 uppercase tracking-widest"
+                  >
+                    <WifiOff size={18} />
+                    {t('classroom.ui.meeting_stop_streaming')}
+                  </Button>
+                </>
               )}
               <Button
                 onClick={() => void handleEndMeeting()}
@@ -165,9 +184,9 @@ export default function MeetingTab({
             </div>
 
             <div className="rounded-[40px] bg-slate-950 p-6 shadow-2xl shadow-primary-brand/10">
-              {remoteStream ? (
+              {remoteFrame ? (
                 <div className="rounded-[24px] overflow-hidden">
-                  <ScreenShareViewer stream={remoteStream} label={t('classroom.ui.meeting_remote_stream')} />
+                  <FrameViewer frame={remoteFrame} label={t('classroom.ui.meeting_remote_stream')} />
                 </div>
               ) : localStream ? (
                 <div className="rounded-[24px] overflow-hidden">

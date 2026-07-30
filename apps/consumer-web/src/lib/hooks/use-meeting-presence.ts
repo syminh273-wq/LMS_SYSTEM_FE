@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getDatabase, ref, onValue, off, type Database } from 'firebase/database';
-import firebaseApp from '@/lib/firebase';
+import { ref, onValue, off } from 'firebase/database';
+import firebaseApp, { getRealtimeDatabase } from '@/lib/firebase';
 import { meetingRoomApi, type LiveRoomMarker, type MeetingRoom } from '@/lib/api/meeting-room';
 
 export type UseMeetingPresenceResult = {
@@ -13,15 +13,6 @@ type Options = {
   classroomUid: string | null | undefined;
   enabled?: boolean;
 };
-
-let cachedDb: Database | null = null;
-function getCachedDb(app: typeof firebaseApp): Database | null {
-  if (!app) return null;
-  if (!cachedDb) {
-    cachedDb = getDatabase(app);
-  }
-  return cachedDb;
-}
 
 /**
  * Subscribes to `classrooms/{classroomUid}/live_room` on Firebase Realtime DB
@@ -44,11 +35,37 @@ export function useMeetingPresence({ classroomUid, enabled = true }: Options): U
     let cancelled = false;
     setLoading(true);
 
+    let firebaseRef: ReturnType<typeof ref> | null = null;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+
+    // REST fallback — used when Firebase isn't configured, fails to subscribe,
+    // or errors out at runtime (e.g. RTDB rules deny read access).
+    const startPolling = () => {
+      if (pollInterval) return;
+      const poll = async () => {
+        try {
+          const res = await meetingRoomApi.getLiveRoom(classroomUid);
+          if (cancelled) return;
+          setMarker(res.live_room);
+          setRoom(res.room);
+        } catch {
+          if (!cancelled) {
+            setMarker(null);
+            setRoom(null);
+          }
+        } finally {
+          if (!cancelled) setLoading(false);
+        }
+      };
+      void poll();
+      pollInterval = setInterval(poll, 5000);
+    };
+
     if (firebaseApp) {
       try {
-        const db = getCachedDb(firebaseApp);
+        const db = getRealtimeDatabase();
         if (!db) throw new Error('No db');
-        const r = ref(db, `classrooms/${classroomUid}/live_room`);
+        firebaseRef = ref(db, `classrooms/${classroomUid}/live_room`);
 
         const handler = (snap: { val: () => unknown }) => {
           if (cancelled) return;
@@ -66,41 +83,37 @@ export function useMeetingPresence({ classroomUid, enabled = true }: Options): U
           } else {
             setMarker(null);
             setRoom(null);
+            // Khi Firebase báo "không có live room", vẫn poll REST định kỳ
+            // để bắt được khi giáo viên mở lớp mà Firebase chưa cập nhật kịp
+            // (RTDB rules deny write, hoặc write bị lỗi mạng).
+            if (!pollInterval) startPolling();
           }
           setLoading(false);
         };
 
-        onValue(r, handler);
-        return () => {
-          cancelled = true;
-          off(r);
+        // onValue's error callback fires asynchronously (permission-denied, disconnect, etc.)
+        // — a try/catch around the subscribe call can't see it, so it must be handled here
+        // to still fall back to REST polling instead of hanging silently.
+        const errorHandler = (err: Error) => {
+          if (cancelled) return;
+          console.warn('[useMeetingPresence] Firebase onValue error, falling back to REST:', err);
+          if (firebaseRef) off(firebaseRef);
+          startPolling();
         };
+
+        onValue(firebaseRef, handler, errorHandler);
       } catch (err) {
         console.warn('[useMeetingPresence] Firebase subscribe failed, falling back to REST:', err);
+        startPolling();
       }
+    } else {
+      startPolling();
     }
 
-    const poll = async () => {
-      try {
-        const res = await meetingRoomApi.getLiveRoom(classroomUid);
-        if (cancelled) return;
-        setMarker(res.live_room);
-        setRoom(res.room);
-      } catch {
-        if (!cancelled) {
-          setMarker(null);
-          setRoom(null);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    void poll();
-    const interval = setInterval(poll, 5000);
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      if (firebaseRef) off(firebaseRef);
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [classroomUid, enabled]);
 

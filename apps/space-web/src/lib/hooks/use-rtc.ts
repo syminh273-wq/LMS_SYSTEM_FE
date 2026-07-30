@@ -1,175 +1,80 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 
-interface RTCMessage {
-  type: 'offer' | 'answer' | 'ice-candidate';
-  offer?: RTCSessionDescriptionInit;
-  answer?: RTCSessionDescriptionInit;
-  candidate?: RTCIceCandidateInit;
-}
-
 export type RtcMediaSource = 'screen' | 'camera';
 
-const ICE_SERVERS: RTCConfiguration = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-  ],
-};
-
-const PC_CONFIG: RTCConfiguration = {
-  ...ICE_SERVERS,
-};
+// Video is relayed as JPEG frames over the same WS used for signaling —
+// no WebRTC/ICE/STUN/TURN involved. Simple, works through any firewall,
+// trade-off is higher bandwidth/latency than a real video codec.
+const FRAME_INTERVAL_MS = 120; // ~8 fps
+const FRAME_MAX_WIDTH = 640;
+const FRAME_JPEG_QUALITY = 0.6;
 
 export function useRTC(roomUid: string | null) {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [remoteFrame, setRemoteFrame] = useState<string | null>(null);
   const [localSource, setLocalSource] = useState<RtcMediaSource | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const pcRef = useRef<RTCPeerConnection | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
-  const makingOfferRef = useRef(false);
-  const ignoreOfferRef = useRef(false);
-  const isSettingRemoteAnswerPendingRef = useRef(false);
-  const lastOfferSdpRef = useRef<string | null>(null);
+  const captureVideoRef = useRef<HTMLVideoElement | null>(null);
+  const captureCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const captureIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const sendSignaling = useCallback((payload: object) => {
+  const sendWs = useCallback((payload: object) => {
     const ws = wsRef.current;
-    if (!ws) return;
-    const data = JSON.stringify(payload);
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(data);
-    } else {
-      const sendOnOpen = () => {
-        ws.send(data);
-        ws.removeEventListener('open', sendOnOpen);
-      };
-      ws.addEventListener('open', sendOnOpen, { once: true });
-    }
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify(payload));
   }, []);
 
-  const setupPeerConnection = useCallback((pc: RTCPeerConnection) => {
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        sendSignaling({ type: 'ice-candidate', candidate: event.candidate });
-      }
-    };
-
-    pc.ontrack = (event) => {
-      const stream = event.streams?.[0];
-      if (stream) {
-        setRemoteStream(stream);
-      } else if (event.track) {
-        setRemoteStream((prev) => {
-          if (prev) {
-            prev.addTrack(event.track);
-            return prev;
-          }
-          const s = new MediaStream([event.track]);
-          return s;
-        });
-      }
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      setIsConnected(pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed');
-      if (pc.iceConnectionState === 'failed') {
-        setError('ICE connection failed (check network/NAT)');
-        void pc.restartIce();
-      }
-    };
-
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
-        setIsConnected(false);
-      }
-    };
-  }, [sendSignaling]);
-
-  const ensurePeerConnection = useCallback((): RTCPeerConnection => {
-    if (pcRef.current && pcRef.current.signalingState !== 'closed') {
-      return pcRef.current;
+  const stopFrameCapture = useCallback(() => {
+    if (captureIntervalRef.current) {
+      clearInterval(captureIntervalRef.current);
+      captureIntervalRef.current = null;
     }
-    const pc = new RTCPeerConnection(PC_CONFIG);
-    setupPeerConnection(pc);
-    pcRef.current = pc;
-    return pc;
-  }, [setupPeerConnection]);
+    captureVideoRef.current?.pause();
+    captureVideoRef.current = null;
+    captureCanvasRef.current = null;
+  }, []);
 
-  const createOffer = useCallback(async () => {
-    const pc = pcRef.current;
-    if (!pc) return;
-    if (pc.signalingState !== 'stable' || makingOfferRef.current) return;
-    try {
-      makingOfferRef.current = true;
-      const offer = await pc.createOffer();
-      if (offer.sdp === lastOfferSdpRef.current) {
-        return;
-      }
-      lastOfferSdpRef.current = offer.sdp ?? null;
-      await pc.setLocalDescription(offer);
-      sendSignaling({ type: 'offer', offer });
-    } catch (err) {
-      console.error('[RTC] createOffer error:', err);
-    } finally {
-      makingOfferRef.current = false;
-    }
-  }, [sendSignaling]);
+  const startFrameCapture = useCallback((stream: MediaStream) => {
+    stopFrameCapture();
 
-  const handleSignaling = useCallback(async (data: RTCMessage) => {
-    if (!data || !data.type) return;
-    const pc = ensurePeerConnection();
-    try {
-      if (data.type === 'offer' && data.offer) {
-        const readyForOffer =
-          !makingOfferRef.current &&
-          (pc.signalingState === 'stable' || isSettingRemoteAnswerPendingRef.current === false);
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    void video.play().catch(() => {});
+    captureVideoRef.current = video;
 
-        if (!readyForOffer) {
-          if (pc.signalingState === 'have-local-offer') {
-            await Promise.all([
-              pc.setLocalDescription({ type: 'rollback' }),
-            ]);
-          }
-        }
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-        await pc.setLocalDescription();
-        const answer = pc.localDescription;
-        if (answer) {
-          sendSignaling({ type: 'answer', answer });
-        }
-      } else if (data.type === 'answer' && data.answer) {
-        if (pc.signalingState === 'have-local-offer') {
-          await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-        }
-      } else if (data.type === 'ice-candidate' && data.candidate) {
-        try {
-          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-        } catch (err) {
-          console.warn('[RTC] addIceCandidate error (ignored):', err);
-        }
-      }
-    } catch (err) {
-      console.error('[RTC] signaling error:', err);
-      setError(err instanceof Error ? err.message : 'Signaling failed');
-    }
-  }, [ensurePeerConnection, sendSignaling]);
+    const canvas = document.createElement('canvas');
+    captureCanvasRef.current = canvas;
 
-  useEffect(() => {
-    if (!roomUid) return;
-    const handler = (event: Event) => {
-      const peer = (event as CustomEvent).detail;
-      if (!peer) return;
-      if (!localStreamRef.current) return;
-      if (!pcRef.current) return;
-      void createOffer();
-    };
-    window.addEventListener('rtc:peer-joined', handler);
-    return () => window.removeEventListener('rtc:peer-joined', handler);
-  }, [roomUid, createOffer]);
+    // Sends on a fixed interval regardless of WS readiness — sendWs() is a
+    // no-op until the socket opens, and frames simply start flowing once it
+    // does (no need to buffer/queue anything for a fixed-rate stream).
+    captureIntervalRef.current = setInterval(() => {
+      if (video.readyState < video.HAVE_CURRENT_DATA || !video.videoWidth) return;
+      const scale = Math.min(1, FRAME_MAX_WIDTH / video.videoWidth);
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', FRAME_JPEG_QUALITY);
+      sendWs({ type: 'video-frame', image: dataUrl });
+    }, FRAME_INTERVAL_MS);
+  }, [sendWs, stopFrameCapture]);
+
+  const stopLocalStream = useCallback(() => {
+    stopFrameCapture();
+    localStreamRef.current?.getTracks().forEach((track) => track.stop());
+    localStreamRef.current = null;
+    setLocalStream(null);
+    setLocalSource(null);
+  }, [stopFrameCapture]);
 
   useEffect(() => {
     if (!roomUid) return;
@@ -180,24 +85,22 @@ export function useRTC(roomUid: string | null) {
     const ws = new WebSocket(`${wsBase}/ws/rtc/${roomUid}/?token=${token}`);
     wsRef.current = ws;
 
+    ws.onopen = () => setIsConnected(true);
+    ws.onclose = () => setIsConnected(false);
+    ws.onerror = () => setError('WebSocket connection error');
+
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data?.type === 'peer-joined') {
-          window.dispatchEvent(new CustomEvent('rtc:peer-joined', { detail: data.peer }));
-          return;
+        if (data?.type === 'video-frame' && typeof data.image === 'string') {
+          setRemoteFrame(data.image);
         }
-        if (data?.type === 'peer-left') {
-          window.dispatchEvent(new CustomEvent('rtc:peer-left', { detail: data.peer }));
-          return;
-        }
-        void handleSignaling(data as RTCMessage);
+        // peer-joined/peer-left are informational only in the frame-relay model —
+        // no renegotiation needed, frames just start/stop arriving.
       } catch (err) {
         console.error('[RTC] WS message parse error:', err);
       }
     };
-
-    ws.onerror = () => setError('WebSocket connection error');
 
     return () => {
       ws.close();
@@ -205,32 +108,10 @@ export function useRTC(roomUid: string | null) {
         wsRef.current = null;
       }
     };
-  }, [handleSignaling, roomUid]);
-
-  const stopLocalStream = useCallback(() => {
-    localStreamRef.current?.getTracks().forEach((track) => track.stop());
-    localStreamRef.current = null;
-    setLocalStream(null);
-    setLocalSource(null);
-  }, []);
+  }, [roomUid]);
 
   const startMediaShare = useCallback(async (source: RtcMediaSource) => {
     try {
-      const existingStream = localStreamRef.current;
-      const sameSource =
-        existingStream &&
-        ((source === 'screen' && existingStream.getVideoTracks()[0]?.getSettings().displaySurface) ||
-          (source === 'camera' && !existingStream.getVideoTracks()[0]?.getSettings().displaySurface));
-
-      if (existingStream && sameSource) {
-        const pc = ensurePeerConnection();
-        const hasTrack = pc.getSenders().some((s) => s.track && existingStream.getTracks().includes(s.track));
-        if (!hasTrack) {
-          existingStream.getTracks().forEach((track) => pc.addTrack(track, existingStream));
-        }
-        return;
-      }
-
       stopLocalStream();
 
       const stream = source === 'screen'
@@ -242,43 +123,16 @@ export function useRTC(roomUid: string | null) {
       setLocalSource(source);
       stream.getVideoTracks()[0]?.addEventListener('ended', stopLocalStream, { once: true });
 
-      const pc = ensurePeerConnection();
-      stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-      void createOffer();
+      startFrameCapture(stream);
     } catch (err) {
       console.error('[RTC] startMediaShare error:', err);
       setError(err instanceof Error ? err.message : 'Failed to start media share');
       throw err;
     }
-  }, [createOffer, ensurePeerConnection, stopLocalStream]);
-
-  const renegotiate = useCallback(() => {
-    const pc = pcRef.current;
-    if (!pc) return;
-    if (pc.signalingState === 'stable' && !makingOfferRef.current) {
-      void pc.setLocalDescription().then(() => {
-        const offer = pc.localDescription;
-        if (offer) {
-          sendSignaling({ type: 'offer', offer });
-        }
-      }).catch((err) => {
-        console.error('[RTC] renegotiate error:', err);
-      });
-    }
-  }, [sendSignaling]);
+  }, [startFrameCapture, stopLocalStream]);
 
   const stopMediaShare = useCallback(() => {
     stopLocalStream();
-    const pc = pcRef.current;
-    if (pc) {
-      pc.getSenders().forEach((sender) => {
-        if (sender.track) {
-          try { sender.track.stop(); } catch {}
-          try { pc.removeTrack(sender); } catch {}
-        }
-      });
-    }
-    setIsConnected(false);
   }, [stopLocalStream]);
 
   const toggleCamera = useCallback(() => {
@@ -289,20 +143,13 @@ export function useRTC(roomUid: string | null) {
     }
     const videoTrack = stream.getVideoTracks()[0];
     if (!videoTrack) return;
-    if (videoTrack.enabled) {
-      videoTrack.enabled = false;
-      setLocalStream(new MediaStream(stream.getTracks()));
-    } else {
-      videoTrack.enabled = true;
-      setLocalStream(new MediaStream(stream.getTracks()));
-    }
+    videoTrack.enabled = !videoTrack.enabled;
+    setLocalStream(new MediaStream(stream.getTracks()));
   }, [startMediaShare]);
 
   const cleanup = useCallback(() => {
     stopLocalStream();
-    pcRef.current?.close();
-    pcRef.current = null;
-    setRemoteStream(null);
+    setRemoteFrame(null);
     setIsConnected(false);
     setError(null);
   }, [stopLocalStream]);
@@ -313,7 +160,7 @@ export function useRTC(roomUid: string | null) {
 
   return {
     localStream,
-    remoteStream,
+    remoteFrame,
     localSource,
     isConnected,
     error,
@@ -322,8 +169,6 @@ export function useRTC(roomUid: string | null) {
     startCameraShare,
     stopMediaShare,
     stopScreenShare,
-    renegotiate,
-    createOffer,
     toggleCamera,
   };
 }

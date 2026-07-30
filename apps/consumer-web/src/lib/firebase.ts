@@ -1,4 +1,5 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { getDatabase, type Database } from "firebase/database";
 
 const firebaseConfigured =
   !!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
@@ -45,3 +46,21 @@ function resolveApp(): FirebaseApp | null {
 const app = resolveApp();
 
 export default app;
+
+let cachedDb: Database | null = null;
+
+/**
+ * Single shared Realtime Database instance for this app.
+ * Every caller must go through here — calling `getDatabase()` again
+ * elsewhere on the same app with a different URL format triggers
+ * Firebase's "Database initialized multiple times" fatal error.
+ */
+export function getRealtimeDatabase(): Database | null {
+  if (!app) return null;
+  if (!cachedDb) {
+    cachedDb = firebaseConfig.databaseURL
+      ? getDatabase(app, firebaseConfig.databaseURL)
+      : getDatabase(app);
+  }
+  return cachedDb;
+}

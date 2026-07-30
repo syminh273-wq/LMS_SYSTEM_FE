@@ -1,17 +1,10 @@
-import { getDatabase, ref, set } from "firebase/database";
-import firebaseApp, { firebaseConfig } from "./firebase";
-
-const RTDB_URL = firebaseConfig.databaseURL;
-
-let cachedDb: ReturnType<typeof getDatabase> | null = null;
+import { ref, set } from "firebase/database";
+import firebaseApp, { getRealtimeDatabase } from "./firebase";
 
 function getDb() {
-  if (cachedDb) return cachedDb;
-  if (!firebaseApp) throw new Error("Firebase app not initialized");
-  cachedDb = RTDB_URL
-    ? getDatabase(firebaseApp, RTDB_URL)
-    : getDatabase(firebaseApp);
-  return cachedDb;
+  const db = getRealtimeDatabase();
+  if (!db) throw new Error("Firebase app not initialized");
+  return db;
 }
 
 export async function sendJoinClassroomNotification(params: {

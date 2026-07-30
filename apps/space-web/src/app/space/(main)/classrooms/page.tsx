@@ -24,9 +24,7 @@ import {
   Pencil,
   Trash2,
   Download,
-  GraduationCap,
-  TrendingUp,
-  BarChart3
+  GraduationCap
 } from 'lucide-react';
 import {
   Card,
@@ -551,7 +549,7 @@ export default function ClassroomsPage() {
 
       {/* Stats Section */}
       {!loading && classrooms.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-4">
+        <div className="grid grid-cols-1 gap-8 mt-4">
           {/* Total Classrooms Card */}
           <div className="bg-gradient-to-br from-primary-brand to-primary-brand-dark rounded-3xl p-8 text-white shadow-xl shadow-primary-brand/20 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-12 opacity-10 group-hover:scale-110 transition-transform duration-500">
@@ -561,50 +559,12 @@ export default function ClassroomsPage() {
             <div className="relative">
               <p className="text-indigo-100 text-sm font-bold uppercase tracking-widest mb-2 opacity-80">{t('classroom.ui.list_stats_title')}</p>
               <h2 className="text-6xl font-bold mb-8">{data?.count ?? classrooms.length}</h2>
-
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-card/10 backdrop-blur-md rounded-full border border-white/10">
-                <TrendingUp size={16} className="text-emerald-400" />
-                <span className="text-xs font-bold">+12% <span className="text-primary-brand-muted font-medium">{t('classroom.ui.list_stats_growth_label')}</span></span>
-              </div>
             </div>
 
             <div className="absolute bottom-0 left-0 w-full h-32 opacity-20 pointer-events-none">
               <svg viewBox="0 0 400 100" className="w-full h-full preserve-3d">
                 <path d="M0,80 C50,70 100,90 150,70 C200,50 250,80 300,60 C350,40 400,60 400,60 L400,100 L0,100 Z" fill="white" />
               </svg>
-            </div>
-          </div>
-
-          {/* Resource Allocation Card */}
-          <div className="lg:col-span-2 bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-10">
-              <div>
-                <h3 className="text-lg font-bold text-foreground">{t('classroom.ui.list_resource_title')}</h3>
-                <p className="text-sm text-muted-foreground font-medium mt-1">{t('classroom.ui.list_resource_desc')}</p>
-              </div>
-              <Button className="text-primary text-xs font-bold uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
-                {t('classroom.ui.list_resource_detail')}
-              </Button>
-            </div>
-
-            <div className="flex-1 flex items-end justify-between gap-4 px-4 pb-2">
-              {[
-                { label: t('classroom.ui.list_grade_K10'), value: 35, color: 'bg-accent' },
-                { label: t('classroom.ui.list_grade_K11'), value: 85, color: 'bg-primary' },
-                { label: t('classroom.ui.list_grade_K12'), value: 45, color: 'bg-accent' },
-                { label: t('classroom.ui.list_grade_VOC'), value: 95, color: 'bg-emerald-400' },
-                { label: t('classroom.ui.list_grade_IELTS'), value: 25, color: 'bg-accent' }
-              ].map((item, idx) => (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-4 group">
-                  <div className="w-full relative h-48 bg-muted/50 rounded-xl overflow-hidden">
-                    <div
-                      className={`absolute bottom-0 left-0 w-full transition-all duration-700 ease-out group-hover:brightness-110 shadow-lg ${item.color}`}
-                      style={{ height: `${item.value}%` }}
-                    />
-                  </div>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{item.label}</span>
-                </div>
-              ))}
             </div>
           </div>
         </div>

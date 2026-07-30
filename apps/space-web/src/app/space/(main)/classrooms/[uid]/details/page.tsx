@@ -128,16 +128,18 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     }
   }, [pendingQuery.pendingMembers, handleApproveMember]);
 
-  // RTC instance 1: chỉ lấy function (start/stop) cho meetings hook
-  // null roomUid → ws không kết nối nhưng các function vẫn sẵn sàng
-  const rtcFunctions = useRTC(null);
-  const { startMediaShare, stopScreenShare, stopMediaShare } = rtcFunctions;
-
   // Meetings: query tách riêng khỏi start/end mutation; orchestration (RTC media share) ở page level
   const meetingsQuery = useMeetingRooms({ uid, activeTab: core.activeTab, t });
   const { startMeeting, starting } = useStartMeeting({ uid, t });
   const { endMeeting, ending } = useEndMeeting({ t });
   const meetingAction: 'start' | 'end' | null = starting ? 'start' : ending ? 'end' : null;
+
+  // Single RTC instance keyed by the active meeting's uid — media capture
+  // (startMediaShare) and the WebSocket frame relay MUST share one instance,
+  // otherwise frames get captured on one connection and sent nowhere because
+  // the socket that's actually open belongs to a different instance.
+  const rtc = useRTC(meetingsQuery.activeMeeting?.uid ?? null);
+  const { localStream, remoteFrame, localSource, isConnected: rtcConnected, startMediaShare, stopMediaShare, stopScreenShare, toggleCamera } = rtc;
 
   const handleStartMeeting = useCallback(async (source: 'screen' | 'camera') => {
     if (!core.classroom || meetingAction) return;
@@ -160,13 +162,6 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     meetingsQuery.setMeetingRooms((prev) => prev.map((room) => (room.uid === ended.uid ? ended : room)));
     toast.success(t('classroom.ui.meeting_ended_toast'));
   }, [meetingsQuery, meetingAction, stopScreenShare, endMeeting, t]);
-
-  // RTC instance 2: dùng activeMeeting?.uid để lấy streams cho MeetingTab UI
-  const rtcStreams = useRTC(meetingsQuery.activeMeeting?.uid ?? null);
-  const localStream = rtcStreams.localStream;
-  const remoteStream = rtcStreams.remoteStream;
-  const localSource = rtcStreams.localSource;
-  const rtcConnected = rtcStreams.isConnected;
 
   // RTC peer-joined: auto-start camera when a new consumer peer joins active meeting
   useEffect(() => {
@@ -337,12 +332,13 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
               loadingMeetings={meetingsQuery.loadingMeetings}
               meetingAction={meetingAction}
               localStream={localStream}
-              remoteStream={remoteStream}
+              remoteFrame={remoteFrame}
               localSource={localSource}
               rtcConnected={rtcConnected}
               handleStartMeeting={handleStartMeeting}
               handleEndMeeting={handleEndMeeting}
               stopMediaShare={stopMediaShare}
+              toggleCamera={toggleCamera}
               formatDateTime={formatDateTime}
               t={t}
             />

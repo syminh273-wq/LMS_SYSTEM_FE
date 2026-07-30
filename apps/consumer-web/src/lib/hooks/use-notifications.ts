@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getDatabase, off, onValue, ref } from 'firebase/database';
+import { off, onValue, ref, type Database } from 'firebase/database';
 import { notificationApi, type NotificationItem } from '@/lib/api';
-import firebaseApp from '@/lib/firebase';
+import firebaseApp, { getRealtimeDatabase } from '@/lib/firebase';
 
 type RealtimeNotification = {
   uid: string;
@@ -115,9 +115,11 @@ export function useNotifications({ userId }: Options) {
       return;
     }
 
-    let db: ReturnType<typeof getDatabase>;
+    let db: Database;
     try {
-      db = getDatabase(firebaseApp, databaseURL);
+      const realtimeDb = getRealtimeDatabase();
+      if (!realtimeDb) throw new Error('No db');
+      db = realtimeDb;
     } catch (err) {
       console.error('[useNotifications] getDatabase failed, realtime disabled', err);
       return;

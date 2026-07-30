@@ -158,13 +158,15 @@ export function DocsTreeView({
     indent: 18,
     rootItemId: ROOT_ID,
     getItemName: (item) => {
-      const data = item.getItemData();
+      const data = items[item.getId()];
+      if (!data) return '';
       if (data.kind === 'folder') return data.folder.name;
       if (data.kind === 'doc') return data.doc.name;
       return data.name;
     },
     isItemFolder: (item) => {
-      const data = item.getItemData();
+      const data = items[item.getId()];
+      if (!data) return false;
       return data.kind === 'root' || data.kind === 'all-docs' || data.kind === 'folder';
     },
     onPrimaryAction: (item) => {
@@ -273,9 +275,14 @@ export function DocsTreeView({
   };
 
   const renderRow = (item: ReturnType<typeof headlessTree.getItems>[number]) => {
-    const data = item.getItemData();
     const itemId = item.getId();
-    if (data.kind === 'root') return null;
+    // headless-tree flattens `getItems()` from a cached list that only
+    // refreshes when `expandedItems` changes (see rebuildTree effect above).
+    // Right after a delete, this cache can still hold an id that `items`
+    // no longer has — look it up ourselves instead of item.getItemData(),
+    // which would throw synchronously ("sync dataLoader returned undefined").
+    const data = items[itemId];
+    if (!data || data.kind === 'root') return null;
 
     const selected = isItemSelected(itemId);
     const isFolder = data.kind === 'all-docs' || data.kind === 'folder';

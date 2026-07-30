@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { getDatabase, ref, onValue, off } from 'firebase/database';
+import { ref, onValue, off } from 'firebase/database';
 import { toast } from 'sonner';
-import firebaseApp from '@/lib/firebase';
+import firebaseApp, { getRealtimeDatabase } from '@/lib/firebase';
 
 type MembershipEvent = {
   status: 'approved' | 'rejected';
@@ -28,10 +28,8 @@ export function useMembershipRealtime({ userId, onApproved }: Options) {
   useEffect(() => {
     if (!firebaseApp || !userId) return;
 
-    const databaseURL = firebaseApp.options.databaseURL;
-    if (!databaseURL) return;
-
-    const db = getDatabase(firebaseApp, databaseURL);
+    const db = getRealtimeDatabase();
+    if (!db) return;
     const membershipRef = ref(db, `membership_events/${userId}`);
     initializedRef.current = false;
 

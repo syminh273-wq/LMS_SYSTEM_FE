@@ -23,15 +23,12 @@ import {
   MessageSquare,
   FileText,
   Video,
-  MonitorUp,
-  Camera,
   BarChart3,
   ShieldCheck,
   Send,
   Hash,
   Wifi,
   WifiOff,
-  PhoneOff,
   FileDown,
   ClipboardList,
   Clock,
@@ -52,6 +49,10 @@ import {
   ArrowRight,
   FolderOpen,
   Crown,
+  MonitorUp,
+  Camera,
+  CameraOff,
+  PhoneOff,
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@shared/components/ui/card';
@@ -69,7 +70,7 @@ import { useMe } from '@/lib/hooks/use-me';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { useMeetingPresence } from '@/lib/hooks/use-meeting-presence';
-import { ScreenShareViewer } from '@/components/rtc/screen-share-viewer';
+import { MeetingTab } from '@/components/rtc/meeting-tab';
 import { ClassroomDocsViewer } from '@/components/classroom/docs-viewer/ClassroomDocsViewer';
 import { ConsumerClassroomCalendarTab } from '@/components/calendar/ConsumerClassroomCalendarTab';
 import { LeaveRequestTab } from '@shared/components/leave-request';
@@ -302,12 +303,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [activeRoom, setActiveRoom] = useState<any>(null);
   const [loadingRoom, setLoadingRoom] = useState(false);
   const [joiningMeeting, setJoiningMeeting] = useState(false);
+  const autoJoinAttemptedUidRef = useRef<string | null>(null);
   const { marker: liveMarker, room: liveRoomFromPresence } = useMeetingPresence({
     classroomUid: isAuthenticated && activeTab === 'meeting' ? uid : null,
   });
   const {
     localStream,
-    remoteStream,
+    remoteFrame,
     localSource,
     isConnected: rtcConnected,
     isJoined: rtcJoined,
@@ -315,8 +317,21 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     leave: leaveMeeting,
     startMediaShare,
     stopMediaShare,
-    renegotiate,
+    toggleCamera,
+    error: rtcError,
   } = useRTC(activeRoom?.uid ?? null);
+
+  // useRTC's WS/media errors were previously silent (no UI surface) — a failed
+  // ws/rtc/ connection or getUserMedia rejection would look exactly like "the
+  // join button does nothing". Surface it so it's visible instead of silent.
+  useEffect(() => {
+    if (rtcError) {
+      console.error('[meeting] RTC error:', rtcError);
+      toast.error(rtcError);
+    }
+  }, [rtcError]);
+
+  const cameraEnabled = localSource === 'camera' && (localStream?.getVideoTracks()[0]?.enabled ?? true);
 
   // AI Bot state
   type AiMsg = { role: 'user' | 'assistant'; text: string; loading?: boolean; sources?: Array<{ document: string; metadata: Record<string, string>; score: number }> };
@@ -639,6 +654,62 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   }, [isAuthenticated, uid, activeTab, liveMarker, liveRoomFromPresence]);
 
   useEffect(() => {
+    if (activeTab === 'meeting' && isAuthenticated) {
+      console.log('[meeting] presence state:', {
+        liveMarker,
+        liveRoomFromPresence,
+        activeRoomUid: activeRoom?.uid ?? null,
+      });
+    }
+  }, [activeTab, isAuthenticated, liveMarker, liveRoomFromPresence, activeRoom?.uid]);
+
+  // Auto-join: khi vào tab meeting mà đã có activeRoom thì tự động vào lớp
+  // luôn, không chờ user bấm nút. User vẫn có thể bấm "RỜI PHÒNG" để thoát.
+  //
+  // autoJoinAttemptedUidRef chặn việc thử lại vô hạn: setJoiningMeeting(false)
+  // trong finally khiến effect này tự kích hoạt lại (vì joiningMeeting nằm
+  // trong deps), và nếu activeRoom vẫn còn cùng uid (ví dụ presence poll
+  // chưa kịp cập nhật sau khi giáo viên kết thúc phòng) thì nó sẽ join lại
+  // ngay lập tức — join lại thất bại — lặp lại vô hạn, spam lỗi/toast liên
+  // tục. Ref này đảm bảo mỗi room uid chỉ được thử tự động vào 1 lần.
+  useEffect(() => {
+    if (activeTab !== 'meeting') return;
+    if (!isAuthenticated) return;
+    if (!activeRoom?.uid) return;
+    if (rtcJoined || joiningMeeting) return;
+    if (autoJoinAttemptedUidRef.current === activeRoom.uid) return;
+    autoJoinAttemptedUidRef.current = activeRoom.uid;
+
+    console.log('[meeting] auto-joining room:', activeRoom.uid);
+    void (async () => {
+      setJoiningMeeting(true);
+      try {
+        await joinRoom(activeRoom.uid);
+        toast.success('Đã vào lớp!');
+      } catch (err) {
+        console.error('[meeting] auto-join failed:', err);
+        const message = err instanceof Error ? err.message : 'Không thể tham gia lớp học';
+        if (message.toLowerCase().includes('ended')) {
+          // Phòng đã kết thúc trước khi kịp vào — dọn state ngay thay vì
+          // chờ vòng poll/presence tiếp theo, và không cần báo lỗi ồn ào.
+          setActiveRoom(null);
+        } else {
+          toast.error(message);
+        }
+        setJoiningMeeting(false);
+        return;
+      }
+      setJoiningMeeting(false);
+      try {
+        await startMediaShare('camera');
+      } catch (err) {
+        console.warn('[meeting] auto-start camera failed:', err);
+        toast.warning('Đã vào lớp nhưng không bật được camera. Bạn có thể bật lại bằng nút "Bật camera".');
+      }
+    })();
+  }, [activeTab, isAuthenticated, activeRoom?.uid, rtcJoined, joiningMeeting, joinRoom, startMediaShare]);
+
+  useEffect(() => {
     const onPeerJoined = (event: Event) => {
       const peer = (event as CustomEvent<{ user_type?: string }>).detail;
       if (!peer || !rtcJoined) return;
@@ -830,6 +901,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
           <div className="space-y-6 min-w-0">
 
             {/* Chat Feed */}
+            {/* ?tab=discussion */}
             {activeTab === 'discussion' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm flex flex-col overflow-hidden" style={{ height: '520px' }}>
                 {/* Chat header */}
@@ -903,6 +975,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Exam Quiz Tab */}
+            {/* ?tab=quiz */}
             {activeTab === 'quiz' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
@@ -956,6 +1029,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Mission Collections Tab */}
+            {/* ?tab=collections */}
             {activeTab === 'collections' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
@@ -1075,6 +1149,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Docs Tab */}
+            {/* ?tab=docs */}
             {activeTab === 'docs' && (
               <ClassroomDocsViewer
                 classroomUid={uid}
@@ -1089,6 +1164,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Calendar Tab */}
+            {/* ?tab=calendar */}
             {activeTab === 'calendar' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm p-5 sm:p-6">
                 <ConsumerClassroomCalendarTab classroomUid={uid} classroomName={classroom?.name} />
@@ -1096,11 +1172,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Leaderboard Tab */}
+            {/* ?tab=leaderboard */}
             {activeTab === 'leaderboard' && (
               <LeaderboardTab classroomUid={uid} />
             )}
 
             {/* Leave Request Tab */}
+            {/* ?tab=leave_request */}
             {activeTab === 'leave_request' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm p-5 sm:p-6">
                 <LeaveRequestTab
@@ -1136,139 +1214,104 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Meeting Tab */}
+            {/* ?tab=meeting */}
             {activeTab === 'meeting' && (
-              <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col" style={{ height: '520px' }}>
-                <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Video size={17} className="text-primary" />
-                    <span className="font-black text-foreground text-sm uppercase tracking-tighter">Phòng họp trực tuyến</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold">
-                    {rtcJoined ? (
-                      rtcConnected ? (
-                        <><Wifi size={13} className="text-success" /><span className="text-success">Đã kết nối tín hiệu</span></>
-                      ) : (
-                        <><Loader2 size={13} className="animate-spin text-warning" /><span className="text-warning">Đang kết nối...</span></>
-                      )
-                    ) : (
-                      <><WifiOff size={13} className="text-muted-foreground" /><span className="text-muted-foreground">Chưa tham gia</span></>
+              <div className="space-y-3">
+                {/* Thanh điều khiển tách riêng khỏi khung video để tránh bị overlay che */}
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
+                  <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+                    <Video size={16} className="text-primary" />
+                    <span>Điều khiển phòng họp</span>
+                    {joiningMeeting && (
+                      <span className="ml-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Loader2 size={12} className="animate-spin" />
+                        Đang vào lớp...
+                      </span>
+                    )}
+                    {rtcJoined && !rtcConnected && !joiningMeeting && (
+                      <span className="ml-2 inline-flex items-center gap-1.5 text-xs text-warning">
+                        <Loader2 size={12} className="animate-spin" />
+                        Đang kết nối...
+                      </span>
+                    )}
+                    {rtcJoined && rtcConnected && (
+                      <span className="ml-2 inline-flex items-center gap-1.5 text-xs text-success">
+                        <Wifi size={12} />
+                        Đã kết nối
+                      </span>
                     )}
                   </div>
-                </div>
-
-                <div className="flex-1 p-6 flex flex-col gap-4 overflow-y-auto relative">
-                  <div className="flex-1 min-h-0">
-                    {remoteStream ? (
-                      <ScreenShareViewer stream={remoteStream} label="Giảng viên" />
-                    ) : rtcJoined && activeRoom ? (
-                      <div className="aspect-video bg-primary/20 rounded-2xl flex flex-col items-center justify-center text-primary gap-4 border-2 border-primary/20 border-dashed">
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                          <Video size={32} />
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-black uppercase tracking-widest">Đang chờ giảng viên chia sẻ</p>
-                          <p className="text-xs font-medium opacity-80 mt-1">Bạn đã vào lớp, vui lòng chờ...</p>
-                        </div>
-                      </div>
-                    ) : activeRoom ? (
-                      <div className="aspect-video bg-primary/20 rounded-2xl flex flex-col items-center justify-center text-primary gap-4 border-2 border-primary/20 border-dashed animate-pulse">
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                          <Video size={32} />
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-black uppercase tracking-widest">Lớp học đang diễn ra!</p>
-                          <p className="text-xs font-medium opacity-80 mt-1">Bấm "Tham gia" để vào lớp của giáo viên</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="aspect-video bg-slate-900 rounded-2xl flex flex-col items-center justify-center text-muted-foreground gap-3 border-2 border-dashed border-slate-800">
-                        <Video size={48} className="opacity-20" />
-                        <p className="text-sm font-bold uppercase tracking-widest">Chưa có buổi học nào...</p>
-                        <p className="text-xs font-medium opacity-70">Giáo viên sẽ mở lớp, thông báo sẽ hiện tại đây</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {localStream && (
-                    <div className="absolute bottom-24 right-6 w-44 md:w-56 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl shadow-black/40 z-10">
-                      <ScreenShareViewer stream={localStream} label={localSource === 'camera' ? 'Bạn' : 'Màn hình của bạn'} />
-                    </div>
-                  )}
-
-                  <div className="mt-auto flex flex-col items-center gap-3">
-                    {!rtcJoined && activeRoom ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => void startMediaShare('screen')}
+                      variant="outline"
+                      className="font-bold px-4 h-10 rounded-xl gap-2"
+                    >
+                      <MonitorUp size={15} />
+                      Chia sẻ màn hình
+                    </Button>
+                    {localSource === 'camera' ? (
                       <Button
-                        onClick={async () => {
-                          if (!activeRoom?.uid) return;
-                          try {
-                            setJoiningMeeting(true);
-                            await joinRoom(activeRoom.uid);
-                            await startMediaShare('camera');
-                          } catch (err) {
-                            toast.error(err instanceof Error ? err.message : 'Không thể tham gia lớp học');
-                          } finally {
-                            setJoiningMeeting(false);
-                          }
-                        }}
-                        disabled={joiningMeeting}
-                        className="bg-primary hover:bg-primary font-bold px-10 h-12 rounded-xl gap-2 shadow-lg shadow-indigo-100"
+                        type="button"
+                        onClick={() => toggleCamera()}
+                        variant="outline"
+                        className={`font-bold px-4 h-10 rounded-xl gap-2 ${
+                          cameraEnabled ? '' : 'text-rose-600 border-rose-200 hover:bg-rose-50'
+                        }`}
                       >
-                        {joiningMeeting ? (
-                          <Loader2 size={18} className="animate-spin" />
-                        ) : (
-                          <Video size={18} />
-                        )}
-                        THAM GIA
+                        {cameraEnabled ? <Camera size={15} /> : <CameraOff size={15} />}
+                        {cameraEnabled ? 'Tắt camera' : 'Bật lại camera'}
                       </Button>
-                    ) : rtcJoined ? (
-                      <div className="flex flex-wrap justify-center gap-3">
-                        <Button
-                          onClick={() => void startMediaShare('screen')}
-                          variant="outline"
-                          className="font-bold px-6 h-11 rounded-xl gap-2"
-                        >
-                          <MonitorUp size={16} />
-                          Chia sẻ màn hình
-                        </Button>
-                        <Button
-                          onClick={() => void startMediaShare('camera')}
-                          variant="outline"
-                          className="font-bold px-6 h-11 rounded-xl gap-2"
-                          disabled={Boolean(localStream)}
-                        >
-                          <Camera size={16} />
-                          Bật camera
-                        </Button>
-                        <Button
-                          onClick={() => void stopMediaShare()}
-                          variant="outline"
-                          className="font-bold px-6 h-11 rounded-xl gap-2"
-                          disabled={!localStream}
-                        >
-                          <WifiOff size={16} />
-                          Dừng chia sẻ
-                        </Button>
-                        <Button
-                          onClick={() => void leaveMeeting()}
-                          variant="destructive"
-                          className="font-bold px-6 h-11 rounded-xl gap-2 shadow-lg shadow-rose-100"
-                        >
-                          <PhoneOff size={16} />
-                          RỜI PHÒNG
-                        </Button>
-                      </div>
-                    ) : null}
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={() => void startMediaShare('camera')}
+                        variant="outline"
+                        className="font-bold px-4 h-10 rounded-xl gap-2"
+                        disabled={Boolean(localStream)}
+                      >
+                        <Camera size={15} />
+                        Bật camera
+                      </Button>
+                    )}
+                    {localStream && (
+                      <Button
+                        type="button"
+                        onClick={() => void stopMediaShare()}
+                        variant="outline"
+                        className="font-bold px-4 h-10 rounded-xl gap-2"
+                      >
+                        <WifiOff size={15} />
+                        Dừng chia sẻ
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      onClick={() => void leaveMeeting()}
+                      variant="destructive"
+                      disabled={!rtcJoined}
+                      className="font-bold px-5 h-10 rounded-xl gap-2 shadow-lg shadow-rose-100"
+                    >
+                      <PhoneOff size={15} />
+                      RỜI PHÒNG
+                    </Button>
                   </div>
                 </div>
 
-                <div className="p-4 bg-muted border-t border-border text-center">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                    WebRTC Peer-to-Peer Connection • Bảo mật đầu cuối
-                  </p>
-                </div>
+                <MeetingTab
+                  activeRoom={activeRoom}
+                  rtcJoined={rtcJoined}
+                  rtcConnected={rtcConnected}
+                  remoteFrame={remoteFrame}
+                  localStream={localStream}
+                  localSource={localSource}
+                  joining={joiningMeeting}
+                />
               </div>
             )}
 
+            {/* ?tab=ai */}
             {activeTab === 'ai' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col" style={{ height: '540px' }}>
                 {/* Header */}
@@ -1401,6 +1444,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
 
 
             {/* Assignments */}
+            {/* ?tab=assignments */}
             {activeTab === 'assignments' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
@@ -1493,6 +1537,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
             )}
 
             {/* Exams */}
+            {/* ?tab=exams */}
             {activeTab === 'exams' && (
               <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-border flex items-center justify-between">
