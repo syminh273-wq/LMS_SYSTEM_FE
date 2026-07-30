@@ -155,9 +155,10 @@ export default function AssignQuizModal({
                 <Button
                   key={quiz.uid}
                   type="button"
+                  variant="ghost"
                   disabled={assigned}
                   onClick={() => { setPendingQuiz(quiz); setTimeLimitMin(0); setMaxAttempts(0); }}
-                  className={`w-full text-left rounded-2xl p-5 transition-all flex items-center gap-5 ${
+                  className={`h-auto w-full text-left rounded-2xl p-5 transition-all flex items-center justify-start gap-5 ${
                     assigned
                       ? 'bg-emerald-50 cursor-default opacity-60'
                       : 'bg-card hover:bg-primary-brand-light/30 cursor-pointer group shadow-sm'
