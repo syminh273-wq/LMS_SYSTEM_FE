@@ -18,7 +18,6 @@ class QuizTasksApiClient extends BaseRestApiClient {
 
     const formData = new FormData();
     formData.append('file', input.file);
-    formData.append('quiz_type', 'multiple_choice');
     if (input.title) formData.append('title', input.title);
     if (input.num_questions != null) formData.append('num_questions', String(input.num_questions));
     if (input.max_content_length != null) formData.append('max_content_length', String(input.max_content_length));

@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '../ui/button';
 import { Check, Loader2, X as XIcon } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { cn } from '@shared/lib/utils';
 import {
   LeaveRequest,
   ProcessLeaveRequestInput,
@@ -131,48 +130,6 @@ export function ProcessLeaveRequestDialog({
 
             {request.status === 'pending' ? (
               <>
-                <FormField
-                  control={form.control}
-                  name="choice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => field.onChange('approved')}
-                            className={cn(
-                              'h-10 font-semibold',
-                              field.value === 'approved'
-                                ? 'border-emerald-500 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-700'
-                                : ''
-                            )}
-                          >
-                            <Check size={14} className="mr-1.5" />
-                            {t('leave_request.process.approve', 'Duyệt')}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => field.onChange('rejected')}
-                            className={cn(
-                              'h-10 font-semibold',
-                              field.value === 'rejected'
-                                ? 'border-destructive bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive'
-                                : ''
-                            )}
-                          >
-                            <XIcon size={14} className="mr-1.5" />
-                            {t('leave_request.process.reject', 'Từ chối')}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 {choice === 'rejected' && (
                   <FormField
                     control={form.control}
@@ -184,7 +141,7 @@ export function ProcessLeaveRequestDialog({
                           <span className="text-destructive"> *</span>
                         </FormLabel>
                         <FormControl>
-                          <Textarea rows={3} className="resize-none" {...field} />
+                          <Textarea rows={3} className="resize-none" autoFocus {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -193,28 +150,49 @@ export function ProcessLeaveRequestDialog({
                 )}
 
                 <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => onOpenChange(false)}
-                    disabled={processing}
-                  >
-                    {t('leave_request.process.cancel', 'Huỷ')}
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={processing}
-                    className={cn(
-                      choice === 'approved'
-                        ? 'bg-emerald-600 hover:bg-emerald-700'
-                        : 'bg-destructive hover:bg-destructive/90'
-                    )}
-                  >
-                    {processing && <Loader2 size={14} className="mr-1.5 animate-spin" />}
-                    {choice === 'approved'
-                      ? t('leave_request.process.submit_approve', 'Duyệt đơn')
-                      : t('leave_request.process.submit_reject', 'Từ chối đơn')}
-                  </Button>
+                  {choice === 'rejected' ? (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => form.setValue('choice', 'approved')}
+                        disabled={processing}
+                      >
+                        {t('leave_request.process.back', 'Quay lại')}
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={processing}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        {processing && <Loader2 size={14} className="mr-1.5 animate-spin" />}
+                        <XIcon size={14} className="mr-1.5" />
+                        {t('leave_request.process.submit_reject', 'Từ chối đơn')}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => form.setValue('choice', 'rejected')}
+                        disabled={processing}
+                        className="text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <XIcon size={14} className="mr-1.5" />
+                        {t('leave_request.process.reject', 'Từ chối')}
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={processing}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        {processing && <Loader2 size={14} className="mr-1.5 animate-spin" />}
+                        <Check size={14} className="mr-1.5" />
+                        {t('leave_request.process.submit_approve', 'Duyệt')}
+                      </Button>
+                    </>
+                  )}
                 </DialogFooter>
               </>
             ) : (

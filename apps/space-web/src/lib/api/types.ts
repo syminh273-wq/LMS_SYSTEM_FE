@@ -425,17 +425,9 @@ export type QuizDetail = Quiz & {
   questions: QuizQuestion[];
 };
 
-type QuizType = 'multiple_choice';
-
-export type QuizTypeOption = {
-  value: QuizType;
-  label: string;
-};
-
 export type GenerateQuizRequest = {
   content?: string;
   resource_id?: string;
-  quiz_type?: QuizType;
   num_questions?: number;
   max_content_length?: number;
 };

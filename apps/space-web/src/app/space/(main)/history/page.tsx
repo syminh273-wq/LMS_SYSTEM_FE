@@ -3,31 +3,14 @@
 import { Suspense, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Wallet, RefreshCw, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Wallet, RefreshCw } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import { usePaymentList, usePaymentSummary } from '@/lib/hooks/use-payment-stats';
-import type {
-  PaymentListItem,
-  PaymentStatus,
-  PaymentSummaryParams,
-} from '@/lib/api/payment';
+import { usePaymentList } from '@/lib/hooks/use-payment-stats';
+import type { PaymentListItem, PaymentStatus } from '@/lib/api/payment';
 import { PaymentHistoryList } from '@/components/history/PaymentHistoryList';
 import { PaymentStatusFilter } from '@/components/history/PaymentStatusFilter';
-import { PaymentStatsCards, formatRevenue } from '@/components/history/PaymentStatsCards';
 import { ClassroomFilter } from '@/components/history/ClassroomFilter';
-import { RevenueTrendChart } from '@/components/history/RevenueTrendChart';
-import { PaymentStatusDonut } from '@/components/history/PaymentStatusDonut';
 import { DateRangeFilter, type DateRangeValue } from '@/components/history/DateRangeFilter';
-
-function toIsoStart(date: string | null): string | undefined {
-  if (!date) return undefined;
-  return `${date}T00:00:00.000Z`;
-}
-
-function toIsoEnd(date: string | null): string | undefined {
-  if (!date) return undefined;
-  return `${date}T23:59:59.999Z`;
-}
 
 export default function SpaceHistoryPage() {
   return (
@@ -49,29 +32,27 @@ function SpaceHistoryPageContent() {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | 'all'>(statusFromUrl);
   const [dateRange, setDateRange] = useState<DateRangeValue>({ from: fromUrl, to: toUrl });
 
-  const summaryFilters: PaymentSummaryParams = useMemo(
-    () => ({
-      from: toIsoStart(dateRange.from),
-      to: toIsoEnd(dateRange.to),
-      resource_id: classroomUid === 'all' ? undefined : classroomUid,
-      status: statusFilter,
-    }),
-    [dateRange.from, dateRange.to, classroomUid, statusFilter]
-  );
-
   const { items, loading, refreshing, reload, error } = usePaymentList({
     resourceId: classroomUid === 'all' ? undefined : classroomUid,
     status: 'all',
     limit: 200,
   });
 
-  const { summary, loading: summaryLoading, reload: reloadSummary, error: summaryError } =
-    usePaymentSummary(summaryFilters);
-
   const filtered = useMemo<PaymentListItem[]>(() => {
-    if (statusFilter === 'all') return items;
-    return items.filter((p) => (p.status || '').toUpperCase() === statusFilter);
-  }, [items, statusFilter]);
+    let out = items;
+    if (statusFilter !== 'all') {
+      out = out.filter((p) => (p.status || '').toUpperCase() === statusFilter);
+    }
+    if (dateRange.from) {
+      const from = new Date(`${dateRange.from}T00:00:00.000Z`).getTime();
+      out = out.filter((p) => p.created_at && new Date(p.created_at).getTime() >= from);
+    }
+    if (dateRange.to) {
+      const to = new Date(`${dateRange.to}T23:59:59.999Z`).getTime();
+      out = out.filter((p) => p.created_at && new Date(p.created_at).getTime() <= to);
+    }
+    return out;
+  }, [items, statusFilter, dateRange.from, dateRange.to]);
 
   const updateUrl = (mutate: (sp: URLSearchParams) => void) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -106,32 +87,6 @@ function SpaceHistoryPageContent() {
     });
   };
 
-  const handleRefresh = async () => {
-    await Promise.all([reload(), reloadSummary()]);
-  };
-
-  const headerStats = useMemo(() => {
-    if (!summary) {
-      return [
-        { label: 'Tổng doanh thu', value: formatRevenue(0), tone: 'indigo' as const },
-        { label: 'Tổng giao dịch', value: '0', tone: 'slate' as const },
-        { label: 'Đã thanh toán', value: formatRevenue(0), tone: 'emerald' as const },
-        { label: 'Đang chờ', value: formatRevenue(0), tone: 'amber' as const },
-        { label: 'Đã hoàn tiền', value: formatRevenue(0), tone: 'slate' as const },
-        { label: 'Thanh toán lỗi', value: '0', tone: 'rose' as const },
-      ];
-    }
-    const k = summary.kpis;
-    return [
-      { label: 'Tổng doanh thu', value: formatRevenue(k.total_revenue), tone: 'indigo' as const },
-      { label: 'Tổng giao dịch', value: String(k.total_transactions), tone: 'slate' as const },
-      { label: 'Đã thanh toán', value: formatRevenue(k.total_paid_amount), tone: 'emerald' as const },
-      { label: 'Đang chờ', value: formatRevenue(k.total_pending_amount), tone: 'amber' as const },
-      { label: 'Đã hoàn tiền', value: formatRevenue(k.refunded_amount), tone: 'slate' as const },
-      { label: 'Thanh toán lỗi', value: String(k.failed_count), tone: 'rose' as const },
-    ];
-  }, [summary]);
-
   return (
     <div className="min-h-screen bg-background p-4 sm:p-8">
       <div className="max-w-7xl mx-auto space-y-5">
@@ -162,30 +117,17 @@ function SpaceHistoryPageContent() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => void handleRefresh()}
-              disabled={refreshing || summaryLoading}
+              onClick={() => void reload()}
+              disabled={refreshing}
               className="rounded-lg"
             >
-              <RefreshCw
-                size={14}
-                className={`mr-1 ${refreshing || summaryLoading ? 'animate-spin' : ''}`}
-              />
+              <RefreshCw size={14} className={`mr-1 ${refreshing ? 'animate-spin' : ''}`} />
               Làm mới
             </Button>
             <Button asChild variant="ghost" size="sm" className="rounded-lg">
               <Link href="/space">Về Dashboard</Link>
             </Button>
           </div>
-        </div>
-
-        <PaymentStatsCards stats={headerStats} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <RevenueTrendChart data={summary?.revenue_trend ?? []} loading={summaryLoading} />
-          <PaymentStatusDonut
-            data={summary?.status_distribution ?? []}
-            loading={summaryLoading}
-          />
         </div>
 
         <div className="flex items-center gap-3 flex-wrap rounded-2xl border border-border bg-card p-3">
@@ -195,61 +137,6 @@ function SpaceHistoryPageContent() {
           <div className="h-5 w-px bg-border" />
           <PaymentStatusFilter value={statusFilter} onChange={handleStatusChange} />
         </div>
-
-        {summary?.approximated && (
-          <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] text-amber-800">
-            <AlertTriangle size={14} />
-            Dữ liệu lớn — kết quả có thể gần đúng (đã giới hạn 2.000 giao dịch gần nhất).
-          </div>
-        )}
-
-        {summaryError && (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-            {summaryError}
-          </div>
-        )}
-
-        {summary && summary.by_classroom?.length > 0 && classroomUid === 'all' && (
-          <div className="rounded-2xl border border-border bg-card p-4">
-            <h3 className="text-[12px] font-extrabold uppercase tracking-wide text-muted-foreground mb-3">
-              Tổng hợp theo lớp
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground">
-                    <th className="py-2 font-bold">Lớp</th>
-                    <th className="py-2 font-bold text-right">Giao dịch</th>
-                    <th className="py-2 font-bold text-right">Thành công</th>
-                    <th className="py-2 font-bold text-right">Đang chờ</th>
-                    <th className="py-2 font-bold text-right">Doanh thu</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {summary.by_classroom.map((row) => (
-                    <tr
-                      key={row.classroom_uid}
-                      className="border-t border-border hover:bg-muted cursor-pointer"
-                      onClick={() => handleClassroomChange(row.classroom_uid)}
-                    >
-                      <td className="py-2 font-semibold text-foreground">{row.classroom_name}</td>
-                      <td className="py-2 text-right text-foreground">{row.total_count}</td>
-                      <td className="py-2 text-right text-emerald-700 font-bold">
-                        {row.completed_count}
-                      </td>
-                      <td className="py-2 text-right text-amber-700 font-bold">
-                        {row.pending_count}
-                      </td>
-                      <td className="py-2 text-right text-primary-brand font-extrabold">
-                        {formatRevenue(row.total_revenue)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">

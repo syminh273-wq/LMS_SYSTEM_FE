@@ -138,11 +138,11 @@ function RequestCard({ req, onSelect, showStudent, showEvent, t, locale }: Reque
     <Button
       type="button"
       onClick={() => onSelect?.(req)}
-      className="w-full text-left rounded-xl border border-slate-200 bg-white p-4 hover:border-indigo-300 hover:shadow-sm transition-all"
+      className="w-full flex-col items-stretch justify-start whitespace-normal text-left rounded-xl border border-slate-200 bg-white p-5 h-auto hover:border-indigo-300 hover:shadow-sm transition-all"
     >
-      <div className="flex items-start justify-between gap-3 mb-2">
+      <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
+          <div className="flex items-center gap-2 flex-wrap mb-1.5">
             <LeaveRequestStatusBadge status={req.status} />
             {showStudent && req.student_name && (
               <span className="text-[12px] font-semibold text-slate-700">

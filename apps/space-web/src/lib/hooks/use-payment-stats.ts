@@ -1,12 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { spacePaymentApi } from '@/lib/api/space-payment';
-import type {
-  PaymentListItem,
-  PaymentHistoryParams,
-  PaymentStatus,
-  PaymentAnalyticsSummary,
-  PaymentSummaryParams,
-} from '@/lib/api/payment';
+import type { PaymentListItem, PaymentHistoryParams, PaymentStatus } from '@/lib/api/payment';
 
 function normalizeStatus(raw: string | undefined | null): PaymentStatus {
   const s = (raw || '').toUpperCase();
@@ -99,31 +93,4 @@ export function usePaymentList(options: UsePaymentOptions = {}) {
 
   const stats = computeStats(items);
   return { items, loading, refreshing, error, reload: () => load(true), setItems, stats };
-}
-
-export function usePaymentSummary(filters: PaymentSummaryParams = {}, autoLoad = true) {
-  const [summary, setSummary] = useState<PaymentAnalyticsSummary | null>(null);
-  const [loading, setLoading] = useState<boolean>(autoLoad);
-  const [error, setError] = useState<string | null>(null);
-
-  const { from, to, status, resource_id, bucket } = filters;
-  const reload = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await spacePaymentApi.getSummary({ from, to, status, resource_id, bucket });
-      setSummary(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Không thể tải thống kê thanh toán');
-    } finally {
-      setLoading(false);
-    }
-  }, [from, to, status, resource_id, bucket]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Initial fetch is the only entry point for the data.
-    if (autoLoad) void reload();
-  }, [reload, autoLoad]);
-
-  return { summary, loading, error, reload };
 }

@@ -4,7 +4,6 @@ import type {
   ClassroomMember,
   ClassroomPreviewResponse,
   StudentExamRecord,
-  StudentStatsResponse,
   PaginatedResponse,
   CreateClassroomRequest,
   UpdateClassroomRequest,
@@ -66,10 +65,6 @@ class ClassroomApiClient extends BaseRestApiClient {
 
   public async studentSubmissions(classroomUid: string, memberId: string): Promise<StudentExamRecord[]> {
     return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/submissions/`);
-  }
-
-  public async studentStats(classroomUid: string, memberId: string): Promise<StudentStatsResponse> {
-    return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/stats/`);
   }
 
   // ── Classroom blacklist ────────────────────────────────────────────────────

@@ -40,7 +40,7 @@ function ClassroomRow({ row, consumerUid }: { row: StudentClassroomStat; consume
 
   return (
     <Link
-      href={`/space/classrooms/${row.classroom.uid}/students/${consumerUid}`}
+      href={`/space/classrooms/${row.classroom.uid}/details`}
       className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary-brand hover:shadow-sm dark:hover:border-primary-brand-dark transition-all"
     >
       <div className="flex-shrink-0 p-2.5 rounded-xl bg-primary-brand-light dark:bg-primary-brand-dark/40">

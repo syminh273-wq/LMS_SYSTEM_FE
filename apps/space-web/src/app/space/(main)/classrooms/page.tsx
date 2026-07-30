@@ -278,13 +278,6 @@ export default function ClassroomsPage() {
           </div>
           <h3 className="text-xl font-bold text-foreground mb-2">{t('classroom.ui.list_no_data_title')}</h3>
           <p className="text-muted-foreground mb-8 font-medium">{t('classroom.ui.list_no_data_desc')}</p>
-          <Button
-            onClick={() => router.push('/space/classrooms/create')}
-            className="bg-primary text-primary-foreground rounded-xl px-8 h-12 shadow-lg shadow-primary/20"
-          >
-            <Plus size={20} className="mr-2" />
-            {t('classroom.ui.list_message_create_first')}
-          </Button>
         </div>
       ) : filteredClassrooms.length === 0 ? (
         <div className="text-center py-32 bg-card border border-border rounded-3xl shadow-sm">

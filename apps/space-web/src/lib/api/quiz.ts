@@ -1,6 +1,6 @@
 import BaseRestApiClient from './client';
 import type {
-  Quiz, QuizDetail, QuizTypeOption, GenerateQuizRequest,
+  Quiz, QuizDetail, GenerateQuizRequest,
   UpdateQuizRequest, UpdateAssignmentRequest, UpdateQuestionRequest,
   QuizQuestion, QuizStreamEvent, QuizAttemptRecord, QuizAssignment,
   QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
@@ -19,10 +19,6 @@ class QuizApiClient extends BaseRestApiClient {
     return this.get<QuizDetail>(`/api/v1/space/quiz/${uid}/`);
   }
 
-  public async getTypes(): Promise<QuizTypeOption[]> {
-    return this.get<QuizTypeOption[]>('/api/v1/space/quiz/types/');
-  }
-
   public async generate(data: GenerateQuizRequest): Promise<QuizDetail> {
     return this.post<QuizDetail>('/api/v1/space/quiz/generate/', data);
   }
@@ -37,7 +33,6 @@ class QuizApiClient extends BaseRestApiClient {
     if (file) {
       const formData = new FormData();
       formData.append('file', file);
-      if (data.quiz_type) formData.append('quiz_type', data.quiz_type);
       if (data.num_questions != null) formData.append('num_questions', String(data.num_questions));
       body = formData;
     } else {
