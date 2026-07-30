@@ -1371,14 +1371,15 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                         <Button
                           key={group.key}
                           type="button"
+                          variant="ghost"
                           onClick={() => setSelectedExamGroup(group.key)}
-                          className={`rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary/20 ${
+                          className={`h-auto w-full items-stretch justify-start whitespace-normal rounded-2xl border p-4 text-left shadow-none transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary/20 ${
                             selectedExamGroup === group.key
-                              ? 'border-primary/20 bg-primary/10 shadow-sm'
-                              : 'border-border bg-muted/60'
+                              ? 'border-primary/20 bg-primary/10 shadow-sm hover:bg-primary/10'
+                              : 'border-border bg-muted/60 hover:bg-muted/60'
                           } cursor-pointer`}
                         >
-                          <div className="flex items-center justify-between gap-2">
+                          <div className="flex w-full min-w-0 items-center justify-between gap-2">
                             <div className="min-w-0">
                               <div className="truncate text-sm font-black text-foreground">{group.label}</div>
                               <div className="text-[10px] font-black uppercase text-muted-foreground">{group.items.length} bài</div>
@@ -1469,11 +1470,20 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                                   <span className="text-[10px] font-black uppercase text-muted-foreground">
                                     Đã kết thúc
                                   </span>
+                                ) : deadline.isExpired ? (
+                                  <Button
+                                    type="button"
+                                    disabled
+                                    variant="ghost"
+                                    className="text-[10px] font-black uppercase text-muted-foreground opacity-60 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
+                                  >
+                                    Đã hết hạn
+                                  </Button>
                                 ) : (
                                   <Button
                                     type="button"
                                     onClick={() => router.push(`/consumer/classroom/${uid}/exams/${exam.uid}`)}
-                                    className="text-[10px] font-black uppercase text-primary hover:text-primary cursor-pointer"
+                                    className="rounded-xl bg-primary px-3 py-1.5 text-[10px] font-black uppercase text-white hover:bg-primary/90 cursor-pointer"
                                   >
                                     Xem chi tiết
                                   </Button>
@@ -1636,6 +1646,7 @@ function getDeadlineMeta(value: string | null) {
       label: 'Chưa có hạn nộp',
       cardClassName: 'border-border hover:border-primary/20 focus:ring-primary/20',
       badgeClassName: 'border-border bg-muted text-muted-foreground',
+      isExpired: false,
     };
   }
 
@@ -1647,6 +1658,7 @@ function getDeadlineMeta(value: string | null) {
       label: 'Hạn nộp không hợp lệ',
       cardClassName: 'border-border hover:border-primary/20 focus:ring-primary/20',
       badgeClassName: 'border-border bg-muted text-muted-foreground',
+      isExpired: false,
     };
   }
 
@@ -1655,6 +1667,7 @@ function getDeadlineMeta(value: string | null) {
       label: 'Đã hết hạn',
       cardClassName: 'border-destructive/20 hover:border-destructive/20 focus:ring-destructive/20',
       badgeClassName: 'border-destructive/20 bg-destructive/10 text-destructive',
+      isExpired: true,
     };
   }
 
@@ -1663,6 +1676,7 @@ function getDeadlineMeta(value: string | null) {
       label: `Còn ${Math.ceil(hoursLeft)} giờ`,
       cardClassName: 'border-destructive/20 hover:border-destructive/20 focus:ring-destructive/20',
       badgeClassName: 'border-destructive/20 bg-destructive/10 text-destructive',
+      isExpired: false,
     };
   }
 
@@ -1671,6 +1685,7 @@ function getDeadlineMeta(value: string | null) {
       label: `Còn ${Math.ceil(hoursLeft / 24)} ngày`,
       cardClassName: 'border-warning/20 hover:border-warning/20 focus:ring-warning/20',
       badgeClassName: 'border-warning/20 bg-warning/10 text-warning',
+      isExpired: false,
     };
   }
 
@@ -1678,6 +1693,7 @@ function getDeadlineMeta(value: string | null) {
     label: `Còn ${Math.ceil(hoursLeft / 24)} ngày`,
     cardClassName: 'border-success/20 hover:border-success/20 focus:ring-success/20',
     badgeClassName: 'border-success/20 bg-success/10 text-success',
+    isExpired: false,
   };
 }
 
