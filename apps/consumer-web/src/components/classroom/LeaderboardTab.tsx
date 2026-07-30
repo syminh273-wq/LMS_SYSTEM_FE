@@ -201,19 +201,12 @@ export function LeaderboardTab({ classroomUid }: Props) {
                       )}
                     </div>
                     <div className="text-[11px] font-medium text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span>Quiz: {e.quiz_count}</span>
-                      <span>·</span>
-                      <span>Thi: {e.exam_count}</span>
-                      <span>·</span>
-                      <span>Đi học: {e.attendance_pct.toFixed(0)}%</span>
+                      <span>Số bài thi: {e.exam_count}</span>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-base font-black text-foreground leading-none">
                       {e.total_score.toFixed(1)}
-                    </div>
-                    <div className="text-[10px] font-bold text-muted-foreground mt-1">
-                      Quiz {e.quiz_avg.toFixed(0)} · Thi {e.exam_avg.toFixed(0)}
                     </div>
                   </div>
                 </div>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Award, Crown, Medal, Sparkles, Trophy, TrendingUp, Users } from 'lucide-react';
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
@@ -52,7 +51,6 @@ export default function SpaceClassroomRankingView({
   classroomUid,
   t,
 }: SpaceClassroomRankingViewProps) {
-  const router = useRouter();
   const [data, setData] = useState<ClassroomLeaderboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +106,7 @@ export default function SpaceClassroomRankingView({
           <p className="text-xs text-muted-foreground">
             {t(
               'ranking.no_data_hint',
-              'Students will appear here once they earn XP from classroom activities.',
+              'Students will appear here once their exams are graded.',
             )}
           </p>
         </CardContent>
@@ -118,9 +116,8 @@ export default function SpaceClassroomRankingView({
 
   const total = data.entries.length;
   const top = data.entries[0];
-  const avgXp = Math.round(
-    data.entries.reduce((sum, e) => sum + (e.total_xp || 0), 0) / Math.max(1, total),
-  );
+  const avgScore =
+    data.entries.reduce((sum, e) => sum + (e.total_score || 0), 0) / Math.max(1, total);
   const top3 = data.entries.slice(0, 3);
   const rest = data.entries.slice(3);
 
@@ -139,14 +136,14 @@ export default function SpaceClassroomRankingView({
           icon={Crown}
           label={t('ranking.top_performer', 'Top performer')}
           value={top.student_name}
-          sub={`${top.total_xp.toLocaleString()} XP · Lv ${top.level}`}
+          sub={`${top.total_score.toFixed(1)} điểm`}
           accent="from-amber-500 to-orange-500"
           shadow="shadow-amber-500/20"
         />
         <StatCard
           icon={TrendingUp}
-          label={t('ranking.avg_xp', 'Average XP')}
-          value={`${avgXp.toLocaleString()} XP`}
+          label={t('ranking.avg_score', 'Average score')}
+          value={avgScore.toFixed(1)}
           accent="from-emerald-500 to-teal-500"
           shadow="shadow-emerald-500/20"
         />
@@ -169,7 +166,6 @@ export default function SpaceClassroomRankingView({
                   key={entry.student_id}
                   entry={entry}
                   rank={(i + 1) as 1 | 2 | 3}
-                  onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${entry.student_id}`)}
                 />
               ))}
             </div>
@@ -195,8 +191,7 @@ export default function SpaceClassroomRankingView({
             {data.entries.map((entry) => (
               <li
                 key={entry.student_id}
-                onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${entry.student_id}`)}
-                className="group flex cursor-pointer items-center gap-3 px-5 py-3 transition-colors hover:bg-muted/60"
+                className="group flex items-center gap-3 px-5 py-3"
               >
                 {rankBadge(entry.rank)}
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-xs font-black text-white ring-2 ring-background">
@@ -212,18 +207,11 @@ export default function SpaceClassroomRankingView({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-bold text-foreground group-hover:text-primary-brand">
-                      {entry.student_name}
-                    </p>
-                    {entry.level_title && (
-                      <Badge className="shrink-0 rounded-full bg-primary-brand/10 px-2 py-0 text-[10px] font-bold text-primary-brand hover:bg-primary-brand/10">
-                        {entry.level_title}
-                      </Badge>
-                    )}
-                  </div>
+                  <p className="truncate text-sm font-bold text-foreground">
+                    {entry.student_name}
+                  </p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
+                    {entry.total_score.toFixed(1)} điểm · {entry.exam_count} bài thi
                   </p>
                   {entry.explanation && (
                     <p className="truncate text-[10px] text-muted-foreground">
@@ -231,14 +219,11 @@ export default function SpaceClassroomRankingView({
                     </p>
                   )}
                 </div>
-                <div className="shrink-0 rounded-full bg-primary-brand/10 px-2.5 py-0.5 text-xs font-bold text-primary-brand">
-                  Lv {entry.level}
-                </div>
               </li>
             ))}
             {rest.length === 0 && top3.length === data.entries.length && (
               <li className="px-5 py-6 text-center text-xs text-muted-foreground">
-                {t('ranking.only_top3', 'Only top 3 students have earned XP so far.')}
+                {t('ranking.only_top3', 'Only top 3 students have been graded so far.')}
               </li>
             )}
           </ul>
@@ -328,21 +313,17 @@ const PODIUM_STYLES: Record<
 function PodiumCell({
   entry,
   rank,
-  onClick,
 }: {
   entry: ClassroomLeaderboardResponse['entries'][number];
   rank: 1 | 2 | 3;
-  onClick: () => void;
 }) {
   const style = PODIUM_STYLES[rank];
   const isFirst = rank === 1;
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div
       className={cn(
-        'group flex w-24 flex-col items-center gap-1.5 rounded-2xl p-2 text-center transition-transform hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-28',
+        'flex w-24 flex-col items-center gap-1.5 rounded-2xl p-2 text-center sm:w-28',
         style.order,
       )}
     >
@@ -365,26 +346,21 @@ function PodiumCell({
           )}
         </div>
       </div>
-      <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-foreground group-hover:text-primary-brand">
+      <p className="line-clamp-1 max-w-full px-1 text-xs font-bold text-foreground">
         {entry.student_name}
       </p>
-      {entry.level_title && (
-        <Badge variant="secondary" className="rounded-full px-2 py-0 text-[9px] font-bold">
-          {entry.level_title}
-        </Badge>
-      )}
       <p className="text-[10px] font-medium text-muted-foreground">
-        {entry.total_xp.toLocaleString()} XP · {entry.total_score.toFixed(1)} điểm
+        {entry.total_score.toFixed(1)} điểm
       </p>
       <div
         className={cn(
-          'mt-1 flex w-full items-start justify-center rounded-t-2xl bg-gradient-to-b pt-2 text-white shadow-inner transition group-hover:brightness-105',
+          'mt-1 flex w-full items-start justify-center rounded-t-2xl bg-gradient-to-b pt-2 text-white shadow-inner',
           style.bar,
           style.barHeight,
         )}
       >
         <span className="text-lg font-black drop-shadow-sm">#{rank}</span>
       </div>
-    </button>
+    </div>
   );
 }

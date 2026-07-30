@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { MoreVertical, UserX, Users, ShieldBan, ClipboardCheck, BarChart2, Loader2 } from 'lucide-react';
+import { MoreVertical, UserX, Users, ShieldBan, BarChart2, Loader2 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import {
   DropdownMenu,
@@ -136,10 +136,6 @@ export default function StudentsTab({
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-52">
-                            <DropdownMenuItem onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${member.member_id}`)}>
-                              <ClipboardCheck size={14} className="mr-2" />
-                              {t('classroom.ui.students_action_view_detail')}
-                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => router.push(`/space/classrooms/${classroomUid}/students/${member.member_id}/analyze`)}>
                               <BarChart2 size={14} className="mr-2" />
                               {t('classroom.ui.students_action_view_analysis')}

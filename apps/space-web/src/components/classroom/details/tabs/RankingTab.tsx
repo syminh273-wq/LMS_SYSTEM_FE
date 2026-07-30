@@ -18,7 +18,7 @@ export default function RankingTab({
             {t('classroom.ui.tab_ranking', 'Ranking')}
           </h3>
           <p className="text-sm text-muted-foreground font-medium mt-1">
-            {t('ranking.subtitle', 'Top students by total XP earned from classroom activities.')}
+            {t('ranking.subtitle', 'Top students by weighted exam score (final x3, midterm x2, regular x1).')}
           </p>
         </div>
         <div className="p-6">

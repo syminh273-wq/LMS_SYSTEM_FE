@@ -157,15 +157,8 @@ export type LeaderboardEntry = {
   student_id: string;
   student_name: string;
   student_avatar: string;
-  total_xp: number;
-  level: number;
-  level_title: string;
   total_score: number;
-  quiz_avg: number;
-  exam_avg: number;
-  quiz_count: number;
   exam_count: number;
-  attendance_pct: number;
   explanation: string;
 };
 
@@ -174,7 +167,6 @@ export type LeaderboardResponse = {
   total_students: number;
   my_rank: number | null;
   my_score: number | null;
-  my_xp: number;
   entries: LeaderboardEntry[];
 };
 
