@@ -33,6 +33,7 @@ export type Consumer = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  has_password: boolean;
 };
 
 export type CreateConsumerRequest = {
@@ -727,6 +728,43 @@ export type IssuedCertificate = {
   student_avatar_url?: string;
 
   classroom_name?: string;
+};
+
+// ── Consumer Dashboard ───────────────────────────────────────────────────────
+
+export type DashboardGpa = {
+  gpa_4: number;
+  avg_10: number;
+};
+
+export type DashboardScheduleItem = {
+  uid: string;
+  type: 'class' | 'exam' | 'deadline' | 'study_session';
+  title: string;
+  start_time: string;
+  end_time: string;
+  classroom_id?: string | null;
+};
+
+export type DashboardRecentGrade = {
+  submission_uid: string;
+  exam_title: string;
+  classroom_name: string;
+  grade: number;
+  max_grade: number;
+  percent: number;
+  graded_at: string | null;
+};
+
+export type DashboardSummary = {
+  gpa: DashboardGpa;
+  active_classrooms: number;
+  assignments_submitted: number;
+  assignments_total: number;
+  attendance_pct: number;
+  today_schedule: DashboardScheduleItem[];
+  recent_grades: DashboardRecentGrade[];
+  recent_certificates: IssuedCertificate[];
 };
 
 export type NotificationMetadata = {

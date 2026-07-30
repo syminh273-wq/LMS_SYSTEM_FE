@@ -164,7 +164,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
         <Button
           variant="outline"
           size="icon"
-          className="relative z-[100]"
+          className="relative z-[9999]"
           aria-label="Notifications"
         >
           {unreadCount > 0 ? <BellRing size={18} strokeWidth={2.2} /> : <Bell size={18} strokeWidth={2.2} />}
@@ -178,7 +178,7 @@ function NotificationBell({ userId }: { userId: string | null | undefined }) {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="z-[100] w-[360px] p-0 overflow-hidden"
+        className="z-[9999] w-[360px] p-0 overflow-hidden"
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div>

@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@shared/components/ui/button';
+import { Skeleton } from '@shared/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import {
-  TrendingUp,
-  TrendingDown,
   BookOpen,
   Award,
   Sparkles,
@@ -17,88 +16,52 @@ import {
   CheckCircle2,
   Plus,
   ChevronRight,
-  Activity,
   Users,
-  Clock,
+  ShieldCheck,
 } from 'lucide-react';
 import type { RootState } from '@/lib/redux/store';
 import { cn } from '@shared/lib/utils';
+import { consumerDashboardApi } from '@/lib/api';
+import type { DashboardSummary, DashboardScheduleItem, DashboardRecentGrade } from '@/lib/api';
 
-const MOCK_STATS = [
-  {
-    label: 'GPA tích lũy',
-    value: '3.84',
-    suffix: '/4.0',
-    delta: '+0.12',
-    deltaType: 'up' as const,
-    icon: GraduationCap,
-    color: 'bg-primary',
-    bg: 'bg-primary/10',
-    fg: 'text-primary',
-  },
-  {
-    label: 'Lớp đang học',
-    value: '6',
-    suffix: 'lớp',
-    delta: '+1',
-    deltaType: 'up' as const,
-    icon: BookOpen,
-    color: 'bg-success',
-    bg: 'bg-success/10',
-    fg: 'text-success',
-  },
-  {
-    label: 'Bài đã nộp',
-    value: '24',
-    suffix: '/28',
-    delta: '+4 tuần này',
-    deltaType: 'up' as const,
-    icon: CheckCircle2,
-    color: 'bg-warning',
-    bg: 'bg-warning/10',
-    fg: 'text-warning',
-  },
-  {
-    label: 'Chuyên cần',
-    value: '98',
-    suffix: '%',
-    delta: '-2%',
-    deltaType: 'down' as const,
-    icon: Target,
-    color: 'bg-destructive',
-    bg: 'bg-destructive/10',
-    fg: 'text-destructive',
-  },
-];
+const SCHEDULE_TYPE_LABEL: Record<DashboardScheduleItem['type'], string> = {
+  class: 'Buổi học',
+  exam: 'Bài kiểm tra',
+  deadline: 'Deadline',
+  study_session: 'Ôn tập',
+};
 
-const MOCK_GRADES = [
-  { course: 'Advanced Web Development', code: 'CS301', assignment: 'Final Project', score: 95, total: 100, date: '2 ngày trước', grade: 'A+' },
-  { course: 'Database Management Systems', code: 'CS205', assignment: 'Midterm Exam', score: 88, total: 100, date: '1 tuần trước', grade: 'B+' },
-  { course: 'UI/UX Design Principles', code: 'DS210', assignment: 'Case Study', score: 92, total: 100, date: '2 tuần trước', grade: 'A' },
-  { course: 'Mobile App Development', code: 'CS340', assignment: 'Quiz #3', score: 100, total: 100, date: '3 tuần trước', grade: 'A+' },
-  { course: 'Data Structures & Algorithms', code: 'CS201', assignment: 'Homework #4', score: 42, total: 50, date: '4 tuần trước', grade: 'A' },
-];
+const SCHEDULE_TYPE_COLOR: Record<DashboardScheduleItem['type'], string> = {
+  class: 'bg-primary',
+  exam: 'bg-destructive',
+  deadline: 'bg-warning',
+  study_session: 'bg-success',
+};
 
-const PERFORMANCE_DATA = [
-  { week: 'T1', value: 72 },
-  { week: 'T2', value: 78 },
-  { week: 'T3', value: 85 },
-  { week: 'T4', value: 82 },
-  { week: 'T5', value: 88 },
-  { week: 'T6', value: 92 },
-  { week: 'T7', value: 95 },
-];
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
 
-const SCHEDULE = [
-  { time: '09:00', title: 'React Workshop', type: 'Trực tiếp', color: 'bg-destructive' },
-  { time: '11:30', title: 'Database Quiz', type: 'Deadline', color: 'bg-warning' },
-  { time: '14:00', title: 'Design Review', type: 'Họp nhóm', color: 'bg-success' },
-];
+function formatDate(iso: string | null): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function gradeLetter(pct: number): string {
+  if (pct >= 95) return 'A+';
+  if (pct >= 85) return 'A';
+  if (pct >= 75) return 'B+';
+  if (pct >= 65) return 'B';
+  if (pct >= 50) return 'C';
+  return 'D';
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
   const userProfile = useSelector((s: RootState) => s.user.profile);
 
   useEffect(() => {
@@ -111,11 +74,59 @@ export default function DashboardPage() {
     setIsAuthenticated(true);
   }, [router]);
 
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    consumerDashboardApi
+      .getSummary()
+      .then((data) => {
+        if (!cancelled) setSummary(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
   if (!mounted || !isAuthenticated) return null;
 
   const displayName = userProfile?.full_name || userProfile?.username || 'bạn';
   const firstName = displayName.split(' ').pop() || displayName;
-  const maxScore = Math.max(...PERFORMANCE_DATA.map((d) => d.value));
+
+  const stats = summary
+    ? [
+        {
+          label: 'GPA tích lũy',
+          value: summary.gpa.gpa_4.toFixed(2),
+          suffix: '/4.0',
+          icon: GraduationCap,
+          color: 'bg-primary',
+        },
+        {
+          label: 'Lớp đang học',
+          value: String(summary.active_classrooms),
+          suffix: 'lớp',
+          icon: BookOpen,
+          color: 'bg-success',
+        },
+        {
+          label: 'Bài đã nộp',
+          value: String(summary.assignments_submitted),
+          suffix: `/${summary.assignments_total}`,
+          icon: CheckCircle2,
+          color: 'bg-warning',
+        },
+        {
+          label: 'Chuyên cần',
+          value: summary.attendance_pct.toFixed(0),
+          suffix: '%',
+          icon: Target,
+          color: 'bg-destructive',
+        },
+      ]
+    : [];
 
   return (
     <div className="min-h-screen bg-muted dark:bg-slate-950">
@@ -137,7 +148,9 @@ export default function DashboardPage() {
                 Chào {firstName} 👋
               </h1>
               <p className="text-primary-foreground/80 text-[15px] max-w-lg">
-                Bạn đã hoàn thành 24/28 bài tập. Cố lên, mục tiêu GPA 3.9 đang chờ phía trước.
+                {summary
+                  ? `Bạn đã hoàn thành ${summary.assignments_submitted}/${summary.assignments_total} bài tập. GPA hiện tại của bạn là ${summary.gpa.gpa_4.toFixed(2)}/4.0.`
+                  : 'Đang tải tiến độ học tập của bạn...'}
               </p>
             </div>
 
@@ -154,126 +167,82 @@ export default function DashboardPage() {
 
         {/* ── Stats Grid ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {MOCK_STATS.map((s, i) => {
-            const Icon = s.icon;
-            const isUp = s.deltaType === 'up';
-            return (
-              <div
-                key={s.label}
-                style={{ animationDelay: `${i * 50}ms` }}
-                className="bg-card border border-border rounded-xl p-4 sm:p-5 card-elevated animate-fade-up"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm", s.color)}>
-                    <Icon size={18} strokeWidth={2.2} />
-                  </div>
-                  <div className={cn(
-                    "flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-md",
-                    isUp ? "text-success bg-success/10" : "text-destructive bg-destructive/10"
-                  )}>
-                    {isUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-                    {s.delta}
-                  </div>
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-card border border-border rounded-xl p-4 sm:p-5 card-elevated">
+                  <Skeleton className="w-10 h-10 rounded-lg mb-3" />
+                  <Skeleton className="h-7 w-16 mb-1.5" />
+                  <Skeleton className="h-3 w-20" />
                 </div>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight tabular-nums">{s.value}</p>
-                  {s.suffix && <span className="text-sm text-muted-foreground font-medium">{s.suffix}</span>}
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5 font-medium">{s.label}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* ── Performance + Schedule ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Performance chart */}
-          <div className="lg:col-span-2 bg-card border border-border rounded-xl p-5 sm:p-6 card-elevated">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                  <Activity size={15} className="text-primary" />
-                  Hiệu suất học tập
-                </h3>
-                <p className="text-xs text-muted-foreground mt-0.5">7 tuần gần nhất</p>
-              </div>
-              <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
-                {['Tuần', 'Tháng', 'Học kỳ'].map((v) => (
-                  <Button
-                    key={v}
-                    size="sm"
-                    variant={v === 'Tuần' ? 'secondary' : 'ghost'}
-                    className="text-[11px]"
-                  >
-                    {v}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Bar chart */}
-            <div className="h-48 sm:h-56 flex items-end justify-between gap-2 sm:gap-3">
-              {PERFORMANCE_DATA.map((d, i) => {
-                const height = (d.value / 100) * 100;
-                const isLast = i === PERFORMANCE_DATA.length - 1;
+              ))
+            : stats.map((s, i) => {
+                const Icon = s.icon;
                 return (
-                  <div key={d.week} className="flex-1 flex flex-col items-center gap-2 group">
-                    <div className="relative w-full h-full flex items-end">
-                      <div
-                        className={cn(
-                          "w-full rounded-t-md transition-all",
-                          isLast
-                            ? "bg-primary"
-                            : "bg-muted group-hover:bg-indigo-300"
-                        )}
-                        style={{ height: `${height}%`, minHeight: '4px' }}
-                      />
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded">
-                        {d.value}
-                      </div>
+                  <div
+                    key={s.label}
+                    style={{ animationDelay: `${i * 50}ms` }}
+                    className="bg-card border border-border rounded-xl p-4 sm:p-5 card-elevated animate-fade-up"
+                  >
+                    <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-sm mb-3", s.color)}>
+                      <Icon size={18} strokeWidth={2.2} />
                     </div>
-                    <span className={cn(
-                      "text-[11px] font-semibold",
-                      isLast ? "text-primary" : "text-muted-foreground"
-                    )}>
-                      {d.week}
-                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight tabular-nums">{s.value}</p>
+                      {s.suffix && <span className="text-sm text-muted-foreground font-medium">{s.suffix}</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5 font-medium">{s.label}</p>
                   </div>
                 );
               })}
-            </div>
+        </div>
+
+        {/* ── Today's schedule ── */}
+        <div className="bg-card border border-border rounded-xl p-5 sm:p-6 card-elevated">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+              <CalendarIcon size={15} className="text-primary" />
+              Hôm nay
+            </h3>
+            <Button
+              onClick={() => router.push('/consumer/calendar')}
+              variant="link"
+              className="text-[11px] font-semibold h-auto p-0"
+            >
+              Xem tất cả
+            </Button>
           </div>
 
-          {/* Today's schedule */}
-          <div className="bg-card border border-border rounded-xl p-5 sm:p-6 card-elevated">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <CalendarIcon size={15} className="text-primary" />
-                Hôm nay
-              </h3>
-              <Button variant="link" className="text-[11px] font-semibold h-auto p-0">
-                Xem tất cả
-              </Button>
-            </div>
+          {loading ? (
             <div className="space-y-2.5">
-              {SCHEDULE.map((item) => (
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : !summary?.today_schedule.length ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+              <CalendarIcon size={24} className="text-muted-foreground" />
+              <p className="text-[13px] text-muted-foreground">Không có lịch nào hôm nay</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {summary.today_schedule.map((item) => (
                 <div
-                  key={item.title}
+                  key={item.uid}
                   className="group flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/10 transition-colors cursor-pointer"
                 >
                   <div className="text-[11px] font-bold text-muted-foreground tabular-nums w-10 shrink-0">
-                    {item.time}
+                    {formatTime(item.start_time)}
                   </div>
-                  <div className={cn("w-1 h-8 rounded-full shrink-0", item.color)} />
+                  <div className={cn("w-1 h-8 rounded-full shrink-0", SCHEDULE_TYPE_COLOR[item.type])} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-semibold text-foreground truncate">{item.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{item.type}</p>
+                    <p className="text-[11px] text-muted-foreground">{SCHEDULE_TYPE_LABEL[item.type]}</p>
                   </div>
                   <ChevronRight size={14} className="text-slate-300 group-hover:text-primary transition-colors" />
                 </div>
               ))}
             </div>
-          </div>
+          )}
         </div>
 
         {/* ── Recent Grades ── */}
@@ -296,74 +265,134 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border bg-muted">
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3">Môn học</th>
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3 hidden sm:table-cell">Bài</th>
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3">Điểm</th>
-                  <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3 hidden md:table-cell">Ngày</th>
-                  <th className="text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3">Tiến độ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {MOCK_GRADES.map((g) => {
-                  const pct = (g.score / g.total) * 100;
-                  const isExcellent = pct >= 90;
-                  return (
-                    <tr key={g.course} className="hover:bg-muted transition-colors group">
-                      <td className="px-5 sm:px-6 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0",
-                            isExcellent
-                              ? "bg-success/10 text-success"
-                              : "bg-muted text-muted-foreground"
-                          )}>
-                            {g.grade}
+          {loading ? (
+            <div className="p-5 sm:p-6 space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : !summary?.recent_grades.length ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+              <Award size={24} className="text-muted-foreground" />
+              <p className="text-[13px] text-muted-foreground">Chưa có bài nào được chấm điểm</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-muted">
+                    <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3">Môn học</th>
+                    <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3 hidden sm:table-cell">Bài</th>
+                    <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3">Điểm</th>
+                    <th className="text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3 hidden md:table-cell">Ngày</th>
+                    <th className="text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-5 sm:px-6 py-3">Tiến độ</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {summary.recent_grades.map((g: DashboardRecentGrade) => {
+                    const pct = g.percent;
+                    const isExcellent = pct >= 90;
+                    return (
+                      <tr key={g.submission_uid} className="hover:bg-muted transition-colors group">
+                        <td className="px-5 sm:px-6 py-3.5">
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0",
+                              isExcellent
+                                ? "bg-success/10 text-success"
+                                : "bg-muted text-muted-foreground"
+                            )}>
+                              {gradeLetter(pct)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-semibold text-foreground truncate">{g.classroom_name}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-[13px] font-semibold text-foreground truncate">{g.course}</p>
-                            <p className="text-[11px] text-muted-foreground">{g.code}</p>
+                        </td>
+                        <td className="px-5 sm:px-6 py-3.5 text-[13px] text-muted-foreground hidden sm:table-cell">{g.exam_title}</td>
+                        <td className="px-5 sm:px-6 py-3.5">
+                          <div className="flex items-baseline gap-1">
+                            <span className={cn(
+                              "text-[14px] font-bold tabular-nums",
+                              isExcellent ? "text-success" : "text-foreground"
+                            )}>
+                              {g.grade}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground">/{g.max_grade}</span>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-5 sm:px-6 py-3.5 text-[13px] text-muted-foreground hidden sm:table-cell">{g.assignment}</td>
-                      <td className="px-5 sm:px-6 py-3.5">
-                        <div className="flex items-baseline gap-1">
-                          <span className={cn(
-                            "text-[14px] font-bold tabular-nums",
-                            isExcellent ? "text-success" : "text-foreground"
-                          )}>
-                            {g.score}
-                          </span>
-                          <span className="text-[11px] text-muted-foreground">/{g.total}</span>
-                        </div>
-                      </td>
-                      <td className="px-5 sm:px-6 py-3.5 text-[12px] text-muted-foreground hidden md:table-cell">{g.date}</td>
-                      <td className="px-5 sm:px-6 py-3.5">
-                        <div className="flex items-center justify-end gap-2">
-                          <div className="w-20 sm:w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className={cn(
-                                "h-full rounded-full transition-all",
-                                isExcellent ? "bg-success" : pct >= 70 ? "bg-warning" : "bg-destructive"
-                              )}
-                              style={{ width: `${pct}%` }}
-                            />
+                        </td>
+                        <td className="px-5 sm:px-6 py-3.5 text-[12px] text-muted-foreground hidden md:table-cell">{formatDate(g.graded_at)}</td>
+                        <td className="px-5 sm:px-6 py-3.5">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="w-20 sm:w-24 h-1.5 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className={cn(
+                                  "h-full rounded-full transition-all",
+                                  isExcellent ? "bg-success" : pct >= 70 ? "bg-warning" : "bg-destructive"
+                                )}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                            <span className="text-[11px] font-semibold text-muted-foreground tabular-nums w-9 text-right">
+                              {Math.round(pct)}%
+                            </span>
                           </div>
-                          <span className="text-[11px] font-semibold text-muted-foreground tabular-nums w-9 text-right">
-                            {Math.round(pct)}%
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* ── Recent Certificates ── */}
+        <div className="bg-card border border-border rounded-xl overflow-hidden card-elevated">
+          <div className="flex items-center justify-between p-5 sm:p-6 border-b border-border">
+            <div>
+              <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+                <ShieldCheck size={15} className="text-primary" />
+                Chứng chỉ gần đây
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Các chứng chỉ đã nhận</p>
+            </div>
           </div>
+
+          {loading ? (
+            <div className="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-20 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : !summary?.recent_certificates.length ? (
+            <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+              <ShieldCheck size={24} className="text-muted-foreground" />
+              <p className="text-[13px] text-muted-foreground">Chưa có chứng chỉ nào</p>
+            </div>
+          ) : (
+            <div className="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {summary.recent_certificates.map((cert) => (
+                <button
+                  key={cert.uid}
+                  onClick={() => router.push(`/consumer/certificate/${cert.uid}`)}
+                  className="group flex items-start gap-3 p-3.5 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/10 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                    <Award size={18} strokeWidth={2.2} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-foreground truncate">{cert.title || 'Chứng chỉ'}</p>
+                    <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1">
+                      <Users size={11} />
+                      {cert.classroom_name}
+                    </p>
+                    <p className="text-[10.5px] text-muted-foreground mt-0.5">{cert.issued_at_display}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

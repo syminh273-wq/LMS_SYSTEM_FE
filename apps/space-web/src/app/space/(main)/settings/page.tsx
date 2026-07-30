@@ -44,7 +44,7 @@ type PasswordForm = { current_password: string; new_password: string; confirm_pa
 
 const passwordSchema = z
   .object({
-    current_password: z.string().min(1, 'Vui lòng nhập mật khẩu hiện tại'),
+    current_password: z.string(),
     new_password: z.string().min(8, 'Mật khẩu mới tối thiểu 8 ký tự'),
     confirm_password: z.string(),
   })
@@ -65,6 +65,7 @@ export default function SettingsPage() {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwSuccess, setPwSuccess] = useState('');
   const [pwError, setPwError] = useState('');
+  const [hasPassword, setHasPassword] = useState(true);
 
   const passwordForm = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
@@ -85,7 +86,16 @@ export default function SettingsPage() {
         setLoading(false);
       }
     };
+    const fetchProfile = async () => {
+      try {
+        const profile = await accountService.getProfile();
+        setHasPassword(Boolean((profile as any)?.has_password));
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);
+      }
+    };
     fetchSettings();
+    fetchProfile();
   }, []);
 
   const handleSave = async () => {
@@ -112,6 +122,12 @@ export default function SettingsPage() {
   const handleChangePassword = passwordForm.handleSubmit(async (data) => {
     setPwError('');
     setPwSuccess('');
+
+    if (hasPassword && !data.current_password) {
+      passwordForm.setError('current_password', { message: 'Vui lòng nhập mật khẩu hiện tại' });
+      return;
+    }
+
     setPwLoading(true);
     try {
       await accountService.changePassword(data);
@@ -221,9 +237,17 @@ export default function SettingsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-8">
+          {!hasPassword && (
+            <p className="text-sm text-muted-foreground font-medium bg-muted/30 border border-border rounded-xl px-4 py-3 mb-5">
+              {t('settings.space.security.no_password_hint')}
+            </p>
+          )}
           <Form {...passwordForm}>
             <form onSubmit={handleChangePassword} className="space-y-5">
-              {(['current_password', 'new_password', 'confirm_password'] as const).map((field) => {
+              {(hasPassword
+                ? (['current_password', 'new_password', 'confirm_password'] as const)
+                : (['new_password', 'confirm_password'] as const)
+              ).map((field) => {
                 const labels: Record<typeof field, string> = {
                   current_password: t('settings.space.security.current_password_label'),
                   new_password: t('settings.space.security.new_password_label'),

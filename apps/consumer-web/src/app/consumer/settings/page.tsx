@@ -1,14 +1,14 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Eye, EyeOff, KeyRound, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
+import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { accountService } from '@/lib/api/account';
 import { ValidationException } from '@/lib/api';
 import { useRequireAuth } from '@/lib/hooks/use-require-auth';
-import { ConsumerProfileDropdown } from '@/components/layout/consumer-profile-dropdown';
 import { cn } from '@shared/lib/utils';
 
 type PasswordForm = {
@@ -67,6 +67,14 @@ export default function ConsumerSettingsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [hasPassword, setHasPassword] = useState(true);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    accountService.getProfile()
+      .then((profile) => setHasPassword(Boolean(profile.has_password)))
+      .catch((err) => console.error('Failed to fetch profile:', err));
+  }, [isAuthenticated]);
 
   if (!mounted || !isAuthenticated) return null;
 
@@ -91,7 +99,12 @@ export default function ConsumerSettingsPage() {
     setSuccess('');
     setError('');
 
-    if (!form.current_password || !form.new_password || !form.confirm_password) {
+    if (hasPassword && !form.current_password) {
+      setError('Vui lòng nhập mật khẩu hiện tại.');
+      return;
+    }
+
+    if (!form.new_password || !form.confirm_password) {
       setError('Vui lòng nhập đầy đủ các trường mật khẩu.');
       return;
     }
@@ -142,7 +155,6 @@ export default function ConsumerSettingsPage() {
               <p className="text-[13px] text-muted-foreground mt-0.5">Quản lý bảo mật tài khoản của bạn</p>
             </div>
           </div>
-          <ConsumerProfileDropdown />
         </header>
 
         <section className="overflow-hidden rounded-2xl border border-border bg-card card-elevated">
@@ -187,14 +199,21 @@ export default function ConsumerSettingsPage() {
                 </div>
               )}
 
-              <PasswordField
-                id="currentPassword"
-                label="Mật khẩu hiện tại"
-                value={form.current_password}
-                visible={visible.current_password}
-                onToggle={() => toggleVisible('current_password')}
-                onChange={(value) => updateField('current_password', value)}
-              />
+              {!hasPassword && (
+                <div className="rounded-lg border border-border bg-muted px-4 py-3 text-[12.5px] font-medium text-muted-foreground">
+                  Tài khoản của bạn chưa đặt mật khẩu (đăng nhập qua Google). Đặt mật khẩu mới bên dưới mà không cần mật khẩu hiện tại.
+                </div>
+              )}
+              {hasPassword && (
+                <PasswordField
+                  id="currentPassword"
+                  label="Mật khẩu hiện tại"
+                  value={form.current_password}
+                  visible={visible.current_password}
+                  onToggle={() => toggleVisible('current_password')}
+                  onChange={(value) => updateField('current_password', value)}
+                />
+              )}
               <PasswordField
                 id="newPassword"
                 label="Mật khẩu mới"
@@ -251,12 +270,12 @@ function PasswordField({
         {label}
       </Label>
       <div className="relative">
-        <input
+        <Input
           id={id}
           type={visible ? 'text' : 'password'}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full rounded-lg border border-border bg-background px-4 pr-11 text-[13.5px] font-medium text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+          className="h-11 pr-11"
           autoComplete="off"
         />
         <Button

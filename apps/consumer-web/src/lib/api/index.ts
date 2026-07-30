@@ -5,6 +5,7 @@ import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
 import { examSessionApi } from './exam-session';
 import { consumerCalendarApi } from './calendar';
+import { consumerDashboardApi } from './dashboard';
 import { consumerLeaveRequestApi } from './leaveRequest';
 import { paymentApi } from './payment';
 import { historyApi } from './history';
@@ -20,6 +21,7 @@ export * from './payment';
 export { consumerQuizApi };
 export { examSessionApi };
 export { consumerCalendarApi };
+export { consumerDashboardApi };
 export { consumerLeaveRequestApi };
 export { consumerCourseApi };
 export { paymentApi };
@@ -48,6 +50,7 @@ export const consumerApi = {
   ...consumerApiCompat,
   sharing: sharingApi,
   calendar: consumerCalendarApi,
+  dashboard: consumerDashboardApi,
   leaveRequests: consumerLeaveRequestApi,
   courses: consumerCourseApi,
 };

@@ -332,11 +332,12 @@ export default function ClassroomPage() {
                 ].map(({ key, label }) => (
                   <Button
                     key={key}
+                    variant="ghost"
                     onClick={() => setFilter(key)}
                     className={cn(
-                      "px-3 py-1.5 text-[12.5px] font-semibold rounded-md transition-colors",
+                      "px-3 py-1.5 text-[12.5px] font-semibold rounded-md shadow-none transition-colors",
                       filter === key
-                        ? "bg-slate-900 text-white"
+                        ? "bg-slate-900 text-white hover:bg-slate-900"
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
