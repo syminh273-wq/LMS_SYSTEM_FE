@@ -6,6 +6,17 @@ import firebaseApp from '@/lib/firebase';
 import { notificationApi } from '@/lib/api/notification';
 import { useTranslation } from '@shared/components/LocaleProvider';
 
+type NotificationItem = {
+  uid: string;
+  target_uid: string;
+  notify_type: string;
+  title: string;
+  content: string;
+  metadata: string;
+  is_read: boolean;
+  created_at: string;
+};
+
 type FbNotification = {
   uid: string;
   title: string;
@@ -16,6 +27,37 @@ type FbNotification = {
   metadata: Record<string, string>;
 };
 
+function fromRest(n: NotificationItem): FbNotification {
+  let meta: Record<string, string> = {};
+  if (typeof n.metadata === 'string' && n.metadata) {
+    try {
+      meta = JSON.parse(n.metadata);
+    } catch {
+      meta = {};
+    }
+  }
+  return {
+    uid: n.uid,
+    title: n.title,
+    content: n.content,
+    type: n.notify_type,
+    created_at: n.created_at,
+    is_read: n.is_read ? 'true' : 'false',
+    metadata: meta,
+  };
+}
+
+function getUid(): string | null {
+  if (typeof window === 'undefined') return null;
+  const profileStr = localStorage.getItem('userProfile');
+  if (!profileStr) return null;
+  try {
+    return JSON.parse(profileStr)?.uid ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function NotificationBell() {
   const { t, formatDate } = useTranslation();
   const [notifications, setNotifications] = useState<FbNotification[]>([]);
@@ -24,19 +66,37 @@ export default function NotificationBell() {
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let uid = null;
-    if (typeof window !== 'undefined') {
-      const profileStr = localStorage.getItem('userProfile');
-      if (profileStr) {
-        try {
-          const profile = JSON.parse(profileStr);
-          uid = profile.uid;
-        } catch (e) {
-          console.error('[NotificationBell] Failed to parse userProfile', e);
-        }
+    const uid = getUid();
+    if (!uid) return;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const list = await notificationApi.list({ target_uid: uid, limit: 20 });
+        if (cancelled) return;
+        const normalized = (Array.isArray(list) ? list : []).map(fromRest);
+        normalized.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        );
+        setNotifications((prev) => {
+          const byUid = new Map(prev.map((n) => [n.uid, n]));
+          for (const n of normalized) if (!byUid.has(n.uid)) byUid.set(n.uid, n);
+          return Array.from(byUid.values()).sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          );
+        });
+      } catch (err) {
+        console.error('[NotificationBell] REST list failed', err);
       }
-    }
-    
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const uid = getUid();
     if (!firebaseApp || !uid) return;
 
     const db = getDatabase(firebaseApp);
@@ -46,21 +106,33 @@ export default function NotificationBell() {
       signalRef,
       (snapshot) => {
         const raw = snapshot.val() as Record<string, FbNotification> | null;
-        if (!raw) { 
-          setNotifications([]); 
-          setReadUids(new Set());
-          return; 
+        if (!raw) {
+          return;
         }
 
         const list = Object.values(raw).sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
-        setNotifications(list);
-        
-        // Clear readUids that are now confirmed as read in Firebase to keep state lean
-        setReadUids(prev => {
+        setNotifications((prev) => {
+          const byUid = new Map(prev.map((n) => [n.uid, n]));
+          for (const n of list) {
+            const existing = byUid.get(n.uid);
+            if (!existing) {
+              byUid.set(n.uid, n);
+            } else if (existing.is_read === 'true' && n.is_read !== 'true') {
+              byUid.set(n.uid, { ...n, is_read: 'true' });
+            } else if (n.is_read === 'true' && existing.is_read !== 'true') {
+              byUid.set(n.uid, n);
+            }
+          }
+          return Array.from(byUid.values()).sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          );
+        });
+
+        setReadUids((prev) => {
           const next = new Set(prev);
-          list.forEach(n => {
+          list.forEach((n) => {
             if (n.is_read === 'true') next.delete(n.uid);
           });
           return next;

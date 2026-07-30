@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { classroomApi, examSessionApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
+import { classroomApi, examSessionApi, notificationApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
@@ -372,6 +372,44 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   }, [activeTab, isAuthenticated, uid, classroom]);
 
   const [joiningCheckout, setJoiningCheckout] = useState(false);
+
+  const notifyTeacherOfJoin = React.useCallback((status: 'pending' | 'approved') => {
+    if (!classroom?.teacher_id) {
+      console.warn('[notifyTeacherOfJoin] skip — classroom.teacher_id is empty', { classroom });
+      return;
+    }
+    const studentName = me?.full_name || me?.username || 'Học viên';
+    const title = status === 'pending'
+      ? `Yêu cầu tham gia lớp "${classroom.name}"`
+      : `Học viên mới tham gia lớp "${classroom.name}"`;
+    const content = status === 'pending'
+      ? `${studentName} đã gửi yêu cầu tham gia lớp "${classroom.name}" và đang chờ duyệt.`
+      : `${studentName} vừa tham gia lớp "${classroom.name}".`;
+    const targetUid = classroom.teacher_id;
+    console.log('[notifyTeacherOfJoin] →', { targetUid, status, classroom_uid: classroom.uid });
+    notificationApi
+      .send({
+        target_uid: targetUid,
+        title,
+        content,
+        notify_type: 'system',
+        metadata: {
+          classroom_uid: classroom.uid,
+          classroom_name: classroom.name,
+          student_uid: me?.uid,
+          student_name: studentName,
+          status,
+        },
+      })
+      .then((res) => {
+        console.log('[notifyTeacherOfJoin] ✓ sent', res);
+      })
+      .catch((err) => {
+        console.error('[notifyTeacherOfJoin] ✗ failed', err);
+        toast.error(`Gửi thông báo thất bại: ${err?.message || 'unknown'}`);
+      });
+  }, [classroom, me]);
+
   const handleJoinPaidClassroom = async () => {
     if (!classroom) return;
     try {
@@ -380,6 +418,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       if (res.requires_payment && res.pay_url) {
         window.location.href = `/consumer/classroom/checkout/${classroom.uid}?order_id=${res.order_id || ''}`;
       } else {
+        notifyTeacherOfJoin(res.membership_status === 'pending' ? 'pending' : 'approved');
         toast.success('Đã tham gia lớp');
         router.refresh();
       }
@@ -401,6 +440,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
         window.location.href = `/consumer/classroom/checkout/${classroom.uid}${orderId}`;
         return;
       }
+      notifyTeacherOfJoin(res.membership_status === 'pending' ? 'pending' : 'approved');
       if (res.membership_status === 'pending') {
         toast.success(`Đã gửi yêu cầu tham gia lớp "${classroom.name}". Vui lòng chờ giáo viên duyệt.`);
       } else {

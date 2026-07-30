@@ -67,10 +67,6 @@ export const notificationApi = {
     try {
       await consumerApiInstance.post(`/api/v1/notifications/${uid}/read/`, {});
     } catch (err) {
-      // 404 is expected for notifications that exist only in the realtime feed
-      // (e.g. pushed via Firebase but not persisted to the backend yet). The
-      // caller has already updated local state — do not surface this as a
-      // failure that triggers a revert.
       if (err instanceof ApiException && err.status === 404) {
         return;
       }
@@ -78,4 +74,11 @@ export const notificationApi = {
     }
   },
   markAllRead: () => consumerApiInstance.post(`/api/v1/notifications/read-all/`, {}),
+  send: (payload: {
+    target_uid: string;
+    title: string;
+    content: string;
+    notify_type?: string;
+    metadata?: Record<string, unknown>;
+  }) => consumerApiInstance.post(`/api/v1/notifications/send/`, payload),
 };
