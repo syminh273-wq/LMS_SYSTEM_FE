@@ -5,9 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearProfile } from '@/lib/redux/userSlice';
 import type { RootState } from '@/lib/redux/store';
 import {
-  Bell,
-  BellRing,
-  Check,
   Search,
   HelpCircle,
   LogOut,
@@ -20,7 +17,6 @@ import {
   Calendar as CalendarIcon,
   GraduationCap,
   Sparkles,
-  Inbox,
   Compass,
   Heart,
   Trophy,
@@ -41,11 +37,9 @@ import { ThemeToggle } from "@shared/components/ThemeToggle";
 import { MasterLayout, MasterHeader, MasterBody } from "@shared/components/layout/MasterLayout";
 import { LmsLogo } from "@shared/components/LmsLogo";
 import { cn } from '@shared/lib/utils';
-import { useNotifications } from '@/lib/hooks/use-notifications';
-import type { NotificationItem, NotificationMetadata } from '@/lib/api';
-import { Popover, PopoverContent, PopoverTrigger } from '@shared/components/ui/popover';
 import { Button } from '@shared/components/ui/button';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
+import { NotificationBell } from '@/components/layout/notification-bell';
 
 const SEEN_CERT_KEY = 'seen_cert_uids';
 
@@ -117,166 +111,6 @@ const utilityNavItems: NavItem[] = [
   { name: 'Chứng chỉ', href: '/consumer/certificate', icon: Award },
   { name: 'Quy đổi điểm', href: '/consumer/grading', icon: Calculator },
 ];
-
-function parseNotificationMetadata(raw: string | NotificationMetadata | undefined | null): NotificationMetadata {
-  if (!raw) return {};
-  if (typeof raw !== 'string') return raw as NotificationMetadata;
-  try {
-    return (JSON.parse(raw) as NotificationMetadata) ?? {};
-  } catch {
-    return {};
-  }
-}
-
-function relativeTime(iso: string): string {
-  const t = new Date(iso).getTime();
-  if (Number.isNaN(t)) return '';
-  const diff = Date.now() - t;
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return 'Vừa xong';
-  if (min < 60) return `${min} phút trước`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr} giờ trước`;
-  const day = Math.floor(hr / 24);
-  if (day < 7) return `${day} ngày trước`;
-  return new Date(iso).toLocaleDateString('vi-VN');
-}
-
-function NotificationBell({ userId }: { userId: string | null | undefined }) {
-  const router = useRouter();
-  const [open, setOpen] = React.useState(false);
-  const { items, unreadCount, markRead, markAllRead } = useNotifications({ userId });
-
-  const handleClickItem = (item: NotificationItem) => {
-    void markRead(item.uid);
-    const meta = parseNotificationMetadata(item.metadata);
-    if (meta.classroom_uid) {
-      setOpen(false);
-      router.push(`/consumer/classroom/${meta.classroom_uid}`);
-    }
-  };
-
-  const list = items.slice(0, 10);
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="relative z-[9999]"
-          aria-label="Notifications"
-        >
-          {unreadCount > 0 ? <BellRing size={18} strokeWidth={2.2} /> : <Bell size={18} strokeWidth={2.2} />}
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-white text-[10px] font-bold flex items-center justify-center">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        sideOffset={8}
-        className="z-[9999] w-[360px] p-0 overflow-hidden"
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <div>
-            <h3 className="text-[13px] font-bold text-foreground">Thông báo</h3>
-            <p className="text-[11px] text-muted-foreground">
-              {unreadCount > 0 ? `${unreadCount} chưa đọc` : 'Đã đọc tất cả'}
-            </p>
-          </div>
-          {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => void markAllRead()}
-              className="h-7 text-primary"
-            >
-              <Check size={12} className="mr-1" />
-              Đọc tất cả
-            </Button>
-          )}
-        </div>
-
-        <div className="max-h-[420px] overflow-y-auto">
-          {list.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
-              <Inbox size={32} className="opacity-50" />
-              <p className="text-[12px] font-medium">Chưa có thông báo nào</p>
-            </div>
-          ) : (
-            <ul className="divide-y divide-border">
-              {list.map((item, idx) => {
-                const meta = parseNotificationMetadata(item.metadata);
-                const hasLink = !!meta.classroom_uid;
-                return (
-                  <li key={item.uid ?? `notification-${idx}`}>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleClickItem(item)}
-                      className={cn(
-                        "w-full text-left px-4 py-3 flex items-start gap-3",
-                        !item.is_read && "bg-primary/10",
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "shrink-0 w-9 h-9 rounded-full flex items-center justify-center mt-0.5",
-                          item.notify_type === 'classroom_approved'
-                            ? "bg-success text-success-foreground"
-                            : item.notify_type === 'classroom_rejected'
-                              ? "bg-destructive text-destructive-foreground"
-                              : "bg-primary text-primary-foreground",
-                        )}
-                      >
-                        <Bell size={15} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p
-                            className={cn(
-                              "text-[13px] truncate",
-                              item.is_read
-                                ? "font-semibold text-muted-foreground"
-                                : "font-bold text-foreground",
-                            )}
-                          >
-                            {item.title}
-                          </p>
-                          {!item.is_read && (
-                            <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                          )}
-                        </div>
-                        <p
-                          className={cn(
-                            "text-[12px] line-clamp-2 mt-0.5",
-                            item.is_read
-                              ? "text-muted-foreground"
-                              : "text-foreground",
-                          )}
-                        >
-                          {item.content}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground mt-1 font-medium">
-                          {relativeTime(item.created_at)}
-                          {hasLink && (
-                            <span className="ml-2 text-primary font-semibold">· Xem lớp →</span>
-                          )}
-                        </p>
-                      </div>
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
-}
 
 export function ConsumerShell({ children }: ConsumerShellProps) {
   const pathname = usePathname();
