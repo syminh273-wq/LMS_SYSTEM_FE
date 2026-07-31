@@ -8,10 +8,7 @@ import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 import { historyApi } from '@/lib/api';
 import type { PaymentListItem, PaymentStatus } from '@/lib/api/payment';
-import type { JoinHistoryItem } from '@/lib/api/classroom';
-import { HistoryTabs, type HistoryTab } from '@/components/history/HistoryTabs';
 import { PaymentHistoryList } from '@/components/history/PaymentHistoryList';
-import { JoinHistoryList } from '@/components/history/JoinHistoryList';
 
 const STATUS_FILTERS: { value: PaymentStatus | 'all'; label: string }[] = [
   { value: 'all', label: 'Tất cả' },
@@ -23,9 +20,7 @@ const STATUS_FILTERS: { value: PaymentStatus | 'all'; label: string }[] = [
 
 export default function ConsumerHistoryPage() {
   const router = useRouter();
-  const [tab, setTab] = useState<HistoryTab>('payments');
   const [payments, setPayments] = useState<PaymentListItem[]>([]);
-  const [joins, setJoins] = useState<JoinHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | 'all'>('all');
   const [refreshing, setRefreshing] = useState(false);
@@ -34,9 +29,8 @@ export default function ConsumerHistoryPage() {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
-      const { payments: pmts, joins: jn } = await historyApi.getOverview(100);
+      const { payments: pmts } = await historyApi.getOverview(100);
       setPayments(pmts);
-      setJoins(jn);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Không thể tải lịch sử');
     } finally {
@@ -53,11 +47,6 @@ export default function ConsumerHistoryPage() {
     if (statusFilter === 'all') return payments;
     return payments.filter((p) => p.status === statusFilter);
   }, [payments, statusFilter]);
-
-  const counts = useMemo(
-    () => ({ payments: payments.length, joins: joins.length }),
-    [payments.length, joins.length],
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted to-background p-4 sm:p-8">
@@ -99,30 +88,24 @@ export default function ConsumerHistoryPage() {
           </div>
         </div>
 
-        <HistoryTabs value={tab} onChange={setTab} counts={counts} />
-
-        {tab === 'payments' ? (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              {STATUS_FILTERS.map((s) => {
-                const active = statusFilter === s.value;
-                return (
-                  <Button
-                    key={s.value}
-                    variant={active ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setStatusFilter(s.value)}
-                  >
-                    {s.label}
-                  </Button>
-                );
-              })}
-            </div>
-            <PaymentHistoryList items={filteredPayments} loading={loading} />
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            {STATUS_FILTERS.map((s) => {
+              const active = statusFilter === s.value;
+              return (
+                <Button
+                  key={s.value}
+                  variant={active ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setStatusFilter(s.value)}
+                >
+                  {s.label}
+                </Button>
+              );
+            })}
           </div>
-        ) : (
-          <JoinHistoryList items={joins} loading={loading} />
-        )}
+          <PaymentHistoryList items={filteredPayments} loading={loading} />
+        </div>
       </div>
     </div>
   );

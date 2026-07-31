@@ -5,6 +5,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
+import Link from 'next/link';
 import {
   Paperclip,
   SendHorizontal,
@@ -215,17 +216,32 @@ function MessageBubble({
   const senderLabel = isMe ? 'Bạn' : msg.sender_name || 'Ẩn danh';
   const roleLabel = msg.sender_type === 'space' ? 'Giáo viên' : 'Sinh viên';
   const isTeacher = msg.sender_type === 'space';
+  const profileHref = !isMe && msg.sender_id ? `/space/me/${msg.sender_id}` : null;
+
+  const avatar = (
+    <MessageAvatarImage
+      src={msg.sender_avatar ?? undefined}
+      alt={senderLabel}
+      fallback={senderLabel}
+    />
+  );
 
   return (
     <Message from={isMe ? 'user' : 'assistant'} align={isMe ? 'left' : 'right'}>
-      <MessageAvatarImage
-        src={msg.sender_avatar ?? undefined}
-        alt={senderLabel}
-        fallback={senderLabel}
-      />
+      {profileHref ? (
+        <Link href={profileHref} prefetch={false} aria-label={`Xem trang của ${senderLabel}`}>{avatar}</Link>
+      ) : (
+        avatar
+      )}
       <MessageContent>
         <div className={`flex items-baseline gap-2 px-1 ${isMe ? 'justify-start' : 'justify-end'}`}>
-          <span className="text-[11px] font-bold text-foreground">{senderLabel}</span>
+          {profileHref ? (
+            <Link href={profileHref} prefetch={false} className="text-[11px] font-bold text-foreground hover:underline">
+              {senderLabel}
+            </Link>
+          ) : (
+            <span className="text-[11px] font-bold text-foreground">{senderLabel}</span>
+          )}
           {!isMe && (
             <span
               className={`rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide ${

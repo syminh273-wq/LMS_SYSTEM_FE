@@ -22,6 +22,7 @@ export type DirectConversation = {
   conversation_uid: string;
   other_user: {
     uid: string;
+    type: 'space' | 'consumer' | string;
     name: string;
     avatar: string;
     last_seen_at: string | null;

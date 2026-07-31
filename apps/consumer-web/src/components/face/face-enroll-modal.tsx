@@ -15,6 +15,7 @@ type CameraErrorReason = 'denied' | 'not_found' | 'unknown';
 export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const destroyedRef = useRef(false);
   const [status, setStatus] = useState<Status>('starting');
   const [errorMsg, setErrorMsg] = useState('');
   const [cameraError, setCameraError] = useState<CameraErrorReason | null>(null);
@@ -31,6 +32,10 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 640, height: 480 },
       });
+      if (destroyedRef.current) {
+        stream.getTracks().forEach(t => t.stop());
+        return;
+      }
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -51,8 +56,12 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
   }, []);
 
   useEffect(() => {
+    destroyedRef.current = false;
     void startCamera();
-    return () => stopCamera();
+    return () => {
+      destroyedRef.current = true;
+      stopCamera();
+    };
   }, [startCamera, stopCamera]);
 
   const handleCapture = async () => {
@@ -98,7 +107,7 @@ export function FaceEnrollModal({ onClose, onEnrolled }: Props) {
         ) : (
           <>
             <div className="relative bg-slate-900">
-              <video ref={videoRef} className="h-80 w-full object-cover" autoPlay muted playsInline />
+              <video ref={videoRef} className="h-80 w-full object-cover" muted playsInline />
 
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                 <div className="h-56 w-44 rounded-[50%] border-4 border-white/60 shadow-[0_0_0_9999px_rgba(0,0,0,0.38)]" />

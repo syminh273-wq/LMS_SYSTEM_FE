@@ -19,6 +19,18 @@ type UpdateProfileResponse = ApiMessageResponse & {
   data: UserProfile;
 };
 
+export type PublicAccountProfile = {
+  profile_visibility?: string;
+  address?: string | null;
+  show_address?: boolean;
+  consumer?: {
+    uid: string;
+    full_name: string;
+    avatar_url: string;
+    created_at: string;
+  } | null;
+};
+
 class AccountService extends BaseRestApiClient {
   constructor() {
     super();
@@ -34,6 +46,12 @@ class AccountService extends BaseRestApiClient {
 
   public async changePassword(data: ChangePasswordData): Promise<ApiMessageResponse> {
     return this.post('/api/v1/space/account/spaces/change-password/', data);
+  }
+
+  // Generic public-profile lookup (works for both consumer and space uids —
+  // the backend resolves whichever account table the uid belongs to).
+  public async getPublicProfile(uid: string): Promise<PublicAccountProfile> {
+    return this.get(`/api/v1/consumer/account/profile/${uid}/public/`);
   }
 }
 

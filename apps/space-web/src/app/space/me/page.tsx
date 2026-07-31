@@ -14,6 +14,7 @@ import { updateSocialAvatar } from '@/lib/redux/socialProfileSlice';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { TeachingClassesCard } from '@shared/components/profile/TeachingClassesCard';
+import { Button } from '@shared/components/ui/button';
 
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { BioCard } from '@/components/Me/BioCard';
@@ -31,7 +32,9 @@ export default function MePage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const profile = useSelector((s: RootState) => s.user.profile);
+  const profileStatus = useSelector((s: RootState) => s.user.status);
   const socialProfile = useSelector((s: RootState) => s.socialProfile.profile);
+  const socialProfileStatus = useSelector((s: RootState) => s.socialProfile.status);
   // Local edit buffer for workspace (bio/analytics cards mutate it in place);
   // falls back to the shared Redux cache until the first local edit happens.
   const [workspaceOverride, setWorkspaceOverride] = useState<WorkspaceProfile | null>(null);
@@ -91,6 +94,18 @@ export default function MePage() {
   };
 
   if (!workspace || !profile) {
+    if (profileStatus === 'failed' || socialProfileStatus === 'failed') {
+      return (
+        <WorkspaceShell>
+          <div className="flex flex-col items-center justify-center gap-3 py-32 text-center">
+            <p className="text-muted-foreground text-sm">{t('workspace.common.error')}</p>
+            <Button variant="link" onClick={() => window.location.reload()}>
+              {t('workspace.common.retry')}
+            </Button>
+          </div>
+        </WorkspaceShell>
+      );
+    }
     return (
       <WorkspaceShell>
         <div className="flex items-center justify-center py-32">

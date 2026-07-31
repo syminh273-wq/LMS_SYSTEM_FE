@@ -19,7 +19,6 @@ import {
   Info,
   CalendarOff,
   Calendar,
-  BookOpen,
   MessageSquare,
   FileText,
   Video,
@@ -1740,27 +1739,6 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                       "{classroom.description || 'Lớp học này chưa có mô tả chi tiết.'}"
                     </p>
                   </div>
-                </div>
-              </div>
-              <div className="p-4 bg-muted border-t border-border">
-                <Button className="w-full bg-slate-900 hover:bg-black text-white font-bold text-xs tracking-widest h-11 rounded-xl">
-                  YÊU CẦU TRỢ GIÚP
-                </Button>
-              </div>
-            </div>
-
-            {/* Support Widget */}
-            <div className="bg-primary rounded-3xl p-6 text-white shadow-lg shadow-indigo-100 relative overflow-hidden group cursor-pointer">
-              <div className="absolute right-[-20px] top-[-20px] opacity-20 group-hover:rotate-12 transition-transform duration-500">
-                <BookOpen size={120} />
-              </div>
-              <div className="relative z-10 space-y-3">
-                <h4 className="font-black tracking-tight text-xl">Thư viện tài liệu</h4>
-                <p className="text-primary-foreground/80 text-xs font-medium">Khám phá kho tàng kiến thức được chia sẻ dành riêng cho lớp học này.</p>
-                <div className="flex justify-end">
-                  <Button variant="ghost" size="sm" className="text-white hover:bg-card/20 p-0 h-auto font-bold text-[10px] tracking-widest gap-2">
-                    XEM NGAY <ArrowLeft className="rotate-180" size={12} />
-                  </Button>
                 </div>
               </div>
             </div>

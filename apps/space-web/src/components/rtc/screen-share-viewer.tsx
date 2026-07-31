@@ -9,9 +9,13 @@ export function ScreenShareViewer({ stream, label }: ScreenShareViewerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && stream) {
-      videoRef.current.srcObject = stream;
-    }
+    const video = videoRef.current;
+    if (!video || !stream || video.srcObject === stream) return;
+    video.srcObject = stream;
+    // Drive play() ourselves (instead of relying on the `autoPlay` attribute)
+    // so a promise interrupted by a later srcObject swap rejects quietly
+    // instead of surfacing as an uncaught AbortError.
+    void video.play().catch(() => {});
   }, [stream]);
 
   if (!stream) return null;
@@ -20,7 +24,6 @@ export function ScreenShareViewer({ stream, label }: ScreenShareViewerProps) {
     <div className="relative overflow-hidden rounded-2xl bg-slate-950 aspect-video">
       <video
         ref={videoRef}
-        autoPlay
         playsInline
         muted
         className="h-full w-full object-contain"

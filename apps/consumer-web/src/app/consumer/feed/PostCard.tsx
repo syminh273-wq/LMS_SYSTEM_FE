@@ -75,7 +75,7 @@ export function PostCard({
   const [classroomNames, setClassroomNames] = useState<Record<string, string>>({});
   const lightbox = useImageLightbox();
   const postImages = getPostImages(post);
-  const isMe = currentUserId === post.consumer_uid;
+  const isMe = currentUserId === post.owner_id;
 
   useEffect(() => {
     const uids = Array.isArray(post.classroom_tag) ? post.classroom_tag : post.classroom_tag ? [post.classroom_tag] : [];
@@ -169,7 +169,7 @@ export function PostCard({
               <AuthorLink post={post} className="min-w-0 max-w-full">
                 <p className="text-[13.5px] font-semibold text-foreground leading-none truncate hover:underline">{post.author_name || 'Ẩn danh'}</p>
               </AuthorLink>
-              {post.author_type === 'space' && (
+              {post.owner_type === 'space' && (
                 <span className="inline-flex items-center gap-0.5 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
                   Giáo viên
                 </span>
@@ -317,22 +317,32 @@ export function PostCard({
             <p className="text-center text-xs text-muted-foreground py-2">Chưa có bình luận nào.</p>
           ) : (
             comments.map(c => {
-              const isMine = currentUserId !== null && c.consumer_uid === currentUserId;
+              const isMine = currentUserId !== null && c.owner_id === currentUserId;
+              const commentAuthorHref = !isMine && c.owner_id ? `/consumer/profile/${c.owner_id}` : null;
+              const avatar = (
+                <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
+                  {c.author_avatar
+                    ? <img src={c.author_avatar} alt="" className="w-full h-full object-cover" />
+                    : (c.author_name || '??').slice(0, 2).toUpperCase()
+                  }
+                </div>
+              );
               return (
                 <div key={c.uid} className={`flex items-start gap-2.5 ${isMine ? 'flex-row-reverse' : ''}`}>
-                  <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-white font-bold text-[10px] shrink-0 overflow-hidden">
-                    {c.author_avatar
-                      ? <img src={c.author_avatar} alt="" className="w-full h-full object-cover" />
-                      : (c.author_name || '??').slice(0, 2).toUpperCase()
-                    }
-                  </div>
+                  {commentAuthorHref ? (
+                    <Link href={commentAuthorHref} className="shrink-0" aria-label={`Xem trang của ${c.author_name}`}>{avatar}</Link>
+                  ) : avatar}
                   <div className={`flex-1 min-w-0 ${isMine ? 'flex flex-col items-end' : ''}`}>
                     <div className={`rounded-2xl px-3 py-2 inline-block max-w-full ${
                       isMine
                         ? 'bg-primary text-white border border-indigo-600'
                         : 'bg-card border border-border'
                     }`}>
-                      <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-primary-foreground/80' : 'text-foreground'}`}>{c.author_name}</p>
+                      {commentAuthorHref ? (
+                        <Link href={commentAuthorHref} className={`text-xs font-semibold leading-none mb-1 block hover:underline ${isMine ? 'text-primary-foreground/80' : 'text-foreground'}`}>{c.author_name}</Link>
+                      ) : (
+                        <p className={`text-xs font-semibold leading-none mb-1 ${isMine ? 'text-primary-foreground/80' : 'text-foreground'}`}>{c.author_name}</p>
+                      )}
                       <p className={`text-[13px] break-words ${isMine ? 'text-white' : 'text-foreground'}`}>{c.content}</p>
                     </div>
                     <p className={`text-[10px] text-muted-foreground mt-1 px-1 ${isMine ? 'text-right' : 'text-left'}`}>
@@ -376,8 +386,8 @@ function AuthorLink({ post, children, className }: {
   children: React.ReactNode;
   className?: string;
 }) {
-  const isSpace = post.author_type === 'space' && post.space_uid;
-  const href = isSpace ? `/consumer/profile/${post.space_uid}` : `/consumer/profile/${post.consumer_uid}`;
+  const isSpace = post.owner_type === 'space' && post.space_uid;
+  const href = isSpace ? `/consumer/profile/${post.space_uid}` : `/consumer/profile/${post.owner_id}`;
   return (
     <Link href={href} prefetch={false} className={cn('block shrink-0', className)} aria-label={isSpace ? 'Xem trang giáo viên' : 'Xem trang cá nhân'}>
       {children}

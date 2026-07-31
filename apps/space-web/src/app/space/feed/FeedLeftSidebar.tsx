@@ -41,7 +41,7 @@ export function FeedLeftSidebar({ profile, followingCount = 0 }: { profile: Prof
   ];
 
   return (
-    <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+    <aside className="space-y-4 lg:col-start-1 lg:sticky lg:top-20 lg:self-start">
       <div className="bg-white border border-slate-200 rounded-xl p-5 card-elevated">
         <div className="flex flex-col items-center text-center">
           <div className="relative">

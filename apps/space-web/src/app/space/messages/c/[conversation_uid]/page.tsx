@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
+import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -21,7 +22,7 @@ export default function DirectChatByConvPage() {
   const currentUser = useSelector((s: RootState) => s.user.profile);
   const workspaceOwnerId = useSelector((s: RootState) => s.socialProfile.profile?.owner_id ?? null);
 
-  const [convMeta, setConvMeta] = useState<{ name: string; avatar: string; uid: string }>({ name: '', avatar: '', uid: '' });
+  const [convMeta, setConvMeta] = useState<{ name: string; avatar: string; uid: string; type: string }>({ name: '', avatar: '', uid: '', type: 'consumer' });
   const [messages, setMessages] = useState<WorkspaceMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
@@ -51,9 +52,10 @@ export default function DirectChatByConvPage() {
               name: found.other_user?.name || 'User',
               avatar: found.other_user?.avatar || '',
               uid: found.other_user?.uid || '',
+              type: found.other_user?.type || 'consumer',
             });
           } else {
-            setConvMeta({ name: 'User', avatar: '', uid: '' });
+            setConvMeta({ name: 'User', avatar: '', uid: '', type: 'consumer' });
           }
         }
 
@@ -148,9 +150,19 @@ export default function DirectChatByConvPage() {
               <ArrowLeft size={18} />
             </Button>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[14px] text-slate-900 truncate">
-                {convMeta.name || 'Đang tải...'}
-              </p>
+              {convMeta.uid ? (
+                <Link
+                  href={`/space/me/${convMeta.uid}`}
+                  prefetch={false}
+                  className="font-semibold text-[14px] text-slate-900 truncate hover:underline block"
+                >
+                  {convMeta.name || 'Đang tải...'}
+                </Link>
+              ) : (
+                <p className="font-semibold text-[14px] text-slate-900 truncate">
+                  {convMeta.name || 'Đang tải...'}
+                </p>
+              )}
             </div>
           </div>
 

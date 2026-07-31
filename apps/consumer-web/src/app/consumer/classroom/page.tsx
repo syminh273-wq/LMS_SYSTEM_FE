@@ -15,7 +15,7 @@ import { useMembershipRealtime } from '@/lib/hooks/use-membership-realtime';
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 import {
   Loader2, QrCode, KeyRound, X, Camera, Plus, BookOpen,
-  Users, Hash, School, Sparkles, ArrowRight,
+  Users, Hash, School,
 } from 'lucide-react';
 import { cn } from '@shared/lib/utils';
 
@@ -378,14 +378,6 @@ export default function ClassroomPage() {
             <p className="text-[13.5px] text-muted-foreground max-w-sm mx-auto mb-6">
               Nhấn &ldquo;Tham gia lớp&rdquo; và nhập mã từ giáo viên hoặc quét QR code để bắt đầu.
             </p>
-            <Button
-              onClick={() => setShowJoin(true)}
-              className="h-11 px-6 rounded-lg bg-primary text-white font-semibold hover:bg-primary gap-2"
-            >
-              <Sparkles size={15} />
-              Tham gia lớp đầu tiên
-              <ArrowRight size={15} />
-            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

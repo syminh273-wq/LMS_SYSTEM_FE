@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useReducer } from 'react';
 import { getWebSocketBaseUrl } from '@/lib/api/runtime-url';
 import { meetingRoomApi } from '@/lib/api/meeting-room';
 
@@ -31,6 +31,11 @@ export function useRTC(initialRoomUid: string | null) {
   const [isConnected, setIsConnected] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Bumps to force a re-render when a track's `enabled` flag mutates in place
+  // (see toggleCamera) without swapping the `localStream` object identity —
+  // that identity feeds <video srcObject>, and replacing it there aborts the
+  // element's in-flight play() with "interrupted by a new load request".
+  const [, forceRender] = useReducer((n: number) => n + 1, 0);
 
   const wsRef = useRef<WebSocket | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -193,7 +198,7 @@ export function useRTC(initialRoomUid: string | null) {
     const videoTrack = stream.getVideoTracks()[0];
     if (!videoTrack) return;
     videoTrack.enabled = !videoTrack.enabled;
-    setLocalStream(new MediaStream(stream.getTracks()));
+    forceRender();
   }, [startMediaShare]);
 
   const startScreenShare = useCallback(() => startMediaShare('screen'), [startMediaShare]);

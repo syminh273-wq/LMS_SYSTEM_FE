@@ -20,16 +20,16 @@ export function ShiftPicker({ value, onChange, optional = false, className }: Sh
           type="button"
           onClick={() => onChange('')}
           className={cn(
-            'h-14 rounded-lg border text-left px-2.5 py-1.5 transition-colors',
+            'h-14 w-full flex-col items-start justify-center gap-0 rounded-lg border text-left px-2.5 py-1.5 transition-colors',
             value === ''
               ? 'border-slate-400 bg-slate-100 ring-2 ring-slate-200'
               : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50'
           )}
         >
-          <div className={cn('text-[12px] font-bold', value === '' ? 'text-slate-700' : 'text-slate-900')}>
+          <div className={cn('w-full truncate text-[12px] font-bold', value === '' ? 'text-slate-700' : 'text-slate-900')}>
             {t('calendar.shifts.none', 'Không chọn ca')}
           </div>
-          <div className="text-[10.5px] text-slate-500 mt-0.5">
+          <div className="w-full truncate text-[10.5px] text-slate-500 mt-0.5">
             {t('calendar.shifts.none_hint', 'Giờ tự do')}
           </div>
         </Button>
@@ -42,16 +42,16 @@ export function ShiftPicker({ value, onChange, optional = false, className }: Sh
             key={s.id}
             onClick={() => onChange(s.id)}
             className={cn(
-              'h-14 rounded-lg border text-left px-2.5 py-1.5 transition-colors',
+              'h-14 w-full flex-col items-start justify-center gap-0 rounded-lg border text-left px-2.5 py-1.5 transition-colors',
               active
                 ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-100'
                 : 'border-slate-300 bg-white hover:border-indigo-300 hover:bg-slate-50'
             )}
           >
-            <div className={cn('text-[12px] font-bold', active ? 'text-indigo-700' : 'text-slate-900')}>
+            <div className={cn('w-full truncate text-[12px] font-bold', active ? 'text-indigo-700' : 'text-slate-900')}>
               {t(s.labelKey)}
             </div>
-            <div className="text-[10.5px] text-slate-500 tabular-nums mt-0.5">
+            <div className="w-full truncate text-[10.5px] text-slate-500 tabular-nums mt-0.5">
               {String(s.startHour).padStart(2, '0')}:{String(s.startMinute).padStart(2, '0')} – {String(s.endHour).padStart(2, '0')}:{String(s.endMinute).padStart(2, '0')}
             </div>
           </Button>

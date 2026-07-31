@@ -15,6 +15,7 @@ import { PostCard } from './PostCard';
 import { ConnectSuggestions } from './ConnectSuggestions';
 import { WorkspaceShell } from '@/components/WorkspaceShell';
 import { FeedLeftSidebar } from './FeedLeftSidebar';
+import { Skeleton } from '@shared/components/ui/skeleton';
 
 export default function FeedPage() {
   const router = useRouter();
@@ -80,9 +81,16 @@ export default function FeedPage() {
   return (
     <WorkspaceShell>
       <div className="mx-auto w-full max-w-[90vw] grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_300px] gap-6 py-6 sm:py-8">
-        {profile && <FeedLeftSidebar profile={profile} followingCount={followingCount} />}
+        {profile ? (
+          <FeedLeftSidebar profile={profile} followingCount={followingCount} />
+        ) : (
+          <aside className="hidden lg:block lg:col-start-1 space-y-4">
+            <Skeleton className="h-56 rounded-xl" />
+            <Skeleton className="h-40 rounded-xl" />
+          </aside>
+        )}
 
-        <div className="space-y-4 sm:space-y-5 min-w-0">
+        <div className="space-y-4 sm:space-y-5 min-w-0 lg:col-start-2">
           <CreatePost profile={profile} onCreated={handleCreated} />
 
           {loading ? (

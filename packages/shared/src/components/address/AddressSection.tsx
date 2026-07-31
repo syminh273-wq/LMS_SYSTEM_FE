@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../ui/popover';
+import { ScrollArea } from '../ui/scroll-area';
 import { useTranslation } from '../LocaleProvider';
 
 import { addressService } from '../../lib/api/address-service';
@@ -592,32 +593,34 @@ function ProvinceCombobox({
             )}
           </div>
         </div>
-        <div className="max-h-60 overflow-y-auto p-1">
-          {filtered.length === 0 ? (
-            <p className="px-3 py-4 text-center text-sm text-slate-400">
-              {t('common.no_results', 'Không có kết quả')}
-            </p>
-          ) : (
-            filtered.map((p) => (
-              <Button
-                key={p.code}
-                type="button"
-                onClick={() => {
-                  onChange(p.code);
-                  setOpen(false);
-                  setQuery('');
-                }}
-                className={cn(
-                  'flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-slate-100',
-                  p.code === value && 'bg-indigo-50 font-semibold text-indigo-700',
-                )}
-              >
-                <span>{p.name}</span>
-                {p.code === value && <span className="text-indigo-600">✓</span>}
-              </Button>
-            ))
-          )}
-        </div>
+        <ScrollArea className="h-60">
+          <div className="p-1">
+            {filtered.length === 0 ? (
+              <p className="px-3 py-4 text-center text-sm text-slate-400">
+                {t('common.no_results', 'Không có kết quả')}
+              </p>
+            ) : (
+              filtered.map((p) => (
+                <Button
+                  key={p.code}
+                  type="button"
+                  onClick={() => {
+                    onChange(p.code);
+                    setOpen(false);
+                    setQuery('');
+                  }}
+                  className={cn(
+                    'flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-slate-100',
+                    p.code === value && 'bg-indigo-50 font-semibold text-indigo-700',
+                  )}
+                >
+                  <span>{p.name}</span>
+                  {p.code === value && <span className="text-indigo-600">✓</span>}
+                </Button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   );
@@ -711,32 +714,34 @@ function WardCombobox({
             )}
           </div>
         </div>
-        <div className="max-h-60 overflow-y-auto p-1">
-          {filtered.length === 0 ? (
-            <p className="px-3 py-4 text-center text-sm text-slate-400">
-              {t('common.no_results', 'Không có kết quả')}
-            </p>
-          ) : (
-            filtered.map((w) => (
-              <Button
-                key={w.code}
-                type="button"
-                onClick={() => {
-                  onChange(w.code);
-                  setOpen(false);
-                  setQuery('');
-                }}
-                className={cn(
-                  'flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-slate-100',
-                  w.code === value && 'bg-indigo-50 font-semibold text-indigo-700',
-                )}
-              >
-                <span>{w.name}</span>
-                {w.code === value && <span className="text-indigo-600">✓</span>}
-              </Button>
-            ))
-          )}
-        </div>
+        <ScrollArea className="h-60">
+          <div className="p-1">
+            {filtered.length === 0 ? (
+              <p className="px-3 py-4 text-center text-sm text-slate-400">
+                {t('common.no_results', 'Không có kết quả')}
+              </p>
+            ) : (
+              filtered.map((w) => (
+                <Button
+                  key={w.code}
+                  type="button"
+                  onClick={() => {
+                    onChange(w.code);
+                    setOpen(false);
+                    setQuery('');
+                  }}
+                  className={cn(
+                    'flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-slate-100',
+                    w.code === value && 'bg-indigo-50 font-semibold text-indigo-700',
+                  )}
+                >
+                  <span>{w.name}</span>
+                  {w.code === value && <span className="text-indigo-600">✓</span>}
+                </Button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </PopoverContent>
     </Popover>
   );

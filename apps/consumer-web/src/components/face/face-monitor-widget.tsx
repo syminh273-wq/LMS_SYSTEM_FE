@@ -117,6 +117,10 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'user', width: 320, height: 240 },
         });
+        if (destroyedRef.current) {
+          stream.getTracks().forEach(t => t.stop());
+          return;
+        }
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -205,7 +209,6 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
             <video
               ref={videoRef}
               className="h-32 w-full object-cover bg-slate-800"
-              autoPlay
               muted
               playsInline
             />

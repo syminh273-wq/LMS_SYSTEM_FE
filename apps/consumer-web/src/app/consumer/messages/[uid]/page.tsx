@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
+import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -139,9 +140,12 @@ export default function DirectChatPage() {
               <ArrowLeft size={18} />
             </Button>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[14px] text-foreground truncate">
+              <Link
+                href={`/consumer/profile/${targetUid}`}
+                className="font-semibold text-[14px] text-foreground truncate hover:underline block"
+              >
                 {conv?.other_user.name || 'Đang tải...'}
-              </p>
+              </Link>
             </div>
           </div>
 

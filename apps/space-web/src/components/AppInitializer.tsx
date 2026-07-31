@@ -9,38 +9,38 @@ import { RootState, useAppDispatch } from '@/lib/redux/store';
 export function AppInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const themeColor = useSelector((state: RootState) => state.space.themeColor);
-  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('userProfile');
     const token = localStorage.getItem('accessToken');
-    if (savedProfile && token) {
+    if (!token) return;
+
+    if (savedProfile) {
       try {
         dispatch(setProfile(JSON.parse(savedProfile)));
       } catch (e) {
         console.error('Failed to parse userProfile from localStorage', e);
       }
     }
+
+    // Dispatch on token presence rather than the (not-yet-populated) redux
+    // isAuthenticated flag — on a fresh login there is no cached userProfile
+    // yet, so gating on isAuthenticated would mean these never fire.
+    const fetchSettings = async () => {
+      try {
+        const data = await spaceApi.getSettings();
+        if (Object.keys(data).length > 0) {
+          dispatch(setSettings(data));
+        }
+      } catch (err) {
+        console.error('Failed to fetch global settings:', err);
+      }
+    };
+    fetchSettings();
+    dispatch(fetchAccountProfile());
+    dispatch(fetchSocialProfile());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      const fetchSettings = async () => {
-        try {
-          const data = await spaceApi.getSettings();
-          if (Object.keys(data).length > 0) {
-            dispatch(setSettings(data));
-          }
-        } catch (err) {
-          console.error('Failed to fetch global settings:', err);
-        }
-      };
-      fetchSettings();
-      dispatch(fetchAccountProfile());
-      dispatch(fetchSocialProfile());
-    }
-  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     // Apply theme color to CSS variable

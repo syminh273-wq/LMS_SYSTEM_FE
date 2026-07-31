@@ -6,6 +6,7 @@ import { Loader2, X, ClipboardList, FileText, Check, Camera, ShieldAlert, Wifi }
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
+import { Switch } from '@shared/components/ui/switch';
 import type { Exam } from '@/lib/api';
 
 export default function OpenOnlineExamModal({
@@ -177,9 +178,9 @@ export default function OpenOnlineExamModal({
               </div>
 
               {/* Camera toggle */}
-              <div className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-colors${cameraRequired ? 'bg-primary-brand-light' : 'bg-muted/40'}`}>
+              <div className={`flex items-center justify-between rounded-2xl px-5 py-4 transition-colors ${cameraRequired ? 'bg-primary-brand-light' : 'bg-muted/40'}`}>
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl${cameraRequired ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
+                  <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${cameraRequired ? 'bg-primary-brand text-white' : 'bg-muted text-muted-foreground'}`}>
                     <Camera size={20} />
                   </div>
                   <div>
@@ -189,15 +190,12 @@ export default function OpenOnlineExamModal({
                     </div>
                   </div>
                 </div>
-                <Button
-                  type="button"
+                <Switch
+                  checked={cameraRequired}
+                  onCheckedChange={setCameraRequired}
                   disabled={opening}
-                  onClick={() => setCameraRequired(v => !v)}
-                  className={`relative ml-4 inline-flex h-7 w-13 shrink-0 items-center rounded-full transition-colors disabled:opacity-60${cameraRequired ? 'bg-primary-brand' : 'bg-slate-300'}`}
-                  style={{ width: 52 }}
-                >
-                  <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform${cameraRequired ? 'translate-x-7' : 'translate-x-1'}`} />
-                </Button>
+                  className="ml-4 shrink-0"
+                />
               </div>
 
               {/* Proctoring rules */}

@@ -55,7 +55,7 @@ export function ConnectSuggestions() {
   };
 
   return (
-    <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+    <aside className="space-y-4 lg:col-start-3 lg:sticky lg:top-20 lg:self-start">
       <div className="bg-white border border-slate-200 rounded-xl p-4 card-elevated">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-[13.5px] font-bold text-slate-900">Gợi ý kết nối</h3>
@@ -79,16 +79,8 @@ export function ConnectSuggestions() {
               const isFollowing = Boolean(following[u.consumer_uid]);
               const isBusy = Boolean(busy[u.consumer_uid]);
               const subtitle = u.major || u.department || roleLabel(u.role, u.kind);
-              const consumerWebBase =
-                process.env.NEXT_PUBLIC_CONSUMER_WEB_URL || 'http://localhost:3000';
-              const profileHref =
-                u.kind === 'space'
-                  ? `/space/teachers/${u.consumer_uid}`
-                  : `${consumerWebBase}/consumer/profile/${u.consumer_uid}`;
-              const isExternal = u.kind !== 'space';
-              const linkProps = isExternal
-                ? { href: profileHref }
-                : { href: profileHref, prefetch: false as const };
+              const profileHref = `/space/me/${u.consumer_uid}`;
+              const linkProps = { href: profileHref, prefetch: false as const };
               return (
                 <li key={u.consumer_uid} className="flex items-center gap-2.5">
                   <Link

@@ -601,10 +601,10 @@ export type PostEmotion = 'happy' | 'sad' | 'motivated' | 'excited' | 'tired' | 
 
 export type Post = {
   uid: string;
-  consumer_uid: string;
+  owner_id: string;
   author_name: string;
   author_avatar: string;
-  author_type: 'consumer' | 'space';
+  owner_type: 'consumer' | 'space';
   space_uid: string | null;
   content: string;
   emotion: PostEmotion;
@@ -621,7 +621,8 @@ export type Post = {
 export type PostComment = {
   uid: string;
   post_uid: string;
-  consumer_uid: string;
+  owner_id: string;
+  owner_type: 'consumer' | 'space' | string;
   author_name: string;
   author_avatar: string;
   content: string;
