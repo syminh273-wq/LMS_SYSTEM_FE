@@ -10,7 +10,8 @@ import { Button } from '@shared/components/ui/button';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { accountService, type PublicAccountProfile } from '@/lib/api/account';
 import { portfolioApi, type Portfolio, type PortfolioEntry } from '@/lib/api/portfolio';
-import { classroomApi, type Classroom } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
+import type { Classroom } from '@/lib/api/types';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { socialApi } from '@/lib/api/social';
 import type { RootState } from '@/lib/redux/store';
@@ -116,7 +117,7 @@ export default function PublicProfilePage() {
         const [pf, classes, followStatus] = await Promise.all([
           portfolioApi.getPublic(ownerType, targetUid).catch(() => null),
           ownerType === 'space'
-            ? classroomApi.getByTeacher(targetUid).catch(() => [] as Classroom[])
+            ? classroomApi.getClassroomsByTeacher(targetUid).catch(() => [] as Classroom[])
             : Promise.resolve([] as Classroom[]),
           !owner ? socialApi.getFollowStatus(targetUid).catch(() => ({ following: false })) : Promise.resolve({ following: false }),
         ]);

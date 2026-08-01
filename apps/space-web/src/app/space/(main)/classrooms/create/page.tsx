@@ -108,7 +108,7 @@ export default function CreateClassroomPage() {
         ...data,
         price_vnd: data.pricing_type === 'free' ? 0 : (data.price_vnd ?? 0),
       };
-      await spaceApi.classrooms.create(payload);
+      await spaceApi.classrooms.createClassroom(payload);
       router.push('/space/classrooms');
     } catch (err: any) {
       if (err instanceof ValidationException) {

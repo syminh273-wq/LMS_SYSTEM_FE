@@ -1,5 +1,5 @@
 import { authApi } from '@/features/auth/api';
-import { classroomApi } from './classroom';
+import { classroomApi } from '@/features/classroom/api';
 import { examApi } from './exam';
 import { assignmentApi } from './assignment';
 import { meetingRoomApi } from './meeting-room';
@@ -31,7 +31,7 @@ export const consumerApi = {
   consumers: consumerApiInstance,
   spaces: spaceApiInstance,
   classrooms: {
-    mine: classroomApi.mine.bind(classroomApi),
+    mine: classroomApi.getMyClassrooms.bind(classroomApi),
   }
 };
 

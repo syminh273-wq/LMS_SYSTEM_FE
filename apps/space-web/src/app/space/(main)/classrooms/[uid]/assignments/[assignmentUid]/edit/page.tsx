@@ -102,7 +102,7 @@ export default function EditAssignmentPage({ params }: EditAssignmentPageProps) 
       try {
         setFetching(true);
         const [classroomDetails, assignmentDetails] = await Promise.all([
-          spaceApi.classrooms.retrieve(uid),
+          spaceApi.classrooms.getClassroom(uid),
           spaceApi.assignments.retrieve(assignmentUid),
         ]);
         setClassroom(classroomDetails);

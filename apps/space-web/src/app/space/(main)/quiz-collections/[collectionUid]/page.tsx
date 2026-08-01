@@ -26,7 +26,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { quizCollectionApi } from '@/lib/api/quiz-collection';
 import { quizApi } from '@/lib/api/quiz';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import type {
   QuizCollectionDetail,
   QuizCollectionItem,
@@ -125,7 +125,7 @@ export default function CollectionDetailPage({ params }: Props) {
       setLoading(true);
       const [d, cls] = await Promise.all([
         quizCollectionApi.retrieve(uid),
-        classroomApi.list().then(r => Array.isArray(r) ? r : r.results),
+        classroomApi.getClassrooms().then(r => Array.isArray(r) ? r : r.results),
       ]);
       setDetail(d);
       setItems(d.items);

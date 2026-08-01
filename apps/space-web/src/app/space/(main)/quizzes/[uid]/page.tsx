@@ -5,7 +5,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { parseVnDate } from '@shared/lib/datetime';
 import { quizApi } from '@/lib/api/quiz';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, BookOpen, CheckCircle2,
@@ -470,7 +470,7 @@ function AssignToClassroomModal({
   };
 
   useEffect(() => {
-    classroomApi.list()
+    classroomApi.getClassrooms()
       .then(data => setClassrooms(Array.isArray(data) ? data : data.results))
       .catch(() => toast.error('Không thể tải danh sách lớp học'))
       .finally(() => setLoading(false));

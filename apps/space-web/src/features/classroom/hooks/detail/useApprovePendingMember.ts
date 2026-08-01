@@ -22,7 +22,7 @@ export function useApprovePendingMember({
   const approveMember = async (member: ClassroomMember) => {
     setApprovingId(member.member_id);
     try {
-      await spaceApi.classrooms.approveMember(uid, member.member_id);
+      await spaceApi.classrooms.approveClassroomMember(uid, member.member_id);
       toast.success(t('classroom.ui.pending_approve_success', undefined, { name: member.member_name }));
       return true;
     } catch (err: unknown) {

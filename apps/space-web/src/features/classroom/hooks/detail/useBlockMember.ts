@@ -23,10 +23,10 @@ export function useBlockMember({
     setBlockingMemberId(member.member_id);
     try {
       if (scope === 'global') {
-        await spaceApi.classrooms.addGlobalBlacklist(member.member_id);
+        await spaceApi.classrooms.addToGlobalBlacklist(member.member_id);
         toast.success(t('classroom.ui.block_global_success', undefined, { name: member.member_name }));
       } else {
-        await spaceApi.classrooms.addClassroomBlacklist(uid, member.member_id);
+        await spaceApi.classrooms.addToClassroomBlacklist(uid, member.member_id);
         toast.success(t('classroom.ui.block_classroom_success', undefined, { name: member.member_name }));
       }
       return true;

@@ -155,7 +155,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
       try {
         setFetching(true);
         const [details, quizList] = await Promise.all([
-          spaceApi.classrooms.retrieve(uid),
+          spaceApi.classrooms.getClassroom(uid),
           quizApi.list(uid),
         ]);
         setClassroom(details);

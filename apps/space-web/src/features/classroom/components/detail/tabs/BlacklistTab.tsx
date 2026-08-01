@@ -28,9 +28,9 @@ export default function BlacklistTab({
     setUnblockingId(entry.consumer_uid);
     try {
       if (entry.scope === 'global') {
-        await spaceApi.classrooms.removeGlobalBlacklist(entry.consumer_uid);
+        await spaceApi.classrooms.removeFromGlobalBlacklist(entry.consumer_uid);
       } else {
-        await spaceApi.classrooms.removeClassroomBlacklist(classroomUid, entry.consumer_uid);
+        await spaceApi.classrooms.removeFromClassroomBlacklist(classroomUid, entry.consumer_uid);
       }
       // Refetch blacklist để đồng bộ với merge logic của hook
       refetch();

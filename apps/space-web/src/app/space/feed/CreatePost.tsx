@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { socialApi } from '@/lib/api/social';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import type { Post, PostEmotion, PostVisibility, Classroom } from '@/lib/api/types';
 import {
   Smile, ImageIcon, X, Loader2, Globe, Users, Lock,
@@ -68,8 +68,7 @@ export function CreatePost({ profile, onCreated }: {
   useEffect(() => {
     if (!open || classrooms.length > 0) return;
     setClassroomsLoading(true);
-    classroomApi
-      .list(1)
+    classroomApi.getClassrooms(1)
       .then((res) => {
         const items = Array.isArray(res) ? (res as unknown as Classroom[]) : res.results || [];
         setClassrooms(items);

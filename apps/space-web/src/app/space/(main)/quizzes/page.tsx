@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { quizApi } from '@/lib/api/quiz';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import type { Quiz, QuizDetail, Classroom, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
   Loader2, Plus, Trash2, BookOpen, Wand2, Pencil,
@@ -464,7 +464,7 @@ function AssignToClassroomModal({
   const [closesAt, setClosesAt] = useState('');
 
   useEffect(() => {
-    classroomApi.list()
+    classroomApi.getClassrooms()
       .then(data => setClassrooms(Array.isArray(data) ? data : data.results))
       .catch(() => toast.error('Không thể tải danh sách lớp học'))
       .finally(() => setLoading(false));

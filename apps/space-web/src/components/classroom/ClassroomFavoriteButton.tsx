@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useState } from 'react';
 import { Heart } from 'lucide-react';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import { cn } from '@shared/lib/utils';
 import { toast } from 'sonner';
 
@@ -38,7 +38,7 @@ export function ClassroomFavoriteButton({
     setIsFavorited(!prev.isFavorited);
     setCount(prev.isFavorited ? Math.max(0, prev.count - 1) : prev.count + 1);
     try {
-      const res = await classroomApi.favoriteToggle(classroomUid);
+      const res = await classroomApi.toggleFavorite(classroomUid);
       setIsFavorited(res.is_favorited);
       setCount(res.favorite_count);
       onChange?.({ is_favorited: res.is_favorited, favorite_count: res.favorite_count });

@@ -6,7 +6,8 @@ import { Loader2, Camera } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
-import { classroomApi, type Classroom } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
+import type { Classroom } from '@/lib/api/types';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
 import { setProfile } from '@/features/auth/store';
@@ -58,7 +59,7 @@ export default function MePage() {
       try {
         const [pf, list] = await Promise.all([
           portfolioApi.getMine().catch(() => null),
-          classroomApi.getByTeacher(profile.uid).catch(() => [] as Classroom[]),
+          classroomApi.getClassroomsByTeacher(profile.uid).catch(() => [] as Classroom[]),
         ]);
         setPortfolio(pf);
         setTeachingClasses(list);

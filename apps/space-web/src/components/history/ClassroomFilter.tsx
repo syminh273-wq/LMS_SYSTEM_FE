@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Filter, Loader2 } from 'lucide-react';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import { cn } from '@shared/lib/utils';
 import {
   Select,
@@ -31,7 +31,7 @@ export function ClassroomFilter({ value, onChange, className }: Props) {
     (async () => {
       try {
         setLoading(true);
-        const res = await classroomApi.mine(1);
+        const res = await classroomApi.getMyClassrooms(1);
         const list = Array.isArray(res) ? res : res?.results ?? [];
         if (!cancelled) {
           setOptions(

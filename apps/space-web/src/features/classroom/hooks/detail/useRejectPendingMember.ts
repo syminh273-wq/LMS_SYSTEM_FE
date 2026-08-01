@@ -22,7 +22,7 @@ export function useRejectPendingMember({
   const rejectMember = async (member: ClassroomMember) => {
     setRejectingId(member.member_id);
     try {
-      await spaceApi.classrooms.rejectMember(uid, member.member_id);
+      await spaceApi.classrooms.rejectClassroomMember(uid, member.member_id);
       toast.success(t('classroom.ui.pending_reject_success', undefined, { name: member.member_name }));
       return true;
     } catch (err: unknown) {

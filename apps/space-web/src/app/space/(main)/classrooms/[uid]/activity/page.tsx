@@ -99,7 +99,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
 
   // Fetch classroom name
   useEffect(() => {
-    spaceApi.classrooms.retrieve(uid)
+    spaceApi.classrooms.getClassroom(uid)
       .then(setClassroom)
       .catch(() => {});
   }, [uid]);

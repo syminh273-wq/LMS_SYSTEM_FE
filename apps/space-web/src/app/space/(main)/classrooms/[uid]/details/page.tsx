@@ -76,7 +76,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   // now lives only inside StudentsTab's own useClassroomMembers() call).
   const [studentCount, setStudentCount] = useState(0);
   const fetchStudentCount = useCallback(() => {
-    spaceApi.classrooms.members(uid)
+    spaceApi.classrooms.getClassroomMembers(uid)
       .then((list) => setStudentCount(list.filter((m) => m.role === 'student').length))
       .catch(() => {/* silently fail for sidebar count */});
   }, [uid]);
@@ -87,8 +87,8 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const [blacklistCount, setBlacklistCount] = useState(0);
   const fetchBlacklistCount = useCallback(() => {
     Promise.all([
-      spaceApi.classrooms.listClassroomBlacklist(uid),
-      spaceApi.classrooms.listGlobalBlacklist(),
+      spaceApi.classrooms.getClassroomBlacklist(uid),
+      spaceApi.classrooms.getGlobalBlacklist(),
     ])
       .then(([classroomEntries, globalEntries]) => {
         const map = new Map<string, typeof classroomEntries[0]>();

@@ -117,7 +117,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
     const fetchClassroom = async () => {
       try {
         setFetching(true);
-        const data = await spaceApi.classrooms.retrieve(uid);
+        const data = await spaceApi.classrooms.getClassroom(uid);
         setClassroom(data);
         setLinkData(data.pid ? { code: data.pid } : null);
         form.reset({
@@ -201,7 +201,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
         ...data,
         price_vnd: data.pricing_type === 'free' ? 0 : (data.price_vnd ?? 0),
       };
-      await spaceApi.classrooms.update(uid, payload);
+      await spaceApi.classrooms.updateClassroom(uid, payload);
       toast.success('Cập nhật phòng học thành công');
       router.push('/space/classrooms');
     } catch (err: any) {

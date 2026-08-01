@@ -88,7 +88,7 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
     const fetchData = async () => {
       try {
         setFetching(true);
-        const details = await spaceApi.classrooms.retrieve(uid);
+        const details = await spaceApi.classrooms.getClassroom(uid);
         setClassroom(details);
       } catch (err: unknown) {
         toast.error(err instanceof Error ? err.message : 'Không thể tải dữ liệu');

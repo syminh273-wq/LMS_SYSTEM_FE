@@ -20,7 +20,7 @@ export function useClassroomBlacklist({
 
   const refetchClassroomBlacklist = useCallback(() => {
     setLoadingClassroomBlacklist(true);
-    return spaceApi.classrooms.listClassroomBlacklist(uid)
+    return spaceApi.classrooms.getClassroomBlacklist(uid)
       .then(setClassroomBlacklist)
       .finally(() => setLoadingClassroomBlacklist(false));
   }, [uid]);

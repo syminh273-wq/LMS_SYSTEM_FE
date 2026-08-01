@@ -78,7 +78,7 @@ export default function ClassroomsPage() {
   const fetchClassrooms = async (page: number) => {
     try {
       setLoading(true);
-      const res = await spaceApi.classrooms.list(page);
+      const res = await spaceApi.classrooms.getMyClassrooms(page);
       setData(res);
       setCurrentPage(res.current_page);
     } catch (err: any) {
@@ -175,7 +175,7 @@ export default function ClassroomsPage() {
   const handleDelete = async (uid: string) => {
     if (confirm(t('classroom.ui.list_confirm_delete'))) {
       try {
-        await spaceApi.classrooms.delete(uid);
+        await spaceApi.classrooms.deleteClassroom(uid);
         toast.success(t('classroom.ui.list_delete_success'));
         fetchClassrooms(currentPage);
       } catch (err: any) {

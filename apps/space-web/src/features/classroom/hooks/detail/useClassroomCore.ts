@@ -66,7 +66,7 @@ export function useClassroomCore({
     const fetchDetails = async () => {
       try {
         setFetching(true);
-        const details = await spaceApi.classrooms.retrieve(uid);
+        const details = await spaceApi.classrooms.getClassroom(uid);
         setClassroom(details);
         setLinkData(details.pid ? { code: details.pid } : null);
       } catch (error) {

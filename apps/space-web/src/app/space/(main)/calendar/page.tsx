@@ -61,8 +61,7 @@ export default function SpaceCalendarPage() {
 
   useEffect(() => {
     let cancelled = false;
-    classroomApi
-      .list()
+    classroomApi.getClassrooms()
       .then((data) => {
         if (cancelled) return;
         const list = Array.isArray(data) ? data : data.results;

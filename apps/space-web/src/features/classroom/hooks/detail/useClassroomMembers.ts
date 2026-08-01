@@ -24,7 +24,7 @@ export function useClassroomMembers({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Mounting the tab initiates its request.
     setLoadingMembers(true);
-    spaceApi.classrooms.members(uid)
+    spaceApi.classrooms.getClassroomMembers(uid)
       .then(setMembers)
       .catch(() => toast.error(t('classroom.ui.students_load_error')))
       .finally(() => setLoadingMembers(false));

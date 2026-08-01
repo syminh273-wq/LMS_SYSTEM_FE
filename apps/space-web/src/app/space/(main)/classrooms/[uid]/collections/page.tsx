@@ -7,7 +7,7 @@ import { Layers, Loader2, ArrowLeft, Users, Award, ChevronRight } from 'lucide-r
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { quizCollectionApi } from '@/lib/api/quiz-collection';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import type { QuizCollection, Classroom, QuizCollectionAssignment } from '@/lib/api/types';
 
 interface Props {
@@ -28,7 +28,7 @@ export default function ClassroomCollectionsPage({ params }: Props) {
       try {
         setLoading(true);
         const [cls, myCollections] = await Promise.all([
-          classroomApi.retrieve(classroomUid),
+          classroomApi.getClassroom(classroomUid),
           quizCollectionApi.list(),
         ]);
         setClassroom(cls);

@@ -22,7 +22,7 @@ export function useKickMember({
   const kickMember = async (member: ClassroomMember): Promise<boolean> => {
     setKickingId(member.member_id);
     try {
-      await spaceApi.classrooms.kickMember(uid, member.member_id);
+      await spaceApi.classrooms.kickClassroomMember(uid, member.member_id);
       toast.success(t('classroom.ui.kick_success', undefined, { name: member.member_name }));
       return true;
     } catch (err: unknown) {

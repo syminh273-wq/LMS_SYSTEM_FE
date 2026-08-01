@@ -64,8 +64,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    classroomApi
-      .list()
+    classroomApi.getClassrooms()
       .then((data) => {
         if (cancelled) return;
         const list = Array.isArray(data) ? data : data.results;

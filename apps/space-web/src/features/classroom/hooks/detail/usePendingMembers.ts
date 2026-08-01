@@ -27,7 +27,7 @@ export function usePendingMembers({
 
   const loadPendingMembers = useCallback(() => {
     setLoadingPending(true);
-    spaceApi.classrooms.pendingMembers(uid)
+    spaceApi.classrooms.getPendingMembers(uid)
       .then(setPendingMembers)
       .catch(() => toast.error(t('classroom.ui.pending_load_error')))
       .finally(() => setLoadingPending(false));

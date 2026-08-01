@@ -14,7 +14,7 @@ export function useGlobalBlacklist(): UseGlobalBlacklistResult {
 
   const refetchGlobalBlacklist = useCallback(() => {
     setLoadingGlobalBlacklist(true);
-    return spaceApi.classrooms.listGlobalBlacklist()
+    return spaceApi.classrooms.getGlobalBlacklist()
       .then(setGlobalBlacklist)
       .finally(() => setLoadingGlobalBlacklist(false));
   }, []);

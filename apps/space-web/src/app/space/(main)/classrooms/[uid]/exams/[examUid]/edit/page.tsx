@@ -136,7 +136,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
       try {
         setFetching(true);
         const [classroomDetails, examDetails, quizList] = await Promise.all([
-          spaceApi.classrooms.retrieve(uid),
+          spaceApi.classrooms.getClassroom(uid),
           spaceApi.exams.retrieve(examUid),
           quizApi.list(uid),
         ]);

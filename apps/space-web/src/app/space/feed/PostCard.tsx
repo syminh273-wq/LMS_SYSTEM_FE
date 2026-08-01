@@ -4,7 +4,7 @@ import { Input } from '@shared/components/ui/input';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { socialApi } from '@/lib/api/social';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import type { Post, PostComment, PostEmotion, PostVisibility } from '@/lib/api/types';
 import {
   Heart, MessageCircle, Share2, Globe, Lock, Users,
@@ -85,8 +85,7 @@ export function PostCard({
     let cancelled = false;
     Promise.all(
       missing.map((u) =>
-        classroomApi
-          .retrieve(u)
+        classroomApi.getClassroom(u)
           .then((c) => [u, c.name || c.title || 'Lớp học'] as const)
           .catch(() => [u, 'Lớp học'] as const)
       )

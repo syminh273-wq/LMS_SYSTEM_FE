@@ -100,7 +100,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
     setGradeTableError('');
     try {
       const [memberData, submissionData] = await Promise.all([
-        classroomApi.members(uid),
+        classroomApi.getClassroomMembers(uid),
         examApi.listSubmissions(examUid),
       ]);
       const studentsOnly = memberData.filter(member => member.role === 'student' && member.status === 'approved');
@@ -120,7 +120,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         setLoading(true);
         setError('');
         const [classroomData, examData] = await Promise.all([
-          classroomApi.retrieve(uid),
+          classroomApi.getClassroom(uid),
           examApi.retrieve(examUid),
         ]);
         setClassroom(classroomData);
@@ -158,7 +158,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         setSessionLoading(true);
         setSessionError('');
         if (membersRef.current.length === 0) {
-          const memberData = await classroomApi.members(uid);
+          const memberData = await classroomApi.getClassroomMembers(uid);
           if (cancelled) return;
           const studentsOnly = memberData.filter((m: ClassroomMember) => m.role === 'student' && m.status === 'approved');
           setMembers(studentsOnly);
