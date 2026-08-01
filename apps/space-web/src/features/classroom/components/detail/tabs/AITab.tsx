@@ -12,13 +12,13 @@ import {
   TypingIndicator,
 } from '@shared/components/ui/message';
 import { userSettingsApi } from '@/lib/api';
-import { useAISessions } from '../hooks/useAISessions';
-import { useAISessionHistory } from '../hooks/useAISessionHistory';
-import type { AiMessage, AiToolCall } from '../hooks/useAISessionHistory';
-import { useCreateAISession } from '../hooks/useCreateAISession';
-import { useClearAISession } from '../hooks/useClearAISession';
-import { useAIAskStream } from '../hooks/useAIAskStream';
-import { useAudioRecorder } from '../hooks/useAudioRecorder';
+import { useAISessions } from '@/features/classroom/hooks/detail/useAISessions';
+import { useAISessionHistory } from '@/features/classroom/hooks/detail/useAISessionHistory';
+import type { AiMessage, AiToolCall } from '@/features/classroom/hooks/detail/useAISessionHistory';
+import { useCreateAISession } from '@/features/classroom/hooks/detail/useCreateAISession';
+import { useClearAISession } from '@/features/classroom/hooks/detail/useClearAISession';
+import { useAIAskStream } from '@/features/classroom/hooks/detail/useAIAskStream';
+import { useAudioRecorder } from '@/features/classroom/hooks/detail/useAudioRecorder';
 
 export type AiMode = 'doc' | 'manage' | 'free';
 export type { AiMessage, AiToolCall };

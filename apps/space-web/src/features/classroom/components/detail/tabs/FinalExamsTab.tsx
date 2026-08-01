@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
 import type { Exam } from '@/lib/api';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { useClassroomExams } from '../hooks/useClassroomExams';
-import { useCloseExamOnline } from '../hooks/useCloseExamOnline';
+import { useClassroomExams } from '@/features/classroom/hooks/detail/useClassroomExams';
+import { useCloseExamOnline } from '@/features/classroom/hooks/detail/useCloseExamOnline';
 import OpenOnlineExamModal from '../modals/OpenOnlineExamModal';
 
 interface FinalExamsTabProps {

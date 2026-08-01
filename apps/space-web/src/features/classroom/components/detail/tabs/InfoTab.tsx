@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import type { Classroom, ClassroomJoinLink } from '@/lib/api';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { getActivityMeta } from '../utils/activity';
-import { useClassroomActivity } from '../hooks/useClassroomActivity';
+import { useClassroomActivity } from '@/features/classroom/hooks/detail/useClassroomActivity';
 
 interface InfoTabProps {
   classroom: Classroom;

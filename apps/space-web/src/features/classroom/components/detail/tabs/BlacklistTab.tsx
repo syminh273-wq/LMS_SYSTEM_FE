@@ -4,7 +4,7 @@ import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
 import { toast } from 'sonner';
 import type { BlacklistEntry } from '@/lib/api/types';
-import { useMergedBlacklist } from '@/components/classroom/details/hooks/useMergedBlacklist';
+import { useMergedBlacklist } from '@/features/classroom/hooks/detail/useMergedBlacklist';
 
 interface BlacklistTabProps {
   formatDate: (v: string | null | undefined) => string;

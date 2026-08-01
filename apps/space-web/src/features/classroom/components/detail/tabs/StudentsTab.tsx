@@ -11,9 +11,9 @@ import {
 } from '@shared/components/ui/dropdown-menu';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { ClassroomMember } from '@/lib/api/types';
-import { useClassroomMembers } from '../hooks/useClassroomMembers';
-import { useKickMember } from '../hooks/useKickMember';
-import { useBlockMember } from '../hooks/useBlockMember';
+import { useClassroomMembers } from '@/features/classroom/hooks/detail/useClassroomMembers';
+import { useKickMember } from '@/features/classroom/hooks/detail/useKickMember';
+import { useBlockMember } from '@/features/classroom/hooks/detail/useBlockMember';
 import KickDialog from '../modals/KickDialog';
 import BlockDialog from '../modals/BlockDialog';
 

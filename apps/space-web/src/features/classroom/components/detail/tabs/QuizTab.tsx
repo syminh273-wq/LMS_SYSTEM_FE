@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import { Button } from '@shared/components/ui/button';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-import { useAssignedQuizzes } from '@/components/classroom/details/hooks/useAssignedQuizzes';
-import { useUnassignQuiz } from '@/components/classroom/details/hooks/useUnassignQuiz';
+import { useAssignedQuizzes } from '@/features/classroom/hooks/detail/useAssignedQuizzes';
+import { useUnassignQuiz } from '@/features/classroom/hooks/detail/useUnassignQuiz';
 import type { Quiz } from '@/lib/api/types';
 import AssignQuizModal from '../modals/AssignQuizModal';
 import QuizLeaderboardModal from '@/components/quiz/QuizLeaderboardModal';

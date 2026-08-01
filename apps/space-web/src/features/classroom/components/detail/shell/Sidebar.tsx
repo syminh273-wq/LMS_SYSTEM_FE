@@ -22,7 +22,7 @@ import { Button } from '@shared/components/ui/button';
 import { Card } from '@shared/components/ui/card';
 import type { Classroom, ClassroomJoinLink } from '@/lib/api';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
-import type { ActiveTab, ActiveTabKey } from '../utils/tabs';
+import type { ActiveTab, ActiveTabKey } from '@/features/classroom/components/detail/utils/tabs';
 
 interface SidebarProps {
   activeTab: string;

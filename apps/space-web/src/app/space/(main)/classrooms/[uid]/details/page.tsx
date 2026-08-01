@@ -12,33 +12,33 @@ import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { spaceApi } from '@/lib/api';
 import type { ClassroomMember } from '@/lib/api/types';
-import { useClassroomCore } from '@/components/classroom/details/hooks/useClassroomCore';
-import { usePendingMembers } from '@/components/classroom/details/hooks/usePendingMembers';
-import { useApprovePendingMember } from '@/components/classroom/details/hooks/useApprovePendingMember';
-import { useRejectPendingMember } from '@/components/classroom/details/hooks/useRejectPendingMember';
-import { useMeetingRooms } from '@/components/classroom/details/hooks/useMeetingRooms';
-import { useStartMeeting } from '@/components/classroom/details/hooks/useStartMeeting';
-import { useEndMeeting } from '@/components/classroom/details/hooks/useEndMeeting';
+import { useClassroomCore } from '@/features/classroom/hooks/detail/useClassroomCore';
+import { usePendingMembers } from '@/features/classroom/hooks/detail/usePendingMembers';
+import { useApprovePendingMember } from '@/features/classroom/hooks/detail/useApprovePendingMember';
+import { useRejectPendingMember } from '@/features/classroom/hooks/detail/useRejectPendingMember';
+import { useMeetingRooms } from '@/features/classroom/hooks/detail/useMeetingRooms';
+import { useStartMeeting } from '@/features/classroom/hooks/detail/useStartMeeting';
+import { useEndMeeting } from '@/features/classroom/hooks/detail/useEndMeeting';
 
-import Header from '@/components/classroom/details/shell/Header';
-import Sidebar from '@/components/classroom/details/shell/Sidebar';
+import Header from '@/features/classroom/components/detail/shell/Header';
+import Sidebar from '@/features/classroom/components/detail/shell/Sidebar';
 
-import InfoTab from '@/components/classroom/details/tabs/InfoTab';
-import DocsTab from '@/components/classroom/details/tabs/DocsTab';
-import AITab from '@/components/classroom/details/tabs/AITab';
-import ChatTab from '@/components/classroom/details/tabs/ChatTab';
-import MeetingTab from '@/components/classroom/details/tabs/MeetingTab';
-import CalendarTab from '@/components/classroom/details/tabs/CalendarTab';
-import LeaveRequestTabView from '@/components/classroom/details/tabs/LeaveRequestTabView';
-import ExamsTab from '@/components/classroom/details/tabs/ExamsTab';
-import AssignmentsTab from '@/components/classroom/details/tabs/AssignmentsTab';
-import FinalExamsTab from '@/components/classroom/details/tabs/FinalExamsTab';
-import QuizTab from '@/components/classroom/details/tabs/QuizTab';
-import BlacklistTab from '@/components/classroom/details/tabs/BlacklistTab';
-import RankingTab from '@/components/classroom/details/tabs/RankingTab';
-import StudentsTab from '@/components/classroom/details/tabs/StudentsTab';
+import InfoTab from '@/features/classroom/components/detail/tabs/InfoTab';
+import DocsTab from '@/features/classroom/components/detail/tabs/DocsTab';
+import AITab from '@/features/classroom/components/detail/tabs/AITab';
+import ChatTab from '@/features/classroom/components/detail/tabs/ChatTab';
+import MeetingTab from '@/features/classroom/components/detail/tabs/MeetingTab';
+import CalendarTab from '@/features/classroom/components/detail/tabs/CalendarTab';
+import LeaveRequestTabView from '@/features/classroom/components/detail/tabs/LeaveRequestTabView';
+import ExamsTab from '@/features/classroom/components/detail/tabs/ExamsTab';
+import AssignmentsTab from '@/features/classroom/components/detail/tabs/AssignmentsTab';
+import FinalExamsTab from '@/features/classroom/components/detail/tabs/FinalExamsTab';
+import QuizTab from '@/features/classroom/components/detail/tabs/QuizTab';
+import BlacklistTab from '@/features/classroom/components/detail/tabs/BlacklistTab';
+import RankingTab from '@/features/classroom/components/detail/tabs/RankingTab';
+import StudentsTab from '@/features/classroom/components/detail/tabs/StudentsTab';
 
-import PendingSheet from '@/components/classroom/details/modals/PendingSheet';
+import PendingSheet from '@/features/classroom/components/detail/modals/PendingSheet';
 
 interface ClassroomDetailsPageProps {
   params: Promise<{ uid: string }>;
