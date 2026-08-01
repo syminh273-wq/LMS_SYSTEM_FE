@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { deleteFolder, type ApiCtx } from '../api';
+import { deleteFolder, type ApiCtx } from '@/features/classroom/components/docs-manager/api';
 
 export function useDeleteFolder(ctx: ApiCtx, t: (key: string, fallback?: string) => string) {
   const [deleting, setDeleting] = useState(false);

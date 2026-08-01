@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ClassroomDoc, ClassroomFolder, SortField, SortDir } from '../types';
+import type { ClassroomDoc, ClassroomFolder, SortField, SortDir } from '@/features/classroom/components/docs-manager/types';
 
 // Non-API: UI-only state for the docs manager (selection, search/sort, modal targets).
 export function useDocsTreeUI() {

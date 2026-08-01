@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { uploadDoc, type ApiCtx } from '../api';
-import type { ClassroomDoc } from '../types';
+import { uploadDoc, type ApiCtx } from '@/features/classroom/components/docs-manager/api';
+import type { ClassroomDoc } from '@/features/classroom/components/docs-manager/types';
 
 export function useUploadDoc(ctx: ApiCtx, t: (key: string, fallback?: string) => string) {
   const [uploading, setUploading] = useState(false);

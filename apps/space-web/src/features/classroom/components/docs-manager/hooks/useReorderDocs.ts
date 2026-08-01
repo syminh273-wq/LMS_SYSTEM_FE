@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { reorderDocs, type ApiCtx } from '../api';
+import { reorderDocs, type ApiCtx } from '@/features/classroom/components/docs-manager/api';
 
 export function useReorderDocs(ctx: ApiCtx) {
   const [reordering, setReordering] = useState(false);

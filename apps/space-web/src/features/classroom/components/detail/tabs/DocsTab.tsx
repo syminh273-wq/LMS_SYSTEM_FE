@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ClassroomDocsManager } from '@/components/classroom/docs-manager/ClassroomDocsManager';
+import { ClassroomDocsManager } from '@/features/classroom/components/docs-manager/ClassroomDocsManager';
 
 interface DocsTabProps {
   classroomUid: string;

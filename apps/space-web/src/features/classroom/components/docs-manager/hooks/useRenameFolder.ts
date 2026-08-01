@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { updateFolder, type ApiCtx } from '../api';
-import type { ClassroomFolder } from '../types';
+import { updateFolder, type ApiCtx } from '@/features/classroom/components/docs-manager/api';
+import type { ClassroomFolder } from '@/features/classroom/components/docs-manager/types';
 
 export function useRenameFolder(ctx: ApiCtx, t: (key: string, fallback?: string) => string) {
   const [renaming, setRenaming] = useState(false);

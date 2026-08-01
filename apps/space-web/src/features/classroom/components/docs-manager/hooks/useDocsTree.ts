@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { fetchDocsTree } from '../api';
-import { flattenTree, collectDocsByFolder } from '../tree-utils';
-import type { ClassroomDoc, ClassroomFolder } from '../types';
+import { fetchDocsTree } from '@/features/classroom/components/docs-manager/api';
+import { flattenTree, collectDocsByFolder } from '@/features/classroom/components/docs-manager/tree-utils';
+import type { ClassroomDoc, ClassroomFolder } from '@/features/classroom/components/docs-manager/types';
 
 export type UseDocsTreeArgs = {
   classroomUid: string;

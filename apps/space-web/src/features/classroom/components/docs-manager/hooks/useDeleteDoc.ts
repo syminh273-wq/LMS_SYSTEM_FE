@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { deleteDoc, type ApiCtx } from '../api';
+import { deleteDoc, type ApiCtx } from '@/features/classroom/components/docs-manager/api';
 
 export function useDeleteDoc(ctx: ApiCtx, t: (key: string, fallback?: string) => string) {
   const [deleting, setDeleting] = useState(false);
