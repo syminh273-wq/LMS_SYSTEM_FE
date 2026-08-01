@@ -305,8 +305,8 @@ export type ExamSubmission = {
     results?: Array<{
       question_uid: string;
       question_text: string;
-      chosen: string | null;
-      correct_answer: string;
+      chosen: number[];
+      correct_answers: number[];
       is_correct: boolean;
       explanation: string;
     }>;
@@ -328,7 +328,7 @@ export type ExamSubmission = {
 export type SubmitExamRequest = {
   submission_type?: ExamSubmissionType;
   ref_id?: string | null;
-  answers?: Record<string, string>;
+  answers?: Record<string, number[]>;
   content?: string;
   time_taken_seconds?: number;
 };
@@ -339,14 +339,14 @@ export type UploadedResource = {
   name: string;
 };
 
+export type QuizQuestionType = 'single_answer' | 'multi_answer' | 'true_false';
+
 export type QuizQuestionPublic = {
   uid: string;
   quiz_id: string;
   question_text: string;
-  option_a: string;
-  option_b: string;
-  option_c: string;
-  option_d: string;
+  options: string[];
+  question_type: QuizQuestionType;
   order: number;
 };
 
@@ -454,8 +454,13 @@ export type QuizLeaderboardStudentDetail = {
   attempts: QuizLeaderboardAttempt[];
 };
 
+export type QuizAnswerItem = {
+  question_uid: string;
+  selected_answers: number[]; // 0-based indices into the question's `options`
+};
+
 export type QuizSubmitRequest = {
-  answers: Record<string, 'a' | 'b' | 'c' | 'd'>;
+  answers: QuizAnswerItem[];
   classroom_id: string;
   time_taken_seconds?: number;
 };
@@ -472,8 +477,8 @@ export type QuizResult = {
   results: Array<{
     question_uid: string;
     question_text: string;
-    chosen: string | null;
-    correct_answer: string;
+    chosen: number[];
+    correct_answers: number[];
     is_correct: boolean;
     explanation: string;
   }>;

@@ -419,11 +419,13 @@ function QuestionRow({ index, question, onEdit }: { index: number; question: Qui
       </span>
       <div className="flex-1 min-w-0">
         <p className="text-xs font-bold text-foreground leading-relaxed line-clamp-2">{question.question_text}</p>
-        <div className="mt-1.5 flex items-center gap-3 text-[10px] font-bold text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <CheckCircle2 size={11} className="text-emerald-500" />
-            {question[`option_${question.correct_answer}` as 'option_a' | 'option_b' | 'option_c' | 'option_d']}
-          </span>
+        <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[10px] font-bold text-muted-foreground">
+          {question.correct_answers.map(idx => (
+            <span key={idx} className="inline-flex items-center gap-1">
+              <CheckCircle2 size={11} className="text-emerald-500" />
+              {question.options[idx]}
+            </span>
+          ))}
         </div>
       </div>
       <Button

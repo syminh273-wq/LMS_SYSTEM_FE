@@ -32,6 +32,19 @@ export function useQuizTaskPolling() {
   const tasksState = useSelector((state: RootState) => state.quizTasks);
   const notifiedIds = tasksState.notifiedTaskIds;
 
+  // `tick` is only (re)created once per `authed` change and then re-invokes itself
+  // recursively via setTimeout, so it must never read `tasksState`/`notifiedIds`
+  // directly (those closures go stale). Refs give it a live view instead.
+  const tasksStateRef = useRef(tasksState);
+  useEffect(() => {
+    tasksStateRef.current = tasksState;
+  }, [tasksState]);
+
+  const notifiedIdsRef = useRef(notifiedIds);
+  useEffect(() => {
+    notifiedIdsRef.current = notifiedIds;
+  }, [notifiedIds]);
+
   // Use accessToken from localStorage as the source of truth.
   // The user slice's `isAuthenticated` flag is only set for consumer-web,
   // not for space-web (where we only store the token in localStorage).
@@ -100,12 +113,16 @@ export function useQuizTaskPolling() {
 
       // Try batch list first
       let listOk = false;
+      let latestTasks: QuizTask[] = tasksStateRef.current.ids
+        .map(id => tasksStateRef.current.byId[id])
+        .filter((t): t is QuizTask => !!t);
       try {
         const tasks = await quizTasksApi.list();
         dispatch(setTasks(tasks));
         dispatch(setError(null));
         errorBackoffRef.current = 0;
         listOk = true;
+        latestTasks = tasks;
       } catch (err: unknown) {
         // Fall through to per-task fallback
         const message = err instanceof Error ? err.message : 'Network error';
@@ -114,31 +131,26 @@ export function useQuizTaskPolling() {
 
       // If list failed, OR if some active tasks may have completed
       // server-side, also probe each active task via /tasks/<id>/
-      const activeIds = tasksState.ids
-        .map(id => tasksState.byId[id])
-        .filter((t): t is QuizTask =>
-          !!t && ACTIVE_STATUSES.includes(t.status),
-        )
+      const latestById = new Map(latestTasks.map(t => [t.id, t]));
+      const activeIds = latestTasks
+        .filter(t => ACTIVE_STATUSES.includes(t.status))
         .map(t => t.id);
 
       for (const id of activeIds) {
         try {
           const fresh = await quizTasksApi.retrieve(id);
           dispatch(upsertTask(fresh));
+          latestById.set(id, fresh);
         } catch {
           // ignore individual probe errors
         }
       }
 
       if (listOk) {
-        // Re-read latest state for notification sweep
-        const allTasks: QuizTask[] = Object.values(tasksState.byId).filter(
-          (t): t is QuizTask => !!t,
-        );
-        for (const task of allTasks) {
+        for (const task of latestById.values()) {
           if (
             (task.status === 'completed' || task.status === 'failed') &&
-            !notifiedIds.includes(task.id)
+            !notifiedIdsRef.current.includes(task.id)
           ) {
             handleTerminal(task);
           }
@@ -178,6 +190,9 @@ export function useQuizTaskPolling() {
   };
 
   const handleTerminal = (task: QuizTask) => {
+    if (!notifiedIdsRef.current.includes(task.id)) {
+      notifiedIdsRef.current = [...notifiedIdsRef.current, task.id];
+    }
     dispatch(markNotified(task.id));
 
     if (task.status === 'completed') {

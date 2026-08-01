@@ -55,13 +55,11 @@ export default function ExamSessionPage({ params }: Props) {
   const [quizQuestions, setQuizQuestions] = useState<Array<{
     uid: string;
     question_text: string;
-    option_a: string;
-    option_b: string;
-    option_c: string;
-    option_d: string;
+    options: string[];
+    question_type: 'single_answer' | 'multi_answer';
     order: number;
   }>>([]);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -340,7 +338,9 @@ export default function ExamSessionPage({ params }: Props) {
       body = exam.content_type === 'quiz'
         ? JSON.stringify({
             submission_type: 'online_quiz',
-            answers: quizAnswers,
+            answers: Object.fromEntries(
+              Object.entries(quizAnswers).map(([questionUid, index]) => [questionUid, [index]])
+            ),
             time_taken_seconds: Math.max(0, sessionDuration),
           })
         : JSON.stringify({
@@ -706,9 +706,16 @@ export default function ExamSessionPage({ params }: Props) {
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-black text-foreground">{String(r.question_text ?? `Câu ${i + 1}`)}</p>
                                   <p className="mt-1 text-xs text-muted-foreground">
-                                    Bạn chọn: <span className="font-black text-foreground">{String(r.chosen ?? '(bỏ trống)').toUpperCase()}</span>
+                                    Bạn chọn: <span className="font-black text-foreground">
+                                      {(() => {
+                                        const chosen = (r.chosen as number[] | undefined) ?? [];
+                                        return chosen.length ? chosen.map(i => String.fromCharCode(65 + i)).join(', ') : '(bỏ trống)';
+                                      })()}
+                                    </span>
                                     {' · '}
-                                    Đáp án đúng: <span className="font-black text-success">{String(r.correct_answer ?? '').toUpperCase()}</span>
+                                    Đáp án đúng: <span className="font-black text-success">
+                                      {((r.correct_answers as number[] | undefined) ?? []).map(i => String.fromCharCode(65 + i)).join(', ')}
+                                    </span>
                                   </p>
                                   {r.explanation ? (
                                     <p className="mt-1 text-xs italic text-muted-foreground">{String(r.explanation)}</p>
@@ -1089,23 +1096,22 @@ export default function ExamSessionPage({ params }: Props) {
                     Câu {index + 1}. {question.question_text}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    {(['a', 'b', 'c', 'd'] as const).map(letter => {
-                      const value = question[`option_${letter}` as keyof typeof question] as string;
-                      const selected = quizAnswers[question.uid] === letter;
+                    {question.options.map((optionText, idx) => {
+                      const selected = quizAnswers[question.uid] === idx;
                       return (
                         <Button
-                          key={letter}
+                          key={idx}
                           type="button"
                           disabled={timeExpired || submitted}
-                          onClick={() => setQuizAnswers(prev => ({ ...prev, [question.uid]: letter }))}
+                          onClick={() => setQuizAnswers(prev => ({ ...prev, [question.uid]: idx }))}
                           className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition-all disabled:opacity-60 ${
                             selected
                               ? 'border-primary bg-primary text-white shadow-sm'
                               : 'border-border bg-card text-foreground hover:border-primary/20 hover:bg-primary/10'
                           }`}
                         >
-                          <span className="mr-2 text-xs font-black uppercase">{letter}.</span>
-                          {value}
+                          <span className="mr-2 text-xs font-black uppercase">{String.fromCharCode(65 + idx)}.</span>
+                          {optionText}
                         </Button>
                       );
                     })}

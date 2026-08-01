@@ -411,10 +411,12 @@ function WorkTab({ data }: { data: AuditAnswersResponse }) {
                         Câu {i + 1}: {a.question_text}
                       </p>
                       <p className="mt-1 text-xs font-medium text-muted-foreground">
-                        Bạn chọn: <span className="font-black text-foreground">{a.chosen || '--'}</span>
+                        Bạn chọn: <span className="font-black text-foreground">
+                          {a.chosen?.length ? a.chosen.join(', ').toUpperCase() : '--'}
+                        </span>
                         {' · '}
                         Đáp án đúng: <span className="font-black text-emerald-700">
-                          {String(a.correct_answer ?? '').toUpperCase()}
+                          {(a.correct_answers ?? []).join(', ').toUpperCase()}
                         </span>
                       </p>
                       {a.explanation && (

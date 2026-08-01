@@ -10,11 +10,15 @@ import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment, QuizQues
 import {
   Loader2, ArrowLeft, BookOpen, CheckCircle2,
   Plus, X, Link2, BarChart2, Clock, RotateCcw, Settings,
-  Shuffle, HelpCircle, Target, Lock, Trophy
+  Shuffle, HelpCircle, Target, Lock, Trophy, Trash2
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@shared/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import EditQuestionModal from '@/components/quiz/EditQuestionModal';
 import CloseScheduleDialog from '@/components/quiz/CloseScheduleDialog';
@@ -46,6 +50,7 @@ export default function QuizDetailPage({ params }: Props) {
   const [editingAssignment, setEditingAssignment] = useState<QuizAssignment | null>(null);
   const [closeScheduleAssignment, setCloseScheduleAssignment] = useState<QuizAssignment | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
+  const [deletingQuestion, setDeletingQuestion] = useState<QuizQuestion | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('questions');
 
   // attempts tab state
@@ -113,12 +118,29 @@ export default function QuizDetailPage({ params }: Props) {
     } : prev);
   };
 
+  const handleDeleteQuestion = async () => {
+    if (!quiz || !deletingQuestion) return;
+    const questionUid = deletingQuestion.uid;
+    try {
+      await quizApi.deleteQuestion(quiz.uid, questionUid);
+      setQuiz(prev => prev ? {
+        ...prev,
+        questions: (prev.questions ?? []).filter(q => q.uid !== questionUid),
+        questions_count: Math.max(0, prev.questions_count - 1),
+      } : prev);
+      toast.success('Đã xóa câu hỏi');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Không thể xóa câu hỏi');
+    } finally {
+      setDeletingQuestion(null);
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center py-32 text-muted-foreground"><Loader2 size={36} className="animate-spin" /></div>;
   }
   if (!quiz) return null;
 
-  const OPTION_LABELS = { a: 'A', b: 'B', c: 'C', d: 'D' } as const;
   const assignments = quiz.assigned_classrooms ?? [];
 
   const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
@@ -220,6 +242,11 @@ export default function QuizDetailPage({ params }: Props) {
                   {idx + 1}
                 </span>
                 <p className="text-sm font-bold text-foreground leading-relaxed flex-1">{q.question_text}</p>
+                {q.question_type === 'multi_answer' && (
+                  <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-black uppercase text-primary self-center">
+                    Nhiều đáp án
+                  </span>
+                )}
                 <Button
                   type="button"
                   variant="outline"
@@ -227,20 +254,29 @@ export default function QuizDetailPage({ params }: Props) {
                   onClick={() => setEditingQuestion(q)}
                   className="shrink-0"
                 >
-                  Sửa đáp án
+                  Sửa câu hỏi
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setDeletingQuestion(q)}
+                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 size={14} />
                 </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-10">
-                {(['a', 'b', 'c', 'd'] as const).map(opt => {
-                  const isCorrect = q.correct_answer === opt;
+                {q.options.map((optionText, index) => {
+                  const isCorrect = q.correct_answers.includes(index);
                   return (
-                    <div key={opt} className={`flex items-center gap-3 rounded-xl px-4 py-3 border text-sm font-medium ${
+                    <div key={index} className={`flex items-center gap-3 rounded-xl px-4 py-3 border text-sm font-medium ${
                       isCorrect ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-border bg-muted/50 text-foreground'
                     }`}>
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
                         isCorrect ? 'bg-emerald-500 text-white' : 'bg-muted text-muted-foreground'
-                      }`}>{OPTION_LABELS[opt]}</span>
-                      {q[`option_${opt}` as keyof typeof q] as string}
+                      }`}>{String.fromCharCode(65 + index)}</span>
+                      {optionText}
                       {isCorrect && <CheckCircle2 size={15} className="ml-auto text-emerald-500 shrink-0" />}
                     </div>
                   );
@@ -385,6 +421,21 @@ export default function QuizDetailPage({ params }: Props) {
           onUpdated={handleQuestionUpdated}
         />
       )}
+
+      <AlertDialog open={!!deletingQuestion} onOpenChange={(open) => { if (!open) setDeletingQuestion(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa câu hỏi này?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deletingQuestion?.question_text} — thao tác này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void handleDeleteQuestion()}>Xóa</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

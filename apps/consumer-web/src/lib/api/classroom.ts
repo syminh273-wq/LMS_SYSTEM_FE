@@ -163,10 +163,8 @@ class ClassroomApiClient extends BaseRestApiClient {
     questions: Array<{
       uid: string;
       question_text: string;
-      option_a: string;
-      option_b: string;
-      option_c: string;
-      option_d: string;
+      options: string[];
+      question_type: 'single_answer' | 'multi_answer';
       order: number;
     }>;
   }> {

@@ -34,6 +34,15 @@ class QuizApiClient extends BaseRestApiClient {
       const formData = new FormData();
       formData.append('file', file);
       if (data.num_questions != null) formData.append('num_questions', String(data.num_questions));
+      if (data.question_type) formData.append('question_type', data.question_type);
+      if (data.num_options != null) formData.append('num_options', String(data.num_options));
+      // DRF's ListField reads repeated multipart fields (getlist), not a JSON string — append one per value.
+      if (data.option_counts) {
+        for (const count of data.option_counts) formData.append('option_counts', String(count));
+      }
+      if (data.correct_counts) {
+        for (const count of data.correct_counts) formData.append('correct_counts', String(count));
+      }
       body = formData;
     } else {
       headers['Content-Type'] = 'application/json';
@@ -150,6 +159,10 @@ class QuizApiClient extends BaseRestApiClient {
       `/api/v1/space/quiz/${quizUid}/questions/${questionUid}/`,
       data,
     );
+  }
+
+  public async deleteQuestion(quizUid: string, questionUid: string): Promise<void> {
+    return super.delete<void>(`/api/v1/space/quiz/${quizUid}/questions/${questionUid}/`);
   }
 }
 

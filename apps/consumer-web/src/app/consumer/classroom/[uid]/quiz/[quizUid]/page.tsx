@@ -17,7 +17,7 @@ import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
 
 type GamePhase = 'loading' | 'intro' | 'playing' | 'result';
-type Answer = 'a' | 'b' | 'c' | 'd';
+type Answer = number; // 0-based index into the question's `options`
 
 interface Props {
   params: Promise<{ uid: string; quizUid: string }>;
@@ -60,8 +60,8 @@ function fmtSeconds(s: number): string {
   return `${m}:${String(sec).padStart(2, '0')}`;
 }
 
-const OPTION_KEYS: Answer[] = ['a', 'b', 'c', 'd'];
-const OPTION_LABELS: Record<Answer, string> = { a: 'A', b: 'B', c: 'C', d: 'D' };
+const optionIndices = (count: number): Answer[] => Array.from({ length: count }, (_, i) => i);
+const letterFor = (index: number) => String.fromCharCode(65 + index);
 
 function shuffleArray<T>(items: T[]): T[] {
   const result = [...items];
@@ -84,8 +84,8 @@ export default function QuizGamePage({ params }: Props) {
   const [playQuestions, setPlayQuestions] = useState<QuizQuestionPublic[]>([]);
   const [optionOrder, setOptionOrder] = useState<Record<string, Answer[]>>({});
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, Answer>>({});
-  const [selected, setSelected] = useState<Answer | null>(null);
+  const [answers, setAnswers] = useState<Record<string, Answer[]>>({});
+  const [selected, setSelected] = useState<Answer[]>([]);
   const [result, setResult] = useState<QuizResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -103,7 +103,7 @@ export default function QuizGamePage({ params }: Props) {
   const autoSubmitFiredRef = useRef(false);
   const timeLeftRef = useRef(0);
   const closesAtCountdownRef = useRef<number | null>(null);
-  const latestAnswersRef = useRef<Record<string, Answer>>({});
+  const latestAnswersRef = useRef<Record<string, Answer[]>>({});
   const handleAutoSubmitRef = useRef<() => Promise<void>>(async () => {});
 
   useEffect(() => {
@@ -198,7 +198,7 @@ export default function QuizGamePage({ params }: Props) {
       setPlayQuestions(orderedQuestions);
       setOptionOrder(
         quiz.shuffle_options
-          ? Object.fromEntries(orderedQuestions.map(q => [q.uid, shuffleArray(OPTION_KEYS)]))
+          ? Object.fromEntries(orderedQuestions.map(q => [q.uid, shuffleArray(optionIndices(q.options.length))]))
           : {}
       );
     }
@@ -220,7 +220,7 @@ export default function QuizGamePage({ params }: Props) {
   const isOpen = quiz?.is_open !== false;
   const canStart = isOpen && !isClosed && !isBlocked && !isNotYetOpen;
 
-  const doSubmit = useCallback(async (finalAnswers: Record<string, Answer>) => {
+  const doSubmit = useCallback(async (finalAnswers: Record<string, Answer[]>) => {
     if (timerRef.current) clearInterval(timerRef.current);
     setSubmitting(true);
     try {
@@ -257,7 +257,10 @@ export default function QuizGamePage({ params }: Props) {
         }
       } else {
         const res = await consumerQuizApi.submit(quizUid, {
-          answers: finalAnswers,
+          answers: Object.entries(finalAnswers).map(([question_uid, selected_answers]) => ({
+            question_uid,
+            selected_answers,
+          })),
           classroom_id: classroomUid,
           time_taken_seconds: timeTaken,
         });
@@ -308,12 +311,18 @@ export default function QuizGamePage({ params }: Props) {
   useEffect(() => { latestAnswersRef.current = answers; }, [answers]);
   useEffect(() => { handleAutoSubmitRef.current = handleAutoSubmit; }, [handleAutoSubmit]);
 
+  const isMultiType = currentQuestion?.question_type === 'multi_answer';
+
   const handleAnswer = (option: Answer) => {
-    setSelected(option);
+    if (isMultiType) {
+      setSelected(prev => (prev.includes(option) ? prev.filter(o => o !== option) : [...prev, option]));
+    } else {
+      setSelected([option]);
+    }
   };
 
   const handleNext = useCallback(async () => {
-    if (!currentQuestion || selected === null) return;
+    if (!currentQuestion || selected.length === 0) return;
     const newAnswers = { ...answers, [currentQuestion.uid]: selected };
     setAnswers(newAnswers);
     if (isLast) {
@@ -321,24 +330,24 @@ export default function QuizGamePage({ params }: Props) {
     } else {
       const nextQuestion = playQuestions[currentIdx + 1];
       setCurrentIdx(prev => prev + 1);
-      setSelected(nextQuestion ? newAnswers[nextQuestion.uid] ?? null : null);
+      setSelected(nextQuestion ? newAnswers[nextQuestion.uid] ?? [] : []);
     }
   }, [currentQuestion, selected, answers, isLast, doSubmit, playQuestions, currentIdx]);
 
   const handlePrev = useCallback(() => {
     if (!currentQuestion || currentIdx === 0) return;
-    const newAnswers = selected !== null ? { ...answers, [currentQuestion.uid]: selected } : answers;
-    if (selected !== null) setAnswers(newAnswers);
+    const newAnswers = selected.length > 0 ? { ...answers, [currentQuestion.uid]: selected } : answers;
+    if (selected.length > 0) setAnswers(newAnswers);
     const prevQuestion = playQuestions[currentIdx - 1];
     setCurrentIdx(prev => prev - 1);
-    setSelected(prevQuestion ? newAnswers[prevQuestion.uid] ?? null : null);
+    setSelected(prevQuestion ? newAnswers[prevQuestion.uid] ?? [] : []);
   }, [currentQuestion, currentIdx, selected, answers, playQuestions]);
 
   const handleRestart = () => {
     if (timerRef.current) clearInterval(timerRef.current);
     setCurrentIdx(0);
     setAnswers({});
-    setSelected(null);
+    setSelected([]);
     setResult(null);
     setTimeLeft(0);
     startedAtRef.current = null;
@@ -645,18 +654,25 @@ export default function QuizGamePage({ params }: Props) {
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                   Câu hỏi {currentIdx + 1}
                 </span>
-                {Object.keys(answers).length > 0 && (
-                  <span className="text-[10px] font-bold text-muted-foreground">
-                    Đã trả lời {Object.keys(answers).length}/{totalQuestions}
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {isMultiType && (
+                    <span className="text-[10px] font-black uppercase text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                      Nhiều đáp án
+                    </span>
+                  )}
+                  {Object.values(answers).filter(a => a.length > 0).length > 0 && (
+                    <span className="text-[10px] font-bold text-muted-foreground">
+                      Đã trả lời {Object.values(answers).filter(a => a.length > 0).length}/{totalQuestions}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className="text-base sm:text-lg font-bold text-foreground leading-relaxed">{currentQuestion.question_text}</p>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
-              {(optionOrder[currentQuestion.uid] ?? OPTION_KEYS).map((opt, idx) => {
-                const isSelected = selected === opt;
+              {(optionOrder[currentQuestion.uid] ?? optionIndices(currentQuestion.options.length)).map((opt, idx) => {
+                const isSelected = selected.includes(opt);
                 return (
                   <Button
                     key={opt}
@@ -665,7 +681,7 @@ export default function QuizGamePage({ params }: Props) {
                     disabled={submitting}
                     style={{ animationDelay: `${idx * 60}ms` }}
                     className={`group w-full flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all duration-200 focus:outline-none animate-in fade-in slide-in-from-left-2
-                      ${selected === null
+                      ${selected.length === 0
                         ? 'border-border bg-card text-foreground hover:border-primary/40 hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/10 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
                         : isSelected
                           ? 'border-primary bg-gradient-to-r from-primary to-primary text-white shadow-xl shadow-indigo-200 scale-[1.01]'
@@ -675,13 +691,13 @@ export default function QuizGamePage({ params }: Props) {
                     <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black shrink-0 transition-all ${
                       isSelected
                         ? 'bg-card text-primary shadow-md'
-                        : selected === null
+                        : selected.length === 0
                           ? 'bg-gradient-to-br from-muted to-muted text-muted-foreground group-hover:from-primary/10 group-hover:to-primary/10 group-hover:text-primary'
                           : 'bg-muted text-muted-foreground'
                     }`}>
-                      {OPTION_LABELS[OPTION_KEYS[idx]]}
+                      {letterFor(idx)}
                     </span>
-                    <span className="flex-1">{currentQuestion[`option_${opt}` as keyof QuizQuestionPublic] as string}</span>
+                    <span className="flex-1">{currentQuestion.options[opt]}</span>
                     {isSelected && <CheckCircle2 size={18} className="shrink-0" />}
                   </Button>
                 );
@@ -701,7 +717,7 @@ export default function QuizGamePage({ params }: Props) {
               )}
               <Button
                 onClick={() => void handleNext()}
-                disabled={selected === null || submitting}
+                disabled={selected.length === 0 || submitting}
                 className="flex-1 h-14 bg-gradient-to-r from-primary to-primary hover:from-primary hover:to-primary text-white font-black rounded-2xl shadow-xl shadow-indigo-200/60 gap-2 text-base disabled:opacity-40 disabled:shadow-none transition-all hover:-translate-y-0.5 active:translate-y-0"
               >
                 {submitting ? (
@@ -853,16 +869,16 @@ export default function QuizGamePage({ params }: Props) {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pl-8">
-                  {item.chosen && (
+                  {item.chosen?.length > 0 && (
                     <div className={`rounded-xl px-3 py-2 text-xs font-bold ${
                       item.is_correct ? 'bg-success/10 text-success border border-success/20' : 'bg-destructive/10 text-destructive border border-destructive/20'
                     }`}>
-                      Bạn chọn: {item.chosen.toUpperCase()}
+                      Bạn chọn: {item.chosen.map(letterFor).join(', ')}
                     </div>
                   )}
                   {!item.is_correct && result.show_explanation !== false && (
                     <div className="rounded-xl px-3 py-2 text-xs font-bold bg-success/10 text-success border border-success/20">
-                      Đáp án: {String(item.correct_answer ?? '').toUpperCase()}
+                      Đáp án: {(item.correct_answers ?? []).map(letterFor).join(', ')}
                     </div>
                   )}
                 </div>

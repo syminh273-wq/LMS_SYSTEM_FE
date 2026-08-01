@@ -38,7 +38,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
   const [exam, setExam] = useState<Exam | null>(null);
   const [submission, setSubmission] = useState<ExamSubmission | null>(null);
   const [quizData, setQuizData] = useState<any>(null);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number[]>>({});
   const [answerFile, setAnswerFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -121,7 +121,8 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
 
   const deadline = getDeadlineMeta(exam.due_date, now);
   const submissionDisabled = deadline.expired || submitting || (exam.exam_type === 'quiz' && submission !== null);
-  const submitActionDisabled = submissionDisabled || (exam.exam_type === 'assignment' && !answerFile) || (exam.exam_type === 'quiz' && Object.keys(quizAnswers).length === 0);
+  const answeredQuizCount = Object.values(quizAnswers).filter(a => a.length > 0).length;
+  const submitActionDisabled = submissionDisabled || (exam.exam_type === 'assignment' && !answerFile) || (exam.exam_type === 'quiz' && answeredQuizCount === 0);
   const submittedFile = submission?.resource_url
     ? {
         url: submission.resource_url,
@@ -341,14 +342,14 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                               </p>
                             </div>
                             <div className="flex flex-wrap gap-2 border-t border-border bg-muted px-4 py-3">
-                              {item.chosen && (
+                              {item.chosen?.length > 0 && (
                                 <span className={`rounded-lg px-3 py-1 text-xs font-black uppercase ${item.is_correct ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
-                                  Bạn chọn: {item.chosen}
+                                  Bạn chọn: {item.chosen.map(i => String.fromCharCode(65 + i)).join(', ')}
                                 </span>
                               )}
                               {!item.is_correct && (
                                 <span className="rounded-lg bg-success/10 px-3 py-1 text-xs font-black uppercase text-success">
-                                  Đáp án: {item.correct_answer}
+                                  Đáp án: {item.correct_answers.map(i => String.fromCharCode(65 + i)).join(', ')}
                                 </span>
                               )}
                             </div>
@@ -382,7 +383,9 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      {quizData.questions.map((q: any, index: number) => (
+                      {quizData.questions.map((q: any, index: number) => {
+                        const isMultiType = q.question_type === 'multi_answer';
+                        return (
                         <Card key={q.uid} className="overflow-hidden">
                           <CardHeader className="pb-3 pt-4">
                             <div className="flex items-center gap-2">
@@ -390,25 +393,35 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                                 {index + 1}
                               </span>
                               <h3 className="text-sm font-bold text-foreground leading-relaxed">{q.question_text}</h3>
+                              {isMultiType && (
+                                <span className="ml-auto shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-black uppercase text-primary">
+                                  Nhiều đáp án
+                                </span>
+                              )}
                             </div>
                           </CardHeader>
                           <CardContent className="pt-2">
                             <div className="grid grid-cols-1 gap-2">
-                              {['a', 'b', 'c', 'd'].map((letter) => {
-                                const optionText = q[`option_${letter}`];
-                                if (!optionText) return null;
-                                const isSelected = quizAnswers[q.uid] === letter;
+                              {(q.options as string[]).map((optionText: string, idx: number) => {
+                                const chosenList = quizAnswers[q.uid] || [];
+                                const isSelected = chosenList.includes(idx);
 
                                 return (
                                   <Button
-                                    key={letter}
+                                    key={idx}
                                     type="button"
                                     variant="outline"
-                                    onClick={() => setQuizAnswers(prev => ({ ...prev, [q.uid]: letter }))}
+                                    onClick={() => setQuizAnswers(prev => {
+                                      const current = prev[q.uid] || [];
+                                      const next = isMultiType
+                                        ? (current.includes(idx) ? current.filter(i => i !== idx) : [...current, idx])
+                                        : [idx];
+                                      return { ...prev, [q.uid]: next };
+                                    })}
                                     className={`flex h-auto items-center gap-3 rounded-xl p-3 text-left ${isSelected ? 'border-primary bg-primary/5' : ''}`}
                                   >
                                     <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-black uppercase ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                                      {letter}
+                                      {String.fromCharCode(65 + idx)}
                                     </span>
                                     <span className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground'}`}>{optionText}</span>
                                     {isSelected && <Check size={16} className="ml-auto text-primary" />}
@@ -418,10 +431,11 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
                             </div>
                           </CardContent>
                         </Card>
-                      ))}
+                        );
+                      })}
 
                       <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-center">
-                        <p className="mb-4 text-sm font-medium text-muted-foreground">Kiểm tra kỹ các đáp án trước khi nộp bài. Bạn đã làm {Object.keys(quizAnswers).length}/{quizData.total_questions} câu.</p>
+                        <p className="mb-4 text-sm font-medium text-muted-foreground">Kiểm tra kỹ các đáp án trước khi nộp bài. Bạn đã làm {answeredQuizCount}/{quizData.total_questions} câu.</p>
                         {submitError && <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm font-bold text-destructive">{submitError}</div>}
                         <Button
                           type="submit"

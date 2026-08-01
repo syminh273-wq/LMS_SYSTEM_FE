@@ -357,23 +357,28 @@ export type SharingLink = {
 export type ClassroomJoinLink = Pick<SharingLink, 'code'>;
 
 type QuizStatus = 'draft' | 'published' | 'archived';
+export type QuizQuestionType = 'single_answer' | 'multi_answer' | 'true_false';
+export const QUIZ_MIN_OPTIONS = 2;
+export const QUIZ_MAX_OPTIONS = 8;
 
 export type QuizQuestion = {
   uid: string;
   quiz_id: string;
   question_text: string;
-  option_a: string;
-  option_b: string;
-  option_c: string;
-  option_d: string;
-  correct_answer: 'a' | 'b' | 'c' | 'd';
+  options: string[];
+  question_type: QuizQuestionType;
+  correct_answers: number[]; // 0-based indices into `options`
   explanation: string;
   order: number;
   created_at?: string;
 };
 
 export type UpdateQuestionRequest = {
-  correct_answer: 'a' | 'b' | 'c' | 'd';
+  question_text?: string;
+  options?: string[];
+  question_type?: QuizQuestionType;
+  correct_answers?: number[]; // 0-based indices into `options`
+  explanation?: string;
 };
 
 export type QuizAssignment = {
@@ -430,6 +435,10 @@ export type GenerateQuizRequest = {
   resource_id?: string;
   num_questions?: number;
   max_content_length?: number;
+  question_type?: QuizQuestionType;
+  num_options?: number;
+  option_counts?: number[]; // per-question option count, overrides num_options/num_questions when set
+  correct_counts?: number[]; // per-question required number of correct answers (multi_answer only), same length as option_counts
 };
 
 export type UpdateQuizRequest = {
@@ -517,8 +526,8 @@ type QuizStreamQuestionEvent = {
   index: number;
   question_uid: string;
   question: string;
-  options: Record<'a' | 'b' | 'c' | 'd', string>;
-  correct: 'a' | 'b' | 'c' | 'd';
+  options: string[];
+  correct: number | number[];
   explanation: string;
 };
 
@@ -797,6 +806,7 @@ export type QuizTask = {
   id: string;
   kind: QuizTaskKind;
   title: string;
+  question_type?: QuizQuestionType;
   status: QuizTaskStatus;
   progress: number;
   total_steps: number;
@@ -877,8 +887,8 @@ export type AuditDetailsResponse = {
 type AuditQuizAnswer = {
   question_uid: string;
   question_text: string;
-  chosen: string | null;
-  correct_answer: string | null;
+  chosen: string[] | null;
+  correct_answers: string[] | null;
   is_correct: boolean;
   explanation?: string;
 };
