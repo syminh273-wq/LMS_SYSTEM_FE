@@ -121,12 +121,14 @@ export default function FavoritesPage() {
           <div className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
             Nhấn biểu tượng trái tim trên lớp học bất kỳ để thêm vào danh sách yêu thích của bạn.
           </div>
-          <Button
-            onClick={() => router.push('/consumer/discover')}
-            className="mt-4 gap-1.5"
-          >
-            Khám phá lớp học
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => router.push('/consumer/discover')}
+              className="mt-4 gap-1.5"
+            >
+              Khám phá lớp học
+            </Button>
+          </div>
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 text-sm text-muted-foreground">
