@@ -64,7 +64,7 @@ export function LeaderboardTab({ classroomUid }: Props) {
       setLoading(true);
       setError(null);
       try {
-        const res = await classroomApi.leaderboard(classroomUid, RANK_LIMIT);
+        const res = await classroomApi.getClassroomLeaderboard(classroomUid, RANK_LIMIT);
         if (!cancelled) setData(res);
       } catch (e: unknown) {
         if (!cancelled) {

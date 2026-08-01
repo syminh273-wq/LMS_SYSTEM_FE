@@ -134,7 +134,7 @@
   },
   "buttons": {
     "submit": "Submit",
-    "back_to_classroom": "Back to Classroom",
+    "back_to_classroom": "Back to ClassroomProps",
     "view": "View",
     "update": "Update",
     "choose_file": "Choose File",

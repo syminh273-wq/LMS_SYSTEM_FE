@@ -98,7 +98,7 @@ interface NavItem {
 const primaryNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/consumer/dashboard', icon: LayoutDashboard },
   { name: 'Khám phá', href: '/consumer/discover', icon: Compass },
-  { name: 'Classroom', href: '/consumer/classroom', icon: BookOpen },
+  { name: 'ClassroomProps', href: '/consumer/classroom', icon: BookOpen },
   { name: 'Lịch sử', href: '/consumer/history', icon: HistoryIcon },
 ];
 

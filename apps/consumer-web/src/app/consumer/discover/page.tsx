@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, Classroom } from '@/lib/api';
+import { classroomApi, ClassroomProps } from '@/lib/api';
 import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { useMe } from '@/features/auth/hooks/useMe';
 import { toast } from 'sonner';
@@ -26,7 +26,7 @@ import {
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 import { cn } from '@/lib/utils';
 
-type CategoryValue = NonNullable<Classroom['category']>;
+type CategoryValue = NonNullable<ClassroomProps['category']>;
 type PricingFilter = 'all' | 'free' | 'paid';
 
 const CATEGORIES: Array<{ value: CategoryValue; label: string; emoji: string }> = [
@@ -79,7 +79,7 @@ export default function DiscoverPage() {
   const [category, setCategory] = useState<CategoryValue | null>(null);
   const [pricing, setPricing] = useState<PricingFilter>('all');
   const [page, setPage] = useState(1);
-  const [results, setResults] = useState<Array<Classroom & { is_joined?: boolean }>>([]);
+  const [results, setResults] = useState<Array<ClassroomProps & { is_joined?: boolean }>>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [joining, setJoining] = useState<string | null>(null);

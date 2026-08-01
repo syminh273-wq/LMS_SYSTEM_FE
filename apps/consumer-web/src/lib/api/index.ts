@@ -1,5 +1,5 @@
 import { authApi } from '@/features/auth/api';
-import { classroomApi } from './classroom';
+import { classroomApi } from '@/features/classroom/api';
 import { consumerQuizApi } from './quiz';
 import { spaceApi as spaceApiInstance } from './space';
 import { consumerApi as consumerApiInstance } from './consumer';
@@ -37,7 +37,7 @@ const consumerApiCompat = {
   consumers: consumerApiInstance,
   spaces: spaceApiInstance,
   classrooms: {
-    mine: classroomApi.mine.bind(classroomApi),
+    mine: classroomApi.getMyClassrooms.bind(classroomApi),
   }
 };
 

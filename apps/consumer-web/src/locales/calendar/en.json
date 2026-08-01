@@ -54,7 +54,7 @@
     "field_type": "Type",
     "field_start": "Start",
     "field_end": "End",
-    "field_classroom": "Classroom",
+    "field_classroom": "ClassroomProps",
     "field_description": "Description",
     "field_shift": "Shift",
     "save": "Save",

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState, use } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { classroomApi, examSessionApi, notificationApi, Classroom, Exam, consumerQuizApi } from '@/lib/api';
+import { classroomApi, examSessionApi, notificationApi, ClassroomProps, Exam, consumerQuizApi } from '@/lib/api';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
@@ -180,7 +180,7 @@ function JoinRequiredPage({
   onJoin,
   joining,
 }: {
-  classroom: Classroom;
+  classroom: ClassroomProps;
   onJoin: () => void;
   joining: boolean;
 }) {
@@ -242,7 +242,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const searchParams = useSearchParams();
   const { isAuthenticated, isMounted } = useRequireAuth();
   const { status: meStatus, me } = useMe();
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [membershipStatus, setMembershipStatus] = useState<'approved' | 'pending' | null>(null);
@@ -353,7 +353,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoading(true);
         setError("");
-        const data: any = await classroomApi.retrieve(uid);
+        const data: any = await classroomApi.getClassroom(uid);
         setClassroom(data);
         setMembershipStatus((data.membership_status as any) || (data.join_required ? null : 'approved'));
       } catch (err: unknown) {
@@ -447,7 +447,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     if (!classroom) return;
     try {
       setJoiningCheckout(true);
-      const res = await classroomApi.quickJoin(classroom.uid);
+      const res = await classroomApi.joinClassroomQuickly(classroom.uid);
       if (res.requires_payment && res.pay_url) {
         toast.info('Lớp học trả phí, đang chuyển đến MoMo...');
         const orderId = res.order_id ? `?order_id=${res.order_id}` : '';
@@ -475,7 +475,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoadingExams(true);
         setExamError("");
-        const data = await classroomApi.exams(uid);
+        const data = await classroomApi.getClassroomExams(uid);
         setExams((data as Exam[]).filter(exam => exam.status !== 'draft'));
       } catch (err: unknown) {
         setExamError(err instanceof Error ? err.message : 'Không thể tải danh sách bài kiểm tra');
@@ -494,7 +494,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
       try {
         setLoadingAssignments(true);
         setAssignmentError("");
-        const data = await classroomApi.assignments(uid);
+        const data = await classroomApi.getClassroomAssignments(uid);
         setAssignments((data as Exam[]).filter(item => item.status !== 'draft'));
       } catch (err: unknown) {
         setAssignmentError(err instanceof Error ? err.message : 'Không thể tải danh sách bài tập');

@@ -1,54 +1,43 @@
-import AbstractRestApiClient from './client';
+import AbstractRestApiClient from '@/lib/api/client';
 import type {
-  Classroom as ClassroomType,
+  ClassroomProps as ClassroomType,
   ClassroomPreviewResponse,
   Conversation,
   Exam,
   ExamSubmission,
-  LeaderboardEntry,
   LeaderboardResponse,
   Message,
   PaginatedResponse,
   CreateClassroomRequest,
   SharingLink,
-  SubmitExamRequest,
+  SubmitExamFormProps,
   UploadedResource,
-} from './types';
+} from '@/lib/api/types';
+import type { JoinHistoryItemProps } from '@/features/classroom/types';
 
-export type JoinHistoryItem = {
-  classroom_uid: string;
-  classroom_name: string;
-  teacher_id: string | null;
-  joined_at: string | null;
-  amount: number;
-  order_id: string;
-};
-
-class ClassroomApiClient extends AbstractRestApiClient {
+class ClassroomAPI extends AbstractRestApiClient {
   constructor() {
     super();
   }
 
-  // ── Space (teacher) endpoints ──────────────────────────────────────────────
-  public async list(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
-    return this.get<PaginatedResponse<Classroom>>(`/api/v1/space/course/classrooms/?page=${page}`);
+  public async getClassrooms(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
+    return this.get<PaginatedResponse<ClassroomType>>(`/api/v1/space/course/classrooms/?page=${page}`);
   }
 
-  public async create(data: CreateClassroomRequest): Promise<ClassroomType> {
-    return this.post<Classroom>('/api/v1/space/course/classrooms/', data);
+  public async createClassroom(data: CreateClassroomRequest): Promise<ClassroomType> {
+    return this.post<ClassroomType>('/api/v1/space/course/classrooms/', data);
   }
 
-  public async getSharingLink(uid: string): Promise<SharingLink> {
+  public async getClassroomSharingLink(uid: string): Promise<SharingLink> {
     return this.get<SharingLink>(`/api/v1/space/course/classrooms/${uid}/sharing_link/`);
   }
 
-  // ── Consumer (student) endpoints ───────────────────────────────────────────
-  public async retrieve(uid: string): Promise<ClassroomType> {
-    return this.get<Classroom>(`/api/v1/consumer/course/classrooms/${uid}/`);
+  public async getClassroom(uid: string): Promise<ClassroomType> {
+    return this.get<ClassroomType>(`/api/v1/consumer/course/classrooms/${uid}/`);
   }
 
-  public async mine(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
-    return this.get<PaginatedResponse<Classroom>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
+  public async getMyClassrooms(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
+    return this.get<PaginatedResponse<ClassroomType>>(`/api/v1/consumer/course/classrooms/?page=${page}`);
   }
 
   public async discover(params: {
@@ -65,7 +54,7 @@ class ClassroomApiClient extends AbstractRestApiClient {
     return this.get(`/api/v1/consumer/course/classrooms/discover/?${search.toString()}`);
   }
 
-  public async quickJoin(uid: string): Promise<{
+  public async joinClassroomQuickly(uid: string): Promise<{
     joined: boolean;
     requires_payment: boolean;
     membership_status: string;
@@ -116,45 +105,45 @@ class ClassroomApiClient extends AbstractRestApiClient {
     return this.get(`/api/v1/consumer/course/classrooms/${uid}/access/`);
   }
 
-  public async leaderboard(uid: string, limit: number = 10): Promise<LeaderboardResponse> {
+  public async getClassroomLeaderboard(uid: string, limit: number = 10): Promise<LeaderboardResponse> {
     return this.get<LeaderboardResponse>(`/api/v1/consumer/ranking/classrooms/${uid}/leaderboard/?limit=${limit}`);
   }
 
-  public async preview(uid: string): Promise<ClassroomPreviewResponse> {
+  public async getClassroomPreview(uid: string): Promise<ClassroomPreviewResponse> {
     return this.get<ClassroomPreviewResponse>(`/api/v1/consumer/course/classrooms/${uid}/preview/`);
   }
 
-  public async favoriteToggle(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
+  public async toggleFavorite(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
     return this.post(`/api/v1/consumer/social/classrooms/${uid}/favorite/`);
   }
 
-  public async favoriteStatus(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
+  public async getFavoriteStatus(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
     return this.get(`/api/v1/consumer/social/classrooms/${uid}/favorite/status/`);
   }
 
-  public async favorites(page: number = 1): Promise<PaginatedResponse<{ classroom: ClassroomType; created_at: string }>> {
+  public async getFavorites(page: number = 1): Promise<PaginatedResponse<{ classroom: ClassroomType; created_at: string }>> {
     return this.get(`/api/v1/consumer/social/classrooms/favorites/?page=${page}`);
   }
 
-  public async exams(uid: string): Promise<Exam[]> {
+  public async getClassroomExams(uid: string): Promise<Exam[]> {
     const response = await this.get<Exam[] | { results: Exam[] }>(
       `/api/v1/consumer/course/classrooms/${uid}/exams/`
     );
     return Array.isArray(response) ? response : response.results;
   }
 
-  public async retrieveExam(examUid: string): Promise<Exam> {
+  public async getExam(examUid: string): Promise<Exam> {
     return this.get<Exam>(`/api/v1/consumer/course/exams/${examUid}/`);
   }
 
-  public async assignments(uid: string): Promise<Exam[]> {
+  public async getClassroomAssignments(uid: string): Promise<Exam[]> {
     const response = await this.get<Exam[] | { results: Exam[] }>(
       `/api/v1/consumer/course/classrooms/${uid}/assignments/`
     );
     return Array.isArray(response) ? response : response.results;
   }
 
-  public async examQuestions(examUid: string, options?: RequestInit): Promise<{
+  public async getExamQuestions(examUid: string, options?: RequestInit): Promise<{
     exam_uid: string;
     title: string;
     total_questions: number;
@@ -171,7 +160,7 @@ class ClassroomApiClient extends AbstractRestApiClient {
     return this.get<any>(`/api/v1/consumer/course/exams/${examUid}/questions/`, options);
   }
 
-  public async submitExam(examUid: string, data: SubmitExamRequest): Promise<ExamSubmission> {
+  public async submitExam(examUid: string, data: SubmitExamFormProps): Promise<ExamSubmission> {
     return this.post<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/`, data);
   }
 
@@ -183,11 +172,10 @@ class ClassroomApiClient extends AbstractRestApiClient {
     return this.patch<UploadedResource>(`/api/v1/resource/${resourceUid}/reupload/`, data);
   }
 
-  public async getByTeacher(teacherId: string): Promise<ClassroomType[]> {
-    return this.get<Classroom[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
+  public async getClassroomsByTeacher(teacherId: string): Promise<ClassroomType[]> {
+    return this.get<ClassroomType[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
   }
 
-  // ── Chat ───────────────────────────────────────────────────────────────────
   public async getConversation(classroomUid: string): Promise<Conversation> {
     const list = await this.get<Conversation[]>(
       `/api/v1/chat/conversations/?classroom_uid=${classroomUid}`
@@ -202,5 +190,5 @@ class ClassroomApiClient extends AbstractRestApiClient {
   }
 }
 
-export const classroomApi = new ClassroomApiClient();
-export type Classroom = ClassroomType;
+export const classroomApi = new ClassroomAPI();
+export type ClassroomProps = ClassroomType;

@@ -99,7 +99,7 @@ export type UpdateSpaceRequest = {
   cover_url?: string;
 };
 
-export type Classroom = {
+export type ClassroomProps = {
   uid: string;
   pid: string;
   name: string;
@@ -131,7 +131,7 @@ export type Classroom = {
 type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
 
 export type ClassroomPreviewResponse = {
-  classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
+  classroom: ClassroomProps & { is_favorited?: boolean; favorite_count?: number };
   preview: {
     folder: { uid: string; name: string } | null;
     items: Array<
@@ -167,7 +167,7 @@ export type ClassroomPreviewResponse = {
 };
 
 export type ClassroomFavoriteItem = {
-  classroom: Classroom;
+  classroom: ClassroomProps;
   created_at: string;
 };
 
@@ -344,7 +344,7 @@ export type ExamSubmission = {
   updated_at?: string;
 };
 
-export type SubmitExamRequest = {
+export type SubmitExamFormProps = {
   submission_type?: ExamSubmissionType;
   ref_id?: string | null;
   answers?: Record<string, number[]>;

@@ -1,16 +1,16 @@
 import AbstractRestApiClient from './client';
 import { normalizePayment } from './payment';
 import type { PaymentListItem } from './payment';
-import type { JoinHistoryItem } from './classroom';
+import type { JoinHistoryItemProps } from '@/features/classroom/types';
 
 export type HistoryOverview = {
   payments: PaymentListItem[];
-  joins: JoinHistoryItem[];
+  joins: JoinHistoryItemProps[];
 };
 
 const CLASSROOM_ORDER_INFO_PREFIX = 'Lớp học: ';
 
-function toJoinHistory(payments: PaymentListItem[]): JoinHistoryItem[] {
+function toJoinHistory(payments: PaymentListItem[]): JoinHistoryItemProps[] {
   return payments
     .filter((p) => p.status === 'COMPLETED' && p.resource_type === 'classroom' && p.resource_id)
     .map((p) => ({

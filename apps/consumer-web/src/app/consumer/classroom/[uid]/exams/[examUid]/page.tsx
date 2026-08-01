@@ -26,7 +26,7 @@ import { Button } from '@shared/components/ui/button';
 import { Input } from '@shared/components/ui/input';
 import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
 import { Label } from '@shared/components/ui/label';
-import { classroomApi, Classroom, Exam, ExamContentType, ExamSubmission, ExamSubmissionType } from '@/lib/api';
+import { classroomApi, ClassroomProps, Exam, ExamContentType, ExamSubmission, ExamSubmissionType } from '@/lib/api';
 import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { FaceMonitorWidget } from '@/components/face/face-monitor-widget';
 
@@ -34,7 +34,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
   const { uid, examUid } = use(params);
   const router = useRouter();
   const { isAuthenticated, isMounted } = useRequireAuth();
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [exam, setExam] = useState<Exam | null>(null);
   const [submission, setSubmission] = useState<ExamSubmission | null>(null);
   const [quizData, setQuizData] = useState<any>(null);
@@ -60,8 +60,8 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
         setLoading(true);
         setError('');
         const [classroomData, examData] = await Promise.all([
-          classroomApi.retrieve(uid),
-          classroomApi.retrieveExam(examUid),
+          classroomApi.getClassroom(uid),
+          classroomApi.getExam(examUid),
         ]);
 
         setClassroom(classroomData);
@@ -70,7 +70,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
 
         if (examData.exam_type === 'quiz') {
           try {
-            const questions = await classroomApi.examQuestions(examUid);
+            const questions = await classroomApi.getExamQuestions(examUid);
             setQuizData(questions);
             quizStartedAtRef.current = Date.now();
           } catch (err) {

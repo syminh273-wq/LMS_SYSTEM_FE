@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState, useEffect, use, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { consumerQuizApi } from '@/lib/api/quiz';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import { consumerQuizCollectionApi } from '@/lib/api/quiz-collection';
 import { CertificateCelebration } from '@/components/quiz/certificate-celebration';
 import QuizLeaderboardModal from '@/components/quiz/QuizLeaderboardModal';

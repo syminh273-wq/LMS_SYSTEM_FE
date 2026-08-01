@@ -1,6 +1,6 @@
 {
   "labels": {
-    "title": "Classroom",
+    "title": "ClassroomProps",
     "join_class": "Join Class",
     "create_class": "Create Class",
     "class_code": "Class Code (PID)",
@@ -11,7 +11,7 @@
     "announcements": "Announcements",
     "join_dialog_title": "Join Class",
     "join_class_btn": "Join Class",
-    "join_class_full": "Join Classroom",
+    "join_class_full": "Join ClassroomProps",
     "tab_code": "Enter Code",
     "tab_qr": "Scan QR",
     "code_placeholder": "Example: AB1C2D",
@@ -196,7 +196,7 @@
   "payment": {
     "success_title": "Payment successful!",
     "success_pending_body": "Your payment has been received. Please wait for the teacher to approve your join request.",
-    "class_label": "Classroom",
+    "class_label": "ClassroomProps",
     "course_label": "Course",
     "btn_go_to_class": "Enter classroom",
     "btn_close": "Close"

@@ -7,7 +7,7 @@ import { Loader2, CheckCircle2, XCircle, AlertTriangle, ArrowLeft, Clock } from 
 import { Card, CardContent } from '@shared/components/ui/card';
 import { Button } from '@shared/components/ui/button';
 import { toast } from 'sonner';
-import { classroomApi, Classroom } from '@/lib/api';
+import { classroomApi, ClassroomProps } from '@/lib/api';
 import { PaymentSuccessDialog } from '@/components/payment';
 
 const POLL_INTERVAL_MS = 1500;
@@ -18,7 +18,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
   const router = useRouter();
   const { t } = useTranslation();
 
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [status, setStatus] = useState<'initiating' | 'redirecting' | 'processing' | 'success' | 'failed' | 'timeout'>('initiating');
   const [errorMsg, setErrorMsg] = useState('');
   const [successOpen, setSuccessOpen] = useState(false);
@@ -28,7 +28,7 @@ export default function ClassroomCheckoutPage({ params }: { params: Promise<{ ui
     let cancelled = false;
     (async () => {
       try {
-        const data = await classroomApi.retrieve(uid);
+        const data = await classroomApi.getClassroom(uid);
         if (!cancelled) setClassroom(data);
       } catch {}
     })();

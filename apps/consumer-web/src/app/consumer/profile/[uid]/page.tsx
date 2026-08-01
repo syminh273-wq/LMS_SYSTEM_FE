@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { Button } from '@shared/components/ui/button';
 
 import { accountService, type UserProfile } from '@/lib/api/account';
-import { classroomApi, type Classroom } from '@/lib/api/classroom';
+import { classroomApi, type ClassroomProps } from '@/features/classroom/api';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio, type PortfolioEntry } from '@/lib/api/portfolio';
 import { socialApi } from '@/lib/api/social';
@@ -48,7 +48,7 @@ export default function PublicProfilePage() {
   const [portfolio, setPortfolio] = useState<Portfolio>(EMPTY_PORTFOLIO);
   const [publicAddress, setPublicAddress] = useState<string>('');
   const [publicShowAddress, setPublicShowAddress] = useState<boolean>(true);
-  const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
+  const [teachingClasses, setTeachingClasses] = useState<ClassroomProps[]>([]);
   const [teachingLoading, setTeachingLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +69,7 @@ export default function PublicProfilePage() {
           accountService.getPublicProfile(targetUid).catch(() => null),
           communityApi.getPublicProfile(targetUid).catch(() => null),
           portfolioApi.getPublic('consumer', targetUid).catch(() => EMPTY_PORTFOLIO),
-          classroomApi.getByTeacher(targetUid).catch(() => [] as Classroom[]),
+          classroomApi.getClassroomsByTeacher(targetUid).catch(() => [] as ClassroomProps[]),
         ]);
         if (accountData) {
           const consumer = (accountData as { consumer?: UserProfile | null }).consumer;

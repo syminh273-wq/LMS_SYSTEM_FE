@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { classroomApi, consumerApi, type Classroom } from '@/lib/api';
+import { classroomApi, consumerApi, type ClassroomProps } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { Label } from '@shared/components/ui/label';
 import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
@@ -21,7 +21,7 @@ import { cn } from '@shared/lib/utils';
 
 type JoinTab = 'code' | 'qr';
 
-function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: Classroom) => void }) {
+function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: ClassroomProps) => void }) {
   const [tab, setTab] = useState<JoinTab>('code');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -122,7 +122,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
           name: classroomName,
           status: 'active',
           membership_status: 'approved',
-        } as Classroom);
+        } as ClassroomProps);
         onClose();
       } else {
         toast.info(
@@ -263,7 +263,7 @@ export default function ClassroomPage() {
   const router = useRouter();
   const { isAuthenticated, isMounted } = useRequireAuth();
   const userId = useSelector((state: RootState) => state.user.profile?.uid);
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<ClassroomProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showJoin, setShowJoin] = useState(false);
@@ -271,7 +271,7 @@ export default function ClassroomPage() {
 
   const fetchClassrooms = useCallback(async () => {
     try {
-      const data = await classroomApi.mine();
+      const data = await classroomApi.getMyClassrooms();
       setClassrooms(data.results);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không thể tải danh sách classroom.');
@@ -291,7 +291,7 @@ export default function ClassroomPage() {
     onApproved: useCallback(() => { void fetchClassrooms(); }, [fetchClassrooms]),
   });
 
-  const handleJoined = (classroom: Classroom) => {
+  const handleJoined = (classroom: ClassroomProps) => {
     setClassrooms(prev => {
       if (prev.find(c => c.uid === classroom.uid)) return prev;
       return [classroom, ...prev];

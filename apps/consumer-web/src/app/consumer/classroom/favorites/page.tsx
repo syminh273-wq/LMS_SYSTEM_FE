@@ -44,7 +44,7 @@ export default function FavoritesPage() {
   const fetchFavorites = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await classroomApi.favorites(1);
+      const res = await classroomApi.getFavorites(1);
       setItems(res.results);
     } catch {
       setItems([]);

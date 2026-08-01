@@ -145,7 +145,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
       setLoading(true);
       setError(null);
       try {
-        const res = await classroomApi.preview(uid);
+        const res = await classroomApi.getClassroomPreview(uid);
         if (!cancelled) setData(res);
       } catch (e: unknown) {
         if (!cancelled) {
@@ -164,7 +164,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
     if (!data) return;
     setJoining(true);
     try {
-      const res = await classroomApi.quickJoin(data.classroom.uid);
+      const res = await classroomApi.joinClassroomQuickly(data.classroom.uid);
       if (res.requires_payment) {
         toast.info('Lớp học trả phí, đang chuyển đến MoMo...');
         router.push(`/consumer/classroom/checkout/${data.classroom.uid}`);
@@ -172,7 +172,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
       }
       if (res.membership_status === 'pending') {
         toast.success('Đã gửi yêu cầu tham gia. Vui lòng chờ giáo viên duyệt.');
-        const refreshed = await classroomApi.preview(uid);
+        const refreshed = await classroomApi.getClassroomPreview(uid);
         setData(refreshed);
       } else {
         toast.success('Tham gia lớp thành công!');

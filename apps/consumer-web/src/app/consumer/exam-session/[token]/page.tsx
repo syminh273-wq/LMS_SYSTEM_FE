@@ -31,7 +31,7 @@ import {
   isAuditViolation,
 } from '@shared/lib/exam';
 import { examSessionApi, type ProctoringEventType } from '@/lib/api/exam-session';
-import { classroomApi } from '@/lib/api/classroom';
+import { classroomApi } from '@/features/classroom/api';
 import { FaceMonitorWidget, type FaceEventType, type MonitorResult } from '@/components/face/face-monitor-widget';
 import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { parseVnDate } from '@shared/lib/datetime';
@@ -240,7 +240,7 @@ export default function ExamSessionPage({ params }: Props) {
           setTimeLeft(result.session.time_remaining_seconds);
         }
         if (result.exam.content_type === 'quiz') {
-          const quizData = await classroomApi.examQuestions(result.exam.uid, { signal: controller.signal });
+          const quizData = await classroomApi.getExamQuestions(result.exam.uid, { signal: controller.signal });
           if (controller.signal.aborted) return;
           setQuizQuestions([...quizData.questions].sort((a, b) => a.order - b.order));
         }
