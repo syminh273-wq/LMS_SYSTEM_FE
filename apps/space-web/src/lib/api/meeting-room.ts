@@ -30,16 +30,8 @@ class MeetingRoomApiClient extends AbstractRestApiClient {
     );
   }
 
-  public async create(data: CreateMeetingRoomRequest): Promise<MeetingRoom> {
-    return this.post<MeetingRoom>('/api/v1/space/course/meeting-rooms/', data);
-  }
-
   public async quickStart(data: CreateMeetingRoomRequest): Promise<MeetingRoom> {
     return this.post<MeetingRoom>('/api/v1/space/course/meeting-rooms/quick_start/', data);
-  }
-
-  public async start(uid: string): Promise<MeetingRoom> {
-    return this.post<MeetingRoom>(`/api/v1/space/course/meeting-rooms/${uid}/start/`);
   }
 
   public async end(uid: string): Promise<MeetingRoom> {

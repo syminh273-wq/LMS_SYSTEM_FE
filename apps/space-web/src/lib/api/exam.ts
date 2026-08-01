@@ -59,10 +59,6 @@ class ExamApiClient extends AbstractRestApiClient {
     return this.post<AIGradeBatchResponse>(`/api/v1/space/course/exams/${examUid}/submissions/ai-grade/`, data);
   }
 
-  public async aiGradeClassroomSubmissions(classroomUid: string, data: AIGradeRequest): Promise<AIGradeBatchResponse> {
-    return this.post<AIGradeBatchResponse>(`/api/v1/space/course/classrooms/${classroomUid}/exams/ai-grade/`, data);
-  }
-
   public async openOnline(
     examUid: string,
     settings: { late_threshold_seconds: number; duration_seconds: number; camera_required: boolean; max_face_warnings: number; max_tab_leaves?: number }

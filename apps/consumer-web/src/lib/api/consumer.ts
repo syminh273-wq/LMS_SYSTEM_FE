@@ -14,10 +14,6 @@ class ConsumerApiClient extends AbstractRestApiClient {
     return this.get<Consumer[]>('/api/v1/consumer/account/consumers/');
   }
 
-  public async me(): Promise<Consumer> {
-    return this.get<Consumer>('/api/v1/consumer/account/consumers/me/');
-  }
-
   public async create(data: CreateConsumerRequest): Promise<Consumer> {
     return this.post<Consumer>('/api/v1/consumer/account/consumers/', data);
   }

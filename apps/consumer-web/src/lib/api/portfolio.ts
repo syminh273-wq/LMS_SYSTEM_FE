@@ -27,23 +27,6 @@ export type Portfolio = {
   education: PortfolioEntry[];
 };
 
-type PublicTeacher = {
-  uid: string;
-  full_name: string;
-  name: string;
-  slug: string;
-  description: string;
-  logo_url: string;
-  cover_url: string;
-  avatar_url: string;
-  portfolio: Portfolio;
-};
-
-type PortfolioUploadResult = {
-  file_key: string;
-  url: string;
-};
-
 class PortfolioApiClient extends AbstractRestApiClient {
   async getMine(): Promise<Portfolio> {
     return this.get<Portfolio>('/api/v1/portfolio/me/');
@@ -51,20 +34,6 @@ class PortfolioApiClient extends AbstractRestApiClient {
 
   async getPublic(ownerType: 'space' | 'consumer', ownerId: string): Promise<Portfolio> {
     return this.get<Portfolio>(`/api/v1/portfolio/${ownerType}/${ownerId}/`);
-  }
-
-  async getPublicTeacher(uid: string): Promise<PublicTeacher> {
-    return this.get<PublicTeacher>(`/api/v1/public/teachers/${uid}/`);
-  }
-
-  async bulkUpsert(entries: Array<{
-    uid?: string;
-    key: PortfolioKey;
-    value: Record<string, unknown>;
-    is_public?: boolean;
-    display_order?: number;
-  }>): Promise<Portfolio> {
-    return this.patch<Portfolio>('/api/v1/portfolio/me/', { entries });
   }
 
   async upsertEntry(uid: string | null, payload: {
@@ -109,16 +78,6 @@ class PortfolioApiClient extends AbstractRestApiClient {
 
   async deleteEntry(uid: string): Promise<void> {
     return this.delete<void>(`/api/v1/portfolio/me/entries/${uid}/`);
-  }
-
-  async reorder(orders: Array<{ uid: string; display_order: number }>): Promise<Portfolio> {
-    return this.patch<Portfolio>('/api/v1/portfolio/me/reorder/', { orders });
-  }
-
-  async uploadFile(file: File): Promise<PortfolioUploadResult> {
-    const form = new FormData();
-    form.append('file', file);
-    return this.post<PortfolioUploadResult>('/api/v1/portfolio/me/upload/', form);
   }
 }
 

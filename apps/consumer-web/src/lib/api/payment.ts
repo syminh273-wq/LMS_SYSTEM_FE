@@ -22,12 +22,6 @@ export type PaymentListItem = {
   teacher_name?: string | null;
 };
 
-type PaymentHistoryParams = {
-  status?: PaymentStatus;
-  resource_type?: PaymentResourceType;
-  limit?: number;
-};
-
 const VALID_STATUSES: readonly PaymentStatus[] = ['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED'];
 
 function normalizeStatus(raw: unknown): PaymentStatus {
@@ -41,15 +35,6 @@ export function normalizePayment(item: PaymentListItem): PaymentListItem {
 }
 
 class PaymentApiClient extends AbstractRestApiClient {
-  public async list(params?: PaymentHistoryParams): Promise<PaymentListItem[]> {
-    const qs = buildQueryString(params);
-    const response = await this.get<PaymentListItem[] | { results: PaymentListItem[] }>(
-      `/api/v1/consumer/payment/${qs ? `?${qs}` : ''}`
-    );
-    const data = Array.isArray(response) ? response : response.results;
-    return data.map(normalizePayment);
-  }
-
   public async findByOrderId(orderId: string): Promise<PaymentListItem | null> {
     try {
       const item = await this.get<PaymentListItem>(
@@ -60,19 +45,6 @@ class PaymentApiClient extends AbstractRestApiClient {
       return null;
     }
   }
-
-  public async getHistory(params?: PaymentHistoryParams): Promise<PaymentListItem[]> {
-    return this.list(params);
-  }
-}
-
-function buildQueryString(params?: PaymentHistoryParams): string {
-  if (!params) return '';
-  const sp = new URLSearchParams();
-  if (params.status) sp.set('status', params.status.toLowerCase());
-  if (params.resource_type) sp.set('resource_type', params.resource_type);
-  if (params.limit) sp.set('limit', String(params.limit));
-  return sp.toString();
 }
 
 export const paymentApi = new PaymentApiClient();

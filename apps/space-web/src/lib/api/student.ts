@@ -37,13 +37,6 @@ class StudentApiClient extends AbstractRestApiClient {
   async getStudentDetail(consumerUid: string): Promise<StudentDetail> {
     return this.get<StudentDetail>(`/api/v1/space/course/students/${consumerUid}/`);
   }
-
-  /** Per-exam submissions for a student in a classroom (existing endpoint). */
-  async getStudentSubmissions(classroomUid: string, consumerUid: string) {
-    return this.get<{ exam: { uid: string; title: string; status: string; due_date: string | null }; submission: import('./types').ExamSubmission | null }[]>(
-      `/api/v1/space/course/classrooms/${classroomUid}/members/${consumerUid}/submissions/`,
-    );
-  }
 }
 
 export const studentApi = new StudentApiClient();

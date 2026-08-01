@@ -3,7 +3,6 @@ import type {
   ClassroomProps,
   ClassroomMemberProps,
   ClassroomPreviewResponse,
-  StudentExamRecord,
   PaginatedResponse,
   CreateClassroomRequest,
   UpdateClassroomRequest,
@@ -59,10 +58,6 @@ class ClassroomAPI extends AbstractRestApiClient {
 
   public async kickClassroomMember(classroomUid: string, memberId: string): Promise<void> {
     return super.delete(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/kick/`);
-  }
-
-  public async getStudentSubmissions(classroomUid: string, memberId: string): Promise<StudentExamRecord[]> {
-    return this.get(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/submissions/`);
   }
 
   public async getClassroomBlacklist(uid: string): Promise<BlacklistEntry[]> {

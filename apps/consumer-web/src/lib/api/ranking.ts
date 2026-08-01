@@ -5,8 +5,6 @@ import type {
   Achievement,
   GlobalLeaderboardResponse,
   MyRankResponse,
-  LevelsResponse,
-  AchievementsCatalogResponse,
   LeaderboardPeriod,
 } from './types';
 
@@ -55,14 +53,6 @@ class RankingApiClient extends AbstractRestApiClient {
     return this.get<GlobalLeaderboardResponse>(
       `/api/v1/consumer/ranking/leaderboard/${qs ? `?${qs}` : ''}`
     );
-  }
-
-  public async getLevels(): Promise<LevelsResponse> {
-    return this.get<LevelsResponse>('/api/v1/consumer/ranking/levels/');
-  }
-
-  public async getAchievementsCatalog(): Promise<AchievementsCatalogResponse> {
-    return this.get<AchievementsCatalogResponse>('/api/v1/consumer/ranking/achievements/catalog/');
   }
 }
 

@@ -12,10 +12,6 @@ class ConsumerLeaveRequestApiClient extends AbstractRestApiClient {
     return leaveRequestApiService.list('consumer', params);
   }
 
-  public async retrieve(uid: string): Promise<LeaveRequest> {
-    return leaveRequestApiService.retrieve('consumer', uid);
-  }
-
   public async create(input: CreateLeaveRequestInput): Promise<LeaveRequest> {
     return leaveRequestApiService.create('consumer', input);
   }

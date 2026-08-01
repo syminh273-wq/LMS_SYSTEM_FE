@@ -1,8 +1,8 @@
 import AbstractRestApiClient from './client';
 import type {
-  Quiz, QuizDetail, GenerateQuizRequest,
-  UpdateQuizRequest, UpdateAssignmentRequest, UpdateQuestionRequest,
-  QuizQuestion, QuizStreamEvent, QuizAttemptRecord, QuizAssignment,
+  Quiz, QuizDetail,
+  UpdateAssignmentRequest, UpdateQuestionRequest,
+  QuizQuestion, QuizAttemptRecord, QuizAssignment,
   QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
 } from './types';
 
@@ -17,66 +17,6 @@ class QuizApiClient extends AbstractRestApiClient {
 
   public async retrieve(uid: string): Promise<QuizDetail> {
     return this.get<QuizDetail>(`/api/v1/space/quiz/${uid}/`);
-  }
-
-  public async generate(data: GenerateQuizRequest): Promise<QuizDetail> {
-    return this.post<QuizDetail>('/api/v1/space/quiz/generate/', data);
-  }
-
-  public async *generateStream(data: GenerateQuizRequest, file?: File): AsyncGenerator<QuizStreamEvent> {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    let body: FormData | string;
-    if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      if (data.num_questions != null) formData.append('num_questions', String(data.num_questions));
-      if (data.question_type) formData.append('question_type', data.question_type);
-      if (data.num_options != null) formData.append('num_options', String(data.num_options));
-      // DRF's ListField reads repeated multipart fields (getlist), not a JSON string — append one per value.
-      if (data.option_counts) {
-        for (const count of data.option_counts) formData.append('option_counts', String(count));
-      }
-      if (data.correct_counts) {
-        for (const count of data.correct_counts) formData.append('correct_counts', String(count));
-      }
-      body = formData;
-    } else {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(data);
-    }
-
-    const res = await fetch(`${apiBase}/api/v1/space/quiz/generate-stream/`, {
-      method: 'POST',
-      headers,
-      body,
-    });
-
-    if (!res.ok) throw new Error(`Generation failed: ${res.status}`);
-
-    const reader = res.body!.getReader();
-    const decoder = new TextDecoder();
-    let buf = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (!done) buf += decoder.decode(value, { stream: true });
-      const lines = buf.split('\n');
-      buf = done ? '' : (lines.pop() ?? '');
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          try { yield JSON.parse(line.slice(6)) as QuizStreamEvent; } catch { /* skip */ }
-        }
-      }
-      if (done) break;
-    }
-  }
-
-  public async update(uid: string, data: UpdateQuizRequest): Promise<Quiz> {
-    return this.patch<Quiz>(`/api/v1/space/quiz/${uid}/`, data);
   }
 
   public async deleteQuiz(uid: string): Promise<void> {

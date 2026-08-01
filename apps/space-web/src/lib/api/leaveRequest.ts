@@ -11,10 +11,6 @@ class SpaceLeaveRequestApiClient extends AbstractRestApiClient {
     return leaveRequestApiService.list('space', params);
   }
 
-  public async retrieve(uid: string): Promise<LeaveRequest> {
-    return leaveRequestApiService.retrieve('space', uid);
-  }
-
   public async process(uid: string, input: ProcessLeaveRequestInput): Promise<LeaveRequest> {
     return leaveRequestApiService.process(uid, input);
   }

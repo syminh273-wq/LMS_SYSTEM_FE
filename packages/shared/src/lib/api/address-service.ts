@@ -23,11 +23,6 @@ class AddressService extends AbstractRestApiClient {
     return this.put<Address>(PATH, data);
   }
 
-  /** Partial update — only the fields provided are sent. */
-  async update(data: Partial<AddressPayload>): Promise<Address> {
-    return this.patch<Address>(PATH, data);
-  }
-
   /** Soft-delete the current user's address. */
   async remove(): Promise<void> {
     await this.delete(PATH);

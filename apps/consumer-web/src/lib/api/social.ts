@@ -48,10 +48,6 @@ class SocialApiClient extends AbstractRestApiClient {
     return this.post(`/api/v1/consumer/social/posts/${uid}/comments/`, { content });
   }
 
-  public async deleteComment(uid: string, commentUid: string): Promise<void> {
-    return super.delete(`/api/v1/consumer/social/posts/${uid}/comments/${commentUid}/`);
-  }
-
   // ── Following ──────────────────────────────────────────────────────────────
   public async toggleFollow(targetUid: string): Promise<{ following: boolean }> {
     return this.post(`/api/v1/consumer/social/follow/${targetUid}/`, {});
@@ -62,21 +58,10 @@ class SocialApiClient extends AbstractRestApiClient {
   }
 
   public async getFollowing(uid?: string, limit = 50): Promise<any[]> {
-    const url = uid 
+    const url = uid
       ? `/api/v1/consumer/social/following/?uid=${uid}&limit=${limit}`
       : `/api/v1/consumer/social/following/?limit=${limit}`;
     return this.get(url);
-  }
-
-  public async getFollowers(uid?: string, limit = 50): Promise<any[]> {
-    const url = uid 
-      ? `/api/v1/consumer/social/followers/?uid=${uid}&limit=${limit}`
-      : `/api/v1/consumer/social/followers/?limit=${limit}`;
-    return this.get(url);
-  }
-
-  public async getFollowingFeed(limit = 20): Promise<Post[]> {
-    return this.get(`/api/v1/consumer/social/feed/following/?limit=${limit}`);
   }
 
   // ── Suggestions ────────────────────────────────────────────────────────────

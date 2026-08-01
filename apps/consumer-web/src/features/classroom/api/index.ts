@@ -8,10 +8,7 @@ import type {
   LeaderboardResponse,
   Message,
   PaginatedResponse,
-  CreateClassroomRequest,
-  SharingLink,
   SubmitExamFormProps,
-  UploadedResource,
 } from '@/lib/api/types';
 import type { JoinHistoryItemProps } from '@/features/classroom/types';
 
@@ -22,14 +19,6 @@ class ClassroomAPI extends AbstractRestApiClient {
 
   public async getClassrooms(page: number = 1): Promise<PaginatedResponse<ClassroomType>> {
     return this.get<PaginatedResponse<ClassroomType>>(`/api/v1/space/course/classrooms/?page=${page}`);
-  }
-
-  public async createClassroom(data: CreateClassroomRequest): Promise<ClassroomType> {
-    return this.post<ClassroomType>('/api/v1/space/course/classrooms/', data);
-  }
-
-  public async getClassroomSharingLink(uid: string): Promise<SharingLink> {
-    return this.get<SharingLink>(`/api/v1/space/course/classrooms/${uid}/sharing_link/`);
   }
 
   public async getClassroom(uid: string): Promise<ClassroomType> {
@@ -117,10 +106,6 @@ class ClassroomAPI extends AbstractRestApiClient {
     return this.post(`/api/v1/consumer/social/classrooms/${uid}/favorite/`);
   }
 
-  public async getFavoriteStatus(uid: string): Promise<{ is_favorited: boolean; favorite_count: number }> {
-    return this.get(`/api/v1/consumer/social/classrooms/${uid}/favorite/status/`);
-  }
-
   public async getFavorites(page: number = 1): Promise<PaginatedResponse<{ classroom: ClassroomType; created_at: string }>> {
     return this.get(`/api/v1/consumer/social/classrooms/favorites/?page=${page}`);
   }
@@ -162,14 +147,6 @@ class ClassroomAPI extends AbstractRestApiClient {
 
   public async submitExam(examUid: string, data: SubmitExamFormProps): Promise<ExamSubmission> {
     return this.post<ExamSubmission>(`/api/v1/consumer/course/exams/${examUid}/submissions/`, data);
-  }
-
-  public async uploadSubmissionResource(data: FormData): Promise<UploadedResource> {
-    return this.post<UploadedResource>('/api/v1/resource/upload/', data);
-  }
-
-  public async reuploadSubmissionResource(resourceUid: string, data: FormData): Promise<UploadedResource> {
-    return this.patch<UploadedResource>(`/api/v1/resource/${resourceUid}/reupload/`, data);
   }
 
   public async getClassroomsByTeacher(teacherId: string): Promise<ClassroomType[]> {

@@ -1,8 +1,8 @@
 import AbstractRestApiClient from './client';
 import type {
   Course,
-  CourseLesson,
   CourseEnrolled,
+  CourseLesson,
   CoursePreview,
   EnrollResponse,
   AccessResponse,

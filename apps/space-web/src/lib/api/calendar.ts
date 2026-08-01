@@ -29,10 +29,6 @@ class CalendarApiClient extends AbstractRestApiClient {
     return this.get<CalendarEvent[]>(`/api/v1/space/calendar/events/${buildQuery(params)}`);
   }
 
-  public async retrieve(uid: string): Promise<CalendarEvent> {
-    return this.get<CalendarEvent>(`/api/v1/space/calendar/events/${uid}/`);
-  }
-
   public async create(payload: CreateCalendarEventRequest): Promise<CalendarEvent> {
     return this.post<CalendarEvent>('/api/v1/space/calendar/events/', payload);
   }

@@ -63,18 +63,6 @@ class SpaceRankingApiClient extends AbstractRestApiClient {
       `/api/v1/space/ranking/classrooms/${classroomUid}/leaderboard/?limit=${safeLimit}`,
     );
   }
-
-  public async getStudentProfile(studentUid: string): Promise<StudentRankingProfile> {
-    return this.get<StudentRankingProfile>(
-      `/api/v1/space/ranking/students/${studentUid}/`,
-    );
-  }
-
-  public async getStudentAchievements(studentUid: string): Promise<StudentAchievement[]> {
-    return this.get<StudentAchievement[]>(
-      `/api/v1/space/ranking/students/${studentUid}/achievements/`,
-    );
-  }
 }
 
 export const spaceRankingApi = new SpaceRankingApiClient();

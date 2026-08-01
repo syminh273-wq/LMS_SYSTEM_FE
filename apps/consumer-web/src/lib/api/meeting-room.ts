@@ -41,10 +41,6 @@ class MeetingRoomApiClient extends AbstractRestApiClient {
     super();
   }
 
-  public async getByClassroom(classroomUid: string): Promise<MeetingRoom[]> {
-    return this.get<MeetingRoom[]>(`/api/v1/consumer/course/meeting-rooms/?classroom_uid=${classroomUid}`);
-  }
-
   public async getLiveRoom(classroomUid: string): Promise<LiveRoomResponse> {
     return this.get<LiveRoomResponse>(
       `/api/v1/consumer/course/meeting-rooms/live/?classroom_uid=${classroomUid}`,

@@ -36,10 +36,6 @@ class LeaveRequestApiService extends AbstractRestApiClient {
     );
   }
 
-  public async retrieve(base: 'space' | 'consumer', uid: string): Promise<LeaveRequest> {
-    return this.get<LeaveRequest>(`/api/v1/${base}/calendar/leave-requests/${uid}/`);
-  }
-
   public async create(
     base: 'consumer',
     input: CreateLeaveRequestInput

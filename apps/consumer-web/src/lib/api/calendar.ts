@@ -18,10 +18,6 @@ class ConsumerCalendarApiClient extends AbstractRestApiClient {
   public async list(params: ListCalendarEventsParams = {}): Promise<CalendarEvent[]> {
     return this.get<CalendarEvent[]>(`/api/v1/consumer/calendar/events/${buildQuery(params)}`);
   }
-
-  public async retrieve(uid: string): Promise<CalendarEvent> {
-    return this.get<CalendarEvent>(`/api/v1/consumer/calendar/events/${uid}/`);
-  }
 }
 
 export const consumerCalendarApi = new ConsumerCalendarApiClient();

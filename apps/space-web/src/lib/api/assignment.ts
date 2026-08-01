@@ -1,5 +1,5 @@
 import AbstractRestApiClient from './client';
-import type { AIGradeBatchResponse, AIGradeRequest, Exam, ExamSubmission } from './types';
+import type { Exam } from './types';
 
 class AssignmentApiClient extends AbstractRestApiClient {
   public async listByClassroom(
@@ -32,25 +32,6 @@ class AssignmentApiClient extends AbstractRestApiClient {
 
   public async deleteAssignment(uid: string): Promise<void> {
     return super.delete<void>(`/api/v1/space/course/assignments/${uid}/`);
-  }
-
-  public async listSubmissions(assignmentUid: string): Promise<ExamSubmission[]> {
-    return this.get<ExamSubmission[]>(`/api/v1/space/course/assignments/${assignmentUid}/submissions/`);
-  }
-
-  public async gradeSubmission(
-    submissionUid: string,
-    data: { grade?: number; feedback?: string }
-  ): Promise<ExamSubmission> {
-    return this.patch<ExamSubmission>(`/api/v1/space/course/assignments/submissions/${submissionUid}/grade/`, data);
-  }
-
-  public async aiGradeSubmission(submissionUid: string, data: AIGradeRequest): Promise<ExamSubmission> {
-    return this.post<ExamSubmission>(`/api/v1/space/course/assignments/submissions/${submissionUid}/ai-grade/`, data);
-  }
-
-  public async aiGradeAssignmentSubmissions(assignmentUid: string, data: AIGradeRequest): Promise<AIGradeBatchResponse> {
-    return this.post<AIGradeBatchResponse>(`/api/v1/space/course/assignments/${assignmentUid}/submissions/ai-grade/`, data);
   }
 }
 
