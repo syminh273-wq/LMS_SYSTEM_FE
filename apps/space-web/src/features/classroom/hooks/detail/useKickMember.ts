@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 export interface UseKickMemberArgs {
@@ -9,7 +9,7 @@ export interface UseKickMemberArgs {
 }
 
 export interface UseKickMemberResult {
-  kickMember: (member: ClassroomMember) => Promise<boolean>;
+  kickMember: (member: ClassroomMemberProps) => Promise<boolean>;
   kickingId: string | null;
 }
 
@@ -19,7 +19,7 @@ export function useKickMember({
 }: UseKickMemberArgs): UseKickMemberResult {
   const [kickingId, setKickingId] = useState<string | null>(null);
 
-  const kickMember = async (member: ClassroomMember): Promise<boolean> => {
+  const kickMember = async (member: ClassroomMemberProps): Promise<boolean> => {
     setKickingId(member.member_id);
     try {
       await spaceApi.classrooms.kickClassroomMember(uid, member.member_id);

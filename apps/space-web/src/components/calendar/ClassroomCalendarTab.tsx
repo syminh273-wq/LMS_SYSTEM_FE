@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ChevronLeft, ChevronRight, Plus, Loader2, CalendarDays, Repeat, CalendarPlus } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { calendarApi, classroomApi, type Classroom } from '@/lib/api';
+import { calendarApi, classroomApi, type ClassroomProps } from '@/lib/api';
 import {
   CalendarEvent,
   CalendarEventType,
@@ -60,7 +60,7 @@ export function ClassroomCalendarTab({ classroomUid, classroomName }: Props) {
   const [recurringOpen, setRecurringOpen] = useState(false);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [recurringResult, setRecurringResult] = useState<Awaited<ReturnType<typeof calendarApi.createRecurring>> | null>(null);
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<ClassroomProps[]>([]);
 
   useEffect(() => {
     let cancelled = false;

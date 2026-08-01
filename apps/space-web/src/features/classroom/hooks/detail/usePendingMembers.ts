@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { usePendingRealtime } from '@/lib/hooks/use-pending-realtime';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 export interface UsePendingMembersArgs {
@@ -10,8 +10,8 @@ export interface UsePendingMembersArgs {
 }
 
 export interface UsePendingMembersResult {
-  pendingMembers: ClassroomMember[];
-  setPendingMembers: React.Dispatch<React.SetStateAction<ClassroomMember[]>>;
+  pendingMembers: ClassroomMemberProps[];
+  setPendingMembers: React.Dispatch<React.SetStateAction<ClassroomMemberProps[]>>;
   loadingPending: boolean;
   loadPendingMembers: () => void;
 }
@@ -22,7 +22,7 @@ export function usePendingMembers({
   uid,
   t,
 }: UsePendingMembersArgs): UsePendingMembersResult {
-  const [pendingMembers, setPendingMembers] = useState<ClassroomMember[]>([]);
+  const [pendingMembers, setPendingMembers] = useState<ClassroomMemberProps[]>([]);
   const [loadingPending, setLoadingPending] = useState(false);
 
   const loadPendingMembers = useCallback(() => {

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { spaceApi, UpdateClassroomRequest, ValidationException, Classroom, ClassroomJoinLink } from '@/lib/api';
+import { spaceApi, UpdateClassroomRequest, ValidationException, ClassroomProps, ClassroomJoinLink } from '@/lib/api';
 import {
   ArrowLeft,
   Loader2,
@@ -94,7 +94,7 @@ export default function EditClassroomPage({ params }: EditClassroomPageProps) {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [globalError, setGlobalError] = useState('');
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [linkData, setLinkData] = useState<ClassroomJoinLink | null>(null);
 
   const form = useForm<EditFormValues>({

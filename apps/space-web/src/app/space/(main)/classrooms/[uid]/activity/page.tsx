@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { spaceApi } from '@/lib/api';
-import type { ActivityLog, ActivityLogEventType, ActivityLogLevel, Classroom } from '@/lib/api/types';
+import type { ActivityLog, ActivityLogEventType, ActivityLogLevel, ClassroomProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 // ── Meta helpers ──────────────────────────────────────────────────────────────
@@ -86,7 +86,7 @@ export default function ClassroomActivityPage({ params }: { params: Promise<{ ui
   const { uid } = use(params);
   const router = useRouter();
 
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [level, setLevel] = useState<ActivityLogLevel>('major');
   const [activeGroup, setActiveGroup] = useState(0);

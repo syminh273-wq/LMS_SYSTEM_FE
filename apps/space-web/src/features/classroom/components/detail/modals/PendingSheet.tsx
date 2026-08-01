@@ -1,6 +1,6 @@
 import { Loader2, X, Check, Users, RefreshCw } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 
 export default function PendingSheet({
   open,
@@ -18,12 +18,12 @@ export default function PendingSheet({
 }: {
   open: boolean;
   onClose: () => void;
-  pendingMembers: ClassroomMember[];
+  pendingMembers: ClassroomMemberProps[];
   loadingPending: boolean;
   approvingId: string | null;
   rejectingId: string | null;
-  onApproveMember: (member: ClassroomMember) => Promise<void>;
-  onRejectMember: (member: ClassroomMember) => Promise<void>;
+  onApproveMember: (member: ClassroomMemberProps) => Promise<void>;
+  onRejectMember: (member: ClassroomMemberProps) => Promise<void>;
   onApproveAll: () => Promise<void>;
   onRefresh: () => void;
   formatDateTime: (v: string) => string;

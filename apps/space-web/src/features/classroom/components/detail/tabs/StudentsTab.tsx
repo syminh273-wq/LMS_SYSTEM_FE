@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { useClassroomMembers } from '@/features/classroom/hooks/detail/useClassroomMembers';
 import { useKickMember } from '@/features/classroom/hooks/detail/useKickMember';
 import { useBlockMember } from '@/features/classroom/hooks/detail/useBlockMember';
@@ -38,8 +38,8 @@ export default function StudentsTab({
   const { kickMember, kickingId } = useKickMember({ uid: classroomUid, t });
   const { blockMember, blockingMemberId } = useBlockMember({ uid: classroomUid, t });
 
-  const [memberToKick, setMemberToKick] = useState<ClassroomMember | null>(null);
-  const [memberToBlock, setMemberToBlock] = useState<{ member: ClassroomMember; scope: 'classroom' | 'global' } | null>(null);
+  const [memberToKick, setMemberToKick] = useState<ClassroomMemberProps | null>(null);
+  const [memberToBlock, setMemberToBlock] = useState<{ member: ClassroomMemberProps; scope: 'classroom' | 'global' } | null>(null);
 
   const onKickConfirm = async () => {
     if (!memberToKick) return;

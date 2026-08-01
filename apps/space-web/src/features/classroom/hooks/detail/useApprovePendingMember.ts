@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 export interface UseApprovePendingMemberArgs {
@@ -9,7 +9,7 @@ export interface UseApprovePendingMemberArgs {
 }
 
 export interface UseApprovePendingMemberResult {
-  approveMember: (member: ClassroomMember) => Promise<boolean>;
+  approveMember: (member: ClassroomMemberProps) => Promise<boolean>;
   approvingId: string | null;
 }
 
@@ -19,7 +19,7 @@ export function useApprovePendingMember({
 }: UseApprovePendingMemberArgs): UseApprovePendingMemberResult {
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
-  const approveMember = async (member: ClassroomMember) => {
+  const approveMember = async (member: ClassroomMemberProps) => {
     setApprovingId(member.member_id);
     try {
       await spaceApi.classrooms.approveClassroomMember(uid, member.member_id);

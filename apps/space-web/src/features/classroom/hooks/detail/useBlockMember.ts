@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 export interface UseBlockMemberArgs {
@@ -9,7 +9,7 @@ export interface UseBlockMemberArgs {
 }
 
 export interface UseBlockMemberResult {
-  blockMember: (member: ClassroomMember, scope: 'classroom' | 'global') => Promise<boolean>;
+  blockMember: (member: ClassroomMemberProps, scope: 'classroom' | 'global') => Promise<boolean>;
   blockingMemberId: string | null;
 }
 
@@ -19,7 +19,7 @@ export function useBlockMember({
 }: UseBlockMemberArgs): UseBlockMemberResult {
   const [blockingMemberId, setBlockingMemberId] = useState<string | null>(null);
 
-  const blockMember = async (member: ClassroomMember, scope: 'classroom' | 'global'): Promise<boolean> => {
+  const blockMember = async (member: ClassroomMemberProps, scope: 'classroom' | 'global'): Promise<boolean> => {
     setBlockingMemberId(member.member_id);
     try {
       if (scope === 'global') {

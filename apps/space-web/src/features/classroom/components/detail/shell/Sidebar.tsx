@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import { Card } from '@shared/components/ui/card';
-import type { Classroom, ClassroomJoinLink } from '@/lib/api';
+import type { ClassroomProps, ClassroomJoinLink } from '@/lib/api';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import type { ActiveTab, ActiveTabKey } from '@/features/classroom/components/detail/utils/tabs';
 
@@ -34,7 +34,7 @@ interface SidebarProps {
   studentCount: number;
   blacklistCount: number;
   activeMeeting: MeetingRoom | null;
-  classroom: Classroom;
+  classroom: ClassroomProps;
   linkData: ClassroomJoinLink | null;
   onDownloadQr: () => void;
   t: (key: string, fallback?: string, vars?: Record<string, unknown>) => string;

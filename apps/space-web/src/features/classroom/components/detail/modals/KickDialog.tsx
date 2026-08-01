@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@shared/components/ui/dialog';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 
 export default function KickDialog({
   memberToKick,
@@ -15,7 +15,7 @@ export default function KickDialog({
   kickingId,
   t,
 }: {
-  memberToKick: ClassroomMember | null;
+  memberToKick: ClassroomMemberProps | null;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   kickingId: string | null;

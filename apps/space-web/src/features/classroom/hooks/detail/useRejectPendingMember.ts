@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 export interface UseRejectPendingMemberArgs {
@@ -9,7 +9,7 @@ export interface UseRejectPendingMemberArgs {
 }
 
 export interface UseRejectPendingMemberResult {
-  rejectMember: (member: ClassroomMember) => Promise<boolean>;
+  rejectMember: (member: ClassroomMemberProps) => Promise<boolean>;
   rejectingId: string | null;
 }
 
@@ -19,7 +19,7 @@ export function useRejectPendingMember({
 }: UseRejectPendingMemberArgs): UseRejectPendingMemberResult {
   const [rejectingId, setRejectingId] = useState<string | null>(null);
 
-  const rejectMember = async (member: ClassroomMember) => {
+  const rejectMember = async (member: ClassroomMemberProps) => {
     setRejectingId(member.member_id);
     try {
       await spaceApi.classrooms.rejectClassroomMember(uid, member.member_id);

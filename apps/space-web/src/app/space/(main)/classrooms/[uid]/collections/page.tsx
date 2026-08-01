@@ -8,7 +8,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
 import { quizCollectionApi } from '@/lib/api/quiz-collection';
 import { classroomApi } from '@/features/classroom/api';
-import type { QuizCollection, Classroom, QuizCollectionAssignment } from '@/lib/api/types';
+import type { QuizCollection, ClassroomProps, QuizCollectionAssignment } from '@/lib/api/types';
 
 interface Props {
   params: Promise<{ uid: string }>;
@@ -18,7 +18,7 @@ export default function ClassroomCollectionsPage({ params }: Props) {
   const router = useRouter();
   const { t } = useTranslation();
   const classroomUid = use(params).uid;
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [collections, setCollections] = useState<QuizCollection[]>([]);
   const [assignments, setAssignments] = useState<Record<string, QuizCollectionAssignment[]>>({});
   const [loading, setLoading] = useState(true);

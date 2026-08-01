@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { parseVnDate } from '@shared/lib/datetime';
 import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/features/classroom/api';
-import type { QuizDetail, Classroom, QuizAttemptRecord, QuizAssignment, QuizQuestion } from '@/lib/api/types';
+import type { QuizDetail, ClassroomProps, QuizAttemptRecord, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
   Loader2, ArrowLeft, BookOpen, CheckCircle2,
   Plus, X, Link2, BarChart2, Clock, RotateCcw, Settings,
@@ -448,7 +448,7 @@ function AssignToClassroomModal({
   onClose: () => void;
   onAssigned: (a: QuizAssignment) => void;
 }) {
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<ClassroomProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState<string | null>(null);
 

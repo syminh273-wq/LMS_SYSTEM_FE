@@ -1,7 +1,7 @@
 import AbstractRestApiClient from '@/lib/api/client';
 import type {
-  Classroom,
-  ClassroomMember,
+  ClassroomProps,
+  ClassroomMemberProps,
   ClassroomPreviewResponse,
   StudentExamRecord,
   PaginatedResponse,
@@ -17,20 +17,20 @@ class ClassroomAPI extends AbstractRestApiClient {
     super();
   }
 
-  public async getClassrooms(page: number = 1): Promise<PaginatedResponse<Classroom>> {
-    return this.get<PaginatedResponse<Classroom>>(`/api/v1/space/course/classrooms/?page=${page}`);
+  public async getClassrooms(page: number = 1): Promise<PaginatedResponse<ClassroomProps>> {
+    return this.get<PaginatedResponse<ClassroomProps>>(`/api/v1/space/course/classrooms/?page=${page}`);
   }
 
-  public async createClassroom(data: CreateClassroomRequest): Promise<Classroom> {
-    return this.post<Classroom>('/api/v1/space/course/classrooms/', data);
+  public async createClassroom(data: CreateClassroomRequest): Promise<ClassroomProps> {
+    return this.post<ClassroomProps>('/api/v1/space/course/classrooms/', data);
   }
 
-  public async getClassroom(uid: string): Promise<Classroom> {
-    return this.get<Classroom>(`/api/v1/space/course/classrooms/${uid}/`);
+  public async getClassroom(uid: string): Promise<ClassroomProps> {
+    return this.get<ClassroomProps>(`/api/v1/space/course/classrooms/${uid}/`);
   }
 
-  public async updateClassroom(uid: string, data: UpdateClassroomRequest): Promise<Classroom> {
-    return this.patch<Classroom>(`/api/v1/space/course/classrooms/${uid}/`, data);
+  public async updateClassroom(uid: string, data: UpdateClassroomRequest): Promise<ClassroomProps> {
+    return this.patch<ClassroomProps>(`/api/v1/space/course/classrooms/${uid}/`, data);
   }
 
   public async deleteClassroom<TResponse = any>(uid: string, options?: RequestInit): Promise<TResponse> {
@@ -41,16 +41,16 @@ class ClassroomAPI extends AbstractRestApiClient {
     return this.get<SharingLink>(`/api/v1/space/course/classrooms/${uid}/sharing_link/`);
   }
 
-  public async getClassroomMembers(uid: string): Promise<ClassroomMember[]> {
-    return this.get<ClassroomMember[]>(`/api/v1/space/course/classrooms/${uid}/members/`);
+  public async getClassroomMembers(uid: string): Promise<ClassroomMemberProps[]> {
+    return this.get<ClassroomMemberProps[]>(`/api/v1/space/course/classrooms/${uid}/members/`);
   }
 
-  public async getPendingMembers(uid: string): Promise<ClassroomMember[]> {
-    return this.get<ClassroomMember[]>(`/api/v1/space/course/classrooms/${uid}/members/?status=pending`);
+  public async getPendingMembers(uid: string): Promise<ClassroomMemberProps[]> {
+    return this.get<ClassroomMemberProps[]>(`/api/v1/space/course/classrooms/${uid}/members/?status=pending`);
   }
 
-  public async approveClassroomMember(classroomUid: string, memberId: string): Promise<ClassroomMember> {
-    return this.post<ClassroomMember>(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/approve/`);
+  public async approveClassroomMember(classroomUid: string, memberId: string): Promise<ClassroomMemberProps> {
+    return this.post<ClassroomMemberProps>(`/api/v1/space/course/classrooms/${classroomUid}/members/${memberId}/approve/`);
   }
 
   public async rejectClassroomMember(classroomUid: string, memberId: string): Promise<void> {
@@ -89,12 +89,12 @@ class ClassroomAPI extends AbstractRestApiClient {
     return super.delete(`/api/v1/space/course/blacklist/${consumer_uid}/`);
   }
 
-  public async getMyClassrooms(page: number = 1): Promise<PaginatedResponse<Classroom>> {
-    return this.get<PaginatedResponse<Classroom>>(`/api/v1/space/course/classrooms/?page=${page}`);
+  public async getMyClassrooms(page: number = 1): Promise<PaginatedResponse<ClassroomProps>> {
+    return this.get<PaginatedResponse<ClassroomProps>>(`/api/v1/space/course/classrooms/?page=${page}`);
   }
 
-  public async getClassroomsByTeacher(teacherId: string): Promise<Classroom[]> {
-    return this.get<Classroom[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
+  public async getClassroomsByTeacher(teacherId: string): Promise<ClassroomProps[]> {
+    return this.get<ClassroomProps[]>(`/api/v1/consumer/course/classrooms/by-teacher/?teacher_id=${encodeURIComponent(teacherId)}`);
   }
 
   public async getClassroomPreview(uid: string): Promise<ClassroomPreviewResponse> {

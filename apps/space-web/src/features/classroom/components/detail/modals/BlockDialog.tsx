@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@shared/components/ui/dialog';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 
 export default function BlockDialog({
   memberToBlock,
@@ -15,7 +15,7 @@ export default function BlockDialog({
   blockingMemberId,
   t,
 }: {
-  memberToBlock: { member: ClassroomMember; scope: 'classroom' | 'global' } | null;
+  memberToBlock: { member: ClassroomMemberProps; scope: 'classroom' | 'global' } | null;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   blockingMemberId: string | null;

@@ -2,10 +2,10 @@ import * as React from 'react';
 import { ArrowLeft, Settings, Users } from 'lucide-react';
 import { Button } from '@shared/components/ui/button';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import type { Classroom } from '@/lib/api';
+import type { ClassroomProps } from '@/lib/api';
 
 interface HeaderProps {
-  classroom: Classroom;
+  classroom: ClassroomProps;
   pendingMembersCount: number;
   onOpenPendingSheet: () => void;
   onLoadPendingMembers: () => void;

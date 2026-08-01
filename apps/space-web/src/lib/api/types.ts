@@ -94,7 +94,7 @@ export type UpdateSpaceRequest = {
   cover_url?: string;
 };
 
-export type Classroom = {
+export type ClassroomProps = {
   uid: string;
   pid: string;
   name: string;
@@ -125,7 +125,7 @@ export type Classroom = {
 type ClassroomPreviewActionType = 'join' | 'checkout' | 'none';
 
 export type ClassroomPreviewResponse = {
-  classroom: Classroom & { is_favorited?: boolean; favorite_count?: number };
+  classroom: ClassroomProps & { is_favorited?: boolean; favorite_count?: number };
   preview: {
     folder: { uid: string; name: string } | null;
     items: Array<
@@ -311,8 +311,8 @@ export type ExamAnalyticsStats = {
 
 export type ExamAnalyticsResponse = {
   exam: Exam;
-  classroom: Classroom;
-  students: ClassroomMember[];
+  classroom: ClassroomProps;
+  students: ClassroomMemberProps[];
   submissions: ExamSubmission[];
   stats: ExamAnalyticsStats;
 };
@@ -372,7 +372,7 @@ export type SharingLink = {
   updated_at: string;
 };
 
-// Built locally from Classroom.pid — no separate sharing_link request needed.
+// Built locally from ClassroomProps.pid — no separate sharing_link request needed.
 export type ClassroomJoinLink = Pick<SharingLink, 'code'>;
 
 type QuizStatus = 'draft' | 'published' | 'archived';
@@ -603,7 +603,7 @@ export type ChatConversation = {
   created_at: string;
 };
 
-export type ClassroomMember = {
+export type ClassroomMemberProps = {
   member_id: string;
   member_type: 'space' | 'consumer';
   member_name: string;
@@ -633,7 +633,7 @@ export type StudentExamRecord = {
 };
 
 export type StudentStatsResponse = {
-  member: ClassroomMember | null;
+  member: ClassroomMemberProps | null;
   profile: StudentPublicProfile | null;
   submissions: StudentExamRecord[];
   ranking: {

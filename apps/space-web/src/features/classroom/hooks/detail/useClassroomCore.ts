@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { spaceApi, Classroom, ClassroomJoinLink } from '@/lib/api';
+import { spaceApi, ClassroomProps, ClassroomJoinLink } from '@/lib/api';
 import { toast } from 'sonner';
 
 type ActiveTab = 'info' | 'docs' | 'chat' | 'meeting' | 'assignments' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking';
@@ -37,7 +37,7 @@ export interface UseClassroomCoreArgs {
 
 export interface UseClassroomCoreResult {
   fetching: boolean;
-  classroom: Classroom | null;
+  classroom: ClassroomProps | null;
   linkData: ClassroomJoinLink | null;
   activeTab: ActiveTab;
   setActiveTab: React.Dispatch<React.SetStateAction<ActiveTab>>;
@@ -56,7 +56,7 @@ export function useClassroomCore({
   t,
 }: UseClassroomCoreArgs): UseClassroomCoreResult {
   const [fetching, setFetching] = useState(false);
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [linkData, setLinkData] = useState<ClassroomJoinLink | null>(null);
   const [activeTab, setActiveTab] = useState<'info' | 'docs' | 'chat' | 'meeting' | 'assignments' | 'exams' | 'final_exams' | 'quiz' | 'students' | 'ai' | 'blacklist' | 'calendar' | 'leave_request' | 'ranking'>('info');
   const [selectedExamKind, setSelectedExamKind] = useState<ExamKind>('midterm');

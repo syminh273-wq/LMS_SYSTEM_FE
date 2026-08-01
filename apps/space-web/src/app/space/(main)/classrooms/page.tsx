@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { spaceApi, PaginatedResponse, Classroom } from '@/lib/api';
+import { spaceApi, PaginatedResponse, ClassroomProps } from '@/lib/api';
 import { 
   Plus, 
   Search, 
@@ -67,7 +67,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 export default function ClassroomsPage() {
   const router = useRouter();
   const { t, formatDate: localeFormatDate } = useTranslation();
-  const [data, setData] = useState<PaginatedResponse<Classroom> | null>(null);
+  const [data, setData] = useState<PaginatedResponse<ClassroomProps> | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,7 +88,7 @@ export default function ClassroomsPage() {
     }
   };
 
-  const handleDownloadQr = async (classroom: Classroom) => {
+  const handleDownloadQr = async (classroom: ClassroomProps) => {
     try {
       const code = classroom.resolve_link?.code || classroom.pid;
 

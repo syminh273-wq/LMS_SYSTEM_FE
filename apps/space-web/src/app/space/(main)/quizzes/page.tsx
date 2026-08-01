@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { quizApi } from '@/lib/api/quiz';
 import { classroomApi } from '@/features/classroom/api';
-import type { Quiz, QuizDetail, Classroom, QuizAssignment, QuizQuestion } from '@/lib/api/types';
+import type { Quiz, QuizDetail, ClassroomProps, QuizAssignment, QuizQuestion } from '@/lib/api/types';
 import {
   Loader2, Plus, Trash2, BookOpen, Wand2, Pencil,
   ChevronDown, ChevronUp, Link2, Clock, RotateCcw, Settings,
@@ -450,7 +450,7 @@ function AssignToClassroomModal({
   onClose: () => void;
   onAssigned: (a: QuizAssignment) => void;
 }) {
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<ClassroomProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState<string | null>(null);
 

@@ -26,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import { Classroom, Exam, ExamContentType, ExamStatus, quizApi, Quiz, spaceApi } from '@/lib/api';
+import { ClassroomProps, Exam, ExamContentType, ExamStatus, quizApi, Quiz, spaceApi } from '@/lib/api';
 
 interface EditExamPageProps {
   params: Promise<{ uid: string; examUid: string }>;
@@ -94,7 +94,7 @@ export default function EditExamPage({ params }: EditExamPageProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<File | null>(null);
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [exam, setExam] = useState<Exam | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [fetching, setFetching] = useState(true);

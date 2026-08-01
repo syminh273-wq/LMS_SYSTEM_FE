@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 export interface UseClassroomMembersArgs {
@@ -9,8 +9,8 @@ export interface UseClassroomMembersArgs {
 }
 
 export interface UseClassroomMembersResult {
-  members: ClassroomMember[];
-  setMembers: React.Dispatch<React.SetStateAction<ClassroomMember[]>>;
+  members: ClassroomMemberProps[];
+  setMembers: React.Dispatch<React.SetStateAction<ClassroomMemberProps[]>>;
   loadingMembers: boolean;
 }
 
@@ -18,7 +18,7 @@ export function useClassroomMembers({
   uid,
   t,
 }: UseClassroomMembersArgs): UseClassroomMembersResult {
-  const [members, setMembers] = useState<ClassroomMember[]>([]);
+  const [members, setMembers] = useState<ClassroomMemberProps[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { spaceApi, Classroom } from '@/lib/api';
+import { spaceApi, ClassroomProps } from '@/lib/api';
 import type { MeetingRoom } from '@/lib/api/meeting-room';
 import { toast } from 'sonner';
 
@@ -9,7 +9,7 @@ export interface UseStartMeetingArgs {
 }
 
 export interface UseStartMeetingResult {
-  startMeeting: (classroom: Classroom, activeMeeting: MeetingRoom | null) => Promise<MeetingRoom | null>;
+  startMeeting: (classroom: ClassroomProps, activeMeeting: MeetingRoom | null) => Promise<MeetingRoom | null>;
   starting: boolean;
 }
 
@@ -19,7 +19,7 @@ export function useStartMeeting({
 }: UseStartMeetingArgs): UseStartMeetingResult {
   const [starting, setStarting] = useState(false);
 
-  const startMeeting = async (classroom: Classroom, activeMeeting: MeetingRoom | null) => {
+  const startMeeting = async (classroom: ClassroomProps, activeMeeting: MeetingRoom | null) => {
     setStarting(true);
     try {
       const room = activeMeeting || await spaceApi.meetingRooms.quickStart({

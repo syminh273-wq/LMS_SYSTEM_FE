@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ChevronLeft, ChevronRight, Plus, Loader2, Calendar as CalendarIcon, Repeat, CalendarPlus } from 'lucide-react';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import { calendarApi, classroomApi, type Classroom } from '@/lib/api';
+import { calendarApi, classroomApi, type ClassroomProps } from '@/lib/api';
 import {
   CalendarEvent,
   CalendarEventType,
@@ -48,7 +48,7 @@ const TYPE_FILTERS: Array<{ key: CalendarEventType | 'all'; labelKey: string }> 
 
 export default function SpaceCalendarPage() {
   const { t, locale } = useTranslation();
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<ClassroomProps[]>([]);
   const [classroomFilter, setClassroomFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<CalendarEventType | 'all'>('all');
   const [editing, setEditing] = useState<CalendarEvent | null>(null);

@@ -30,7 +30,7 @@ import { classroomApi } from '@/features/classroom/api';
 import type {
   QuizCollectionDetail,
   QuizCollectionItem,
-  Classroom,
+  ClassroomProps,
   Quiz,
 } from '@/lib/api/types';
 import { AddQuizDialog } from '@/components/quiz-collection/AddQuizDialog';
@@ -101,7 +101,7 @@ export default function CollectionDetailPage({ params }: Props) {
   const [uid, setUid] = useState<string | null>(null);
   const [detail, setDetail] = useState<QuizCollectionDetail | null>(null);
   const [quizzes, setQuizzes] = useState<Record<string, Quiz>>({});
-  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [classrooms, setClassrooms] = useState<ClassroomProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');

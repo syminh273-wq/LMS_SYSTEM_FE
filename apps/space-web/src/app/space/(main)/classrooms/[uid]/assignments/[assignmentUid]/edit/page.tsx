@@ -26,7 +26,7 @@ import {
 } from '@shared/components/ui/form';
 import { Textarea } from '@shared/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shared/components/ui/dialog';
-import { Classroom, Exam, ExamStatus, spaceApi } from '@/lib/api';
+import { ClassroomProps, Exam, ExamStatus, spaceApi } from '@/lib/api';
 
 interface EditAssignmentPageProps {
   params: Promise<{ uid: string; assignmentUid: string }>;
@@ -66,7 +66,7 @@ export default function EditAssignmentPage({ params }: EditAssignmentPageProps) 
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [assignment, setAssignment] = useState<Exam | null>(null);
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);

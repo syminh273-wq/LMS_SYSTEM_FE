@@ -9,12 +9,12 @@ import {
   DialogFooter,
 } from '@shared/components/ui/dialog';
 import { useTranslation } from '@shared/components/LocaleProvider';
-import type { Classroom } from '@/lib/api/types';
+import type { ClassroomProps } from '@/lib/api/types';
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  classrooms: Classroom[];
+  classrooms: ClassroomProps[];
   existingIds: string[];
   onConfirm: (classroomId: string) => Promise<void> | void;
 }

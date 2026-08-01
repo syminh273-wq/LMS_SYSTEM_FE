@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { spaceApi } from '@/lib/api';
-import type { ClassroomMember } from '@/lib/api/types';
+import type { ClassroomMemberProps } from '@/lib/api/types';
 import { useClassroomCore } from '@/features/classroom/hooks/detail/useClassroomCore';
 import { usePendingMembers } from '@/features/classroom/hooks/detail/usePendingMembers';
 import { useApprovePendingMember } from '@/features/classroom/hooks/detail/useApprovePendingMember';
@@ -107,7 +107,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
   const { rejectMember, rejectingId } = useRejectPendingMember({ uid, t });
   const [showPendingSheet, setShowPendingSheet] = useState(false);
 
-  const handleApproveMember = useCallback(async (member: ClassroomMember) => {
+  const handleApproveMember = useCallback(async (member: ClassroomMemberProps) => {
     const ok = await approveMember(member);
     if (ok) {
       pendingQuery.setPendingMembers((prev) => prev.filter((m) => m.member_id !== member.member_id));
@@ -115,7 +115,7 @@ export default function ClassroomDetailsPage({ params }: ClassroomDetailsPagePro
     }
   }, [approveMember, pendingQuery, fetchStudentCount]);
 
-  const handleRejectMember = useCallback(async (member: ClassroomMember) => {
+  const handleRejectMember = useCallback(async (member: ClassroomMemberProps) => {
     const ok = await rejectMember(member);
     if (ok) {
       pendingQuery.setPendingMembers((prev) => prev.filter((m) => m.member_id !== member.member_id));

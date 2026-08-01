@@ -11,7 +11,7 @@ import { useTranslation } from '@shared/components/LocaleProvider';
 import { accountService, type PublicAccountProfile } from '@/lib/api/account';
 import { portfolioApi, type Portfolio, type PortfolioEntry } from '@/lib/api/portfolio';
 import { classroomApi } from '@/features/classroom/api';
-import type { Classroom } from '@/lib/api/types';
+import type { ClassroomProps } from '@/lib/api/types';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { socialApi } from '@/lib/api/social';
 import type { RootState } from '@/lib/redux/store';
@@ -75,7 +75,7 @@ export default function PublicProfilePage() {
   const [profile, setProfile] = useState<SpaceProfile | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceProfile | null>(null);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
-  const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
+  const [teachingClasses, setTeachingClasses] = useState<ClassroomProps[]>([]);
   const [teachingLoading, setTeachingLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -117,8 +117,8 @@ export default function PublicProfilePage() {
         const [pf, classes, followStatus] = await Promise.all([
           portfolioApi.getPublic(ownerType, targetUid).catch(() => null),
           ownerType === 'space'
-            ? classroomApi.getClassroomsByTeacher(targetUid).catch(() => [] as Classroom[])
-            : Promise.resolve([] as Classroom[]),
+            ? classroomApi.getClassroomsByTeacher(targetUid).catch(() => [] as ClassroomProps[])
+            : Promise.resolve([] as ClassroomProps[]),
           !owner ? socialApi.getFollowStatus(targetUid).catch(() => ({ following: false })) : Promise.resolve({ following: false }),
         ]);
         if (cancelled) return;

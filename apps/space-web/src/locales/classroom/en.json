@@ -1,6 +1,6 @@
 {
   "labels": {
-    "title": "Classroom",
+    "title": "ClassroomProps",
     "create_class": "Create Class",
     "class_name": "Class Name",
     "subject": "Subject",
@@ -230,7 +230,7 @@
     "filter_documents": "Documents",
     "filter_exams": "Exams",
     "filter_students": "Students",
-    "filter_classroom": "Classroom",
+    "filter_classroom": "ClassroomProps",
     "events_count": "{{count}} events",
     "filter_by_search": "filtered by \"{{query}}\"",
     "filter_by_group": "group \"{{group}}\"",

@@ -41,7 +41,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@shared/components/ui/dropdown-menu';
-import { classroomApi, examApi, type Classroom, type ClassroomMember, type Exam, type ExamSession, type ExamSubmission } from '@/lib/api';
+import { classroomApi, examApi, type ClassroomProps, type ClassroomMemberProps, type Exam, type ExamSession, type ExamSubmission } from '@/lib/api';
 import { SubmissionAuditModal } from '@/components/exam/submission-audit-modal';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { toast } from 'sonner';
@@ -49,7 +49,7 @@ import { toast } from 'sonner';
 type SubmissionFilter = 'submitted' | 'missing';
 type ExamDetailTab = 'submissions' | 'online';
 type GradeFilter = 'all' | 'submitted' | 'missing' | 'graded' | 'ungraded';
-type GradeRow = { member: ClassroomMember; submission: ExamSubmission | null };
+type GradeRow = { member: ClassroomMemberProps; submission: ExamSubmission | null };
 
 interface OpenExamSettings {
   camera_required: boolean;
@@ -63,9 +63,9 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, formatDateTime } = useTranslation();
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [exam, setExam] = useState<Exam | null>(null);
-  const [members, setMembers] = useState<ClassroomMember[]>([]);
+  const [members, setMembers] = useState<ClassroomMemberProps[]>([]);
   const [submissions, setSubmissions] = useState<ExamSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -85,7 +85,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
 
   // Grade table state (moved from modal)
   const [gradeTableLoading, setGradeTableLoading] = useState(false);
-  const membersRef = useRef<ClassroomMember[]>([]);
+  const membersRef = useRef<ClassroomMemberProps[]>([]);
   const [gradeTableError, setGradeTableError] = useState('');
   const [activeStudentId, setActiveStudentId] = useState<string | null>(null);
   const [grade, setGrade] = useState('');
@@ -160,7 +160,7 @@ export default function SpaceExamDetailPage({ params }: { params: Promise<{ uid:
         if (membersRef.current.length === 0) {
           const memberData = await classroomApi.getClassroomMembers(uid);
           if (cancelled) return;
-          const studentsOnly = memberData.filter((m: ClassroomMember) => m.role === 'student' && m.status === 'approved');
+          const studentsOnly = memberData.filter((m: ClassroomMemberProps) => m.role === 'student' && m.status === 'approved');
           setMembers(studentsOnly);
           membersRef.current = studentsOnly;
         }
@@ -831,7 +831,7 @@ function GradeTableEmptyState({ title, description }: { title: string; descripti
   );
 }
 
-function StudentIdentity({ member }: { member: ClassroomMember }) {
+function StudentIdentity({ member }: { member: ClassroomMemberProps }) {
   return (
     <div className="flex items-center gap-2.5">
       <Avatar className="size-8 rounded-lg">
@@ -878,7 +878,7 @@ function SubmissionGradingDrawer({
   onAIGrade,
   onClose,
 }: {
-  row: { member: ClassroomMember; submission: ExamSubmission };
+  row: { member: ClassroomMemberProps; submission: ExamSubmission };
   grade: string;
   feedback: string;
   saving: boolean;

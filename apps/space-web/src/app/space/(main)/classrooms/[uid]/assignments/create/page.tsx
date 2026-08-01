@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from '@shared/components/ui/form';
 import { Textarea } from '@shared/components/ui/textarea';
-import { Classroom, ExamStatus, spaceApi } from '@/lib/api';
+import { ClassroomProps, ExamStatus, spaceApi } from '@/lib/api';
 
 interface CreateAssignmentPageProps {
   params: Promise<{ uid: string }>;
@@ -65,7 +65,7 @@ export default function CreateAssignmentPage({ params }: CreateAssignmentPagePro
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<File | null>(null);
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
 

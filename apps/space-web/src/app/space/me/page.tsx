@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
 import { classroomApi } from '@/features/classroom/api';
-import type { Classroom } from '@/lib/api/types';
+import type { ClassroomProps } from '@/lib/api/types';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
 import { setProfile } from '@/features/auth/store';
@@ -41,7 +41,7 @@ export default function MePage() {
   const [workspaceOverride, setWorkspaceOverride] = useState<WorkspaceProfile | null>(null);
   const workspace = workspaceOverride ?? socialProfile;
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
-  const [teachingClasses, setTeachingClasses] = useState<Classroom[]>([]);
+  const [teachingClasses, setTeachingClasses] = useState<ClassroomProps[]>([]);
   const [teachingLoading, setTeachingLoading] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
@@ -59,7 +59,7 @@ export default function MePage() {
       try {
         const [pf, list] = await Promise.all([
           portfolioApi.getMine().catch(() => null),
-          classroomApi.getClassroomsByTeacher(profile.uid).catch(() => [] as Classroom[]),
+          classroomApi.getClassroomsByTeacher(profile.uid).catch(() => [] as ClassroomProps[]),
         ]);
         setPortfolio(pf);
         setTeachingClasses(list);

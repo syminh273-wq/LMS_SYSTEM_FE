@@ -25,7 +25,7 @@ import {
   FormMessage,
 } from '@shared/components/ui/form';
 import { Textarea } from '@shared/components/ui/textarea';
-import { Classroom, ExamContentType, ExamStatus, quizApi, spaceApi, Quiz } from '@/lib/api';
+import { ClassroomProps, ExamContentType, ExamStatus, quizApi, spaceApi, Quiz } from '@/lib/api';
 
 interface CreateExamPageProps {
   params: Promise<{ uid: string }>;
@@ -105,7 +105,7 @@ export default function CreateExamPage({ params }: CreateExamPageProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<File | null>(null);
-  const [classroom, setClassroom] = useState<Classroom | null>(null);
+  const [classroom, setClassroom] = useState<ClassroomProps | null>(null);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
