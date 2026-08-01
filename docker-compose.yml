@@ -1,0 +1,23 @@
+# LMS_SYSTEM frontend: consumer-web (port 3000) + space-web (port 3003).
+# Both build from the monorepo root (yarn workspaces) — see apps/*/Dockerfile.
+# Run:   docker compose up -d --build
+# Stop:  docker compose down
+# Logs:  docker compose logs -f
+services:
+  consumer-web:
+    build:
+      context: .
+      dockerfile: apps/consumer-web/Dockerfile
+    container_name: lms-consumer-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+
+  space-web:
+    build:
+      context: .
+      dockerfile: apps/space-web/Dockerfile
+    container_name: lms-space-web
+    restart: unless-stopped
+    ports:
+      - "3003:3003"

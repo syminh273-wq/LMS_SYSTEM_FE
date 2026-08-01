@@ -1,0 +1,15 @@
+**/node_modules
+**/.next
+**/.turbo
+**/out
+.git
+.gitignore
+.idea
+.vscode
+.claude
+*.log
+.DS_Store
+docs/
+Dockerfile
+docker-compose*.yml
+.dockerignore
