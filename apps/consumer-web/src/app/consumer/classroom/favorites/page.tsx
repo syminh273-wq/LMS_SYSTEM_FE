@@ -4,8 +4,8 @@ import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, type ClassroomFavoriteItem } from '@/lib/api';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
-import { useMe } from '@/lib/hooks/use-me';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
+import { useMe } from '@/features/auth/hooks/useMe';
 import { toast } from 'sonner';
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 import { cn } from '@/lib/utils';
@@ -34,7 +34,7 @@ const formatPrice = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + 'Ä
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const { me } = useMe();
 
   const [items, setItems] = useState<ClassroomFavoriteItem[]>([]);
@@ -54,9 +54,9 @@ export default function FavoritesPage() {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated || !mounted) return;
+    if (!isAuthenticated || !isMounted) return;
     void fetchFavorites();
-  }, [isAuthenticated, mounted, fetchFavorites]);
+  }, [isAuthenticated, isMounted, fetchFavorites]);
 
   const filtered = items.filter((it) => {
     if (!search.trim()) return true;
@@ -73,7 +73,7 @@ export default function FavoritesPage() {
     }
   };
 
-  if (!mounted) {
+  if (!isMounted) {
     return (
       <div className="flex items-center justify-center py-32">
         <Loader2 size={32} className="animate-spin text-muted-foreground" />

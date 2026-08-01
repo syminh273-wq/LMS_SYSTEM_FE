@@ -9,7 +9,7 @@ import { ArrowLeft, ArrowRight, Mail, ShieldCheck } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
-import { authApi } from '@/lib/api/auth';
+import { authApi } from '@/features/auth/api';
 
 type FormValues = { email: string };
 
@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      await authApi.consumerForgotPassword({ email: data.email });
+      await authApi.forgotPasswordAsConsumer({ email: data.email });
       toast.success('Mã OTP đã được gửi về email của bạn.');
       router.push(`/consumer/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (err: unknown) {

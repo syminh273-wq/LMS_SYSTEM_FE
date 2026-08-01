@@ -27,13 +27,13 @@ import { Input } from '@shared/components/ui/input';
 import { Card, CardContent, CardHeader } from '@shared/components/ui/card';
 import { Label } from '@shared/components/ui/label';
 import { classroomApi, Classroom, Exam, ExamContentType, ExamSubmission, ExamSubmissionType } from '@/lib/api';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { FaceMonitorWidget } from '@/components/face/face-monitor-widget';
 
 export default function ConsumerExamDetailPage({ params }: { params: Promise<{ uid: string; examUid: string }> }) {
   const { uid, examUid } = use(params);
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [exam, setExam] = useState<Exam | null>(null);
   const [submission, setSubmission] = useState<ExamSubmission | null>(null);
@@ -96,7 +96,7 @@ export default function ConsumerExamDetailPage({ params }: { params: Promise<{ u
     if (selectedPreviewFile?.url.startsWith('blob:')) URL.revokeObjectURL(selectedPreviewFile.url);
   }, [selectedPreviewFile]);
 
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   if (loading) {
     return <ExamResultSkeleton />;

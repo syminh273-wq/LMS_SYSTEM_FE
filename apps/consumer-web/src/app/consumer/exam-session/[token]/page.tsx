@@ -33,7 +33,7 @@ import {
 import { examSessionApi, type ProctoringEventType } from '@/lib/api/exam-session';
 import { classroomApi } from '@/lib/api/classroom';
 import { FaceMonitorWidget, type FaceEventType, type MonitorResult } from '@/components/face/face-monitor-widget';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { parseVnDate } from '@shared/lib/datetime';
 import type { Exam, ExamSessionInfo } from '@/lib/api/types';
 
@@ -43,7 +43,7 @@ interface Props {
 
 export default function ExamSessionPage({ params }: Props) {
   const { token } = use(params);
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [session, setSession] = useState<ExamSessionInfo | null>(null);
@@ -225,7 +225,7 @@ export default function ExamSessionPage({ params }: Props) {
   };
 
   useEffect(() => {
-    if (!mounted || !isAuthenticated) return;
+    if (!isMounted || !isAuthenticated) return;
     const controller = new AbortController();
     loadAbortRef.current?.abort();
     loadAbortRef.current = controller;
@@ -254,7 +254,7 @@ export default function ExamSessionPage({ params }: Props) {
     };
     void load();
     return () => controller.abort();
-  }, [token, mounted, isAuthenticated]);
+  }, [token, isMounted, isAuthenticated]);
 
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) return;
@@ -455,7 +455,7 @@ export default function ExamSessionPage({ params }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exam?.uid, session?.uid, submitted, timeExpired]);
 
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   if (loading) {
     return (

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { classroomApi, consumerApi, type Classroom } from '@/lib/api';
 import { Button } from '@shared/components/ui/button';
 import { Label } from '@shared/components/ui/label';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/lib/redux/store';
 import { toast } from 'sonner';
@@ -261,7 +261,7 @@ function JoinDialog({ onClose, onJoined }: { onClose: () => void; onJoined: (c: 
 
 export default function ClassroomPage() {
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const userId = useSelector((state: RootState) => state.user.profile?.uid);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
@@ -298,7 +298,7 @@ export default function ClassroomPage() {
     });
   };
 
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   const filtered = filter === 'active'
     ? classrooms.filter(c => c.status === 'active')

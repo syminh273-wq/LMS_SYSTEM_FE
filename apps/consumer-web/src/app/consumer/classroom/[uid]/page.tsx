@@ -64,8 +64,8 @@ import {
   BubbleMeta,
   TypingIndicator,
 } from '@shared/components/ui/message';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
-import { useMe } from '@/lib/hooks/use-me';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
+import { useMe } from '@/features/auth/hooks/useMe';
 import { useClassroomChat } from '@/lib/hooks/use-classroom-chat';
 import { useRTC } from '@/lib/hooks/use-rtc';
 import { useMeetingPresence } from '@/lib/hooks/use-meeting-presence';
@@ -240,7 +240,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const { status: meStatus, me } = useMe();
   const [classroom, setClassroom] = useState<Classroom | null>(null);
   const [loading, setLoading] = useState(true);
@@ -723,7 +723,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
     return () => window.removeEventListener('rtc:peer-joined', onPeerJoined);
   }, [rtcJoined, localStream, startMediaShare]);
 
-  if (!mounted) return null;
+  if (!isMounted) return null;
 
   if (meStatus === 'loading') {
     return (

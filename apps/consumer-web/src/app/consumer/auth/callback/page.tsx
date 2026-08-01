@@ -3,7 +3,7 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDispatch } from 'react-redux';
-import { setProfile } from '@/lib/redux/userSlice';
+import { setProfile } from '@/features/auth/store';
 import { accountService } from '@/lib/api/account';
 
 function AuthCallbackContent() {

@@ -2,7 +2,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearProfile } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/features/auth/store';
 import type { RootState } from '@/lib/redux/store';
 import {
   Search,

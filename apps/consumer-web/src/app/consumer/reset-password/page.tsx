@@ -9,7 +9,7 @@ import { ArrowLeft, Eye, EyeOff, CheckCircle2, Lock } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
-import { authApi } from '@/lib/api/auth';
+import { authApi } from '@/features/auth/api';
 import { cn } from '@shared/lib/utils';
 
 type FormValues = { new_password: string; confirm_password: string };
@@ -33,7 +33,7 @@ export default function ResetPasswordPage() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      await authApi.consumerResetPassword({
+      await authApi.resetPasswordAsConsumer({
         reset_token: token,
         new_password: data.new_password,
         confirm_password: data.confirm_password,

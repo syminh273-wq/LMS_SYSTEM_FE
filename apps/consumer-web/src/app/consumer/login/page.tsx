@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@shared/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { setProfile } from '@/lib/redux/userSlice';
+import { setProfile } from '@/features/auth/store';
 import { consumerApi, ValidationException } from '@/lib/api';
 import { accountService } from '@/lib/api/account';
 import { useRouter, useSearchParams } from 'next/navigation';

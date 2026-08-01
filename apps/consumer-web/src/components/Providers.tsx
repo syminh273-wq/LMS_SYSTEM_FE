@@ -8,7 +8,7 @@ import { ThemeProvider } from '@shared/components/ThemeProvider';
 import { LocaleProvider } from '@shared/components/LocaleProvider';
 import { consumerWebBundles } from '@/lib/i18n/bundles';
 import { FaceEnrollModal } from '@/components/face/face-enroll-modal';
-import { setFaceEnrolled, restoreSession } from '@/lib/redux/userSlice';
+import { setFaceEnrolled, restoreSession } from '@/features/auth/store';
 import type { RootState } from '@/lib/redux/store';
 
 const PUBLIC_PATHS = ['/login', '/auth/', '/join/', '/preview/'];

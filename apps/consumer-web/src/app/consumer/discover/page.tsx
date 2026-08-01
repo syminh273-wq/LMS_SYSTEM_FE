@@ -5,8 +5,8 @@ import { Button } from '@shared/components/ui/button';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { classroomApi, Classroom } from '@/lib/api';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
-import { useMe } from '@/lib/hooks/use-me';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
+import { useMe } from '@/features/auth/hooks/useMe';
 import { toast } from 'sonner';
 import {
   Search,
@@ -71,7 +71,7 @@ const formatPrice = (n: number) => new Intl.NumberFormat('vi-VN').format(n) + '�
 
 export default function DiscoverPage() {
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const { me } = useMe();
 
   const [search, setSearch] = useState('');
@@ -103,9 +103,9 @@ export default function DiscoverPage() {
   }, [category, pricing, search, page]);
 
   useEffect(() => {
-    if (!isAuthenticated || !mounted) return;
+    if (!isAuthenticated || !isMounted) return;
     void fetchPage();
-  }, [isAuthenticated, mounted, fetchPage]);
+  }, [isAuthenticated, isMounted, fetchPage]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -126,7 +126,7 @@ export default function DiscoverPage() {
     return `${results.length} lớp học${totalPages > 1 ? ` · trang ${page}/${totalPages}` : ''}`;
   }, [loading, results.length, totalPages, page]);
 
-  if (!mounted) {
+  if (!isMounted) {
     return (
       <div className="flex items-center justify-center py-32">
         <Loader2 size={32} className="animate-spin text-muted-foreground" />

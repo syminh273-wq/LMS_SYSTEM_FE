@@ -26,7 +26,7 @@ import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import { accountService, type UserProfile } from '@/lib/api/account';
-import { clearProfile } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/features/auth/store';
 
 export function WorkspaceShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();

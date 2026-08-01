@@ -17,7 +17,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@shared/components/ui/avata
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@shared/components/ui/card';
 import { ProtectedPageShell } from '@/components/layout/protected-page-shell';
 import { ResourceManagementSection } from '@/components/resource/resource-management-section';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import {
   Mail,
   User,

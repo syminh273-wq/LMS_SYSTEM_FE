@@ -5,8 +5,8 @@ import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { classroomApi, type ClassroomPreviewResponse } from '@/lib/api';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
-import { useMe } from '@/lib/hooks/use-me';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
+import { useMe } from '@/features/auth/hooks/useMe';
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent } from '@shared/components/ui/card';
@@ -97,7 +97,7 @@ function fileKind(name: string, fileType?: string): 'image' | 'video' | 'audio' 
 export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = use(params);
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const { status: meStatus, me } = useMe();
 
   const [data, setData] = useState<ClassroomPreviewResponse | null>(null);
@@ -139,7 +139,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
   }, [previewDoc]);
 
   useEffect(() => {
-    if (!mounted || !isAuthenticated) return;
+    if (!isMounted || !isAuthenticated) return;
     let cancelled = false;
     (async () => {
       setLoading(true);
@@ -158,7 +158,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
       }
     })();
     return () => { cancelled = true; };
-  }, [uid, isAuthenticated, mounted]);
+  }, [uid, isAuthenticated, isMounted]);
 
   const handleJoin = async () => {
     if (!data) return;
@@ -196,7 +196,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
     router.push(`/consumer/classroom/${data.classroom.uid}`);
   };
 
-  if (!mounted || loading || meStatus === 'loading') {
+  if (!isMounted || loading || meStatus === 'loading') {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex items-center justify-center py-32">

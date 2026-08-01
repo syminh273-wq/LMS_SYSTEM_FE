@@ -8,7 +8,7 @@ import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { accountService } from '@/lib/api/account';
 import { ValidationException } from '@/lib/api';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
 import { cn } from '@shared/lib/utils';
 
 type PasswordForm = {
@@ -57,7 +57,7 @@ function normalizeGooglePasswordMessage(message: string) {
 
 export default function ConsumerSettingsPage() {
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted } = useRequireAuth();
   const [form, setForm] = useState<PasswordForm>(EMPTY_FORM);
   const [visible, setVisible] = useState<VisibleFields>({
     current_password: false,
@@ -76,7 +76,7 @@ export default function ConsumerSettingsPage() {
       .catch((err) => console.error('Failed to fetch profile:', err));
   }, [isAuthenticated]);
 
-  if (!mounted || !isAuthenticated) return null;
+  if (!isMounted || !isAuthenticated) return null;
 
   const passwordChecks = [
     { label: 'Ít nhất 8 ký tự', done: form.new_password.length >= 8 },

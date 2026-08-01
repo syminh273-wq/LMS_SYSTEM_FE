@@ -10,12 +10,12 @@ export function useRequireAuth() {
   const dispatch = useDispatch()
   const faceEnrolled = useSelector((state: RootState) => state.user.faceEnrolled)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken")
     setIsAuthenticated(Boolean(token))
-    setMounted(true)
+    setIsMounted(true)
     if (!token) {
       router.push("/consumer/login")
       return
@@ -34,5 +34,5 @@ export function useRequireAuth() {
     router.push("/consumer/login")
   }
 
-  return { isAuthenticated, mounted, logout }
+  return { isAuthenticated, isMounted, logout }
 }

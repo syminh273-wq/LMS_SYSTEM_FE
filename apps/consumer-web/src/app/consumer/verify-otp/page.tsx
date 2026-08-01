@@ -9,7 +9,7 @@ import { ArrowLeft, ArrowRight, RefreshCw, KeyRound } from 'lucide-react';
 import { Input } from '@shared/components/ui/input';
 import { Label } from '@shared/components/ui/label';
 import { toast } from 'sonner';
-import { authApi } from '@/lib/api/auth';
+import { authApi } from '@/features/auth/api';
 
 type FormValues = { otp_code: string };
 
@@ -35,7 +35,7 @@ export default function VerifyOTPPage() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      const result = await authApi.consumerVerifyOtp({ email, otp_code: data.otp_code });
+      const result = await authApi.verifyOtpAsConsumer({ email, otp_code: data.otp_code });
       toast.success('Xác thực thành công!');
       router.push(`/consumer/reset-password?token=${encodeURIComponent(result.reset_token)}`);
     } catch (err: unknown) {
@@ -49,7 +49,7 @@ export default function VerifyOTPPage() {
     if (countdown > 0) return;
     setResending(true);
     try {
-      await authApi.consumerForgotPassword({ email });
+      await authApi.forgotPasswordAsConsumer({ email });
       toast.success('Mã OTP mới đã được gửi.');
       setCountdown(60);
     } catch {
