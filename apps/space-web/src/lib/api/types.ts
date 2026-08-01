@@ -1,18 +1,37 @@
-export type LoginRequest = {
+export type LoginCredentialsDTO = {
   email: string;
   password: string;
 };
 
-export type RegisterRequest = {
+export type RegisterFormProps = {
   email: string;
   password: string;
   full_name?: string;
 };
 
-export type AuthTokenResponse = {
+export type AuthResponse = {
   access: string;
   refresh: string;
   message: string;
+};
+
+export type ForgotPasswordFormProps = {
+  email: string;
+};
+
+export type VerifyOTPFormProps = {
+  email: string;
+  otp_code: string;
+};
+
+export type VerifyOTPResponse = {
+  reset_token: string;
+};
+
+export type ResetPasswordFormProps = {
+  reset_token: string;
+  new_password: string;
+  confirm_password: string;
 };
 
 export type ApiMessageResponse = {

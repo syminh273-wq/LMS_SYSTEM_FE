@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { fetchAccountProfile } from '@/lib/redux/userSlice';
-import type { UserProfile } from '@/lib/api/account';
+import { fetchAccountProfile } from '@/features/auth/store';
+import type { Consumer } from '@/lib/api';
+import { accountService } from '@/lib/api/account';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 
 type MeStatus = 'loading' | 'authenticated' | 'unauthenticated';
 
 export type UseMeResult = {
   status: MeStatus;
-  me: UserProfile | null;
+  me: Consumer | null;
   reload: () => Promise<void>;
 };
 

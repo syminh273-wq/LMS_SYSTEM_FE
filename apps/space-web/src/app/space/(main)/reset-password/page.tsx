@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, CheckCircle, Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { authApi } from '@/lib/api/auth';
+import { authApi } from '@/features/auth/api';
 import { Input } from '@shared/components/ui/input';
 import {
   Form,
@@ -58,7 +58,7 @@ function SpaceResetPasswordContent() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      await authApi.spaceResetPassword({
+      await authApi.resetPasswordAsSpace({
         reset_token: token,
         new_password: data.new_password,
         confirm_password: data.confirm_password,

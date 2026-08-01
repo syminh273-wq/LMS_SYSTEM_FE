@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import { authApi } from '@/lib/api/auth';
+import { authApi } from '@/features/auth/api';
 import { Input } from '@shared/components/ui/input';
 import {
   Form,
@@ -56,7 +56,7 @@ function SpaceVerifyOTPPageContent() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      const result = await authApi.spaceVerifyOtp({ email, otp_code: data.otp_code });
+      const result = await authApi.verifyOtpAsSpace({ email, otp_code: data.otp_code });
       toast.success('Xác thực thành công!');
       router.push(`/space/reset-password?token=${encodeURIComponent(result.reset_token)}`);
     } catch (err: any) {
@@ -70,7 +70,7 @@ function SpaceVerifyOTPPageContent() {
     if (countdown > 0) return;
     setResending(true);
     try {
-      await authApi.spaceForgotPassword({ email });
+      await authApi.forgotPasswordAsSpace({ email });
       toast.success('Mã OTP mới đã được gửi.');
       setCountdown(60);
     } catch {

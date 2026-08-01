@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { toast } from 'sonner';
-import { authApi } from '@/lib/api/auth';
+import { authApi } from '@/features/auth/api';
 import { Input } from '@shared/components/ui/input';
 import {
   Form,
@@ -37,7 +37,7 @@ export default function SpaceForgotPasswordPage() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      await authApi.spaceForgotPassword({ email: data.email });
+      await authApi.forgotPasswordAsSpace({ email: data.email });
       toast.success('Mã OTP đã được gửi về email của bạn.');
       router.push(`/space/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (err: any) {

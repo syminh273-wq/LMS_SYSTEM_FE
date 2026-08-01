@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { classroomApi, type Classroom } from '@/lib/api/classroom';
 import { communityApi, type WorkspaceProfile } from '@/lib/api/community';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
-import { setProfile } from '@/lib/redux/userSlice';
+import { setProfile } from '@/features/auth/store';
 import { updateSocialAvatar } from '@/lib/redux/socialProfileSlice';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 import { useTranslation } from '@shared/components/LocaleProvider';

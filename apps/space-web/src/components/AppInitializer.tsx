@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { spaceApi } from '@/lib/api';
 import { setSettings } from '@/lib/redux/spaceSlice';
-import { setProfile, fetchAccountProfile } from '@/lib/redux/userSlice';
+import { setProfile, fetchAccountProfile } from '@/features/auth/store';
 import { fetchSocialProfile } from '@/lib/redux/socialProfileSlice';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 

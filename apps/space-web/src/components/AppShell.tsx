@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/lib/redux/store';
-import { clearProfile } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/features/auth/store';
 import { setBrandColors } from '@shared/lib/redux/themeSlice';
 import { cn } from '@shared/lib/utils';
 import { Button } from '@shared/components/ui/button';

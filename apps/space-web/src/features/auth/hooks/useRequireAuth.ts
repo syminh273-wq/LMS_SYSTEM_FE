@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation"
 
 export function useRequireAuth() {
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
@@ -12,15 +12,15 @@ export function useRequireAuth() {
        localStorage" pattern for a useRequireAuth hook. The two setState
        calls only run once on the client, and any consumer that needs
        `mounted === true` is already waiting for hydration. */
-    setMounted(true)
+    setIsMounted(true)
     setIsAuthenticated(Boolean(localStorage.getItem("accessToken")))
   }, [])
 
   useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (isMounted && !isAuthenticated) {
       router.push("/space/login")
     }
-  }, [isAuthenticated, mounted, router])
+  }, [isAuthenticated, isMounted, router])
 
   const logout = () => {
     localStorage.removeItem("accessToken")
@@ -30,7 +30,7 @@ export function useRequireAuth() {
 
   return {
     isAuthenticated,
-    mounted,
+    isMounted,
     logout,
   }
 }

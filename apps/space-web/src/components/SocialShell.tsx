@@ -29,7 +29,7 @@ import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import NotificationBell from '@/components/NotificationBell';
-import { clearProfile } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/features/auth/store';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 import { portfolioApi, type Portfolio } from '@/lib/api/portfolio';
 

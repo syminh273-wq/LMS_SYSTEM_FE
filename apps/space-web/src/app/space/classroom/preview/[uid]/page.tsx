@@ -5,8 +5,8 @@ import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { classroomApi, type ClassroomPreviewResponse } from '@/lib/api';
-import { useRequireAuth } from '@/lib/hooks/use-require-auth';
-import { useMe } from '@/lib/hooks/use-me';
+import { useRequireAuth } from '@/features/auth/hooks/useRequireAuth';
+import { useMe } from '@/features/auth/hooks/useMe';
 import { ClassroomFavoriteButton } from '@/components/classroom/ClassroomFavoriteButton';
 import { Button } from '@shared/components/ui/button';
 import { Card, CardContent } from '@shared/components/ui/card';
@@ -97,7 +97,7 @@ function fileKind(name: string, fileType?: string): 'image' | 'video' | 'audio' 
 export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = use(params);
   const router = useRouter();
-  const { isAuthenticated, mounted } = useRequireAuth();
+  const { isAuthenticated, isMounted: mounted } = useRequireAuth();
   const { status: meStatus, me } = useMe();
 
   const [data, setData] = useState<ClassroomPreviewResponse | null>(null);

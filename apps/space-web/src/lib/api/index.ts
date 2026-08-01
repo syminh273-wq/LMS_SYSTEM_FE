@@ -1,4 +1,4 @@
-import { authApi } from './auth';
+import { authApi } from '@/features/auth/api';
 import { classroomApi } from './classroom';
 import { examApi } from './exam';
 import { assignmentApi } from './assignment';
@@ -25,8 +25,8 @@ export { userSettingsApi };
 // Backward compatibility exports for the previous structure
 export const consumerApi = {
   auth: {
-    login: authApi.consumerLogin.bind(authApi),
-    register: authApi.consumerRegister.bind(authApi),
+    login: authApi.loginAsConsumer.bind(authApi),
+    register: authApi.registerAsConsumer.bind(authApi),
   },
   consumers: consumerApiInstance,
   spaces: spaceApiInstance,
@@ -37,8 +37,8 @@ export const consumerApi = {
 
 export const spaceApi = {
   auth: {
-    login: authApi.spaceLogin.bind(authApi),
-    register: authApi.spaceRegister.bind(authApi),
+    login: authApi.loginAsSpace.bind(authApi),
+    register: authApi.registerAsSpace.bind(authApi),
   },
   classrooms: classroomApi,
   exams: examApi,

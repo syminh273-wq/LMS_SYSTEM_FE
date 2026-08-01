@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { spaceApi, ValidationException } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { fetchAccountProfile } from '@/lib/redux/userSlice';
+import { fetchAccountProfile } from '@/features/auth/store';
 import { useAppDispatch } from '@/lib/redux/store';
 import {
   Eye,

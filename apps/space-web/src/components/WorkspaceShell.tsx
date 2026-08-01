@@ -25,7 +25,7 @@ import { ThemeToggle } from '@shared/components/ThemeToggle';
 import { LanguageSwitcher } from '@shared/components/LanguageSwitcher';
 import { useTranslation } from '@shared/components/LocaleProvider';
 import type { UserProfile } from '@/lib/api/account';
-import { clearProfile } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/features/auth/store';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 import NotificationBell from './NotificationBell';
 

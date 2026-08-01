@@ -10,7 +10,7 @@ import {
 } from '@shared/components/ui/dropdown-menu';
 import { useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { clearProfile } from '@/lib/redux/userSlice';
+import { clearProfile } from '@/features/auth/store';
 import { RootState, useAppDispatch } from '@/lib/redux/store';
 import {
   LogOut,
