@@ -59,7 +59,7 @@ export default function ExamSessionPage({ params }: Props) {
     question_type: 'single_answer' | 'multi_answer';
     order: number;
   }>>([]);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number[]>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -292,7 +292,7 @@ export default function ExamSessionPage({ params }: Props) {
     if (!isAutoSubmit) {
       if (exam.content_type === 'quiz') {
         if (quizQuestions.length === 0) { setSubmitError('Bài thi chưa có câu hỏi'); return; }
-        if (Object.keys(quizAnswers).length < quizQuestions.length) {
+        if (Object.values(quizAnswers).filter(a => a.length > 0).length < quizQuestions.length) {
           setSubmitError('Vui lòng trả lời đầy đủ câu hỏi trước khi nộp bài'); return;
         }
       }
@@ -338,9 +338,7 @@ export default function ExamSessionPage({ params }: Props) {
       body = exam.content_type === 'quiz'
         ? JSON.stringify({
             submission_type: 'online_quiz',
-            answers: Object.fromEntries(
-              Object.entries(quizAnswers).map(([questionUid, index]) => [questionUid, [index]])
-            ),
+            answers: quizAnswers,
             time_taken_seconds: Math.max(0, sessionDuration),
           })
         : JSON.stringify({
@@ -1086,24 +1084,37 @@ export default function ExamSessionPage({ params }: Props) {
                 <h2 className="mt-1 text-lg font-black text-foreground">{quizQuestions.length} câu hỏi</h2>
               </div>
               <div className="rounded-xl bg-primary/10 px-3 py-2 text-xs font-black text-primary">
-                {Object.keys(quizAnswers).length}/{quizQuestions.length}
+                {Object.values(quizAnswers).filter(a => a.length > 0).length}/{quizQuestions.length}
               </div>
             </div>
             <div className="space-y-5">
-              {quizQuestions.map((question, index) => (
+              {quizQuestions.map((question, index) => {
+                const isMultiType = question.question_type === 'multi_answer';
+                return (
                 <div key={question.uid} className="rounded-2xl border border-border bg-muted p-4">
-                  <div className="mb-3 text-sm font-black leading-relaxed text-foreground">
-                    Câu {index + 1}. {question.question_text}
+                  <div className="mb-3 flex items-center gap-2 text-sm font-black leading-relaxed text-foreground">
+                    <span>Câu {index + 1}. {question.question_text}</span>
+                    {isMultiType && (
+                      <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-black uppercase text-primary">
+                        Nhiều đáp án
+                      </span>
+                    )}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {question.options.map((optionText, idx) => {
-                      const selected = quizAnswers[question.uid] === idx;
+                      const selected = (quizAnswers[question.uid] ?? []).includes(idx);
                       return (
                         <Button
                           key={idx}
                           type="button"
                           disabled={timeExpired || submitted}
-                          onClick={() => setQuizAnswers(prev => ({ ...prev, [question.uid]: idx }))}
+                          onClick={() => setQuizAnswers(prev => {
+                            const current = prev[question.uid] ?? [];
+                            const next = isMultiType
+                              ? (current.includes(idx) ? current.filter(i => i !== idx) : [...current, idx])
+                              : [idx];
+                            return { ...prev, [question.uid]: next };
+                          })}
                           className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition-all disabled:opacity-60 ${
                             selected
                               ? 'border-primary bg-primary text-white shadow-sm'
@@ -1117,7 +1128,8 @@ export default function ExamSessionPage({ params }: Props) {
                     })}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
