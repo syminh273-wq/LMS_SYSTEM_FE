@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 export type WorkspaceProfile = {
   owner_id: string;
@@ -58,7 +58,7 @@ export type WorkspaceMessage = {
   is_mine?: boolean;
 };
 
-class CommunityApiClient extends BaseRestApiClient {
+class CommunityApiClient extends AbstractRestApiClient {
   // ── Profile (space scope) ──────────────────────────────────────────────────
   async getMyProfile(): Promise<WorkspaceProfile> {
     return this.get<WorkspaceProfile>('/api/v1/space/social/profile/me/');

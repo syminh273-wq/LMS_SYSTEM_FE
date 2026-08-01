@@ -1,7 +1,7 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { Post, PostComment, CreatePostRequest, SuggestionsResponse } from './types';
 
-class SocialApiClient extends BaseRestApiClient {
+class SocialApiClient extends AbstractRestApiClient {
   // ── Feed ────────────────────────────────────────────────────────────────────
   public async getFeed(limit = 20, before?: string): Promise<Post[]> {
     const params = new URLSearchParams({ limit: String(limit) });

@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 export type SearchResultItem = {
   id: string;
@@ -35,7 +35,7 @@ export type SearchResponse = {
 
 type SearchType = 'classroom' | 'exam' | 'quiz' | 'consumer' | 'resource';
 
-class SearchApiClient extends BaseRestApiClient {
+class SearchApiClient extends AbstractRestApiClient {
   async search(
     q: string,
     types: SearchType[] = ['classroom', 'exam', 'quiz', 'consumer'],

@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import {
   CreateLeaveRequestInput,
   LeaveRequest,
@@ -26,7 +26,7 @@ function toFormData(input: CreateLeaveRequestInput): FormData {
   return fd;
 }
 
-class LeaveRequestApiService extends BaseRestApiClient {
+class LeaveRequestApiService extends AbstractRestApiClient {
   public async list(
     base: 'space' | 'consumer',
     params: ListLeaveRequestsParams = {}

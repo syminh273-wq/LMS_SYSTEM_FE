@@ -2,7 +2,7 @@ import { UnauthorizedException, ValidationException, ApiException } from './exce
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-export default class BaseRestApiClient {
+export default abstract class AbstractRestApiClient {
   public baseURL: string;
   public static onUnauthorized?: () => void;
 
@@ -116,7 +116,7 @@ export default class BaseRestApiClient {
                   return retryData as TResponse;
                 }
               }
-              BaseRestApiClient.onUnauthorized?.();
+              AbstractRestApiClient.onUnauthorized?.();
               localStorage.removeItem('accessToken');
               localStorage.removeItem('refreshToken');
               localStorage.removeItem('userProfile');

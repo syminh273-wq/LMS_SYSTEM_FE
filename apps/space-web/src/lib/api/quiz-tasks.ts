@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   QuizTask,
   QuizTaskStatus,
@@ -15,7 +15,7 @@ type CreateGenerateTaskInput = {
   correct_counts?: number[]; // per-question required number of correct answers (multi_answer only), same length as option_counts
 };
 
-class QuizTasksApiClient extends BaseRestApiClient {
+class QuizTasksApiClient extends AbstractRestApiClient {
   private async createTask(path: string, input: CreateGenerateTaskInput): Promise<CreateQuizTaskResponse> {
     const formData = new FormData();
     formData.append('file', input.file);

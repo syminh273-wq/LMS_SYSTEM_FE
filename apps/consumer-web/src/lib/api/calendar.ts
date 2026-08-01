@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import {
   CalendarEvent,
   ListCalendarEventsParams,
@@ -14,7 +14,7 @@ function buildQuery(params: ListCalendarEventsParams = {}): string {
   return qs ? `?${qs}` : '';
 }
 
-class ConsumerCalendarApiClient extends BaseRestApiClient {
+class ConsumerCalendarApiClient extends AbstractRestApiClient {
   public async list(params: ListCalendarEventsParams = {}): Promise<CalendarEvent[]> {
     return this.get<CalendarEvent[]>(`/api/v1/consumer/calendar/events/${buildQuery(params)}`);
   }

@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 export interface MeetingRoom {
   uid: string;
@@ -23,7 +23,7 @@ type CreateMeetingRoomRequest = {
   max_participants?: number;
 };
 
-class MeetingRoomApiClient extends BaseRestApiClient {
+class MeetingRoomApiClient extends AbstractRestApiClient {
   public async getByClassroom(classroomUid: string): Promise<MeetingRoom[]> {
     return this.get<MeetingRoom[]>(
       `/api/v1/space/course/meeting-rooms/?classroom_uid=${encodeURIComponent(classroomUid)}`

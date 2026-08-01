@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { ExamSessionInfo, JoinSessionResponse } from './types';
 
 export type ProctoringEventType =
@@ -44,7 +44,7 @@ interface RecordEventResponse {
   submission: Record<string, unknown> | null;
 }
 
-class ExamSessionApiClient extends BaseRestApiClient {
+class ExamSessionApiClient extends AbstractRestApiClient {
   public async join(token: string, options?: RequestInit): Promise<JoinSessionResponse> {
     return this.get<JoinSessionResponse>(`/api/v1/consumer/course/exam-sessions/${token}/`, options);
   }

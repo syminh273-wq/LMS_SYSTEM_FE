@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { ChatMessage } from './types';
 
 export type WorkspaceProfile = {
@@ -58,7 +58,7 @@ export type WorkspaceMessage = {
   is_mine?: boolean;
 };
 
-class CommunityApiClient extends BaseRestApiClient {
+class CommunityApiClient extends AbstractRestApiClient {
   // ── Profile ────────────────────────────────────────────────────────────────
   async getMyProfile(): Promise<WorkspaceProfile> {
     return this.get<WorkspaceProfile>('/api/v1/consumer/social/profile/me/');

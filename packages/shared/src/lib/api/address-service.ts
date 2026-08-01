@@ -1,10 +1,10 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import { ApiException } from './exceptions';
 import type { Address, AddressPayload } from './address';
 
 const PATH = '/api/v1/account/addresses/me/';
 
-class AddressService extends BaseRestApiClient {
+class AddressService extends AbstractRestApiClient {
   /**
    * Fetch the current user's address.
    * Returns `null` if the user has no address yet (404).

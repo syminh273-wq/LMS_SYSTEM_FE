@@ -2,7 +2,7 @@ import { UnauthorizedException, ValidationException, ApiException } from './exce
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-export default class BaseRestApiClient {
+export default class AbstractRestApiClient {
   public baseURL: string;
   public static onUnauthorized?: () => void;
 
@@ -67,7 +67,7 @@ export default class BaseRestApiClient {
     if (!response.ok) {
       if (response.status === 401) {
         if (typeof window !== 'undefined') {
-          BaseRestApiClient.onUnauthorized?.();
+          AbstractRestApiClient.onUnauthorized?.();
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userProfile');

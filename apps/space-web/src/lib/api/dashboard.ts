@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 type DashboardKpis = {
   total_classrooms: number;
@@ -25,7 +25,7 @@ export type DashboardSummary = {
   top_classes: DashboardTopClass[];
 };
 
-class DashboardApiClient extends BaseRestApiClient {
+class DashboardApiClient extends AbstractRestApiClient {
   public async summary(): Promise<DashboardSummary> {
     return this.get<DashboardSummary>('/api/v1/space/dashboard/summary/');
   }

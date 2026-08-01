@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   RankingProfile,
   XpTransaction,
@@ -10,7 +10,7 @@ import type {
   LeaderboardPeriod,
 } from './types';
 
-class RankingApiClient extends BaseRestApiClient {
+class RankingApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

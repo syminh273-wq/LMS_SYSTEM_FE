@@ -1,7 +1,7 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { AIGradeBatchResponse, AIGradeRequest, Exam, ExamSubmission } from './types';
 
-class AssignmentApiClient extends BaseRestApiClient {
+class AssignmentApiClient extends AbstractRestApiClient {
   public async listByClassroom(
     classroomUid: string,
     params?: { status?: string | string[] }

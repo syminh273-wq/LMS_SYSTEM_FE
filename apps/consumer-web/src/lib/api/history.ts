@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import { normalizePayment } from './payment';
 import type { PaymentListItem } from './payment';
 import type { JoinHistoryItem } from './classroom';
@@ -25,7 +25,7 @@ function toJoinHistory(payments: PaymentListItem[]): JoinHistoryItem[] {
     }));
 }
 
-class HistoryApiClient extends BaseRestApiClient {
+class HistoryApiClient extends AbstractRestApiClient {
   public async getOverview(limit: number = 100): Promise<HistoryOverview> {
     const sp = new URLSearchParams();
     sp.set('limit', String(limit));

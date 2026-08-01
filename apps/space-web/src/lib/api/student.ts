@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { TeacherContact, StudentDetail } from './types';
 
 export type StudentSearchResult = {
@@ -19,7 +19,7 @@ type StudentSearchResponse = {
   error?: string;
 };
 
-class StudentApiClient extends BaseRestApiClient {
+class StudentApiClient extends AbstractRestApiClient {
   /** All unique students who ever studied with the authenticated teacher. */
   async listMyStudents(): Promise<TeacherContact[]> {
     return this.get<TeacherContact[]>('/api/v1/space/course/students/');

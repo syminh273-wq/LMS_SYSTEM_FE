@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   AuthTokenResponse,
   LoginRequest,
@@ -11,7 +11,7 @@ interface VerifyOTPRequest { email: string; otp_code: string }
 interface VerifyOTPResponse { reset_token: string }
 interface ResetPasswordRequest { reset_token: string; new_password: string; confirm_password: string }
 
-class AuthApiClient extends BaseRestApiClient {
+class AuthApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 type ClassroomLeaderboardEntry = {
   rank: number;
@@ -49,7 +49,7 @@ export type StudentAchievement = {
   unlocked_at?: string | null;
 };
 
-class SpaceRankingApiClient extends BaseRestApiClient {
+class SpaceRankingApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

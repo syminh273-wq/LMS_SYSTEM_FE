@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { ApiMessageResponse, Consumer } from './index';
 
 interface UpdateProfileData {
@@ -31,7 +31,7 @@ export type PublicAccountProfile = {
   } | null;
 };
 
-class AccountService extends BaseRestApiClient {
+class AccountService extends AbstractRestApiClient {
   constructor() {
     super();
   }

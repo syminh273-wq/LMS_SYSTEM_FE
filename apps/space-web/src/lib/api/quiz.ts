@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   Quiz, QuizDetail, GenerateQuizRequest,
   UpdateQuizRequest, UpdateAssignmentRequest, UpdateQuestionRequest,
@@ -6,7 +6,7 @@ import type {
   QuizLeaderboardResponse, QuizLeaderboardStudentDetail,
 } from './types';
 
-class QuizApiClient extends BaseRestApiClient {
+class QuizApiClient extends AbstractRestApiClient {
   public async list(classroomId?: string): Promise<Quiz[]> {
     const url = classroomId
       ? `/api/v1/space/quiz/?classroom_id=${encodeURIComponent(classroomId)}`

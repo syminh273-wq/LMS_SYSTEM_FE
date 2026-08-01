@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 export interface MeetingRoom {
   uid: string;
@@ -36,7 +36,7 @@ interface JoinRoomResponse {
   camera_required: boolean;
 }
 
-class MeetingRoomApiClient extends BaseRestApiClient {
+class MeetingRoomApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

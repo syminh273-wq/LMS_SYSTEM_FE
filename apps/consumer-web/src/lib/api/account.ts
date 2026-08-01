@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { ApiMessageResponse, Consumer, StudentProfileSettings, PublicStudentProfile } from './index';
 
 interface UpdateProfileData {
@@ -19,7 +19,7 @@ interface ChangePasswordData {
   confirm_password: string;
 }
 
-class AccountService extends BaseRestApiClient {
+class AccountService extends AbstractRestApiClient {
   constructor() {
     super();
   }

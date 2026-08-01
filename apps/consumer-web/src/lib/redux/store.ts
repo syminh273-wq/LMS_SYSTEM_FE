@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer, { clearProfile } from './userSlice';
 import themeReducer from '@shared/lib/redux/themeSlice';
-import BaseRestApiClient from '../api/client';
+import AbstractRestApiClient from '../api/client';
 
 export const store = configureStore({
   reducer: {
@@ -10,7 +10,7 @@ export const store = configureStore({
   },
 });
 
-BaseRestApiClient.onUnauthorized = () => {
+AbstractRestApiClient.onUnauthorized = () => {
   store.dispatch(clearProfile());
 };
 

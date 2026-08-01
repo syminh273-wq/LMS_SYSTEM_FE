@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { PaginatedResponse } from './types';
 
 export type Notification = {
@@ -12,7 +12,7 @@ export type Notification = {
   created_at: string;
 };
 
-class NotificationApiClient extends BaseRestApiClient {
+class NotificationApiClient extends AbstractRestApiClient {
   async list(params?: { target_uid?: string; limit?: number }): Promise<Notification[]> {
     const search = new URLSearchParams();
     if (params?.target_uid) search.set('target_uid', params.target_uid);

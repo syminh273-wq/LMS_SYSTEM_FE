@@ -1,11 +1,11 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { 
   Consumer, 
   CreateConsumerRequest, 
   UpdateConsumerRequest 
 } from './types';
 
-class ConsumerApiClient extends BaseRestApiClient {
+class ConsumerApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

@@ -1,11 +1,11 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { 
   Space, 
   CreateSpaceRequest, 
   UpdateSpaceRequest 
 } from './types';
 
-class SpaceApiClient extends BaseRestApiClient {
+class SpaceApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

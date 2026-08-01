@@ -2,7 +2,7 @@ import { UnauthorizedException, ValidationException, ApiException } from './exce
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-export default class BaseRestApiClient {
+export default abstract class AbstractRestApiClient {
   protected baseURL: string;
   public static onUnauthorized?: () => void;
 
@@ -22,9 +22,9 @@ export default class BaseRestApiClient {
     options: RequestInit = {}
   ): Promise<TResponse> {
     const url = `${this.baseURL}${path.startsWith('/') ? path : `/${path}`}`;
-    
+
     const isFormData = body instanceof FormData;
-    
+
     const headers: Record<string, string> = {};
 
     if (!isFormData && method !== 'GET' && body) {
@@ -67,7 +67,7 @@ export default class BaseRestApiClient {
     if (!response.ok) {
       if (response.status === 401) {
         if (typeof window !== 'undefined') {
-          BaseRestApiClient.onUnauthorized?.();
+          AbstractRestApiClient.onUnauthorized?.();
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('userProfile');

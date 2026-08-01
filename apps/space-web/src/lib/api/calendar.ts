@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import {
   CalendarEvent,
   CreateCalendarEventRequest,
@@ -24,7 +24,7 @@ function buildQuery(params: ListCalendarEventsParams = {}): string {
   return qs ? `?${qs}` : '';
 }
 
-class CalendarApiClient extends BaseRestApiClient {
+class CalendarApiClient extends AbstractRestApiClient {
   public async list(params: ListCalendarEventsParams = {}): Promise<CalendarEvent[]> {
     return this.get<CalendarEvent[]>(`/api/v1/space/calendar/events/${buildQuery(params)}`);
   }

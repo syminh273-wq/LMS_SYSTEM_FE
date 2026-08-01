@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   Course,
   CourseLesson,
@@ -12,7 +12,7 @@ import type {
   PaginatedResponse,
 } from './types';
 
-class CourseApiClient extends BaseRestApiClient {
+class CourseApiClient extends AbstractRestApiClient {
   public async list(page: number = 1): Promise<PaginatedResponse<Course>> {
     return this.get<PaginatedResponse<Course>>(`/api/v1/space/course/courses/?page=${page}`);
   }

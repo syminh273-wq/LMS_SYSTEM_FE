@@ -1,7 +1,7 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type { ChatMessage, ChatConversation } from './types';
 
-class ChatApiClient extends BaseRestApiClient {
+class ChatApiClient extends AbstractRestApiClient {
   async getConversations(classroomUid: string): Promise<ChatConversation[]> {
     return this.get<ChatConversation[]>(
       `/api/v1/chat/conversations/?classroom_uid=${classroomUid}`

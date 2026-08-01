@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   Classroom as ClassroomType,
   ClassroomPreviewResponse,
@@ -24,7 +24,7 @@ export type JoinHistoryItem = {
   order_id: string;
 };
 
-class ClassroomApiClient extends BaseRestApiClient {
+class ClassroomApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

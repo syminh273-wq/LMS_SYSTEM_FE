@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   QuizCollection,
   QuizCollectionDetail,
@@ -6,7 +6,7 @@ import type {
   IssuedCertificate,
 } from './types';
 
-class ConsumerQuizCollectionApiClient extends BaseRestApiClient {
+class ConsumerQuizCollectionApiClient extends AbstractRestApiClient {
   public async listByClassroom(classroomId: string): Promise<QuizCollection[]> {
     const response = await this.get<QuizCollection[] | { results: QuizCollection[] }>(
       `/api/v1/consumer/quiz-collection/?classroom_id=${encodeURIComponent(classroomId)}`

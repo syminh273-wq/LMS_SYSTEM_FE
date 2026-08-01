@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 type PortfolioKey =
   | 'intro'
@@ -44,7 +44,7 @@ type PortfolioUploadResult = {
   url: string;
 };
 
-class PortfolioApiClient extends BaseRestApiClient {
+class PortfolioApiClient extends AbstractRestApiClient {
   async getMine(): Promise<Portfolio> {
     return this.get<Portfolio>('/api/v1/portfolio/me/');
   }

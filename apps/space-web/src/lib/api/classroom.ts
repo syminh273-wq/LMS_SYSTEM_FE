@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   Classroom,
   ClassroomMember,
@@ -14,7 +14,7 @@ import type {
 
 export type { Classroom };
 
-class ClassroomApiClient extends BaseRestApiClient {
+class ClassroomApiClient extends AbstractRestApiClient {
   constructor() {
     super();
   }

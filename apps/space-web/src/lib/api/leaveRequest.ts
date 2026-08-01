@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import { leaveRequestApiService } from '@shared/lib/api/leaveRequestApi';
 import {
   LeaveRequest,
@@ -6,7 +6,7 @@ import {
   ProcessLeaveRequestInput,
 } from '@shared/lib/api/leaveRequest';
 
-class SpaceLeaveRequestApiClient extends BaseRestApiClient {
+class SpaceLeaveRequestApiClient extends AbstractRestApiClient {
   public async list(params: ListLeaveRequestsParams = {}): Promise<LeaveRequest[]> {
     return leaveRequestApiService.list('space', params);
   }

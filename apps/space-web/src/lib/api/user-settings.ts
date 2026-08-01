@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 
 type UserSettings = Record<string, string>;
 
@@ -7,7 +7,7 @@ interface AvailableVoice {
     name: string;
 }
 
-class UserSettingsService extends BaseRestApiClient {
+class UserSettingsService extends AbstractRestApiClient {
     constructor() {
         super();
     }

@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import { leaveRequestApiService } from '@shared/lib/api/leaveRequestApi';
 import {
   CreateLeaveRequestInput,
@@ -7,7 +7,7 @@ import {
   ProcessLeaveRequestInput,
 } from '@shared/lib/api/leaveRequest';
 
-class ConsumerLeaveRequestApiClient extends BaseRestApiClient {
+class ConsumerLeaveRequestApiClient extends AbstractRestApiClient {
   public async list(params: ListLeaveRequestsParams = {}): Promise<LeaveRequest[]> {
     return leaveRequestApiService.list('consumer', params);
   }

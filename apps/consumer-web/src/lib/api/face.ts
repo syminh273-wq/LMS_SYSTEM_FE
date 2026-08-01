@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   FaceEnrollResponse,
   FaceEnrollStatusResponse,
@@ -7,7 +7,7 @@ import type {
   FaceClassroomVerifyResponse,
 } from './types';
 
-class FaceApiClient extends BaseRestApiClient {
+class FaceApiClient extends AbstractRestApiClient {
   async enroll(image: string): Promise<FaceEnrollResponse> {
     return this.post<FaceEnrollResponse>('/api/v1/consumer/face/enroll/', { image });
   }

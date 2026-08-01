@@ -1,4 +1,4 @@
-import BaseRestApiClient from './client';
+import AbstractRestApiClient from './client';
 import type {
   QuizCollection,
   QuizCollectionDetail,
@@ -13,7 +13,7 @@ import type {
   UpdateCertificateRequest,
 } from './types';
 
-class QuizCollectionApiClient extends BaseRestApiClient {
+class QuizCollectionApiClient extends AbstractRestApiClient {
   public async list(): Promise<QuizCollection[]> {
     const response = await this.get<QuizCollection[] | { results: QuizCollection[] }>(
       '/api/v1/space/quiz-collection/'
@@ -75,7 +75,7 @@ type UpdateCertificatePayload = Omit<UpdateCertificateRequest, 'template_url'> &
   clearTemplateImage?: boolean;
 };
 
-class CertificateApiClient extends BaseRestApiClient {
+class CertificateApiClient extends AbstractRestApiClient {
   public async list(): Promise<Certificate[]> {
     const response = await this.get<Certificate[] | { results: Certificate[] }>(
       '/api/v1/space/certificate/'
