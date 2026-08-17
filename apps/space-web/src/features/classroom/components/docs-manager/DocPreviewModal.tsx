@@ -92,6 +92,7 @@ export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDe
             />
           ) : video ? (
             <video
+              key={doc.url}
               src={doc.url}
               controls
               autoPlay
@@ -102,7 +103,7 @@ export function DocPreviewModal({ doc, open, onClose, t, canManage = false, onDe
               <p className="text-sm font-bold text-slate-900 mb-4 truncate" title={doc.name}>
                 {doc.name}
               </p>
-              <audio src={doc.url} controls autoPlay className="w-full" />
+              <audio key={doc.url} src={doc.url} controls autoPlay className="w-full" />
             </div>
           ) : pdf ? (
             <iframe

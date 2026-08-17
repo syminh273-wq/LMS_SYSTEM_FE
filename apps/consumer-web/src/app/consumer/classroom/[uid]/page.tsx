@@ -247,6 +247,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
   const [error, setError] = useState("");
   const [membershipStatus, setMembershipStatus] = useState<'approved' | 'pending' | null>(null);
   const [draft, setDraft] = useState("");
+  const sendingDraftRef = useRef(false);
   const [exams, setExams] = useState<Exam[]>([]);
   const [loadingExams, setLoadingExams] = useState(false);
   const [examError, setExamError] = useState("");
@@ -955,9 +956,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey && draft.trim()) {
+                      if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && draft.trim()) {
+                        e.preventDefault();
+                        if (sendingDraftRef.current) return;
+                        sendingDraftRef.current = true;
                         sendMessage(draft.trim());
                         setDraft('');
+                        sendingDraftRef.current = false;
                       }
                     }}
                   />
@@ -965,7 +970,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     size="icon"
                     className="rounded-xl bg-primary hover:bg-primary shrink-0"
                     disabled={!draft.trim() || !connected}
-                    onClick={() => { sendMessage(draft.trim()); setDraft(''); }}
+                    onClick={() => {
+                      if (sendingDraftRef.current || !draft.trim()) return;
+                      sendingDraftRef.current = true;
+                      sendMessage(draft.trim());
+                      setDraft('');
+                      sendingDraftRef.current = false;
+                    }}
                   >
                     <Send size={16} />
                   </Button>

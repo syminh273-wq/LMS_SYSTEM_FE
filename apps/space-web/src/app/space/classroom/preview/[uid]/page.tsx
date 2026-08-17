@@ -628,6 +628,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                 />
               ) : previewDoc.kind === 'video' ? (
                 <video
+                  key={previewDoc.url}
                   src={previewDoc.url}
                   controls
                   autoPlay
@@ -638,7 +639,7 @@ export default function ClassroomPreviewPage({ params }: { params: Promise<{ uid
                   <p className="text-sm font-bold text-foreground mb-4 truncate" title={previewDoc.name}>
                     {previewDoc.name}
                   </p>
-                  <audio src={previewDoc.url} controls autoPlay className="w-full" />
+                  <audio key={previewDoc.url} src={previewDoc.url} controls autoPlay className="w-full" />
                 </div>
               ) : previewDoc.kind === 'pdf' ? (
                 <iframe
