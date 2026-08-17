@@ -1115,13 +1115,13 @@ export default function ExamSessionPage({ params }: Props) {
                               : [idx];
                             return { ...prev, [question.uid]: next };
                           })}
-                          className={`rounded-xl border px-4 py-3 text-left text-sm font-bold transition-all disabled:opacity-60 ${
+                          className={`h-auto min-w-0 items-start justify-start whitespace-normal break-words rounded-xl border px-4 py-3 text-left text-sm font-bold transition-all disabled:opacity-60 ${
                             selected
                               ? 'border-primary bg-primary text-white shadow-sm'
                               : 'border-border bg-card text-foreground hover:border-primary/20 hover:bg-primary/10'
                           }`}
                         >
-                          <span className="mr-2 text-xs font-black uppercase">{String.fromCharCode(65 + idx)}.</span>
+                          <span className="mr-2 shrink-0 text-xs font-black uppercase">{String.fromCharCode(65 + idx)}.</span>
                           {optionText}
                         </Button>
                       );

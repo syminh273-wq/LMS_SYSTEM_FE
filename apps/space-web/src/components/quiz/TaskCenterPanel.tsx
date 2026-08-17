@@ -46,6 +46,7 @@ function filterTasks(tasks: QuizTask[], tab: TaskCenterTab): QuizTask[] {
 
 function formatRelative(iso: string, t: (k: string, f?: string, v?: Record<string, string | number>) => string): string {
   const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (!Number.isFinite(diff)) return t('quizTasks.progress.just_now');
   if (diff < 60) return t('quizTasks.progress.just_now');
   if (diff < 3600) return t('quizTasks.progress.minutes_ago', undefined, { count: Math.floor(diff / 60) });
   if (diff < 86400) return t('quizTasks.progress.hours_ago', undefined, { count: Math.floor(diff / 3600) });

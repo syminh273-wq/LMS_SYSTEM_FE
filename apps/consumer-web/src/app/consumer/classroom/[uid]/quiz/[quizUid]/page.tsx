@@ -680,7 +680,7 @@ export default function QuizGamePage({ params }: Props) {
                     onClick={() => handleAnswer(opt)}
                     disabled={submitting}
                     style={{ animationDelay: `${idx * 60}ms` }}
-                    className={`group w-full flex items-center gap-4 rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all duration-200 focus:outline-none animate-in fade-in slide-in-from-left-2
+                    className={`group h-auto w-full flex items-center justify-start gap-4 whitespace-normal rounded-2xl border-2 px-5 py-4 text-left text-sm font-semibold transition-all duration-200 focus:outline-none animate-in fade-in slide-in-from-left-2
                       ${selected.length === 0
                         ? 'border-border bg-card text-foreground hover:border-primary/40 hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/10 hover:shadow-lg hover:shadow-indigo-100 hover:-translate-y-0.5 active:scale-[0.98]'
                         : isSelected
@@ -697,7 +697,7 @@ export default function QuizGamePage({ params }: Props) {
                     }`}>
                       {letterFor(idx)}
                     </span>
-                    <span className="flex-1">{currentQuestion.options[opt]}</span>
+                    <span className="min-w-0 flex-1 break-words">{currentQuestion.options[opt]}</span>
                     {isSelected && <CheckCircle2 size={18} className="shrink-0" />}
                   </Button>
                 );
