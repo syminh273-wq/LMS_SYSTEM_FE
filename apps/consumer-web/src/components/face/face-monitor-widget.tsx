@@ -28,6 +28,7 @@ type Props = {
 
 const MIN_INTERVAL_MS = 500;
 const FACE_DEBOUNCE_MS = 3000; // Emit face warning at most once per 3s per rule
+const WARMUP_MS = 4000; // Ignore bad frames right after camera/model start (student hasn't framed their face yet)
 
 export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEvent }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -47,6 +48,7 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
   });
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastEmittedAtRef = useRef<Record<string, number>>({});
+  const startedAtRef = useRef<number>(0);
   const [result, setResult] = useState<MonitorResult | null>(null);
   useEffect(() => {
     destroyedRef.current = false;
@@ -64,6 +66,9 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
     const emitIfBad = (next: MonitorResult) => {
       if (!onFaceEventRef.current) return;
       const now = Date.now();
+      // Camera/model just started — give the student a moment to frame their
+      // face before treating "no face yet" as a proctoring violation.
+      if (now - startedAtRef.current < WARMUP_MS) return;
       const debounce = (key: string, intervalMs: number) => {
         const last = lastEmittedAtRef.current[key] || 0;
         if (now - last < intervalMs) return false;
@@ -121,6 +126,7 @@ export function FaceMonitorWidget({ examUid, roomUid, onStatusChange, onFaceEven
           stream.getTracks().forEach(t => t.stop());
           return;
         }
+        startedAtRef.current = Date.now();
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;

@@ -1545,7 +1545,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ uid:
                     <span className="font-black text-foreground text-sm uppercase tracking-tighter">Bài kiểm tra</span>
                   </div>
                   <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase text-primary">
-                    {exams.length} bài
+                    {exams.filter(exam => exam.exam_type !== 'assignment').length} bài
                   </span>
                 </div>
 
@@ -1769,6 +1769,11 @@ function getExamStatusClass(status: string) {
 
 const EXAM_GROUPS = [
   {
+    key: 'regular',
+    label: 'Kiểm tra thường xuyên',
+    keywords: ['kiem tra thuong xuyen', 'kiểm tra thường xuyên', 'thuong xuyen', 'thường xuyên'],
+  },
+  {
     key: 'midterm',
     label: 'Kiểm tra giữa kì',
     keywords: ['kiem tra giua ki', 'kiểm tra giữa kì', 'kiểm tra giữa kỳ', 'giua ki', 'giữa kì', 'giữa kỳ'],
@@ -1784,7 +1789,7 @@ type ExamGroupKey = typeof EXAM_GROUPS[number]['key'];
 
 function getGroupedPublishedExams(exams: Exam[]) {
   const publishedExams = exams
-    .filter(exam => exam.status !== 'draft')
+    .filter(exam => exam.status !== 'draft' && exam.exam_type !== 'assignment')
     .sort((left, right) => getDueTimestamp(left.due_date) - getDueTimestamp(right.due_date));
 
   return EXAM_GROUPS.map(group => ({

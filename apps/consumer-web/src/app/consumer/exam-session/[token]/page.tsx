@@ -409,8 +409,18 @@ export default function ExamSessionPage({ params }: Props) {
     if (exam.exam_mode !== 'online') return;
     if (submitted || timeExpired) return;
 
+    // Joining the session triggers the camera permission prompt (see
+    // FaceMonitorWidget's getUserMedia call), which itself causes a genuine
+    // blur/visibilitychange as the browser steals focus for the dialog.
+    // Ignore violation events for a short grace period right after the
+    // listeners arm so that prompt isn't misreported as the student leaving.
+    const PROCTOR_GRACE_MS = 4000;
+    const armedAt = Date.now();
+    const withinGrace = () => Date.now() - armedAt < PROCTOR_GRACE_MS;
+
     const onVisibility = () => {
       if (document.hidden) {
+        if (withinGrace()) return;
         sendProctoringEvent('visibility_lost', { visibility_state: document.visibilityState });
         sendProctoringEvent('tab_leave');
       } else {
@@ -419,6 +429,7 @@ export default function ExamSessionPage({ params }: Props) {
       }
     };
     const onBlur = () => {
+      if (withinGrace()) return;
       sendProctoringEvent('window_blur');
       sendProctoringEvent('app_blur');
     };
@@ -431,6 +442,7 @@ export default function ExamSessionPage({ params }: Props) {
       }
     };
     const onPageHide = () => {
+      if (withinGrace()) return;
       sendProctoringEvent('window_out', { reason: 'pagehide' });
     };
 
